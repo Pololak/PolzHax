@@ -10,6 +10,9 @@ namespace gd {
 
 	class PlayerObject : public GameObject {
 	public:
+
+		HardStreak* m_waveTrail;
+
 		virtual void setVisible(bool visible) {
 			return reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(
 				base + 0x1FA860
@@ -71,6 +74,10 @@ namespace gd {
 		}
 		auto setGlowColor(cocos2d::ccColor3B color) {
 			from<cocos2d::CCSprite*>(this, 0x378)->setColor(color);
+		}
+
+		auto& position() {
+			return from<cocos2d::CCPoint>(this, 0x4a8);
 		}
 
 		/*auto getColor3() {

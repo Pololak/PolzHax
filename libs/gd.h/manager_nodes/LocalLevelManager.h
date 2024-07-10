@@ -8,10 +8,8 @@ namespace gd {
     class LocalLevelManager : GManager {
     public:
 
-        static LocalLevelManager* sharedState() {
-            return reinterpret_cast<LocalLevelManager * (__stdcall*)()>(
-                base + 0xab6f0
-                )();
+        static auto sharedState() {
+            return reinterpret_cast<LocalLevelManager * (__stdcall*)()>(base + 0xac180)();
         }
         //static GameManager* sharedState() {
         //    return reinterpret_cast<GameManager * (__stdcall*)()>(
@@ -24,9 +22,11 @@ namespace gd {
                 base + 0xac250
                 )(this);
         }
-        auto getLocalevels() {
+        auto getLocalLevels() {
             return from<cocos2d::CCArray*>(this, 0x108);
         }
+
+
 
         /*inline static LocalLevelManager* get() {
             return LocalLevelManager::sharedState();

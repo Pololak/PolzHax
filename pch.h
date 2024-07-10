@@ -7,11 +7,16 @@
 #ifndef PCH_H
 #define PCH_H
 
+//#define _CRT_SECURE_NO_WARNINGS
+
 // add headers that you want to pre-compile here
-#include <Windows.h>
+#pragma once
+//#include <Windows.h>
 #include "framework.h"
 #include "MinHook.h"
 #include <gd.h>
 #include <cocos2d.h>
+#include <GUI/CCControlExtension/CCScale9Sprite.h>
+#include <GUI/CCControlExtension/CCControlUtils.h>
 using namespace cocos2d;
 #endif //PCH_H

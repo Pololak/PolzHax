@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -109,8 +109,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)libs\MinHook;$(SolutionDir)cappuccino-sdk\incl\cocos2dx;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\kazmath\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\imgui-hook\imgui;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\imgui-hook;$(SolutionDir)cappuccino-sdk\incl\extensions;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)libs\MinHook;$(SolutionDir)cappuccino-sdk\incl\cocos2dx;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\kazmath\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\imgui-hook\imgui;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\imgui-hook;$(SolutionDir)cappuccino-sdk\incl\extensions;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\mat-dash\include;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\nfd\src\include;C:\Users\user\Desktop\CappuccinoSDK-master\projects\PolzHax\libs\nfd\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalOptions>-D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -535,12 +536,12 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\SlotData.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine-cocos2dx.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
-    <ClInclude Include="CheckPoint.h" />
-    <ClInclude Include="CreatorLayer.h" />
-    <ClInclude Include="EditLevelLayer.h" />
     <ClInclude Include="EditorPauseLayer.h" />
+    <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="GarageLayer.h" />
+    <ClInclude Include="gd.hpp" />
+    <ClInclude Include="HitboxNode.h" />
+    <ClInclude Include="hsv.hpp" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
@@ -553,6 +554,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCBlockLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCNodeContainer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CreatorLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditLevelLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorUI.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EndLevelLayer.h" />
@@ -563,6 +565,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJSpecialColorSelect.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingCircle.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuGameLayer.h" />
@@ -573,8 +576,11 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\PlayLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SetIDPopup.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\TextAlertPopup.h" />
+    <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h" />
+    <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h" />
     <ClInclude Include="libs\gd.h\level_nodes\LevelSettingsObject.h" />
+    <ClInclude Include="libs\gd.h\level_nodes\SettingsColorObject.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\AchievementManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameLevelManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameManager.h" />
@@ -607,6 +613,7 @@
     <ClInclude Include="libs\gd.h\sprite_nodes\GJItemIcon.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\GJRobotSprite.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\GJSpiderSprite.h" />
+    <ClInclude Include="libs\gd.h\sprite_nodes\HardStreak.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\PlayerObject.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\SimplePlayer.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\TextArea.h" />
@@ -621,23 +628,32 @@
     <ClInclude Include="libs\imgui-hook\imgui\imstb_rectpack.h" />
     <ClInclude Include="libs\imgui-hook\imgui\imstb_textedit.h" />
     <ClInclude Include="libs\imgui-hook\imgui\imstb_truetype.h" />
+    <ClInclude Include="libs\mat-dash\include\matdash.hpp" />
+    <ClInclude Include="libs\mat-dash\include\matdash\boilerplate.hpp" />
+    <ClInclude Include="libs\mat-dash\include\matdash\cocos.hpp" />
+    <ClInclude Include="libs\mat-dash\include\matdash\console.hpp" />
+    <ClInclude Include="libs\mat-dash\include\matdash\detail\gen.hpp" />
+    <ClInclude Include="libs\mat-dash\include\matdash\detail\impl.hpp" />
+    <ClInclude Include="libs\mat-dash\include\matdash\minhook.hpp" />
+    <ClInclude Include="libs\matplist.hpp" />
     <ClInclude Include="libs\MinHook\MinHook.h" />
-    <ClInclude Include="LoadingLayer.h" />
+    <ClInclude Include="libs\nfd\src\common.h" />
+    <ClInclude Include="libs\nfd\src\include\nfd.h" />
+    <ClInclude Include="libs\nfd\src\nfd_common.h" />
+    <ClInclude Include="lvl-share.hpp" />
+    <ClInclude Include="matplist.hpp" />
     <ClInclude Include="menu.h" />
-    <ClInclude Include="MenuGameLayer.h" />
-    <ClInclude Include="MenuLayer.h" />
-    <ClInclude Include="ModMenuLayer.h" />
-    <ClInclude Include="PauseLayer.h" />
+    <ClInclude Include="ObjectsIds.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="PlayLayer.h" />
+    <ClInclude Include="preview-mode.hpp" />
     <ClInclude Include="state.h" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CreatorLayer.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="EditLevelLayer.cpp" />
     <ClCompile Include="EditorPauseLayer.cpp" />
-    <ClCompile Include="GarageLayer.cpp" />
+    <ClCompile Include="explorer.cpp" />
+    <ClCompile Include="HitboxNode.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp" />
@@ -646,14 +662,12 @@
     <ClCompile Include="libs\imgui-hook\imgui\imgui_draw.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="LoadingLayer.cpp" />
+    <ClCompile Include="libs\nfd\src\nfd_common.c" />
+    <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
+    <ClCompile Include="lvl-share.cpp" />
     <ClCompile Include="menu.cpp" />
-    <ClCompile Include="MenuGameLayer.cpp" />
-    <ClCompile Include="MenuLayer.cpp" />
-    <ClCompile Include="ModMenuLayer.cpp" />
-    <ClCompile Include="PauseLayer.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="PlayLayer.cpp" />
+    <ClCompile Include="preview-mode.cpp" />
     <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>

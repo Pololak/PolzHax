@@ -22,9 +22,6 @@ enum class GJLevelType {
 
 class GJGameLevel : public cocos2d::CCNode {
 public:
-    auto& getSongID() {
-        return from<int>(this, 0x1a4);
-    }
     static auto create() {
         return reinterpret_cast<GJGameLevel * (__stdcall*)()>(base + 0x621c0)(); //0x621C0 - GD 1.92
     }
@@ -42,6 +39,9 @@ public:
     }
     auto getUserID() {
         return from<int>(this, 0x198);
+    }
+    auto& songID() {
+        return from<int>(this, 0x1a4);
     }
 
     cocos2d::CCDictionary* m_lastBuildSave;

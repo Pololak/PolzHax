@@ -28,6 +28,12 @@
     <Filter Include="libs\ImGui">
       <UniqueIdentifier>{456ec293-e762-4cd6-8b97-1fe07c7e69ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs\mat-dash">
+      <UniqueIdentifier>{4dc07176-4d93-47a5-be33-d64361a4e454}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\nfd">
+      <UniqueIdentifier>{568e2e71-9f12-49ce-9b93-a10c4b70e01c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1368,15 +1374,6 @@
     <ClInclude Include="libs\MinHook\MinHook.h">
       <Filter>libs\MinHook</Filter>
     </ClInclude>
-    <ClInclude Include="PauseLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.h">
       <Filter>libs\ImGui</Filter>
     </ClInclude>
@@ -1413,26 +1410,8 @@
     <ClInclude Include="state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CheckPoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CreatorLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GarageLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LoadingLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuGameLayer.h">
       <Filter>libs\gd.h</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuGameLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditLevelLayer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EndLevelLayer.h">
       <Filter>libs\gd.h</Filter>
@@ -1440,10 +1419,85 @@
     <ClInclude Include="EditorPauseLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModMenuLayer.h">
+    <ClInclude Include="libs\gd.h\manager_nodes\ObjectToolbox.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="explorer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libs\gd.h\manager_nodes\ObjectToolbox.h">
+    <ClInclude Include="utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash\boilerplate.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash\cocos.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash\console.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash\detail\gen.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash\detail\impl.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash\minhook.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\mat-dash\include\matdash.hpp">
+      <Filter>libs\mat-dash</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\matplist.hpp">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="preview-mode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hsv.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\HardStreak.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="matplist.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lvl-share.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\common.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\include\nfd.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\nfd_common.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="HitboxNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsIds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\SettingsColorObject.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="gd.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1453,15 +1507,6 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PauseLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayLayer.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp">
       <Filter>libs\ImGui</Filter>
@@ -1493,25 +1538,25 @@
     <ClCompile Include="state.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="CreatorLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GarageLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LoadingLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuGameLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditLevelLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="EditorPauseLayer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModMenuLayer.cpp">
+    <ClCompile Include="explorer.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="preview-mode.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lvl-share.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\nfd\src\nfd_common.c">
+      <Filter>libs\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\nfd\src\nfd_win.cpp">
+      <Filter>libs\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="HitboxNode.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>

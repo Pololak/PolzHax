@@ -1,5 +1,5 @@
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <Windows.h>
 #include <cocos2d.h>
 #include "imgui-hook.hpp"
 
@@ -7,10 +7,15 @@ using namespace cocos2d;
 
 void _stub() {}
 std::function<void()> g_drawFunc = _stub;
+std::function<void()> g_initFunc = _stub;
 std::function<void()> g_toggleCallback = _stub;
 
 void ImGuiHook::setRenderFunction(std::function<void()> func) {
     g_drawFunc = func;
+}
+
+void ImGuiHook::setInitFunction(std::function<void()> func) {
+    g_initFunc = func;
 }
 
 void ImGuiHook::setToggleCallback(std::function<void()> func) {
@@ -18,6 +23,10 @@ void ImGuiHook::setToggleCallback(std::function<void()> func) {
 }
 
 bool g_inited = false;
+
+HWND windowToHWND(GLFWwindow* window) {
+    return WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(window) + 0x244));
+}
 
 void (__thiscall* CCEGLView_swapBuffers)(CCEGLView*);
 void __fastcall CCEGLView_swapBuffers_H(CCEGLView* self) {
@@ -28,9 +37,10 @@ void __fastcall CCEGLView_swapBuffers_H(CCEGLView* self) {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::GetIO();
-        auto hwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(window) + 0x244));
+        auto hwnd = windowToHWND(window);
         ImGui_ImplWin32_Init(hwnd);
         ImGui_ImplOpenGL3_Init();
+        g_initFunc();
     }
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -44,7 +54,7 @@ void __fastcall CCEGLView_swapBuffers_H(CCEGLView* self) {
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     
-    glFlush();
+    // glFlush();
 
     CCEGLView_swapBuffers(self);
 }
@@ -62,7 +72,7 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
         TranslateMessage(&msg);
 
         if (io.WantCaptureMouse) {
-            switch(msg.message) {
+            switch (msg.message) {
                 case WM_LBUTTONDBLCLK:
                 case WM_LBUTTONDOWN:
                 case WM_LBUTTONUP:
@@ -101,17 +111,16 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
         }
 
         if (io.WantCaptureKeyboard) {
-            switch(msg.message) {
+            switch (msg.message) {
                 case WM_HOTKEY:
                 case WM_KEYDOWN:
                 case WM_KEYUP:
-                case WM_KILLFOCUS:
-                case WM_SETFOCUS:
                 case WM_SYSKEYDOWN:
                 case WM_SYSKEYUP:
                     blockInput = true;
             }
-        } else if (msg.message == WM_KEYDOWN && msg.wParam == VK_TAB) {
+        } else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F11 || msg.wParam == VK_F1 || msg.wParam == VK_OEM_3)) {
+            // std::cout << "key is " << std::hex << static_cast<unsigned>(msg.wParam) << std::endl;
             g_toggleCallback();
         }
 
@@ -124,16 +133,48 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
     CCEGLView_pollEvents(self);
 }
 
+void (__thiscall* CCEGLView_toggleFullScreen)(cocos2d::CCEGLView*, bool);
+void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bool toggle) {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
+    CCEGLView_toggleFullScreen(self, toggle);
+
+    g_inited = false;
+    // ImGui::CreateContext();
+    // ImGui::GetIO();
+    // auto hwnd = windowToHWND(self->getWindow());
+    // ImGui_ImplWin32_Init(hwnd);
+    // ImGui_ImplOpenGL3_Init();
+}
+
+void (__thiscall* AppDelegate_applicationWillEnterForeground)(void*);
+void __fastcall AppDelegate_applicationWillEnterForeground_H(void* self) {
+    AppDelegate_applicationWillEnterForeground(self);
+    ImGui::GetIO().ClearInputKeys();
+}
+
 void ImGuiHook::setupHooks(std::function<void(void*, void*, void**)> hookFunc) {
     auto cocosBase = GetModuleHandleA("libcocos2d.dll");
     hookFunc(
-        GetProcAddress(cocosBase, "?swapBuffers@CCEGLView@cocos2d@@UAEXXZ"),
-        CCEGLView_swapBuffers_H,
+        reinterpret_cast<void*>(GetProcAddress(cocosBase, "?swapBuffers@CCEGLView@cocos2d@@UAEXXZ")),
+        reinterpret_cast<void*>(&CCEGLView_swapBuffers_H),
         reinterpret_cast<void**>(&CCEGLView_swapBuffers)
     );
     hookFunc(
-        GetProcAddress(cocosBase, "?pollEvents@CCEGLView@cocos2d@@QAEXXZ"),
-        CCEGLView_pollEvents_H,
+        reinterpret_cast<void*>(GetProcAddress(cocosBase, "?pollEvents@CCEGLView@cocos2d@@QAEXXZ")),
+        reinterpret_cast<void*>(&CCEGLView_pollEvents_H),
         reinterpret_cast<void**>(&CCEGLView_pollEvents)
+    );
+    hookFunc(
+        reinterpret_cast<void*>(GetProcAddress(cocosBase, "?toggleFullScreen@CCEGLView@cocos2d@@QAEX_N@Z")),
+        reinterpret_cast<void*>(&CCEGLView_toggleFullScreen_H),
+        reinterpret_cast<void**>(&CCEGLView_toggleFullScreen)
+    );
+    hookFunc(
+        reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandleA(0)) + 0x28f00),
+        reinterpret_cast<void*>(&AppDelegate_applicationWillEnterForeground_H),
+        reinterpret_cast<void**>(&AppDelegate_applicationWillEnterForeground)
     );
 }

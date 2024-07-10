@@ -11,13 +11,20 @@ class GameLevelManager : public cocos2d::CCNode {
     protected:
 
     public:
-        inline static GameLevelManager* sharedState() {
-            return reinterpret_cast<GameLevelManager*(__stdcall*)()>( gd::base + 0x55850)(); //1.91 55190
+        static auto sharedState() {
+            return reinterpret_cast<GameLevelManager * (__stdcall*)()>(base + 0x55850)();
         }
 
-        inline static gd::GJGameLevel* createNewLevel() {
-            return reinterpret_cast<gd::GJGameLevel*(__stdcall*)()>( gd::base + 0xa0db0 )(); //2.1
+        GJGameLevel* createNewLevel() {
+            return reinterpret_cast<GJGameLevel * (__thiscall*)(GameLevelManager*)>(base + 0x56590)(this);
         }
+        //inline static GameLevelManager* sharedState() {
+        //    return reinterpret_cast<GameLevelManager*(__stdcall*)()>( gd::base + 0x55850)(); //1.91 55190
+        //}
+
+        //inline static gd::GJGameLevel* createNewLevel() {
+        //    return reinterpret_cast<gd::GJGameLevel*(__stdcall*)()>( gd::base + 0x56590)(); // 1.92
+        //}
 
         cocos2d::CCArray* getSavedLevels() {
             return reinterpret_cast<cocos2d::CCArray*(__thiscall*)(GameLevelManager*)>( gd::base + 0x57640)(this); //1.91 56f80

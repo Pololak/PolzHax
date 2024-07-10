@@ -49,16 +49,44 @@ namespace gd {
 		kGameObjectTypeSpecial = 40,
 	};
 
+	/*class SettingsColorObject : public CCNode {
+	public:
+		ccColor3B m_color;
+		bool m_blending;
+		int m_custom;
+	};*/
 
+	/*enum GJCustomColorMode {
+		Default = 0,
+		PlayerCol1 = 1,
+		PlayerCol2 = 2,
+		LightBG = 5,
+		Col1 = 3,
+		Col2 = 4,
+		Col3 = 6,
+		Col4 = 7,
+		DL = 8
+	};*/
 
-	enum GJCustomColorMode {};
+	enum class CustomColorMode {
+		Default = 0,
+		PlayerCol1 = 1,
+		PlayerCol2 = 2,
+		LightBG = 5,
+		Col1 = 3,
+		Col2 = 4,
+		Col3 = 6,
+		Col4 = 7,
+		DL = 8
+	};
 
 	class GJSpriteColor;
 	class ColorActionSprite;
 	class GJEffectManager;
+	//enum class GJCustomColorMode;
 
 	#pragma runtime_checks("s", off)
-	class GameObject : public CCSpritePlus {
+	class GameObject : public cocos2d::CCSprite {
 	protected:
 		PAD(44);
 		bool unk_21C;
@@ -186,11 +214,11 @@ namespace gd {
 				base + 0xCFA80
 				)(this, texture); //not correct
 		}
-		virtual void setChildColor(const cocos2d::ccColor3B& color) {
-			return reinterpret_cast<void(__thiscall*)(GameObject*, const cocos2d::ccColor3B&)>(
-				base + 0xEE900
-				)(this, color); //not correct
-		}
+		//virtual void setChildColor(const cocos2d::ccColor3B& color) {
+		//	return reinterpret_cast<void(__thiscall*)(GameObject*, const cocos2d::ccColor3B&)>(
+		//		base + 0xEE900
+		//		)(this, color); //not correct
+		//}
 
 		//CCRGBAProtocol vtable
 		virtual void setOpacity(GLubyte opacity) {
@@ -243,18 +271,18 @@ namespace gd {
 		}
 
 		auto getColorMode() {
-			auto active = from<int>(this, 0x308);
-			auto default_color = from<int>(this, 0x30c);
+			auto active = from<CustomColorMode>(this, 0x308);
+			auto default_color = from<CustomColorMode>(this, 0x30c);
 			// TODO: gd checks some boolean
-			if (active == 0)
+			if (active == CustomColorMode::Default)
 				active = default_color;
 			return active;
 		}
 
-		bool isOnValidGroup() {
+		/*bool isOnValidGroup() {
 			if (from<int>(this, 0x160) == 842150450) return 0;
 			else return 1;
-		}
+		}*/
 
 		int getGroup()
 		{
@@ -292,7 +320,7 @@ namespace gd {
 			return reinterpret_cast<gd::OBB2D*(__thiscall*)(GameObject*)>(base + 0x75290)(this);
 		}
 
-		int getObjectID() {
+		auto& getObjectID() {
 			return from<int>(this, 0x2c4);
 		}
 
@@ -300,6 +328,104 @@ namespace gd {
 			return from<int>(this, 0x308);
 		}
 
+		auto& triggerColor() {
+			return from<cocos2d::ccColor3B>(this, 0x2b8);
+		}
+
+		auto& triggerBlending() {
+			return from<bool>(this, 0x314);
+		}
+
+		bool getIsTintObject() const {
+			return from<bool>(this, 0x2cb);
+		}
+
+		auto& triggerDuration() {
+			return from<float>(this, 0x2bc);
+		}
+
+		void setObjectColor(cocos2d::ccColor3B color) {
+			return reinterpret_cast<void(__thiscall*)(GameObject*, cocos2d::ccColor3B)>(base + 0x75560)(this, color);
+		}
+
+		auto getChildSprite() {
+			return from<cocos2d::CCSprite*>(this, 0x24c);
+		}
+
+		bool getHasColor() const {
+			return from<bool>(this, 0x24a);
+		}
+
+		void setChildColor(cocos2d::ccColor3B color) {
+			if (getHasColor()) {
+				getChildSprite()->setColor(color);
+			}
+		}
+
+		void setCustomColor(cocos2d::ccColor3B color) {
+			if (getHasColor()) setChildColor(color);
+			else setObjectColor(color);
+		}
+		bool isSelected() {
+			return from<bool>(this, 0x316);
+		}
+		
+		auto getActiveColorMode() {
+			return from<CustomColorMode>(this, 0x308);
+		}
+
+		bool shouldBlendColor() {
+			return reinterpret_cast<bool(__thiscall*)(GameObject*)>(base + 0x6ece0)(this);
+		}
+
+		auto& touchTriggered() {
+			return from<bool>(this, 0x271);
+		}
+		/*auto triggerColor() {
+			return from<cocos2d::ccColor3B&>(this, 0x2b8);
+		}
+
+		auto triggerDuration() {
+			return from<float>(this, 0x2bc);
+		}
+		
+		auto triggerBlending() {
+			return from<bool>(this, 0x314);
+		}
+
+		auto touchTriggered() {
+			return from<bool>(this, 0x271);
+		}
+
+		bool getHasColor() const {
+			return from<bool>(this, 0x24a);
+		}
+
+		void setObjectColor(cocos2d::ccColor3B& color) {
+			return reinterpret_cast<void(__thiscall*)(GameObject*, cocos2d::ccColor3B&)>(base + 0x75560)(this, color);
+		}
+
+		void setCustomColor(cocos2d::ccColor3B& color) {
+			if (getHasColor()) setChildColor(color);
+			else setObjectColor(color);
+		}
+
+		auto getChildSprite() {
+			return from<CCSprite*>(this, 0x24c);
+		}
+		void setChildColor(cocos2d::ccColor3B& color) {
+			if (getHasColor()) {
+				getChildSprite()->setColor(color);
+			}
+		}
+
+		bool isSelected() {
+			return from<bool>(this, 0x316);
+		}
+
+		bool getIsTintObject() const {
+			return from<bool>(this, 0x2cb);
+		}*/
 
 		virtual cocos2d::CCRect* const& getObjectRect(cocos2d::CCRect* rect) {
 			return reinterpret_cast<cocos2d::CCRect* (__thiscall*)(GameObject*, cocos2d::CCRect*)>(base + 0x71b90)(this, rect);

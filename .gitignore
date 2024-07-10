@@ -361,3 +361,17 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+Resources/
+EditorPauseLayer.cpp
+EditorPauseLayer.h
+ObjectsIds.h
+PlayLayer.cpp
+PlayLayer.h
+.sln
+.vcxproj
+.filters
+.user
+preview-mode.cpp
+preview-mode.hpp
+

@@ -7,6 +7,30 @@ namespace gd {
 
 	class GJBaseGameLayer;
 
+	class UILayer : public cocos2d::CCLayerColor {
+	public:
+		PAD(8)
+			cocos2d::CCMenu* m_pCheckPointMenu;		// 0x1a0
+
+		void onCheck(CCObject* pSender) {
+			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
+				base + 0x25fb60
+				)(this, pSender);
+		}
+
+		void onDeleteCheck(CCObject* pSender) {
+			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
+				base + 0x25fc90
+				)(this, pSender);
+		}
+
+		void onPause(CCObject* pSender) {
+			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
+				base + 0x25fad0
+				)(this, pSender);
+		}
+	};
+
 	class PlayLayer : public GJBaseGameLayer {
 	public:
 		void resetLevel() {

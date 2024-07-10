@@ -5,6 +5,8 @@
 
 namespace gd
 {
+	class GJGameLevel;
+
 	class EditLevelLayer : public cocos2d::CCLayer {
 	public:
 		auto level() {

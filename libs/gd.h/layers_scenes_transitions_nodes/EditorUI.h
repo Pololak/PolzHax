@@ -2,6 +2,8 @@
 #define __EDITORUI_H__
 
 #include <gd.h>
+#include "cocos2d.h"
+#include "cocos-ext.h"
 
 namespace gd {
 
@@ -12,12 +14,15 @@ class GJScaleControl : public cocos2d::CCLayer {};
 class CCMenuItemSpriteExtra;
 class CCMenuItemToggler;
 class Slider;
+class GameObject;
 
 class EditorUI : public cocos2d::CCLayer {
 public:
     auto pasteObjects(const std::string& str) {
         return reinterpret_cast<cocos2d::CCArray * (__thiscall*)(EditorUI*, gd::string)>(base + 0x492a0)(this, str);
     }
+
+
 
     auto& clipboard() {
         return from<gd::string>(this, 0x264);
@@ -28,7 +33,7 @@ public:
     }
 
     void updateButtons() {
-        reinterpret_cast<void(__thiscall*)(EditorUI*)>(base + 0x41290)(this);
+        reinterpret_cast<void(__thiscall*)(EditorUI*)>(base + 0x41450)(this);
     }
 
     bool isPlayback() {
@@ -96,6 +101,7 @@ public:
     void onSettings(CCObject* sender) {
         return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x41190)(this, sender);
     }
+
 };
 
 class EditorPauseLayer : public gd::CCBlockLayer {
@@ -127,7 +133,12 @@ public:
 
 class ColorSelectPopup : public gd::FLAlertLayer {
 public:
-    
+    auto colorPicker() {
+        return from<cocos2d::extension::CCControlColourPicker*>(this, 0x1c0);
+    }
+    auto fadeTime() {
+        return from<float>(this, 0x1ec); //1d0
+    }
 };
 
 /*

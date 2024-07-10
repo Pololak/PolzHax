@@ -4,6 +4,7 @@
 #include <cocos2d.h>
 #include <GUI/CCControlExtension/CCScale9Sprite.h>
 #include "gdMacros.h"
+#include <stdint.h>
 
 template <class R, class T>
 R& from(T base, intptr_t offset) {
@@ -96,6 +97,8 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/SetIDPopup.h"
 #include "layers_scenes_transitions_nodes/GJSpecialColorSelect.h"
 #include "layers_scenes_transitions_nodes/EndLevelLayer.h"
+#include "layers_scenes_transitions_nodes/LevelInfoLayer.h"
+#include "layers_scenes_transitions_nodes/DrawGridLayer.h"
 //#include "layers_scenes_transitions_nodes/EditorPauseLayer.h"
 
 #include "layers_scenes_transitions_nodes/EditLevelLayer.h"
@@ -131,9 +134,13 @@ namespace gd {
 
 #include "level_nodes/GJGameLevel.h"
 #include "level_nodes/LevelSettingsObject.h"
+#include "level_nodes/ColorAction.h"
+//#include "level_nodes/SettingsColorObject.h"
+//#include "level_nodes/CustomColorMode.h"
 
 #include "sprite_nodes/CCSpritePlus.h"
 #include "sprite_nodes/ButtonSprite.h"
+#include "sprite_nodes/HardStreak.h"
 
 #include "sprite_nodes/GameObject.h"
 #include "other_nodes/StartPosObject.h"

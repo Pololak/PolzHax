@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include <set>
 
 std::set<int>hazard = {
 	8,
@@ -90,4 +92,4 @@ std::set<int>saws = {
 	740, 741, 742,
 	678, 679, 680,
 	183, 184, 185
-}
+};

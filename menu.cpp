@@ -1,11 +1,17 @@
-#pragma warning(disable : 4996)
 #include "pch.h"
 #include "menu.h"
 
 #include <imgui-hook.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <filesystem>
+#include <fstream>
+#include <chrono>
 #include "state.h"
+#include "explorer.h"
+#include "utils.hpp"
+
+DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 
 bool show = false;
 
@@ -16,18 +22,46 @@ ImVec4 color4;
 ImVec4 color5;
 ImVec4 color6;
 
+void update_speed_hack() {
+    const auto value = setting().onSpeedhack ? setting().speedhack : 1.f;
+    if (auto fme = gd::FMODAudioEngine::sharedEngine())
+        if (auto sound = fme->currentSound())
+            if (setting().onSpeedhackMusic) sound->setPitch(value);
+            else sound->setPitch(1.f);
+    CCDirector::sharedDirector()->m_pScheduler->setTimeScale(value);
+}
+
+void update_pitch_shifter() {
+    const auto value = setting().onPitch ? setting().pitchshift : 1.f;
+    if (auto fme = gd::FMODAudioEngine::sharedEngine())
+        if (auto sound = fme->currentSound())
+            sound->setPitch(value);
+        else sound->setPitch(1.f);
+}
+
+// Pitch Shifter is currently unused.
+
+void update_fps_bypass() {
+    const auto value = setting().onFPSBypass ? setting().fps : 60.f;
+    static const auto addr = cocos_symbol<&CCApplication::setAnimationInterval>("?setAnimationInterval@CCApplication@cocos2d@@UAEXN@Z");
+    addr(CCApplication::sharedApplication(), 1.0 / value);
+    CCDirector::sharedDirector()->setAnimationInterval(1.0 / value);
+}
+
 void save() {
-	auto file = fopen("Resources/polzsave.dat", "wb");
-	if (file) {
-		fwrite(&setting(), sizeof(setting()), 1, file);
-		fclose(file);
-	}
+    auto file = fopen("Resources/polzsave.dat", "wb");
+    if (file) {
+        fwrite(&setting(), sizeof(setting()), 1, file);
+        fclose(file);
+    }
 }
 
 bool oneX = true;
 
 void RenderMain() {
 	unsigned long long pointervalue;
+    
+    
     if (oneX) {
         auto file = fopen("Resources/polzsave.dat", "rb");
         if (file) {
@@ -40,11 +74,742 @@ void RenderMain() {
                 fclose(file);
             }
         }
-        if (ImGui::Begin("Player", nullptr)) {
+
+        //ImGuiIO& io = ImGui::GetIO();
+        //io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 14);
+
+        if (ImGui::Begin("PolzHax", nullptr)) {
             ImGui::SetWindowPos({ 5,5 });
             ImGui::EndTabItem();
         }
 
+        if (ImGui::Begin("Bypass", nullptr)) {
+            ImGui::SetWindowPos({ 155,5 });
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::Begin("Cosmetic", nullptr)) {
+            ImGui::SetWindowPos({ 310,5 });
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::Begin("Creator", nullptr)) {
+            ImGui::SetWindowPos({ 528,5 });
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::Begin("Level", nullptr)) {
+            ImGui::SetWindowPos({ 704,5 });
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::Begin("Universal", nullptr)) {
+            ImGui::SetWindowPos({ 908,5 });
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::Begin("Icons", nullptr)) {
+            ImGui::SetWindowPos({ 1149,5 });
+            ImGui::EndTabItem();
+        }
+        
+        if (ImGui::Begin("Speedhack", nullptr)) {
+            ImGui::SetWindowPos({ 528,431 });
+            ImGui::EndTabItem();
+        }
+        
+        if (ImGui::Begin("Interface", nullptr)) {
+            ImGui::SetWindowPos({ 908,454 });
+            ImGui::EndTabItem();
+        }
+
+        // Fuck this stupid save function i have no fucking words
+        // Ima need to copypaste 80+ patches for fucking saves
+        // Kick me in the balls. (wait what)
+
+        // Bypass
+
+        if (setting().onCharFilter) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x75\x04", 2, NULL);
+        }
+
+        if (setting().onIcons) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48000F), "\xe9\x74\x02\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E606), "\xe9\xdc\x00\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E098), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E128), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E1B8), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E248), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E2D8), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E9BE), "\xeb\x13", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47EAAE), "\xeb\x13", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48000F), "\x0f\x85\x73\x02\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E606), "\x0f\x85\xdb\x00\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E098), "\x74\x04", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E128), "\x74\x04", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E1B8), "\x74\x04", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E248), "\x74\x04", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E2D8), "\x74\x04", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E9BE), "\x75\x13", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47EAAE), "\x75\x13", 2, NULL);
+        }
+
+        if (setting().onMainLevels) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A81AF), "\xe9\xa3\x02\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A8C22), "\xe9\x98\x00\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A81AF), "\x0f\x84\xa2\x02\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A8C22), "\x0f\x8e\x97\x00\x00\x00", 6, NULL);
+        }
+
+        if (setting().onSliderLimit) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf27), "\xeb\x07", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf3b), "\xeb\x07", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf27), "\x76\x07", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf3b), "\x76\x07", 2, NULL);
+        }
+
+        if (setting().onTextLength) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\xeb\x04", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\x7c\x04", 2, NULL);
+        }
+
+        // Cosmetic
+
+        if (setting().onSCoinUncoll) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x443368), "\x8B\xC2\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4735CE), "\x8B\xD9\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x443368), "\x0F\x44\xC2", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4735CE), "\x0F\x44\xD9", 3, NULL);
+        }
+
+        if (setting().onCoinsPractice) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4eb138), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4eb138), "\x75\x4c", 2, NULL);
+        }
+
+        if (setting().onDontEnter) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x8B\xD9", 2, NULL);
+        }
+
+        if (setting().onFObjectInvisible) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x0f\x84\xd1\x02\x00\x00", 6, NULL);
+        }
+
+        if (setting().onHidePracticeBtn) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4FEE29), "\x83\xC4\x04\x90\x90\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4fee6a), "\x83\xC4\x04\x90\x90\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4FEE29), "\xff\x92\xdc\x00\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4fee6a), "\xff\x92\xdc\x00\x00\x00", 6, NULL);
+        }
+
+        if (setting().onInstantMirror) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL); // E9 9B 01 00 00 90
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x3F", 7, NULL); // 0F 84 9A 01 00 00
+        }
+
+        if (setting().onMaxParticles) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xB64D7), "\x8b\x7d\x07", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xB64D7), "\x8b\x7d\x08", 3, NULL);
+        }
+
+        if (setting().onMiniCube) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d8cf4), "\x31\xff\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d8cf4), "\x0f\x4f\xf9", 3, NULL);
+        }
+
+        if (setting().onNoAnimations) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x886be), "\xc0", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88da0), "\xc0", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x886be), "\xc1", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88da0), "\xc1", 1, NULL);
+        }
+
+        if (setting().onNoDeathEffect) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\xe9\xe7\x01\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
+        }
+
+        if (setting().onNoGhostTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f3374), "\x6a\x00\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f338d), "\x6a\x00\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f3374), "\xff\x75\x08", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f338d), "\xff\x75\x08", 3, NULL);
+        }
+
+        if (setting().onNoGlowObject) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x46d8a3), "\xe9\x8f\x01\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x46d8a3), "\x0f\x85\x8e\x01\x00\x00", 6, NULL);
+        }
+
+        if (setting().onNoGravityEffect) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f4586), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f4586), "\x75\x07", 2, NULL);
+        }
+
+        if (setting().onNoMirror) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\xe9\x9b\x01\x00\x00\x90", 6, NULL); // E9 9B 01 00 00 90
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\x0f\x84\x9a\x01\x00\x00", 6, NULL);
+        }
+
+        if (setting().onNoNewBest) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5ff0), "\xc3", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5ff0), "\x55", 1, NULL);
+        }
+
+        if (setting().onNoOrbRing) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F6D40), "\xc3", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F6D40), "\x55", 1, NULL);
+        }
+
+        if (setting().onNoParticles) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\xC3", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\x56", 1, NULL);
+        }
+
+        if (setting().onNoLightning) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\xeb", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\x75", 1, NULL);
+        }
+
+        if (setting().onNoPulse) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\x90\x90\x90\x90\x90\x90\x90\x90", 8, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\xf3\x0f\x11\x87\xac\x01\x00\x00", 8, NULL);
+        }
+
+        if (setting().onNoRespawnFlash) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\xE9\x99\x00\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\x0f\x85\x98\x00\x00\x00", 6, NULL);
+        }
+
+        if (setting().onNoShadeEffect) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\xeb", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\x77", 1, NULL);
+        }
+
+        if (setting().onNoWaveTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\xeb", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\x74", 1, NULL);
+        }
+
+        if (setting().onPracticePulse) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429975), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\xEB\x16", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429975), "\x75\x0c", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\x74\x16", 2, NULL);
+        }
+
+        if (setting().onSolidPlayerTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac3dc), "\x90\x90\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac3dc), "\x89\x41\x10", 3, NULL);
+        }
+
+        if (setting().onSolidWaveTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d9ade), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d9ade), "\x75\x0c", 2, NULL);
+        }
+
+        if (setting().onTrailAlwaysOff) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\xC3", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\x56", 1, NULL);
+        }
+
+        if (setting().onTrailAlwaysOn) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x01", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x00", 1, NULL);
+        }
+
+        if (setting().onTrailBugFix) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC29D), "\xBB\xFF\x00\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC29D), "\xf3\x0f\x2c\xc1\x2b\xd8", 6, NULL);
+        }
+
+        if (setting().onWaveTrailDeath) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdddfa), "\xeb", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdddfa), "\x74", 1, NULL);
+        }
+
+        // Creator
+
+        if (setting().onAbsolutePosition) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44B49D), "\x90\x8b\xcf\x90\x90\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44B49D), "\x51\x8b\xcf\xff\x50\x5c", 6, NULL);
+        }
+
+        if (setting().onCopyHack) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49C7ED), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49dfe5), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49C7ED), "\x0f\x84\x2e\x01\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49dfe5), "\x75\x0e", 2, NULL);
+        }
+
+        if (setting().onDefSongBypass) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a37f), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3fe), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a391), "\x90\x90\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3a0), "\x90\x90\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a410), "\x90\x90\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a41f), "\x90\x90\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a37f), "\x74\x4e", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3fe), "\x74\x4e", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a391), "\x0f\x4f\xf0", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3a0), "\x0f\x48\xf1", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a410), "\x0f\x4f\xf0", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a41f), "\x0f\x48\xf1", 3, NULL);
+        }
+
+        if (setting().onEditorExtension) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44779c), "\xEB", 1, NULL); // Placing Objects Left
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477d2), "\xEB", 1, NULL); // Placing Objects Right
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\xEB", 1, NULL); // Placing Objects Top
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\xEB", 1, NULL); // Placing Objects Bottom
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\xEB\x44", 2, NULL); // Moving Objects
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\x00\x20\x90", 3, NULL); // Grid V1
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\x00\x20\x90", 3, NULL); // Grid V2
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\x00\x20\x90", 3, NULL); // Grid V3
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\x00\x20\x90", 3, NULL); // Grid H
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\x00\x20\x90", 3, NULL); // Portal Lines (Top)
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\x00\x20\x90", 3, NULL); // Portal Lines (Bottom)
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\x00\x20\x90", 3, NULL); // Music Lines
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44779c), "\x77", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477d2), "\x76", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\x76", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\x77", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\x76\x09", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\xb8\xa6\x54", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\xb8\xa6\x54", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\xb8\xa6\x54", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\xb8\xa6\x54", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\xb8\xa6\x54", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\xb8\xa6\x54", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\xb8\xa6\x54", 3, NULL);
+        }
+
+        if (setting().onFreeScroll) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca45), "\xEB", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca5c), "\xEB", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca75), "\xEB", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca8c), "\xEB", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca45), "\x77", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca5c), "\x77", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca75), "\x77", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca8c), "\x77", 1, NULL);
+        }
+
+        if (setting().onHideGrid) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\x0f\x86\x59\x01\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\x0f\x86\x53\x01\x00\x00", 6, NULL);
+        }
+
+        if (setting().onHideTrigLine) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493e08), "\xE9\xce\x00\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493e08), "\x0f\x84\xcd\x00\x00\x00", 6, NULL);
+        }
+
+        if (setting().onLevelEdit) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
+        }
+
+        if (setting().onNoCMark) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x454aa0), "\xb8\x00\x00\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x454aa0), "\x8b\x81\x04\x02\x00\x00", 6, NULL);
+        }
+
+        if (setting().onNoDeathX) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48c76a), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48c76a), "\xc7\x04\x24\x33\x33\x33\x3f", 7, NULL);
+        }
+
+        if (setting().onNoEditorTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494305), "\x00", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49442c), "\x00", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494305), "\xFF", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49442c), "\xFF", 1, NULL);
+        }
+
+        if (setting().onObjBypass) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43e30e), "\x68\xFF\xFF\xFF\x7F", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448ed5), "\x3D\xFF\xFF\xFF\x7F", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\xFF\xFF\xFF\x7F", 5, NULL);
+            //WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\xFF\xFF\xFF\x7F", 5, NULL); // 25 69 20 6F 62 6A 65 63 74 73 20 20 20
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43e30e), "\x68\x20\x4e\x00\x00", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448ed5), "\x3D\x20\x4e\x00\x00", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\x20\x4e\x00\x00", 5, NULL);
+        }
+
+        if (setting().onPlaceOver) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48D37F), "\xeb", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48D37F), "\x77", 1, NULL);
+        }
+
+        if (setting().onSmoothEditTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x72\x79", 2, NULL);
+        }
+
+        if (setting().onVerifyHack) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\xeb\x2f", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\x75\x2f", 2, NULL);
+        }
+
+        if (setting().onZoomBypass) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bb5), "\x90\x90\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bba), "\x90\x90\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bb5), "\x0f\x2f\xc8", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bba), "\x0f\x28\xc8", 3, NULL);
+        }
+
+        // Level
+
+        if (setting().onConfirmExit) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\x90\x90\x90\x90\x90", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f9d), "\x90\x90\x90\x90\x90", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\x90\x90\x90\x90\x90", 5, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\xe8\xfb\xbb\x01\x00", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x6a\x10", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f9d), "\x68\x7c\x42\x51\x00", 5, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\xe8\xc6\xd7\xf2\xff", 5, NULL);
+        }
+
+        if (setting().onMusicSync) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\xeb\x08", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\x75\x08", 2, NULL);
+        }
+
+        if (setting().onHiFPSRotation) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dc13b), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dc13b), "\x0f\x82\xd6\x00\x00\x00", 6, NULL); // 0f 82 d6 00 00 00
+        }
+
+        if (setting().onInstantComplete) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e16f6), "\xC7\x87\x74\x04\x00\x00\x00\x00\x00\x70\x90\x90", 12, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e16f6), "\xF3\x0F\x11\x8F\x74\x04\x00\x00\x9F\xF6\xC4\x44", 12, NULL);
+        }
+
+        if (setting().onInstantTriggers) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x89780), "\xC0", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x89780), "\xC1", 1, NULL);
+        }
+
+        if (setting().onJumpHack) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da510), "\x01", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da295), "\x01", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da510), "\x00", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da295), "\x00", 1, NULL);
+        }
+
+        if (setting().onNoclip) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\xe9\xf0\x02\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\x0f\x85\xef\x02\x00\x00", 6, NULL);
+        }
+
+        if (setting().onPauseDurComp) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x00", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x01", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x88\x81\xf9\x02\x00\x00", 6, NULL);
+        }
+
+        if (setting().onPracticeMusic) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3663), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0699), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F06CB), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\x90\x90\x90\x90\x90", 5, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x0f\x85\x4d\x07\x00\x00", 6, NULL); // 0f 85 4d 07 00 00
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3663), "\x75\x41", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0699), "\x75\x3e", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F06CB), "\x75\x0c", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\xe8\xaa\x42\xf2\xff", 5, NULL); // e8 aa 42 f2 ff
+        }
+
+        if (setting().onSuicide) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea268), "\xe9\xc9\x01\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\xe9\x59\x02\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea268), "\x0f\x86\xc8\x01\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\x0f\x87\x58\x02\x00\x00", 6, NULL);
+        }
+
+        // Universal
+
+        if (setting().onFastAlt) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x8b\x03\x8b\xcb\xff\x50\x18", 7, NULL);
+        }
+
+        if (setting().onForceVis) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60783), "\xB0\x01\x90", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60c9a), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60783), "\x8a\x45\x08", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60c9a), "\x0f\x84\xcb\x00\x00\x00", 6, NULL);
+        }
+
+        if (setting().onFreeWinReSize) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\x90\x90\x90\x90\x90", 5, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\xe8\xb0\xf3\xff\xff", 5, NULL);
+        }
+
+        if (setting().onIgnoreSlider) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cec0), "\xc3", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cec0), "\x55", 1, NULL);
+        }
+
+        if (setting().onImmortalIcons) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\xc3", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\x55", 1, NULL);
+        }
+
+        if (setting().onInstantGameWork) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc0", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc1", 1, NULL);
+        }
+
+        if (setting().onKrmalMode) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x8b\xd8\x90", 3, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x0f\x45\xdb", 3, NULL);
+        }
+
+        if (setting().onNoRotation) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90", 10, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\xf3\x0f\x11\x41\x1c\xf3\x0f\x11\x41\x18", 10, NULL);
+        }
+
+        if (setting().onNoTransition) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\x31\xc0\x89", 3, NULL); // 31 C0 89
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
+        }
+
+        if (setting().onSafeMode) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\xe9\x14\x00\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\x75\x6c", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\x0f\x85\x76\x01\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
+        }
+
+        if (setting().onRestartButton) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x75\x29", 2, NULL);
+        }
+
+        if (setting().onTransparentBG) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf96), "\x90\xb1\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf9e), "\xff\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7db), "\x90\xb1\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7e3), "\xff\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488132), "\x90\xb1\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48813a), "\xff\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48969e), "\x90\xb1\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4896a5), "\xff\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde1), "\x90\xb1\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde9), "\xff\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f97c), "\x90\xb1\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f984), "\xff\xff", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf96), "\x80\xc9\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf9e), "\x00\x66", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7db), "\x80\xc9\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7e3), "\x00\x66", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488132), "\x80\xc9\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48813a), "\x00\x66", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48969e), "\x80\xc9\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4896a5), "\x00\x66", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde1), "\x80\xc9\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde9), "\x00\x66", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f97c), "\x80\xc9\xff", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f984), "\x00\x66", 2, NULL);
+        }
+
+        if (setting().onTransparentLists) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488a4f), "\x00\x00\x00\x40", 4, NULL); // RGBA format
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48a945), "\x00\x00\x00\x40", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431cba), "\x60", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c89), "\x20\x20", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c8c), "\x20", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c7f), "\x40\x40", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c82), "\x40", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488a4f), "\xbf\x72\x3e\xff", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48a945), "\xbf\x72\x3e\xff", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431cba), "\xff", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c89), "\xa1\x58", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c8c), "\x2c", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c7f), "\xc2\x72", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c82), "\x3e", 1, NULL);
+        }
+
+        if (setting().onTransparentTextLabels) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b9af), "\x68\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43BCA4), "\x68\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FC73), "\x68\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FD1C), "\x68\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A00E3), "\x68\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A04A6), "\x68\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\x00", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b9af), "\x68\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43BCA4), "\x68\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FC73), "\x68\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FD1C), "\x68\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A00E3), "\x68\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A04A6), "\x68\xff", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
+        }
+
+        // fuck it.
+      
         auto* colors = ImGui::GetStyle().Colors;
 
         color1.x = setting().Overlaycolor[0];
@@ -104,24 +869,997 @@ void RenderMain() {
         oneX = false;
     }
 
+    //const auto& font = ImGui::GetIO().Fonts->Fonts.back();
+    //ImGui::PushFont(font);
+
     if (show) {
-        if (ImGui::Begin("Player", nullptr,
-            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
-        {
+        //ImGui::PushFont(font);
+
+
+        
+
+        
+
+        if (setting().onExplorer) {
+            render_explorer_window(setting().onExplorer);
+        }
+
+        if (ImGui::Begin("Bypass", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
-                if (setting().onNoclip) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), "\xe9\xf0\x02\x00\x00\x90", 6, NULL);
+            if (ImGui::Checkbox("Character Filter", &setting().onCharFilter)) {
+                if (setting().onCharFilter) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x90\x90", 2, NULL);
                 }
                 else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), "\x0f\x85\xef\x02\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x75\x04", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Icons", &setting().onIcons)) {
+                if (setting().onIcons) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48000F), "\xe9\x74\x02\x00\x00\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E606), "\xe9\xdc\x00\x00\x00\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E098), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E128), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E1B8), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E248), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E2D8), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E9BE), "\xeb\x13", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47EAAE), "\xeb\x13", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48000F), "\x0f\x85\x73\x02\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E606), "\x0f\x85\xdb\x00\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E098), "\x74\x04", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E128), "\x74\x04", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E1B8), "\x74\x04", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E248), "\x74\x04", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E2D8), "\x74\x04", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E9BE), "\x75\x13", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47EAAE), "\x75\x13", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Main Levels", &setting().onMainLevels)) {
+                if (setting().onMainLevels) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A81AF), "\xe9\xa3\x02\x00\x00\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A8C22), "\xe9\x98\x00\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A81AF), "\x0f\x84\xa2\x02\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A8C22), "\x0f\x8e\x97\x00\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Slider Limit", &setting().onSliderLimit)) {
+                if (setting().onSliderLimit) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf27), "\xeb\x07", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf3b), "\xeb\x07", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf27), "\x76\x07", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf3b), "\x76\x07", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Text Length", &setting().onTextLength)) {
+                if (setting().onTextLength) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\xeb\x04", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\x7c\x04", 2, NULL);
                 }
             }
         }
 
-        if (ImGui::Begin("Settings", nullptr,
+        if (ImGui::Begin("Cosmetic", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            if (ImGui::Checkbox("Coins Show Uncollected", &setting().onSCoinUncoll)) {
+                if (setting().onSCoinUncoll) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x443368), "\x8B\xC2\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4735CE), "\x8B\xD9\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x443368), "\x0F\x44\xC2", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4735CE), "\x0F\x44\xD9", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Coins in Practice", &setting().onCoinsPractice)) {
+                if (setting().onCoinsPractice) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4eb138), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4eb138), "\x75\x4c", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Don't Enter", &setting().onDontEnter)) {
+                if (setting().onDontEnter) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x8B\xD9", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Force Objects Invisible", &setting().onFObjectInvisible)) {
+                if (setting().onFObjectInvisible) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x0f\x84\xd1\x02\x00\x00", 6, NULL);
+                }
+            }
+
+            ImGui::Checkbox("Hide Attempts", &setting().onHideAttempts);
+
+            if (ImGui::Checkbox("Hide Pause Menu", &setting().onHidePauseMenu)) {
+                if (layers().PauseLayerObject)
+                {
+                    if (setting().onHidePauseMenu) layers().PauseLayerObject->setVisible(0);
+                    else layers().PauseLayerObject->setVisible(1);
+                }
+            }
+
+            ImGui::Checkbox("Hide Player", &setting().onHidePlayer);
+
+            if (ImGui::Checkbox("Hide Practice Buttons", &setting().onHidePracticeBtn)) {
+                if (setting().onHidePracticeBtn) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4FEE29), "\x83\xC4\x04\x90\x90\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4fee6a), "\x83\xC4\x04\x90\x90\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4FEE29), "\xff\x92\xdc\x00\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4fee6a), "\xff\x92\xdc\x00\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Instant Mirror", &setting().onInstantMirror)) {
+                if (setting().onInstantMirror) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL); // E9 9B 01 00 00 90
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x3F", 7, NULL); // 0F 84 9A 01 00 00
+                }
+            }
+
+            if (ImGui::Checkbox("Max Particles", &setting().onMaxParticles)) {
+                if (setting().onMaxParticles) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xB64D7), "\x8b\x7d\x07", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xB64D7), "\x8b\x7d\x08", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Mini Cube Icon", &setting().onMiniCube)) {
+                if (setting().onMiniCube) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d8cf4), "\x31\xff\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d8cf4), "\x0f\x4f\xf9", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Animations", &setting().onNoAnimations)) {
+                if (setting().onNoAnimations) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x886be), "\xc0", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88da0), "\xc0", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x886be), "\xc1", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88da0), "\xc1", 1, NULL);
+                }
+            }
+
+            /*if (ImGui::Checkbox("No Background Flash", &setting().onNoBGFlash)) {
+                if (setting().onNoBGFlash) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6cd1), "\xeb\x0e\x90\x90\x90\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c93), "\x00", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6cd1), "\x8b\x8f\x00\x02\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c93), "\x01", 1, NULL);
+                }
+            }*/
+
+            /*if (ImGui::Checkbox("No Cube Rotation", &setting().onNoCubeRotation)) {
+                if (setting().onNoCubeRotation) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dab30), "\xc3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dab30), "\x57", 1, NULL);
+                }
+            }*/
+
+            if (ImGui::Checkbox("No Death Effect", &setting().onNoDeathEffect)) {
+                if (setting().onNoDeathEffect) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\xe9\xe7\x01\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
+                }
+            }
+
+            /*if (ImGui::Checkbox("No Force Player Glow", &setting().onNoForceGlow)) {
+                if (setting().onNoForceGlow) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x00", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x01", 1, NULL);
+                }
+            }*/
+
+            if (ImGui::Checkbox("No Ghost Trail", &setting().onNoGhostTrail)) {
+                if (setting().onNoGhostTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f3374), "\x6a\x00\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f338d), "\x6a\x00\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f3374), "\xff\x75\x08", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f338d), "\xff\x75\x08", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Glow", &setting().onNoGlowObject)) {
+                if (setting().onNoGlowObject) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x46d8a3), "\xe9\x8f\x01\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x46d8a3), "\x0f\x85\x8e\x01\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Gravity Effect", &setting().onNoGravityEffect)) {
+                if (setting().onNoGravityEffect) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f4586), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f4586), "\x75\x07", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Mirror", &setting().onNoMirror)) {
+                if (setting().onNoMirror) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\xe9\x9b\x01\x00\x00\x90", 6, NULL); // E9 9B 01 00 00 90
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\x0f\x84\x9a\x01\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No New Best Popup", &setting().onNoNewBest)) {
+                if (setting().onNoNewBest) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5ff0), "\xc3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5ff0), "\x55", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Orb Ring", &setting().onNoOrbRing)) {
+                if (setting().onNoOrbRing) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F6D40), "\xc3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F6D40), "\x55", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Particles", &setting().onNoParticles)) {
+                if (setting().onNoParticles) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\xC3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\x56", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Portal Lightning", &setting().onNoLightning)) {
+                if (setting().onNoLightning) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\xeb", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\x75", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Pulse", &setting().onNoPulse)) {
+                if (setting().onNoPulse) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\x90\x90\x90\x90\x90\x90\x90\x90", 8, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\xf3\x0f\x11\x87\xac\x01\x00\x00", 8, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Respawn Flash", &setting().onNoRespawnFlash)) {
+                if (setting().onNoRespawnFlash) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\xE9\x99\x00\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\x0f\x85\x98\x00\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Shade Effect", &setting().onNoShadeEffect)) {
+                if (setting().onNoShadeEffect) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\xeb", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\x77", 1, NULL);
+                }
+            }
+
+            //ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
+
+            if (ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail)) {
+                if (setting().onNoWaveTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\xeb", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\x74", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Practice Pulse", &setting().onPracticePulse)) {
+                if (setting().onPracticePulse) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429975), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\xEB\x16", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429975), "\x75\x0c", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\x74\x16", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Solid Player Trail", &setting().onSolidPlayerTrail)) {
+                if (setting().onSolidPlayerTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac3dc), "\x90\x90\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac3dc), "\x89\x41\x10", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Solid Wave Trail", &setting().onSolidWaveTrail)) {
+                if (setting().onSolidWaveTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d9ade), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d9ade), "\x75\x0c", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Trail Always Off", &setting().onTrailAlwaysOff)) {
+                if (setting().onTrailAlwaysOff) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\xC3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\x56", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Trail Always On", &setting().onTrailAlwaysOn)) {
+                if (setting().onTrailAlwaysOn) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x01", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x00", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Trail Bug Fix", &setting().onTrailBugFix)) {
+                if (setting().onTrailBugFix) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC29D), "\xBB\xFF\x00\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC29D), "\xf3\x0f\x2c\xc1\x2b\xd8", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Wave Trail on Death", &setting().onWaveTrailDeath)) {
+                if (setting().onWaveTrailDeath) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdddfa), "\xeb", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdddfa), "\x74", 1, NULL);
+                }
+            }
+        }
+
+        if (ImGui::Begin("Creator", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            
+
+            if (ImGui::Checkbox("Absolute Rotation", &setting().onAbsolutePosition)) {
+                if (setting().onAbsolutePosition) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44B49D), "\x90\x8b\xcf\x90\x90\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44B49D), "\x51\x8b\xcf\xff\x50\x5c", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Copy Hack", &setting().onCopyHack)) {
+                if (setting().onCopyHack) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49C7ED), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49dfe5), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49C7ED), "\x0f\x84\x2e\x01\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49dfe5), "\x75\x0e", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Default Song Bypass", &setting().onDefSongBypass)) {
+                if (setting().onDefSongBypass) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a37f), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3fe), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a391), "\x90\x90\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3a0), "\x90\x90\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a410), "\x90\x90\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a41f), "\x90\x90\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a37f), "\x74\x4e", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3fe), "\x74\x4e", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a391), "\x0f\x4f\xf0", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a3a0), "\x0f\x48\xf1", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a410), "\x0f\x4f\xf0", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a41f), "\x0f\x48\xf1", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Editor Extension", &setting().onEditorExtension)) {
+                if (setting().onEditorExtension) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44779c), "\xEB", 1, NULL); // Placing Objects Left
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477d2), "\xEB", 1, NULL); // Placing Objects Right
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\xEB", 1, NULL); // Placing Objects Top
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\xEB", 1, NULL); // Placing Objects Bottom
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\xEB\x44", 2, NULL); // Moving Objects
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\x00\x20\x90", 3, NULL); // Grid V1
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\x00\x20\x90", 3, NULL); // Grid V2
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\x00\x20\x90", 3, NULL); // Grid V3
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\x00\x20\x90", 3, NULL); // Grid H
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\x00\x20\x90", 3, NULL); // Portal Lines (Top)
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\x00\x20\x90", 3, NULL); // Portal Lines (Bottom)
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\x00\x20\x90", 3, NULL); // Music Lines
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44779c), "\x77", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477d2), "\x76", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\x76", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\x77", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\x76\x09", 2, NULL); // Moving Objects
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\xb8\xa6\x54", 3, NULL); // Grid V1
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\xb8\xa6\x54", 3, NULL); // Grid V2
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\xb8\xa6\x54", 3, NULL); // Grid V3
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\xb8\xa6\x54", 3, NULL); // Grid H
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\xb8\xa6\x54", 3, NULL); // Portal Lines (Top)
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\xb8\xa6\x54", 3, NULL); // Portal Lines (Bottom)
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\xb8\xa6\x54", 3, NULL); // Music Lines
+                }
+            }
+
+            //ImGui::Checkbox("Editor Preview Mode", &setting().onEditorPreview);
+
+            if (ImGui::Checkbox("Free Scroll", &setting().onFreeScroll)) {
+                if (setting().onFreeScroll) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca45), "\xEB", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca5c), "\xEB", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca75), "\xEB", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca8c), "\xEB", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca45), "\x77", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ca5c), "\x77", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca75), "\x77", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca8c), "\x77", 1, NULL);
+                }
+            }
+
+            ImGui::Checkbox("Global Clipboard", &setting().onPersClip);
+
+            if (ImGui::Checkbox("Hide Grid", &setting().onHideGrid)) {
+                if (setting().onHideGrid) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\x0f\x86\x59\x01\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\x0f\x86\x53\x01\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Hide Trigger Lines", &setting().onHideTrigLine)) {
+                if (setting().onHideTrigLine) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493e08), "\xE9\xce\x00\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493e08), "\x0f\x84\xcd\x00\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
+                if (setting().onLevelEdit) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No (C) Mark", &setting().onNoCMark)) {
+                if (setting().onNoCMark) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x454aa0), "\xb8\x00\x00\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x454aa0), "\x8b\x81\x04\x02\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Death X", &setting().onNoDeathX)) {
+                if (setting().onNoDeathX) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48c76a), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48c76a), "\xc7\x04\x24\x33\x33\x33\x3f", 7, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Editor Trail", &setting().onNoEditorTrail)) {
+                if (setting().onNoEditorTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494305), "\x00", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49442c), "\x00", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494305), "\xFF", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49442c), "\xFF", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Object Bypass", &setting().onObjBypass)) {
+                if (setting().onObjBypass) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43e30e), "\x68\xFF\xFF\xFF\x7F", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448ed5), "\x3D\xFF\xFF\xFF\x7F", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\xFF\xFF\xFF\x7F", 5, NULL);
+                    //WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\xFF\xFF\xFF\x7F", 5, NULL); // 25 69 20 6F 62 6A 65 63 74 73 20 20 20
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43e30e), "\x68\x20\x4e\x00\x00", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448ed5), "\x3D\x20\x4e\x00\x00", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\x20\x4e\x00\x00", 5, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Place Over", &setting().onPlaceOver)) {
+                if (setting().onPlaceOver) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48D37F), "\xeb", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48D37F), "\x77", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Smooth Trail", &setting().onSmoothEditTrail)) {
+                if (setting().onSmoothEditTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x72\x79", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Verify Hack", &setting().onVerifyHack)) {
+                if (setting().onVerifyHack) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\xeb\x2f", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\x75\x2f", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Zoom Bypass", &setting().onZoomBypass)) {
+                if (setting().onZoomBypass) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bb5), "\x90\x90\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bba), "\x90\x90\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bb5), "\x0f\x2f\xc8", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bba), "\x0f\x28\xc8", 3, NULL);
+                }
+            }
+        }
+
+        if (ImGui::Begin("Level", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            /*if (ImGui::Checkbox("Ball Rotation Fix", &setting().onBallRotationFix)) {
+                if (setting().onBallRotationFix) {
+
+                }
+                else {
+
+                }
+            }*/
+
+            if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
+                if (setting().onConfirmExit) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\x90\x90\x90\x90\x90", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f9d), "\x90\x90\x90\x90\x90", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\x90\x90\x90\x90\x90", 5, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\xe8\xfb\xbb\x01\x00", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x6a\x10", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f9d), "\x68\x7c\x42\x51\x00", 5, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\xe8\xc6\xd7\xf2\xff", 5, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Correct Music Sync", &setting().onMusicSync)) {
+                if (setting().onMusicSync) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\xeb\x08", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\x75\x08", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("High FPS Rotation Fix", &setting().onHiFPSRotation)) {
+                if (setting().onHiFPSRotation) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dc13b), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dc13b), "\x0f\x82\xd6\x00\x00\x00", 6, NULL); // 0f 82 d6 00 00 00
+                }
+            }
+
+            /*if (ImGui::Checkbox("Ignore ESC", &setting().onIgnoreEsc)) {
+                if (setting().onIgnoreEsc) {
+
+                }
+                else {
+
+                }
+            }*/
+
+            if (ImGui::Checkbox("Instant Complete", &setting().onInstantComplete)) {
+                if (setting().onInstantComplete) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e16f6), "\xC7\x87\x74\x04\x00\x00\x00\x00\x00\x70\x90\x90", 12, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e16f6), "\xF3\x0F\x11\x8F\x74\x04\x00\x00\x9F\xF6\xC4\x44", 12, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Instant Triggers", &setting().onInstantTriggers)) {
+                if (setting().onInstantTriggers) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x89780), "\xC0", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x89780), "\xC1", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Jump Hack", &setting().onJumpHack)) {
+                if (setting().onJumpHack) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da510), "\x01", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da295), "\x01", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da510), "\x00", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da295), "\x00", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
+                if (setting().onNoclip) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\xe9\xf0\x02\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\x0f\x85\xef\x02\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Pause During Completion", &setting().onPauseDurComp)) {
+                if (setting().onPauseDurComp) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x00", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x01", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x88\x81\xf9\x02\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Practice Music", &setting().onPracticeMusic)) {
+                if (setting().onPracticeMusic) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3663), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0699), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F06CB), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\x90\x90\x90\x90\x90", 5, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x0f\x85\x4d\x07\x00\x00", 6, NULL); // 0f 85 4d 07 00 00
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3663), "\x75\x41", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0699), "\x75\x3e", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F06CB), "\x75\x0c", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\xe8\xaa\x42\xf2\xff", 5, NULL); // e8 aa 42 f2 ff
+                }
+            }
+
+            if (ImGui::Checkbox("Suicide", &setting().onSuicide)) {
+                if (setting().onSuicide) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea268), "\xe9\xc9\x01\x00\x00\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\xe9\x59\x02\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea268), "\x0f\x86\xc8\x01\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\x0f\x87\x58\x02\x00\x00", 6, NULL);
+                }
+            }
+        }
+
+        if (ImGui::Begin("Universal", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+            if (ImGui::DragFloat("##fpsbypass", &setting().fps, 1.f, 1.f, 360.f))
+                update_fps_bypass();
+            ImGui::SameLine();
+            if (ImGui::Checkbox("FPS bypass", &setting().onFPSBypass))
+                update_fps_bypass();
+            ImGui::EndTabItem();
+
+            /*if (ImGui::DragFloat("##pitchshifter", &setting().pitchshift, 1.f, 1.f, 10.f))
+                update_pitch_shifter();
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Pitch Shifter", &setting().onPitch))
+                update_pitch_shifter();
+            ImGui::EndTabItem();*/
+
+            /*if (ImGui::Checkbox("Allow Low Volume", &setting().onAllowLowVolume)) {
+                if (setting().onAllowLowVolume) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd0cb0), "\xeb", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd0cb0), "\x76", 1, NULL);
+                }
+            }*/
+
+            if (ImGui::Checkbox("Fast Alt-Tab", &setting().onFastAlt)) {
+                if (setting().onFastAlt) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x8b\x03\x8b\xcb\xff\x50\x18", 7, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Force Visibility", &setting().onForceVis)) {
+                if (setting().onForceVis) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60783), "\xB0\x01\x90", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60c9a), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60783), "\x8a\x45\x08", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60c9a), "\x0f\x84\xcb\x00\x00\x00", 6, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Free Window Resize", &setting().onFreeWinReSize)) {
+                if (setting().onFreeWinReSize) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\x90\x90\x90\x90\x90", 5, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\xe8\xb0\xf3\xff\xff", 5, NULL);
+                }
+            }
+
+            ImGui::Checkbox("HUE Fix", &setting().onAlwaysHue);
+
+            if (ImGui::Checkbox("Ignore Slider", &setting().onIgnoreSlider)) {
+                if (setting().onIgnoreSlider) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cec0), "\xc3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cec0), "\x55", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Immortal Icons", &setting().onImmortalIcons)) {
+                if (setting().onImmortalIcons) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\xc3", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\x55", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Instant Game Work", &setting().onInstantGameWork)) {
+                if (setting().onInstantGameWork) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc0", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc1", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Krmal Mode", &setting().onKrmalMode)) {
+                if (setting().onKrmalMode) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x8b\xd8\x90", 3, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x0f\x45\xdb", 3, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Rotation", &setting().onNoRotation)) {
+                if (setting().onNoRotation) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90", 10, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\xf3\x0f\x11\x41\x1c\xf3\x0f\x11\x41\x18", 10, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("No Transition", &setting().onNoTransition)) {
+                if (setting().onNoTransition) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\x31\xc0\x89", 3, NULL); // 31 C0 89
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
+                }
+            }
+
+            ImGui::Checkbox("Retry Keybind", &setting().onRetryBind);
+
+            if (ImGui::Checkbox("Safe Mode", &setting().onSafeMode)) {
+                if (setting().onSafeMode) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\xe9\x14\x00\x00\x00\x90", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\x75\x6c", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\x0f\x85\x76\x01\x00\x00", 6, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
+                }
+            }
+
+            ImGui::Checkbox("Show Percentage", &setting().onShowPercentage);
+
+            if (ImGui::Checkbox("Show Restart Button", &setting().onRestartButton)) {
+                if (setting().onRestartButton) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x75\x29", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Transparent BG", &setting().onTransparentBG)) {
+                if (setting().onTransparentBG) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf96), "\x90\xb1\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf9e), "\xff\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7db), "\x90\xb1\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7e3), "\xff\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488132), "\x90\xb1\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48813a), "\xff\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48969e), "\x90\xb1\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4896a5), "\xff\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde1), "\x90\xb1\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde9), "\xff\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f97c), "\x90\xb1\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f984), "\xff\xff", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf96), "\x80\xc9\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x42cf9e), "\x00\x66", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7db), "\x80\xc9\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b7e3), "\x00\x66", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488132), "\x80\xc9\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48813a), "\x00\x66", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48969e), "\x80\xc9\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4896a5), "\x00\x66", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde1), "\x80\xc9\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49bde9), "\x00\x66", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f97c), "\x80\xc9\xff", 3, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f984), "\x00\x66", 2, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Transparent Lists", &setting().onTransparentLists)) {
+                if (setting().onTransparentLists) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488a4f), "\x00\x00\x00\x40", 4, NULL); // RGBA format
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48a945), "\x00\x00\x00\x40", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431cba), "\x60", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c89), "\x20\x20", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c8c), "\x20", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c7f), "\x40\x40", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c82), "\x40", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x488a4f), "\xbf\x72\x3e\xff", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48a945), "\xbf\x72\x3e\xff", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431cba), "\xff", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c89), "\xa1\x58", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c8c), "\x2c", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c7f), "\xc2\x72", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c82), "\x3e", 1, NULL);
+                }
+            }
+
+            if (ImGui::Checkbox("Transparent Labels", &setting().onTransparentTextLabels)) {
+                if (setting().onTransparentTextLabels) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b9af), "\x68\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43BCA4), "\x68\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FC73), "\x68\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FD1C), "\x68\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A00E3), "\x68\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A04A6), "\x68\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\x00", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43b9af), "\x68\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43BCA4), "\x68\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FC73), "\x68\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49FD1C), "\x68\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A00E3), "\x68\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A04A6), "\x68\xff", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
+                }
+            }
+        }
+
+        if (ImGui::Begin("Icons", nullptr,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            ImGui::Checkbox("Same Dual Color", &setting().onSameDualColor);
+        }
+
+        if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            if (ImGui::DragFloat("##speedhack", &setting().speedhack, 0.05f, 0.f, 10.f))
+            {
+                update_speed_hack();
+                if (setting().speedhack < 0.f) setting().speedhack = 0;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack))
+            {
+                update_speed_hack();
+            }
+            ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
+        }
+
+        if (ImGui::Begin("Interface", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
@@ -192,12 +1930,68 @@ void RenderMain() {
             }
 
 
-            ImGui::DragFloat("UI Size", &setting().UISize, 0.01f, 1.f, 3.25f);
-            if (setting().UISize < 1.f) setting().UISize = 1.f;
+            ImGui::DragFloat("UI Size", &setting().UISize, 0.01f, 0.5f, 3.25f);
+            if (setting().UISize < 0.5f) setting().UISize = 0.5f;
             if (setting().UISize > 3.25f) setting().UISize = 3.25f;
+
+            
         }
+
+        if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            ImGui::Text("v1.0.3-alpha.1");
+
+            ImGui::Checkbox("Auto Save", &setting().onAutoSave);
+            ImGui::SameLine();
+            if (ImGui::Button("Save"))
+            {
+                save();
+                gd::FLAlertLayer::create(nullptr, "Saved!", "Your hack state is saved!", "Ok", nullptr, 240.f, false, 0)->show();
+            }
+            ImGui::EndTabItem();
+            if (ImGui::Button("Special Thanks"))
+            {
+                gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cl>TheSillyDoggo</c>.", "Ok", nullptr, 320.f, false, 0)->show();
+            }
+            if (ImGui::Button("Cocos Explorer")) {
+                setting().onExplorer = !setting().onExplorer;
+            }
+        }
+
     }
     ImGui::End();
+
+    if (setting().onColorPicker) {
+        static bool just_opened = true;
+        static Color3F color;
+        if (just_opened) {
+            ImGui::OpenPopup("Color picker");
+            just_opened = false;
+            color = Color3F::from(setting().onColorPicker->getColorValue());
+        }
+        bool unused_open = true;
+        if (ImGui::BeginPopupModal("Color picker", &unused_open,
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)) {
+
+            ImGui::ColorPicker3("##color_picker.color", &color.r);
+
+            ImGui::EndPopup();
+        }
+        else {
+            setting().onColorPicker->setColorValue(color);
+            setting().onColorPicker = nullptr;
+            just_opened = true;
+        }
+    }
+
+    update_fps_bypass();
+    update_speed_hack();
+
+    if (setting().onFPSBypass) {
+        update_fps_bypass();
+    }
 }
 
 void setup_imgui_menu() {

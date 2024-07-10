@@ -1,37 +1,166 @@
+#define NOMINMAX
 #include "pch.h"
 
-#include "PauseLayer.h"
-#include "MenuLayer.h"
 #include "EditorPauseLayer.h"
-#include "PlayLayer.h"
+
 
 #include <imgui-hook.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "state.h"
+#include "lvl-share.hpp"
+//#include "preview-mode.hpp"
 
 #include "menu.h"
+#include "utils.hpp"
 
-//gd::EditorUI* editUI;
+#include <matdash.hpp>
+#include <matdash/minhook.hpp>
+
+#include <cocos-ext.h>
+#include <fstream>
+#include <io.h>
+#include <fcntl.h>
+//#include "HitboxNode.h"
+//#include "ObjectsIds.h"
+
 CCLayer* LevelEditorLayerObject;
 CCLayer* playLayer;
 gd::EditorUI* editUI;
 CCLayer* creatorLayer;
-static constexpr const int MENU_TAG = 0x44; // it was for clickable dots from BEv4, but i dropped it
+std::string savedClipboard;
+CCLayer* PlayLayerObject;
+gd::ColorSelectPopup* colorSelectPopup;
 
+// Hitboxes thing by Taswert
 
-// Input Lag Reducer // Begin
-
-//void(__thiscall* fpMainLoop)(cocos2d::CCDirector* self);
-//void(__thiscall* fpPollEvents)(cocos2d::CCEGLView* self);
+//void drawRect(CCDrawNode* drawer, CCRect const& rect, ccColor4F col) {
+//    constexpr size_t N = 4;
+//    CCPoint vert[N];
 //
-//void(__fastcall hkMainLoop)(cocos2d::CCDirector* self) {
-//    fpPollEvents(self->getOpenGLView());
-//    fpMainLoop(self);
+//    vert[0] = CCPointMake(rect.getMinX(), rect.getMinY());
+//    vert[1] = CCPointMake(rect.getMinX(), rect.getMaxY());
+//    vert[2] = CCPointMake(rect.getMaxX(), rect.getMaxY());
+//    vert[3] = CCPointMake(rect.getMaxX(), rect.getMinY());
+//
+//    auto colorA = ccc4FFromccc4B(ccc4(0, 0, 0, 0));
+//
+//    drawer->drawPolygon(vert, N, colorA, 0.5, col);
 //}
-//void __fastcall hkPollEvents(void* self) {};
+//
+//void drawTriangleObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col) {
+//
+//    ob->updateOrientedBox();
+//    if (!ob->getOrientedBox()) return;
+//
+//    CCPoint triangle[3];
+//    auto isFlippedX = ob->getIsFlippedX();
+//    auto isFlippedY = ob->getIsFlippedY();
+//    auto point1 = ob->getOrientedBox()->getPoint1();
+//    auto point2 = ob->getOrientedBox()->getPoint2();
+//    auto point3 = ob->getOrientedBox()->getPoint3();
+//    auto point4 = ob->getOrientedBox()->getPoint4();
+//
+//    if (!isFlippedX && !isFlippedY) {
+//        triangle[0] = point1;
+//        triangle[1] = point2;
+//        triangle[2] = point3;
+//    }
+//    else if (isFlippedX && !isFlippedY) {
+//        triangle[0] = point2;
+//        triangle[1] = point3;
+//        triangle[2] = point4;
+//    }
+//    else if (!isFlippedX && isFlippedY) {
+//        triangle[0] = point1;
+//        triangle[1] = point2;
+//        triangle[2] = point4;
+//    }
+//    else if (isFlippedX && isFlippedY) {
+//        triangle[0] = point1;
+//        triangle[1] = point3;
+//        triangle[2] = point4;
+//    }
+//
+//    drawer->drawPolygon(triangle, 3, { 0, 0, 0, 0 }, 0.5, col);
+//}
+//
+//void drawRectObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col) {
+//    ob->updateOrientedBox();
+//    if (!ob->getOrientedBox()) return;
+//
+//    CCPoint vert[4];
+//    vert[0] = ob->getOrientedBox()->getPoint1();
+//    vert[1] = ob->getOrientedBox()->getPoint2();
+//    vert[2] = ob->getOrientedBox()->getPoint3();
+//    vert[3] = ob->getOrientedBox()->getPoint4();
+//
+//    drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+//}
+//
+//void drawCircleObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col) {
+//    ob->updateOrientedBox();
+//    if (!ob->getOrientedBox()) return;
+//    auto rad = ob->getObjectRadius();
+//
+//    constexpr size_t N = 64;
+//    constexpr float PI = 3.14159265;
+//
+//    CCPoint vert[N];
+//    for (size_t i = 0; i < N; ++i) {
+//        vert[i] = ob->getOrientedBox()->getCenterPoint() + CCPointMake(std::cos(2 * PI * i / N), std::sin(2 * PI * i / N)) * rad;
+//    }
+//    drawer->drawPolygon(vert, N, { 0, 0, 0, 0 }, 0.5, col);
+//}
+//
+//void drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
+//{
+//    CCPoint pointRectangle[4];
+//    CCRect rectRectangle;
+//    CCRect rectRectangleSmall;
+//    pointRectangle[0] = player->getOrientedBox()->getPoint1();
+//    pointRectangle[1] = player->getOrientedBox()->getPoint2();
+//    pointRectangle[2] = player->getOrientedBox()->getPoint3();
+//    pointRectangle[3] = player->getOrientedBox()->getPoint4();
+//
+//    auto p1x = pointRectangle[0].x - pointRectangle[1].x;
+//    auto p1y = pointRectangle[0].y - pointRectangle[1].y;
+//    auto distance1 = sqrt(p1x * p1x + p1y * p1y);
+//
+//    auto p2x = pointRectangle[1].x - pointRectangle[2].x;
+//    auto p2y = pointRectangle[1].y - pointRectangle[2].y;
+//    auto distance2 = sqrt(p2x * p2x + p2y * p2y);
+//
+//    auto distanceS1 = distance1 / 4;
+//    auto distanceS2 = distance2 / 4;
+//
+//    rectRectangle.setRect(player->getPositionX() - distance1 / 2, player->getPositionY() - distance2 / 2, distance1, distance2);
+//    rectRectangleSmall.setRect(player->getPositionX() - distanceS1 / 2, player->getPositionY() - distanceS2 / 2, distanceS1, distanceS2);
+//
+//    drawRect(drawNode, rectRectangleSmall, { 0, 0, 1, 1 });
+//    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0 }, 0.5, { 0.5, 0, 0, 1 });
+//    drawRect(drawNode, rectRectangle, { 1, 0, 0, 1 });
+//}
+//
+//void drawObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
+//    if (hazard.contains(obj->getObjectID()))
+//        drawRectObj(drawNode, obj, { 1, 0, 0, 1 });
+//    else if (orbsnportals.contains(obj->getObjectID()))
+//        drawRectObj(drawNode, obj, { 0, 1, 0, 1 });
+//    else if (solids.contains(obj->getObjectID()))
+//        drawRectObj(drawNode, obj, { 0, 0, 1, 1 });
+//    else if (ramps.contains(obj->getObjectID()))
+//        drawTriangleObj(drawNode, obj, { 0, 0, 1, 1 });
+//    else if (saws.contains(obj->getObjectID()))
+//        drawCircleObj(drawNode, obj, { 1, 0, 0, 1 });
+//}
 
-// End
+// End of Hitboxes thing
+
+CCPoint* EditorUI_getLimitedPosition(CCPoint* retVal, CCPoint point) {
+    *retVal = point;
+    return retVal;
+}
 
 class LevelEditorLayer : public CCLayer {
 public:
@@ -84,56 +213,20 @@ bool __fastcall LevelEditorLayer_init_H(gd::LevelEditorLayer* self, void*, gd::G
     self->addChild(menuh);
 }
 
-CCMenu* editorUIRightMenu = nullptr;
-
 bool(__thiscall* EditorUI_init)(gd::EditorUI* self, CCLayer* editor);
 bool __fastcall EditorUI_init_H(gd::EditorUI* self, void*, CCLayer* editor) {
     editUI = self;
-    editorUIRightMenu = nullptr;
-    bool result = EditorUI_init(self, editor);
-
-    auto rMenuArr = from<CCArray*>(editorUIRightMenu, 0xA8);
-
-    auto copyColorSpr = CCSprite::createWithSpriteFrameName("GJ_copyBtn_001.png");
-    copyColorSpr->setScale(.85f);
-    auto copyColorBtn = gd::CCMenuItemSpriteExtra::create(copyColorSpr, nullptr, 0, 0);
-    copyColorBtn->setPosition({ -95, -44 });
-    auto pasteColorSpr = CCSprite::createWithSpriteFrameName("GJ_pasteBtn_001.png");
-    pasteColorSpr->setScale(.85f);
-    auto pasteColorBtn = gd::CCMenuItemSpriteExtra::create(pasteColorSpr, nullptr, 0, 0);
-    pasteColorBtn->setPosition({ -95, -88 });
-
-    editorUIRightMenu->addChild(pasteColorBtn);
-    editorUIRightMenu->addChild(copyColorBtn);
     
-
+    bool result = EditorUI_init(self, editor);
+    
     auto sliderArr = from<CCArray*>(self, 0xA8);
     auto Slider = reinterpret_cast<gd::Slider*>(sliderArr->objectAtIndex(0));
     Slider->setPositionX(Slider->getPositionX() + 15);
 
-    auto EditButtonBar_edit = reinterpret_cast<gd::EditButtonBar*>(sliderArr->objectAtIndex(19));
-    //EditButtonBar_edit->setPositionX(EditButtonBar_edit->getPositionX() - 45);
-
     auto director = CCDirector::sharedDirector();
     auto size = director->getWinSize();
-    auto menuEUI = CCMenu::create();
 
-    auto editorlbl = CCLabelBMFont::create("", "chatFont.fnt");
-    editorlbl->setString(CCString::createWithFormat("EditorUI: %p", self)->getCString());
-    editorlbl->setAnchorPoint({ 1.f, 0.5f });
-    editorlbl->setPosition(CCDirector::sharedDirector()->getScreenRight() - 120, 130);
-    editorlbl->setScale(0.5f);
-    self->addChild(editorlbl);
-
-    auto lvllbl = CCLabelBMFont::create("", "chatFont.fnt");
-    lvllbl->setString(CCString::createWithFormat("LevelEditorLayer: %p", self->getLevelEditorLayer())->getCString());
-    lvllbl->setAnchorPoint({ 1.f, 0.5f });
-    lvllbl->setPosition(CCDirector::sharedDirector()->getScreenRight() - 120, 120);
-    lvllbl->setScale(0.5f);
-    lvllbl->setTag(4571);
-    self->addChild(lvllbl);
-
-    gd::EditorUI* selectedObject = from<gd::EditorUI*>(self, 0x220);
+    /*gd::EditorUI* selectedObject = from<gd::EditorUI*>(self, 0x220);
     auto objid = CCLabelBMFont::create("", "bigFont.fnt");
     objid->setString(CCString::createWithFormat("ID: %d", selectedObject)->getCString());
     objid->setPosition(director->getScreenLeft() + 90, director->getScreenBottom() + 80);
@@ -150,37 +243,42 @@ bool __fastcall EditorUI_init_H(gd::EditorUI* self, void*, CCLayer* editor) {
     objcolorid->setScale(0.66f);
     objcolorid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 60 });
     objcolorid->setAnchorPoint({ 0, 0.5f });
-    self->addChild(objcolorid);
+    self->addChild(objcolorid);*/
 
-    
-
-    //hideui_btn->setPosition({ director->getScreenLeft(), director->getScreenTop() });
-    //toggleOff->setOpacity(100);
-
-    auto advDelBtn = gd::ButtonSprite::create("Delete", 50, 0, 0.4f, false, "bigFont.fnt", "GJ_button_04.png", 50);
-
-    auto DelSpr = CCSprite::create("GJ_trashBtn_001.png");
-    auto DelBtn = gd::CCMenuItemSpriteExtra::create(DelSpr, nullptr, self, menu_selector(gd::EditorUI::onDeleteSelected));
-
-   
-
-    //director->getRunningScene()->addChild(menuEUI);
-
-    menuEUI->setPosition({ director->getScreenLeft() + 104, director->getScreenTop() - 32.75f });
-    menuEUI->setScale(0.925f);
-
-    menuEUI->addChild(DelBtn);
-    self->addChild(menuEUI);
+    if (setting().onPersClip)
+    {
+        if (!savedClipboard.empty()) {
+            self->clipboard() = savedClipboard;
+            self->updateButtons();
+        }
+    }
 
     return result;
 }
 
-bool(__thiscall* EditorUI_rightMenu)();
-void __fastcall EditorUI_rightMenu_H() {
-    _asm {
-        mov editorUIRightMenu, eax
+bool(__thiscall* EditorUI_dtor)(gd::EditorUI* self);
+bool __fastcall EditorUI_dtor_H(gd::EditorUI* self) {
+    //editUI = self;
+    editUI = nullptr;
+    if (setting().onPersClip) savedClipboard = self->clipboard();
+    EditorUI_dtor(self);
+}
+
+void(__thiscall* LevelInfoLayer_onClone)(gd::LevelInfoLayer*, CCObject*);
+void __stdcall LevelInfoLayer_onClone_H(gd::LevelInfoLayer* self, CCObject* sender) {
+    LevelInfoLayer_onClone(self, sender);
+    if (!self->shouldDownloadLevel()) {
+        auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
+        level->songID() = self->level()->songID();
     }
-    EditorUI_rightMenu();
+}
+
+void(__thiscall* EditLevelLayer_onClone)(gd::EditLevelLayer*);
+void __stdcall EditLevelLayer_onClone_H(gd::EditLevelLayer* self) {
+    EditLevelLayer_onClone(self);
+
+    auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
+    level->songID() = self->level()->songID();
 }
 
 void(__thiscall* EditorPauseLayer_onSaveAndPlay)(gd::EditorPauseLayer*, CCObject*);
@@ -204,56 +302,30 @@ void __fastcall EditorPauseLayer_onExitNoSave_H(gd::EditorPauseLayer* self, void
     editUI = nullptr;
 }
 
-//class MenuGameDelegate : public CCLayer {
-//public:
-//    gd::MenuGameLayer* mgl = nullptr;
-//    static inline MenuGameDelegate* instance = nullptr;;
-//
-//    bool init() {
-//        if (!CCLayer::init()) return false;
-//            
-//            instance = this;
-//
-//            this->setKeyboardEnabled(true);
-//            this->setTouchEnabled(true);
-//
-//            CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, -69, true);
-//
-//            return true;
-//    }
-//    virtual bool ccTouchBegan(CCTouch* pTouch, CCEvent* pEvent) {
-//        if (mgl) {
-//            if (pTouch ? mgl->ccTouchBegan(pTouch, pEvent) : true) {
-//                if (mgl->m_playerObject)
-//                    mgl->m_playerObject->pushButton(1);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    virtual void ccTouchEnded(CCTouch* pTouch, CCEvent* pEvent) {
-//        if (mgl->m_playerObject)
-//            mgl->m_playerObject->releaseButton(1);
-//    }
-//
-//    ~MenuGameDelegate() {
-//        instance = nullptr;
-//    }
-//
-//    CREATE_FUNC(MenuGameDelegate);
-//};
-//
-//bool(__thiscall* MenuGameLayer_init)(CCLayer* self);
-//bool __fastcall MenuGameLayer_init_H(CCLayer* self) {
-//    if (!MenuGameLayer_init) return false;
-//    
-//}
+bool(__thiscall* UILayer_keyDown)(gd::UILayer* self, enumKeyCodes key);
+void __fastcall UILayer_keyDown_H(gd::UILayer* self, void*, enumKeyCodes key) {
+    if ((key == KEY_R) && setting().onRetryBind) {
+        auto pl = gd::GameManager::sharedState()->getPlayLayer();
+        if (pl) {
+            //here, should destroy pause smh
+            //pl->removeMeAndCleanup();
+            pl->resetLevel();
+            /*if (layers().PauseLayerObject)
+            {
+                layers().PauseLayerObject->removeMeAndCleanup();
+                layers().PauseLayerObject = nullptr;
+            }*/
+            pl->resume();
+            return;
+        }
+    }
+    UILayer_keyDown(self, key);
+}
 
 void(__thiscall* Scheduler_update)(void*, float);
 void __fastcall Scheduler_update_H(void* self, float dt) {
 
-        if (editUI) {
+        /*if (editUI) {
             auto objid = editUI->getChildByTag(4572);
             if (objid) {
                 reinterpret_cast<CCLabelBMFont*>(objid)->setString(CCString::createWithFormat("ID: %d", editUI->selectedObjectID())->getCString());
@@ -268,84 +340,15 @@ void __fastcall Scheduler_update_H(void* self, float dt) {
                 }
                 
             }
-        }
+        }*/
 
     Scheduler_update(self, dt);
-}
-
-
-
-class OptionsLayer : public CCLayer {
-public:
-    void FLAlertRepBtn(CCObject*);
-};
-
-void OptionsLayer::FLAlertRepBtn(CCObject*) {
-    auto flalertrep = gd::FLAlertLayer::create(nullptr, "Unavailable", "Gameplay recording is not supported on this device.", "OK", nullptr, 250.0f, false, 0);
-    flalertrep->show();
-}
-
-bool(__thiscall* OptionsLayer_customSetup)(CCLayer* self);
-void __fastcall OptionsLayer_customSetup_H(CCLayer* self) {
-
-    auto layerMain = (cocos2d::CCLayer*)self->getChildren()->objectAtIndex(0);
-
-    auto director = CCDirector::sharedDirector();
-    auto size = director->getWinSize();
-    auto menu = CCMenu::create();
-
-    auto input = gd::CCTextInputNode::create("Text", nullptr, "bigFont.fnt", 30.f, 20.f);
-
-    auto RepLabel = CCLabelBMFont::create("Record\nReplays", "bigFont.fnt", 0.f, kCCTextAlignmentCenter);
-    auto RepSpr = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
-    auto RepBtn = gd::CCMenuItemSpriteExtra::create(RepSpr, nullptr, self, menu_selector(OptionsLayer::FLAlertRepBtn));
-
-    RepSpr->setScale(.8f);
-    RepLabel->setScale(.4f);
-
-    menu->setPosition({ size.width - 145, size.height - 200 });
-    RepLabel->setPosition({ size.width - 145, size.height - 228 });
-
-    menu->addChild(RepBtn);
-
-    layerMain->addChild(RepLabel);
-    layerMain->addChild(menu);
-
-    //layerMain->addChild(input);
-
-    OptionsLayer_customSetup(self);
-}
-
-//bool(__thiscall* ObjectToolbox_init)(CCNode* self);
-//bool __fastcall ObjectToolbox_init_H(CCNode* self) {
-//    if (!ObjectToolbox_init(self)) return false;
-//
-//    
-//
-//    return true;
-//}
-
-bool(__thiscall* SupportLayer_customSetup)(CCLayer* self);
-void __fastcall SupportLayer_customSetup_H(CCLayer* self) {
-
-    auto SupportLayerMain = (cocos2d::CCLayer*)self->getChildren()->objectAtIndex(0);
-
-    auto director = CCDirector::sharedDirector();
-    auto size = director->getWinSize();
-
-    auto PolzLabel = CCLabelBMFont::create("PolzHax by Pololak", "goldFont.fnt");
-
-    PolzLabel->setPosition({ size.width / 2, size.height / 2 - 70});
-    PolzLabel->setScale(.4f);
-
-    SupportLayerMain->addChild(PolzLabel);
-
-    SupportLayer_customSetup(self);
 }
 
 bool(__thiscall* PlayLayer_init)(gd::PlayLayer* self, gd::GJGameLevel* level);
 bool __fastcall PlayLayer_init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level)
 {
+    layers().PauseLayerObject = self;
     playLayer = self;
 
     if (!PlayLayer_init(self, level)) return false;
@@ -353,45 +356,282 @@ bool __fastcall PlayLayer_init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel
     auto director = CCDirector::sharedDirector();
     auto size = CCDirector::sharedDirector()->getWinSize();
 
-    auto cheatindicator = CCLabelBMFont::create(".", "bigFont.fnt");
-    cheatindicator->setPosition({ director->getScreenLeft() + 8, director->getScreenTop() + 2 });
-    cheatindicator->setScale(1.f);
-    cheatindicator->setZOrder(100);
-    cheatindicator->setColor({ 0, 255, 0 });
+    auto playerDrawNode = CCDrawNode::create();
+    playerDrawNode->setZOrder(1000);
+    playerDrawNode->setTag(124);
+    self->layer()->addChild(playerDrawNode);
 
-    auto lol = CCLabelBMFont::create("(totally legit)", "bigFont.fnt");
-    lol->setPosition({ director->getScreenLeft() + 38, director->getScreenTop() - 7.5f });
-    lol->setScale(.2f);
-    lol->setZOrder(100);
-    lol->setOpacity(100);
+    auto objDrawNode = CCDrawNode::create();
+    objDrawNode->setZOrder(1000);
+    objDrawNode->setTag(125);
+    self->layer()->addChild(objDrawNode);
 
-    auto polzlabel = CCLabelBMFont::create("PolzHax Alpha", "bigFont.fnt");
-    polzlabel->setPosition({ director->getScreenLeft() + 55, director->getScreenTop() - 18 });
-    polzlabel->setOpacity(100);
-    polzlabel->setZOrder(100);
-    polzlabel->setScale(.4f);
+    auto secarr = self->getSections();
+    auto arrcount = secarr->count();
 
-    self->addChild(polzlabel);
-    self->addChild(cheatindicator);
-    self->addChild(lol);
+    
+
+    if (setting().onShowPercentage)
+    {
+        const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
+
+        auto percentLabel = CCLabelBMFont::create("0.00%", "bigFont.fnt");
+        percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
+        percentLabel->setScale(0.5f);
+        percentLabel->setZOrder(5);
+        percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
+        percentLabel->setTag(4571);
+        self->addChild(percentLabel);
+    }
+
 }
 
-bool(__thiscall* ColorSelectPopup_init)(gd::ColorSelectPopup* self, gd::GameObject* obj, int colorid, int idk, int idk2);
-void __fastcall ColorSelectPopup_init_H(gd::ColorSelectPopup* self, gd::GameObject* obj, int colorid, int idk, int idk2) {
+bool(__thiscall* PlayLayer_update)(gd::PlayLayer* self, float dt);
+void __fastcall PlayLayer_update_H(gd::PlayLayer* self, void*, float dt) {
+    layers().PauseLayerObject = nullptr;
 
-    auto sprite = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+    PlayLayer_update(self, dt);
+    const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
+
+    auto size = CCDirector::sharedDirector()->getWinSize();
+
+    auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
+
+    if (percentLabel) {
+        const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
+
+        percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
+        percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
+
+        if (value < 100.0f) percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
+        else percentLabel->setString(CCString::create("100.00%")->getCString());
+
+    }
+
+    if (setting().onHideAttempts) {
+        self->attemptsLabel()->setVisible(false);
+    }
+
+    if (setting().onSameDualColor)
+    {
+        self->player2()->setColor(self->player1()->getColor());
+        self->player2()->setSecondColor(self->player1()->getSecondColor());
+
+        self->player2()->setGlowColor(self->player1()->getGlowColor());
+        //self->player2()->setColor3(self->player1()->getColor3());
+
+        self->player2()->setColorSecondVehicle(self->player1()->getColorSecondVehicle());
+        //self->player2()->setColor5(self->player1()->getColor5());
+        self->player2()->setColorGlowVehicle(self->player1()->getColorGlowVehicle());
+        //self->player2()->setColor7(self->player1()->getColor7());
+
+        self->player2()->setWaveTrailColor(self->player1()->getWaveTrailColor());
+    }
+    else
+    {
+        self->player2()->setColor(self->player1()->getSecondColor());
+        self->player2()->setSecondColor(self->player1()->getColor());
+
+        self->player2()->setGlowColor(self->player1()->getGlowColor());
+        //self->player2()->setColor3(self->player1()->getColor3());
+
+        self->player2()->setColorSecondVehicle(self->player1()->getColor());
+        //self->player2()->setColor5(self->player1()->getColor5());
+        self->player2()->setColorGlowVehicle(self->player1()->getGlowColor());
+        //self->player2()->setColor7(self->player1()->getColor7());
+
+        self->player2()->setWaveTrailColor(self->player1()->getSecondColor());
+    }
+
+    if (setting().onHidePlayer) {
+        self->player1()->setVisible(0);
+        self->player2()->setVisible(0);
+    }
+    else {
+        self->player1()->setVisible(1);
+        self->player2()->setVisible(1);
+    }
+
+}
+
+//bool(__thiscall* HardStreak_updateStroke)(gd::HardStreak* self, float dt);
+//void __fastcall HardStreak_updateStroke_H(gd::HardStreak* self, float dt) {
+//    if (setting().onNoWavePulse) {
+//        //self->m_pulseSize = 1;
+//        dt = 1;
+//    }
+//    else {
+//
+//    }
+//    
+//    HardStreak_updateStroke(self, dt);
+//}
+
+
+
+bool(__thiscall* PauseLayer_customSetup)(gd::CCBlockLayer* self);
+bool __fastcall PauseLayer_customSetup_H(gd::CCBlockLayer* self) {
+    layers().PauseLayerObject = self;
+    if (setting().onHidePauseMenu)
+        self->setVisible(false);
+    else self->setVisible(true);
+
+
+
+    bool result = PauseLayer_customSetup(self);
+    return result;
+}
+
+bool(__thiscall* PlayLayer_resume)(CCLayer* self);
+bool __fastcall PlayLayer_resume_H(CCLayer* self)
+{
+    layers().PauseLayerObject = nullptr;
+    bool result = PlayLayer_resume(self);
+    return result;
+}
+
+bool(__thiscall* PauseLayer_onEdit)(CCLayer* self);
+void __fastcall PauseLayer_onEdit_H(CCLayer* self)
+{
+    layers().PauseLayerObject = nullptr;
+    PlayLayerObject = nullptr;
+    PauseLayer_onEdit(self);
+}
+
+bool(__thiscall* PlayLayer_onQuit)(CCNode* self);
+void __fastcall PlayLayer_onQuit_H(CCNode* self) {
+    layers().PauseLayerObject = nullptr;
+    PlayLayerObject = nullptr;
+    PlayLayer_onQuit(self);
+}
+
+class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
+protected:
+
+    void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override
+    {
+        if (btn2)
+        {
+            gd::GameManager::sharedState()->getPlayLayer()->onQuit();
+            gd::GameSoundManager::sharedState()->playSound("quitSound_01.ogg");
+        }
+    }
+};
+ExitAlertProtocol eaProtocol;
+
+bool(__thiscall* PauseLayer_onQuit)(CCObject* btn);
+void __fastcall PauseLayer_onQuit_H(CCObject* btn)
+{
+    PlayLayerObject = nullptr;
+    if (setting().onConfirmExit) gd::FLAlertLayer::create(&eaProtocol, "Confirm", "Are you sure you want to exit the level?", "Cancel", "Exit", 320.f, false, 0)->show();
+    PauseLayer_onQuit(btn);
+}
+
+class CustomizeObjectLayer : public gd::FLAlertLayer
+{
+public:
+    void hightlightSelected(gd::ButtonSprite* spr) {
+        reinterpret_cast<void(__thiscall*)(CustomizeObjectLayer*, gd::ButtonSprite*)>(gd::base + 0x2e730)(this, spr);
+    }
+};
+
+bool(__thiscall* CustomizeObjectLayer_init)(CustomizeObjectLayer* self, gd::GameObject* obj, CCArray* objs);
+bool __fastcall CustomizeObjectLayer_init_H(CustomizeObjectLayer* self, void* edx, gd::GameObject* obj, CCArray* objs) {
+    if (!CustomizeObjectLayer_init(self, obj, objs)) return false;
+
+    auto sprite = gd::ButtonSprite::create("3DL", 250, 0, 0.4, false, "bigFont.fnt", "GJ_button_04.png", 25.0);
+    auto button = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, union_cast<SEL_MenuHandler>(gd::base + 0x2e600));
+    button->setTag(static_cast<int>(gd::CustomColorMode::DL));
+    button->setPosition(100, 0);
+    from<CCArray*>(self, 0x1c4)->addObject(sprite);
+    self->getMenu()->addChild(button);
+
+    if (obj && obj->getColorMode() == gd::CustomColorMode::DL) {
+        self->hightlightSelected(sprite);
+    }
+
+    return true;
+}
+
+bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int color_id, int idk, int idk2) {
+
+    setting().onShouldHue = true;
+    if (!matdash::orig<&ColorSelectPopup_init>(self, obj, color_id, idk, idk2)) return false;
+
+    //gd::ColorSelectPopup* fadeTimeOk = from<gd::ColorSelectPopup*>(self, 0x1ec);
+
+    constexpr auto handler = [](CCObject* _self, CCObject* button) {
+        auto self = reinterpret_cast<gd::ColorSelectPopup*>(_self);
+        auto picker = self->colorPicker();
+        setting().onColorPicker = picker;
+        };
+    auto sprite = gd::ButtonSprite::create("Picker", 0x28, 0, 0.6f, true, "goldFont.fnt", "GJ_button_04.png", 30.0);
+
+
+
+    auto button = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+    const auto win_size = CCDirector::sharedDirector()->getWinSize();
     const auto menu = self->menu();
-    //menu->addChild(sprite);
+    button->setPosition(menu->convertToNodeSpace({ win_size.width - 50.f, win_size.height - 110 }));
+    menu->addChild(button);
 
-    ColorSelectPopup_init(self, obj, colorid, idk, idk2);
+
+    return true;
 }
 
-bool(__thiscall* ColorSelectPopup_dtor)(gd::ColorSelectPopup* self);
-void __fastcall ColorSelectPopup_dtor_H(gd::ColorSelectPopup* self) {
-    ColorSelectPopup_dtor(self);
+void ColorSelectPopup_dtor(gd::ColorSelectPopup* self) {
+    setting().onShouldHue = false;
+    matdash::orig<&ColorSelectPopup_dtor>(self);
+}
+
+matdash::cc::c_decl<cocos2d::extension::RGBA> cocos_hsv2rgb(cocos2d::extension::HSV color) {
+    if ((setting().onShouldHue || setting().onAlwaysHue) && std::isnan(color.h))
+        color.h = 0.0;
+    return matdash::orig<&cocos_hsv2rgb>(color);
 }
 
 
+bool(__thiscall* EditorUI_scrollWheel)(gd::EditorUI* _self, float dy, float dx);
+void __fastcall EditorUI_scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
+    auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf8);
+    auto layer = reinterpret_cast<gd::LevelEditorLayer*>(self->getParent())->gameLayer();
+    auto zoom = layer->getScale();
+
+    static_assert(offsetof(CCDirector, m_pKeyboardDispatcher) == 0x4c, "it wrong!");
+    auto kb = CCDirector::sharedDirector()->m_pKeyboardDispatcher;
+    if (kb->getControlKeyPressed()) {
+        zoom = static_cast<float>(std::pow(2.71828182845904523536, std::log(std::max(zoom, 0.001f)) - dy * 0.01f));
+        // zoom limit
+        zoom = std::max(zoom, 0.01f);
+        zoom = std::min(zoom, 1000000.f);
+        self->updateZoom(zoom);
+    }
+    else if (kb->getShiftKeyPressed()) {
+        layer->setPositionX(layer->getPositionX() - dy * 1.f);
+    }
+    else {
+        EditorUI_scrollWheel(_self, dy, dx);
+    }
+}
+
+bool(__thiscall* ObjectToolbox_gridNodeSizeForKey)(int id);
+void __stdcall ObjectToolbox_gridNodeSizeForKey_H(int id) {
+
+    ObjectToolbox_gridNodeSizeForKey(id);
+}
+
+bool(__thiscall* CCDirector_end)(CCDirector* self);
+void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
+    if (setting().onAutoSave)
+    {
+        auto file = fopen("Resources/polzsave.dat", "wb");
+        if (file) {
+            fwrite(&setting(), sizeof(setting()), 1, file);
+            fclose(file);
+        }
+    }
+    CCDirector_end(self);
+}
 
 // Unlisted Objects
 
@@ -438,10 +678,16 @@ void __fastcall ObjectToolboxAdd_DecoSpikesTab_H() {
 
 bool(__thiscall* ObjectToolboxAdd_ChainTab)();
 void __fastcall ObjectToolboxAdd_ChainTab_H() {
-    objectAdd(0x196);
+    objectAdd(0x1d2); // another brushes that don't overlaps player
+    objectAdd(0x1cd);
+    objectAdd(0x1ce);
+    objectAdd(0x1cf);
+    objectAdd(0x1d0);
+    objectAdd(0x1d1);
+    objectAdd(0x196); // grass
     objectAdd(0x197);
     objectAdd(0x198);
-    objectAdd(0x2D5);
+    objectAdd(0x2D5); // dot
     ObjectToolboxAdd_ChainTab();
 }
 
@@ -452,90 +698,12 @@ void __fastcall ObjectToolboxAdd_TriggerTab_H() {
     ObjectToolboxAdd_TriggerTab();
 }
 
-bool(__thiscall* ObjectToolboxAdd_RingTab)();
-void __fastcall ObjectToolboxAdd_RingTab_H() {
-    objectAdd(0x37);
-    ObjectToolboxAdd_TriggerTab();
-}
+DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 
 DWORD WINAPI my_thread(void* hModule) {
 
-    // Level Bypass
-
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A81AF), "\xE9\xA3\x02\x00\x00\x90", 6, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A8C22), "\xE9\x98\x00\x00\x00\x90", 6, NULL);
-
-    // Icon Bypass
-
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48000F), "\xE9\x74\x02\x00\x00\x90", 6, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E606), "\xE9\xDC\x00\x00\x00\x90", 6, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E098), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E128), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E1B8), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E248), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47E2D8), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47e9be), "\xEB\x13", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47eaae), "\xEB\x13", 2, NULL);
-
-    // fast alt-tab
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
-    
-    // no respawn blink
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\xE9\x99\x00\x00\x00\x90", 6, NULL);
-    
-    // no death effect
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DDE71), "\xE9\xE7\x01\x00\x00\x90", 6, NULL);
-    
-    // esc during completion
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x00", 1, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x90\x90\x90\x90\x90\x90", 6, NULL);
-    
-    // practice pulse
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429975), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\xEB\x16", 2, NULL);
-
-    // no orb ring
-    //WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF6D40), "\xC3", 1, NULL);
-
-    // Practice Music Hack
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x90\x90\x90\x90\x90\x90", 6, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3663), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0699), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F06CB), "\x90\x90", 2, NULL);
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\x90\x90\x90\x90\x90", 5, NULL);
-
-    // Restart Button
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x90\x90", 2, NULL);
-
-
-
-    // # Editor Tweaks #
-
-    // Free Scroll (Top)
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44CA8C), "\xEB\x05", 2, NULL);
-
-    // Grid Extension
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\x00\x20\x73", 3, NULL); // Grid V1
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\x00\x20\x73", 3, NULL); // Grid V2
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\x00\x20\x73", 3, NULL); // Grid V3
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\x00\x20\x73", 3, NULL); // Grid H
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\x00\x20\x73", 3, NULL); // Portal Lines (Top)
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\x00\x20\x73", 3, NULL); // Portal Lines (Bottom)
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\x00\x20\x73", 3, NULL); // Music Lines
-
-    // Play Music Button on LevelInfoLayer
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); //B8 01 00 00 00 90 90
 
-    // ImGui UI Settings
-
-
-
-
-    DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(cocosbase + 0xAC29D), "\xBB\xFF\x00\x00\x00\x90", 6, NULL); // trail cut fix
-
-
-        
     if (MH_Initialize() != MH_OK) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
@@ -543,8 +711,6 @@ DWORD WINAPI my_thread(void* hModule) {
    /* AllocConsole();
     freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);*/
 
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xD5F50), PauseLayer::hook, reinterpret_cast<void**>(&PauseLayer::init));
-  
     MH_CreateHook
     (reinterpret_cast<void*>(gd::base + 0x3f170),
         reinterpret_cast<void**>(&EditorPauseLayer_onSaveAndPlay_H),
@@ -563,11 +729,45 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void**>(&PlayLayer_init_H),
         reinterpret_cast<void**>(&PlayLayer_init));
 
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd7f00),
+        reinterpret_cast<void*>(&PauseLayer_onQuit_H),
+        reinterpret_cast<void**>(&PauseLayer_onQuit));
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd5f50),
+        reinterpret_cast<void**>(&PauseLayer_customSetup_H),
+        reinterpret_cast<void**>(&PauseLayer_customSetup));
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xcfc90),
+        reinterpret_cast<void**>(&ObjectToolbox_gridNodeSizeForKey_H),
+        reinterpret_cast<void**>(&ObjectToolbox_gridNodeSizeForKey));*/
+
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0x3fb90),
+        reinterpret_cast<void**>(&EditorUI_dtor_H),
+        reinterpret_cast<void**>(&EditorUI_dtor));
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0x4ee90),
+        reinterpret_cast<void**>(&EditorUI_scrollWheel_H),
+        reinterpret_cast<void**>(&EditorUI_scrollWheel));
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0x833e0),
+        reinterpret_cast<void**>(&HardStreak_updateStroke_H), 
+        reinterpret_cast<void**>(&HardStreak_updateStroke));*/
+
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd5f50),
+        reinterpret_cast<void**>(&EditorUI_getLimitedPosition_H),
+        reinterpret_cast<void**>(&EditorUI_getLimitedPosition));*/
+
     /*MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xad4d0),
         reinterpret_cast<void**>(&MenuGameLayer_init_H),
         reinterpret_cast<void**>(&MenuGameLayer_init));*/
-   
+
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x44964),
         reinterpret_cast<void*>(&ObjectToolboxAdd_RampTab_H),
@@ -595,16 +795,6 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void**>(&EditorUI_init));
 
     MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xd0470),
-        reinterpret_cast<void*>(&OptionsLayer_customSetup_H),
-        reinterpret_cast<void**>(&OptionsLayer_customSetup));
-
-    MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xfd420),
-        reinterpret_cast<void*>(&SupportLayer_customSetup_H),
-        reinterpret_cast<void**>(&SupportLayer_customSetup));
-
-    MH_CreateHook(
         reinterpret_cast<void*>(cocosbase + 0xff970),
         reinterpret_cast<void**>(&Scheduler_update_H),
         reinterpret_cast<void**>(&Scheduler_update));
@@ -613,17 +803,31 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void*>(gd::base + 0x8c2c0),
         reinterpret_cast<void**>(&LevelEditorLayer_init_H),
         reinterpret_cast<void**>(&LevelEditorLayer_init));
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf39b0),
+        reinterpret_cast<void**>(&PlayLayer_resume_H),
+        reinterpret_cast<void**>(&PlayLayer_resume));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf3b80),
+        reinterpret_cast<void*>(&PlayLayer_onQuit_H),
+        reinterpret_cast<void**>(&PlayLayer_onQuit));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd7bf0),
+        reinterpret_cast<void**>(&PauseLayer_onEdit_H),
+        reinterpret_cast<void**>(&PauseLayer_onEdit));
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x3e3d0),
         EditorPauseLayer::EditorPauseLayer_customSetup_H,
         reinterpret_cast<void**>(&EditorPauseLayer::EditorPauseLayer_customSetup));
 
     MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xaf5ad),
-        MenuLayer::MenuLayer_bottomMenu_H,
-        reinterpret_cast<void**>(&MenuLayer::MenuLayer_bottomMenu));
+        reinterpret_cast<void*>(gd::base + 0x3f570),
+        EditorPauseLayer::EditorPauseLayer_keyDown_H,
+        reinterpret_cast<void**>(&EditorPauseLayer::EditorPauseLayer_keyDown));
 
-    MH_CreateHook(
+
+    /*MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x3e41d),
         EditorPauseLayer::EditorPauseLayer_centerMenu_H,
         reinterpret_cast<void**>(&EditorPauseLayer::EditorPauseLayer_centerMenu));
@@ -631,31 +835,67 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x3e56b),
         EditorPauseLayer::EditorPauseLayer_bottomMenu_H,
-        reinterpret_cast<void**>(&EditorPauseLayer::EditorPauseLayer_bottomMenu));
+        reinterpret_cast<void**>(&EditorPauseLayer::EditorPauseLayer_bottomMenu));*/
+
+    
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xff130),
+        reinterpret_cast<void**>(&UILayer_keyDown_H),
+        reinterpret_cast<void**>(&UILayer_keyDown));
 
     MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0x408fc),
-        reinterpret_cast<void**>(&EditorUI_rightMenu_H),
-        reinterpret_cast<void**>(&EditorUI_rightMenu));
+        reinterpret_cast<void*>(gd::base + 0xe9360),
+        reinterpret_cast<void**>(&PlayLayer_update_H),
+        reinterpret_cast<void**>(&PlayLayer_update));
 
     MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xAF210),
-        MenuLayer::MenuLayer_init_H,
-        reinterpret_cast<void**>(&MenuLayer::MenuLayer_init));
+        reinterpret_cast<void*>(gd::base + 0x2dc70),
+        reinterpret_cast<void**>(&CustomizeObjectLayer_init_H),
+        reinterpret_cast<void**>(&CustomizeObjectLayer_init));
+
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0x9e2c0),
+        reinterpret_cast<void**>(&LevelInfoLayer_onClone_H),
+        reinterpret_cast<void**>(&LevelInfoLayer_onClone));
 
     MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0x29db0),
-        reinterpret_cast<void**>(&ColorSelectPopup_init_H),
-        reinterpret_cast<void**>(&ColorSelectPopup_init));
-    //MH_CreateHook(
-    //    reinterpret_cast<void*>(gd::base + 0x2b050),
-    //    reinterpret_cast<void**>(&ColorSelectPopup_dtor_H),
-    //    reinterpret_cast<void**>(&ColorSelectPopup_dtor));
+        reinterpret_cast<void*>(gd::base + 0x3da30),
+        reinterpret_cast<void**>(&EditLevelLayer_onClone_H),
+        reinterpret_cast<void**>(&EditLevelLayer_onClone));*/
+
+    matdash::add_hook<&EditorUI_getLimitedPosition, matdash::Stdcall>(gd::base + 0x4b500);
+
+    matdash::add_hook<&ColorSelectPopup_init>(gd::base + 0x29db0);
+    matdash::add_hook<&ColorSelectPopup_dtor>(gd::base + 0x2b050);
+
+        auto cocos_ext = GetModuleHandleA("libExtensions.dll");
+    
+        matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
+
+    auto cocos = GetModuleHandleA("libcocos2d.dll");
+
+    //matdash::add_hook<&LevelInfoLayer_onClone>(gd::base + 0x9e2c0);
+    //matdash::add_hook<&EditLevelLayer_onClone>(gd::base + 0x3da30);
+
+    
+
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),
+        reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG_H),
+        reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));*/
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(GetProcAddress(cocos, "?end@CCDirector@cocos2d@@QAEXXZ")),
+        reinterpret_cast<void**>(&CCDirector_end_H),
+        reinterpret_cast<void**>(&CCDirector_end));
+
+    lvl_share::init();
+    //preview_mode::init();
+
     setup_imgui_menu();
 
     MH_EnableHook(MH_ALL_HOOKS);
 
-    return TRUE;
 }
 
     BOOL APIENTRY DllMain(HMODULE hModule,

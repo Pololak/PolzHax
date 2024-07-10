@@ -91,10 +91,10 @@ namespace gd {
 		int m_nPlayerSpider;
 		int m_nPlayerColorRand1;
 		int m_nPlayerColorRand2;
-		int m_nPlayerColor;
+		//int m_nPlayerColor;
 		int m_nPlayerColor2Rand1;
 		int m_nPlayerColor2Rand2;
-		int m_nPlayerColor2;
+		//int m_nPlayerColor2;
 		int m_nPlayerStreakRand1;
 		int m_nPlayerStreakRand2;
 		int m_nPlayerStreak;
@@ -141,8 +141,8 @@ namespace gd {
 		int getPlayerStreak() { return m_nPlayerStreak; }
 		int getPlayerDeathEffect() { return m_nPlayerDeathEffect; }
 		bool getPlayerGlow() { return m_bPlayerGlow; }
-		int getPlayerColor() { return m_nPlayerColor; }
-		int getPlayerColor2() { return m_nPlayerColor2; }
+		//int getPlayerColor() { return m_nPlayerColor; }
+		//int getPlayerColor2() { return m_nPlayerColor2; }
 		IconType getPlayerIconType() { return m_nPlayerIconType; }
 		std::string getPlayerUDID() {
 			return from<std::string>(this, 0x158);
@@ -157,8 +157,8 @@ namespace gd {
 		PLAYER_ICON_FUNC(Spider)
 		PLAYER_ICON_FUNC(Streak)
 		PLAYER_ICON_FUNC(DeathEffect)
-		PLAYER_ICON_FUNC(Color)
-		PLAYER_ICON_FUNC(Color2)
+		//PLAYER_ICON_FUNC(Color)
+		//PLAYER_ICON_FUNC(Color2)
 		void setPlayerGlow(bool v) { m_bPlayerGlow = v; }
 		void setPlayerIconType(IconType v) { m_nPlayerIconType = v; }
 
@@ -184,19 +184,30 @@ namespace gd {
 			);
 		}
 
-		cocos2d::ccColor3B colorForIdx(int _id) {
-			auto ret = reinterpret_cast<cocos2d::ccColor3B(__stdcall*)(
-				int
-			)>(base + 0xc8d10)(_id);
-
-			return ret;
+		cocos2d::ccColor3B colorForIdx(int colorID) {
+			cocos2d::ccColor3B out;
+			reinterpret_cast<cocos2d::ccColor3B* (__thiscall*)(GameManager*, cocos2d::ccColor3B*, int)>(base + 0x6a410)(this, &out, colorID);
+			return out;
 		}
+
+		/*cocos2d::ccColor3B colorForIdx(int colorID) {
+			cocos2d::ccColor3B out;
+			reinterpret_cast<cocos2d::ccColor3B* (__thiscall*)(GameManager*, cocos2d::ccColor3B*, int)>(base + 0x6a410)(this, &out, colorID);
+			return out;
+		}*/
 
 		static GameManager* sharedState() {
-			return reinterpret_cast<GameManager* (__stdcall*)()>(
-				base + 0x667d0 //0xC4A50 original gd
-				)();
+			return reinterpret_cast<GameManager * (__stdcall*)()>(base + 0x667d0)();
 		}
+
+		int getPlayerColor() {
+			return from<int>(this, 0x1c0);
+		}
+
+		int getPlayerColor2() {
+			return from<int>(this, 0x1c4);
+		}
+
 		bool getShowProgressBar() {
 			return from<bool>(this, 0x1d4); //0x1d4 - ghs 1.92
 		}

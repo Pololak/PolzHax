@@ -4,8 +4,24 @@
 #include <gd.h>
 
 namespace gd {
+    class ColorAction;
+
     class LevelSettingsObject : public cocos2d::CCNode {
     public:
+        ColorAction* m_background_color;
+        ColorAction* m_ground_color;
+        ColorAction* m_line_color;
+        ColorAction* m_object_color;
+        ColorAction* m_3dl_color;
+        ColorAction* m_color1;
+        ColorAction* m_color2;
+        ColorAction* m_color3;
+        ColorAction* m_color4;
+
+        auto getBGColor() {
+            return from<int*>(this, 0xe8);
+        }
+
         auto getGamemode() {
             return from<int>(this, 0x10C);
         }
@@ -69,9 +85,9 @@ namespace gd {
             from<bool>(this, 0x129) = isFlipped;
         }
 
-        auto getGJGameLevel() {
+        /*auto getGJGameLevel() {
             return from<gd::GJGameLevel*>(this, 0x12C);
-        }
+        }*/
     };
 }
 
