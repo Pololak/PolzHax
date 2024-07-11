@@ -497,6 +497,8 @@ bool __fastcall PauseLayer_customSetup_H(gd::CCBlockLayer* self) {
     return result;
 }
 
+
+
 bool(__thiscall* PlayLayer_resume)(CCLayer* self);
 bool __fastcall PlayLayer_resume_H(CCLayer* self)
 {
@@ -518,6 +520,14 @@ void __fastcall PlayLayer_onQuit_H(CCNode* self) {
     layers().PauseLayerObject = nullptr;
     PlayLayerObject = nullptr;
     PlayLayer_onQuit(self);
+}
+
+bool(__thiscall* PauseLayer_onRestart)(CCObject* sender);
+void __fastcall PauseLayer_onRestart_H(CCObject* sender) {
+
+    CCEGLView::sharedOpenGLView()->showCursor(false);
+
+    PauseLayer_onRestart(sender);
 }
 
 class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
@@ -831,6 +841,11 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void*>(gd::base + 0xd7bf0),
         reinterpret_cast<void**>(&PauseLayer_onEdit_H),
         reinterpret_cast<void**>(&PauseLayer_onEdit));
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd7b20),
+        reinterpret_cast<void**>(&PauseLayer_onRestart_H),
+        reinterpret_cast<void**>(&PauseLayer_onRestart));
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x3e3d0),
         EditorPauseLayer::EditorPauseLayer_customSetup_H,
@@ -840,6 +855,8 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void*>(gd::base + 0x3f570),
         EditorPauseLayer::EditorPauseLayer_keyDown_H,
         reinterpret_cast<void**>(&EditorPauseLayer::EditorPauseLayer_keyDown));
+
+
 
 
     /*MH_CreateHook(
