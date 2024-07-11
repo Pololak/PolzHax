@@ -4,6 +4,9 @@
 #include <gd.h>
 
 namespace gd {
+
+	class GJGameLevel;
+
 	class LevelInfoLayer : public cocos2d::CCLayer {
 	public:
 		auto level() {

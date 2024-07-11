@@ -264,19 +264,34 @@ bool __fastcall EditorUI_dtor_H(gd::EditorUI* self) {
     EditorUI_dtor(self);
 }
 
-void(__thiscall* LevelInfoLayer_onClone)(gd::LevelInfoLayer*, CCObject*);
-void __stdcall LevelInfoLayer_onClone_H(gd::LevelInfoLayer* self, CCObject* sender) {
-    LevelInfoLayer_onClone(self, sender);
+//void(__thiscall* LevelInfoLayer_onClone)(gd::LevelInfoLayer*, CCObject*);
+//void __stdcall LevelInfoLayer_onClone_H(gd::LevelInfoLayer* self, CCObject* sender) {
+//    LevelInfoLayer_onClone(self, sender);
+//    if (!self->shouldDownloadLevel()) {
+//        auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
+//        level->songID() = self->level()->songID();
+//    }
+//}
+//
+//void(__thiscall* EditLevelLayer_onClone)(gd::EditLevelLayer*);
+//void __stdcall EditLevelLayer_onClone_H(gd::EditLevelLayer* self) {
+//    EditLevelLayer_onClone(self);
+//
+//    auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
+//    level->songID() = self->level()->songID();
+//}
+
+void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
+    matdash::orig<&LevelInfoLayer_onClone>(self, foo);
     if (!self->shouldDownloadLevel()) {
         auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
         level->songID() = self->level()->songID();
     }
 }
 
-void(__thiscall* EditLevelLayer_onClone)(gd::EditLevelLayer*);
-void __stdcall EditLevelLayer_onClone_H(gd::EditLevelLayer* self) {
-    EditLevelLayer_onClone(self);
-
+void EditLevelLayer_onClone(gd::EditLevelLayer* self) {
+    matdash::orig<&EditLevelLayer_onClone>(self);
+    // gd checks for this->field_0x130 == 0, but i have no idea what that is nor do i care
     auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
     level->songID() = self->level()->songID();
 }
@@ -874,8 +889,8 @@ DWORD WINAPI my_thread(void* hModule) {
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
 
-    //matdash::add_hook<&LevelInfoLayer_onClone>(gd::base + 0x9e2c0);
-    //matdash::add_hook<&EditLevelLayer_onClone>(gd::base + 0x3da30);
+    matdash::add_hook<&LevelInfoLayer_onClone>(gd::base + 0x9e2c0);
+    matdash::add_hook<&EditLevelLayer_onClone>(gd::base + 0x3da30);
 
     
 
