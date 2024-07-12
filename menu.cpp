@@ -127,6 +127,8 @@ void RenderMain() {
         // Ima need to copypaste 80+ patches for fucking saves
         // Kick me in the balls. (wait what)
 
+        //WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x518e29), "\x32", 1, NULL);
+
         // Bypass
 
         if (setting().onCharFilter) {
@@ -1941,7 +1943,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.0.4-alpha.1");
+            ImGui::Text("v1.0.5-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

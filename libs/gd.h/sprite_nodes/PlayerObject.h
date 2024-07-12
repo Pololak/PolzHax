@@ -7,6 +7,8 @@
 namespace gd {
 
 	class GameObject;
+	class HardStreak;
+	class PlayLayer;
 
 	class PlayerObject : public GameObject {
 	public:

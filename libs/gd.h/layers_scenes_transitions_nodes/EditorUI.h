@@ -102,6 +102,10 @@ public:
         return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x41190)(this, sender);
     }
 
+    void getCreateBtn() {
+        return reinterpret_cast<void(__fastcall*)()>(base + 0x47200)();
+    }
+
 };
 
 class EditorPauseLayer : public gd::CCBlockLayer {

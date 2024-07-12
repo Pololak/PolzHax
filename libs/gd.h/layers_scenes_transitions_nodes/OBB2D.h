@@ -9,7 +9,7 @@ namespace gd {
     public:
 
         virtual cocos2d::CCRect* getBoundingRect(cocos2d::CCRect* rect) {
-            return reinterpret_cast<cocos2d::CCRect * (__thiscall*)(OBB2D*, cocos2d::CCRect*)>(base + 0x71b90)(this, rect);
+            return reinterpret_cast<cocos2d::CCRect * (__thiscall*)(OBB2D*, cocos2d::CCRect*)>(base + 0x722a0)(this, rect);
         }
 
         cocos2d::CCPoint getPoint1() {

@@ -1,0 +1,69 @@
+#include "PauseLayer.h"
+#include "state.h"
+
+CCLayer* playLayerObject;
+
+class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
+protected:
+
+    void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override
+    {
+        if (btn2)
+        {
+            gd::GameManager::sharedState()->getPlayLayer()->onQuit();
+            gd::GameSoundManager::sharedState()->playSound("quitSound_01.ogg");
+        }
+    }
+};
+
+ExitAlertProtocol eaProtocol;
+
+bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
+    layers().PauseLayerObject = self;
+    if (setting().onHidePauseMenu)
+        self->setVisible(false);
+    else self->setVisible(true);
+
+    bool result = PauseLayer::customSetup(self);
+    return result;
+}
+
+void __fastcall PauseLayer::onEdit_H(CCLayer* self)
+{
+    layers().PauseLayerObject = nullptr;
+    playLayerObject = nullptr;
+    PauseLayer::onEdit(self);
+}
+
+void __fastcall PauseLayer::onRestart_H(CCObject* sender) {
+
+    CCEGLView::sharedOpenGLView()->showCursor(false);
+
+    PauseLayer::onRestart(sender);
+}
+
+void __fastcall PauseLayer::onQuit_H(CCObject* btn)
+{
+    playLayerObject = nullptr;
+    if (setting().onConfirmExit) gd::FLAlertLayer::create(&eaProtocol, "Confirm", "Are you sure you want to exit the level?", "Cancel", "Exit", 320.f, false, 0)->show();
+    PauseLayer::onQuit(btn);
+}
+
+void PauseLayer::mem_init() {
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd5f50),
+        PauseLayer::customSetup_H,
+        reinterpret_cast<void**>(&PauseLayer::customSetup));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd7bf0),
+        PauseLayer::onEdit_H,
+        reinterpret_cast<void**>(&PauseLayer::onEdit));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd7b20),
+        PauseLayer::onRestart_H,
+        reinterpret_cast<void**>(&PauseLayer::onRestart));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xd7f00),
+        PauseLayer::onQuit_H,
+        reinterpret_cast<void**>(&PauseLayer::onQuit));
+}

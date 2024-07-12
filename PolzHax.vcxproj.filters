@@ -34,6 +34,9 @@
     <Filter Include="libs\nfd">
       <UniqueIdentifier>{568e2e71-9f12-49ce-9b93-a10c4b70e01c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Hooks">
+      <UniqueIdentifier>{7b00abb7-50d2-4b7b-8ed7-ac0ef4d1e946}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1416,9 +1419,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EndLevelLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="EditorPauseLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\manager_nodes\ObjectToolbox.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1500,6 +1500,21 @@
     <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="EditorPauseLayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayLayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectToolbox.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorUI.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseLayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1538,9 +1553,6 @@
     <ClCompile Include="state.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditorPauseLayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="explorer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -1558,6 +1570,21 @@
     </ClCompile>
     <ClCompile Include="HitboxNode.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorPauseLayer.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayLayer.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectToolbox.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorUI.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseLayer.cpp">
+      <Filter>Header Files\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

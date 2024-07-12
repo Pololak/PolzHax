@@ -537,6 +537,7 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine-cocos2dx.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
     <ClInclude Include="EditorPauseLayer.h" />
+    <ClInclude Include="EditorUI.h" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gd.hpp" />
@@ -644,7 +645,10 @@
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="ObjectsIds.h" />
+    <ClInclude Include="ObjectToolbox.h" />
+    <ClInclude Include="PauseLayer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="preview-mode.hpp" />
     <ClInclude Include="state.h" />
     <ClInclude Include="utils.hpp" />
@@ -652,6 +656,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EditorPauseLayer.cpp" />
+    <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="explorer.cpp" />
     <ClCompile Include="HitboxNode.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
@@ -666,7 +671,10 @@
     <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
     <ClCompile Include="lvl-share.cpp" />
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="ObjectToolbox.cpp" />
+    <ClCompile Include="PauseLayer.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
     <ClCompile Include="state.cpp" />
   </ItemGroup>
