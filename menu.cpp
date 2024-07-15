@@ -114,7 +114,7 @@ void RenderMain() {
         }
         
         if (ImGui::Begin("Speedhack", nullptr)) {
-            ImGui::SetWindowPos({ 528,431 });
+            ImGui::SetWindowPos({ 528,454 });
             ImGui::EndTabItem();
         }
         
