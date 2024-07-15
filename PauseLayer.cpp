@@ -25,6 +25,25 @@ bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
     else self->setVisible(true);
 
     bool result = PauseLayer::customSetup(self);
+
+    auto director = CCDirector::sharedDirector();
+
+    auto bg = (extension::CCScale9Sprite*)self->getChildren()->objectAtIndex(0);
+    /*auto progressBarLabel = (CCLabelBMFont*)self->getChildren()->objectAtIndex(11);
+    progressBarLabel->setVisible(0);
+
+    auto barLabel = CCLabelBMFont::create("Bar", "bigFont.fnt");
+    barLabel->setPosition({ director->getScreenRight(), director->getScreenBottom() });
+    self->addChild(barLabel);*/
+
+    if (setting().onTransparentPause) {
+        bg->setVisible(0);
+    }
+    else {
+        bg->setVisible(1);
+    }
+
+
     return result;
 }
 

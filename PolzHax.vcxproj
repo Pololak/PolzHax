@@ -536,8 +536,8 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\SlotData.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine-cocos2dx.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
-    <ClInclude Include="EditorPauseLayer.h" />
     <ClInclude Include="EditorUI.h" />
+    <ClInclude Include="EndLevelLayer.h" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gd.hpp" />
@@ -655,8 +655,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="EditorPauseLayer.cpp" />
     <ClCompile Include="EditorUI.cpp" />
+    <ClCompile Include="EndLevelLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
     <ClCompile Include="HitboxNode.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />

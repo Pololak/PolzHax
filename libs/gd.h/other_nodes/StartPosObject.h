@@ -9,8 +9,11 @@ namespace gd {
 	class StartPosObject : public GameObject {
 	public:
 			
+		float getAudioScale() {
+			return from<float>(this, 0x1AC);
+		}
 		static StartPosObject* create() {
-			return reinterpret_cast<StartPosObject * (__fastcall*)()>(base + 0x754a0)();
+			return reinterpret_cast<StartPosObject * (__fastcall*)()>(base + 0x75bf0)();
 		}
 	};
 }

@@ -1500,9 +1500,6 @@
     <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="EditorPauseLayer.h">
-      <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
     <ClInclude Include="PlayLayer.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
@@ -1513,6 +1510,9 @@
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="PauseLayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="EndLevelLayer.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1571,9 +1571,6 @@
     <ClCompile Include="HitboxNode.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditorPauseLayer.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
     <ClCompile Include="PlayLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
@@ -1584,6 +1581,9 @@
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="PauseLayer.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EndLevelLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
   </ItemGroup>

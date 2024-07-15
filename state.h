@@ -92,6 +92,7 @@ struct SettingStruct {
     bool onNoclip = false;
     bool onPauseDurComp = false;
     bool onPracticeMusic = false;
+    bool onSPSwitcher = false;
     bool onSuicide = false;
     
     // Universal
@@ -114,6 +115,7 @@ struct SettingStruct {
     bool onTransparentBG = false;
     bool onTransparentLists = false;
     bool onTransparentTextLabels = false;
+    bool onTransparentPause = false;
     bool onShouldHue = false;
     bool onAlwaysHue = false;
 

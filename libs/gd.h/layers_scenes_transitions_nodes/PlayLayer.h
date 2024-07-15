@@ -33,6 +33,9 @@ namespace gd {
 
 	class PlayLayer : public GJBaseGameLayer {
 	public:
+
+		StartPosObject* m_startPos; // 0x32C
+
 		void resetLevel() {
 			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f20)(this); //0xf1f20 - GHS 1.92
 		}

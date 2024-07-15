@@ -2,6 +2,7 @@
 #define __LEVELEDITORLAYER_H__
 
 #include <gd.h>
+#include "cocos2d.h"
 //#include "gd.hpp"
 
 namespace gd {

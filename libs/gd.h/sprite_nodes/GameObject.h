@@ -2,6 +2,7 @@
 #define __GAMEOBJECT_H__
 
 #include <gd.h>
+#include "cocos2d.h"
 
 namespace gd {
 
@@ -87,7 +88,7 @@ namespace gd {
 
 	#pragma runtime_checks("s", off)
 	class GameObject : public cocos2d::CCSprite {
-	protected:
+	public:
 		PAD(44);
 		bool unk_21C;
 		bool unk_21D;
@@ -317,7 +318,7 @@ namespace gd {
 		}
 
 		gd::OBB2D* getOrientedBox() {
-			return reinterpret_cast<gd::OBB2D*(__thiscall*)(GameObject*)>(base + 0x75290)(this);
+			return reinterpret_cast<gd::OBB2D*(__thiscall*)(GameObject*)>(base + 0x759e0)(this);
 		}
 
 		auto& getObjectID() {

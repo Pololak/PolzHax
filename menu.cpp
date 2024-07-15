@@ -1355,7 +1355,7 @@ void RenderMain() {
                 }
             }
 
-            //ImGui::Checkbox("Editor Preview Mode", &setting().onEditorPreview);
+            ImGui::Checkbox("Editor Preview Mode", &setting().onEditorPreview);
 
             if (ImGui::Checkbox("Free Scroll", &setting().onFreeScroll)) {
                 if (setting().onFreeScroll) {
@@ -1608,6 +1608,8 @@ void RenderMain() {
                 }
             }
 
+            //ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
+
             if (ImGui::Checkbox("Suicide", &setting().onSuicide)) {
                 if (setting().onSuicide) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea268), "\xe9\xc9\x01\x00\x00\x90", 6, NULL);
@@ -1831,6 +1833,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
                 }
             }
+
+            //ImGui::Checkbox("Transparent Pause", &setting().onTransparentPause);
         }
 
         if (ImGui::Begin("Icons", nullptr,
@@ -1943,7 +1947,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.0.5-alpha.1");
+            ImGui::Text("v1.1.0-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

@@ -3,6 +3,16 @@
 #include "PlayLayer.h"
 
 CCLayer* playLayer;
+CCArray* startPosArr;
+
+int currentStartPos = 0;
+bool fadedoutflag = 0;
+
+std::vector<bool> willFlip;
+std::vector<gd::StartPosObject*> sp;
+std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniPortals, speedChanges, mirrorPortals;
+
+
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     layers().PauseLayerObject = self;
@@ -12,6 +22,43 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
 
     auto director = CCDirector::sharedDirector();
     auto size = CCDirector::sharedDirector()->getWinSize();
+
+    auto secarr = self->getSections();
+    auto objarr1 = self->getObjects();
+    auto arrcount = secarr->count();
+
+
+
+    /*if (startPosArr) delete startPosArr;
+    auto sposarr = new CCArray;
+    auto firstStartPosObj = gd::StartPosObject::create();
+    sposarr->addObject(firstStartPosObj);
+    startPosArr = sposarr;
+    for (int i = 0; i < secarr->count(); i++)
+    {
+        auto objarr = reinterpret_cast<CCArray*>(secarr->objectAtIndex(i));
+        for (int j = 0; j < objarr->count(); j++)
+        {
+            auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+            if (obj->getObjectID() == 31) {
+                startPosArr->addObject(obj);
+            }
+        }
+    }
+    currentStartPos = startPosArr->count() - 1;
+
+    if (setting().onSPSwitcher)
+    {
+        auto spswitcher = CCLabelBMFont::create("", "bigFont.fnt");
+        spswitcher->setZOrder(5);
+        spswitcher->setScale(0.66f);
+        spswitcher->setAnchorPoint({ 0.5f, 0.5f });
+        spswitcher->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
+        spswitcher->setPosition({ CCDirector::sharedDirector()->getScreenRight() / 2, 15.f });
+        spswitcher->setTag(45712);
+        if (startPosArr->count() == 1) spswitcher->setVisible(0);
+        self->addChild(spswitcher);
+    }*/
 
     if (setting().onShowPercentage)
     {
@@ -27,6 +74,9 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     }
 }
 
+bool rKeyFlag = true;
+bool lKeyFlag = true;
+
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
 
@@ -35,6 +85,60 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto size = CCDirector::sharedDirector()->getWinSize();
 
     auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
+    auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
+
+    auto secarr = self->getSections();
+    auto arrcount = secarr->count();
+    /*if (spswitcherlbl)
+    {
+        auto fadeout = CCSequence::create(CCDelayTime::create(2.f), CCFadeOut::create(0.5f), nullptr);
+        if (!fadedoutflag)
+        {
+            spswitcherlbl->runAction(fadeout);
+            fadedoutflag = !fadedoutflag;
+        }
+        if (GetAsyncKeyState(0x45) && rKeyFlag && startPosArr->count() > 1)
+        {
+            rKeyFlag = false;
+            if (currentStartPos == startPosArr->count() - 1) currentStartPos = 0;
+            else currentStartPos++;
+            if (currentStartPos != 0) {
+                self->setPlayerStartPosition(reinterpret_cast<gd::StartPosObject*>(startPosArr->objectAtIndex(currentStartPos))->getOrientedBox()->getCenterPoint());
+                self->setStartPosObject(reinterpret_cast<gd::StartPosObject*>(startPosArr->objectAtIndex(currentStartPos)));
+            }
+            else {
+                self->setPlayerStartPosition({ 0, 105 });
+                self->setStartPosObject(nullptr);
+            }
+            self->resetLevel();
+            spswitcherlbl->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
+            spswitcherlbl->stopAllActions();
+            spswitcherlbl->setOpacity(255);
+            spswitcherlbl->runAction(fadeout);
+        }
+        else if (!GetAsyncKeyState(0x45)) rKeyFlag = true;
+
+        if (GetAsyncKeyState(0x51) && lKeyFlag && startPosArr->count() > 1)
+        {
+            lKeyFlag = false;
+            if (currentStartPos == 0) currentStartPos = startPosArr->count() - 1;
+            else currentStartPos--;
+            if (currentStartPos != 0) {
+                self->setPlayerStartPosition(reinterpret_cast<gd::StartPosObject*>(startPosArr->objectAtIndex(currentStartPos))->getOrientedBox()->getCenterPoint());
+                self->setStartPosObject(reinterpret_cast<gd::StartPosObject*>(startPosArr->objectAtIndex(currentStartPos)));
+            }
+            else {
+                self->setPlayerStartPosition({ 0, 105 });
+                self->setStartPosObject(nullptr);
+            }
+            self->resetLevel();
+            spswitcherlbl->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
+            spswitcherlbl->stopAllActions();
+            spswitcherlbl->setOpacity(255);
+            spswitcherlbl->runAction(fadeout);
+        }
+        else if (!GetAsyncKeyState(0x51)) lKeyFlag = true;
+    }*/
 
     if (percentLabel) {
         const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;

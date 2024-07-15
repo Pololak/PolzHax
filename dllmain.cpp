@@ -5,14 +5,14 @@
 #include "ObjectToolbox.h"
 #include "EditorUI.h"
 #include "PauseLayer.h"
-
+#include "EndLevelLayer.h"
 
 #include <imgui-hook.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "state.h"
 #include "lvl-share.hpp"
-//#include "preview-mode.hpp"
+#include "preview-mode.hpp"
 
 #include "menu.h"
 #include "utils.hpp"
@@ -296,9 +296,10 @@ DWORD WINAPI my_thread(void* hModule) {
     PlayLayer::mem_init();
     EditorPauseLayer::mem_init();
     ObjectToolbox::mem_init();
-    LevelEditorLayer::mem_init();
+    //LevelEditorLayer::mem_init();
     EditorUI::mem_init();
     PauseLayer::mem_init();
+    EndLevelLayer::mem_init();
 
 
     MH_CreateHook(
@@ -334,7 +335,7 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void**>(&CCDirector_end));
 
     lvl_share::init();
-    //preview_mode::init();
+    preview_mode::init();
 
     setup_imgui_menu();
 
