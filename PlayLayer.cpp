@@ -1,9 +1,18 @@
 #include "pch.h"
 #include "state.h"
 #include "PlayLayer.h"
+#include "Scheduler.h"
+#include "Labels.h"
+#include "utils.hpp"
 
-CCLayer* playLayer;
 CCArray* startPosArr;
+CCLayer* playLayer;
+
+std::time_t t;
+SYSTEMTIME st;
+
+bool hasClicked = false;
+Labels* labels = nullptr;
 
 int currentStartPos = 0;
 bool fadedoutflag = 0;
@@ -15,6 +24,8 @@ std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniP
 
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
+    
+    setting().beforeRestartCheatsCount = setting().cheatsCount;
     layers().PauseLayerObject = self;
     playLayer = self;
 
@@ -26,10 +37,8 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     auto secarr = self->getSections();
     auto objarr1 = self->getObjects();
     auto arrcount = secarr->count();
-
-
-
-    /*if (startPosArr) delete startPosArr;
+    
+    if (startPosArr) delete startPosArr;
     auto sposarr = new CCArray;
     auto firstStartPosObj = gd::StartPosObject::create();
     sposarr->addObject(firstStartPosObj);
@@ -58,7 +67,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         spswitcher->setTag(45712);
         if (startPosArr->count() == 1) spswitcher->setVisible(0);
         self->addChild(spswitcher);
-    }*/
+    }
 
     if (setting().onShowPercentage)
     {
@@ -89,7 +98,9 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
 
     auto secarr = self->getSections();
     auto arrcount = secarr->count();
-    /*if (spswitcherlbl)
+        
+
+    if (spswitcherlbl)
     {
         auto fadeout = CCSequence::create(CCDelayTime::create(2.f), CCFadeOut::create(0.5f), nullptr);
         if (!fadedoutflag)
@@ -138,7 +149,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
             spswitcherlbl->runAction(fadeout);
         }
         else if (!GetAsyncKeyState(0x51)) lKeyFlag = true;
-    }*/
+    }
 
     if (percentLabel) {
         const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
@@ -201,6 +212,77 @@ void __fastcall PlayLayer::onQuit_H(CCNode* self) {
     PlayLayer::onQuit(self);
 }
 
+void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
+    setting().beforeRestartCheatsCount = setting().cheatsCount;
+
+    PlayLayer::resetLevel(self);
+}
+
+void __fastcall PlayLayer::pushButton_H(int idk1, bool idk2) {
+    labels->m_isHolding = true;
+    if (!hasClicked) {
+        labels->m_clickFrames.push_back(time::getTime());
+        labels->m_totalClicks++;
+        hasClicked = true;
+    }
+    PlayLayer::pushButton(idk1, idk2);
+}
+
+void __fastcall PlayLayer::releaseButton_H(int idk1, bool idk2) {
+    labels->m_isHolding = false;
+    PlayLayer::releaseButton(idk1, idk2);
+}
+
+void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float idk) {
+
+    if (playLayer) {
+        auto CheatIndicatorLabel = reinterpret_cast<CCLabelBMFont*>(playLayer->getChildByTag(4572));
+
+        if (CheatIndicatorLabel)
+        {
+            ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().CurrentNoclipByte, 1, 0);
+            CheatIndicatorLabel->setColor({ 0, 255, 0 });
+
+            if (setting().NoclipByte != setting().CurrentNoclipByte && setting().onNoclipOutOfMe == false) { setting().cheatsCount++; setting().beforeRestartCheatsCount++; setting().onNoclipOutOfMe = true; }
+            else if (setting().NoclipByte == setting().CurrentNoclipByte && setting().onNoclipOutOfMe == true) { setting().cheatsCount--; setting().onNoclipOutOfMe = false; }
+
+            //no cheats, no before restart cheats, no safe mode
+            if (setting().cheatsCount == 0 &&
+                setting().beforeRestartCheatsCount == 0 &&
+                setting().NoclipByte == setting().CurrentNoclipByte &&
+                !setting().onSafeMode)
+                CheatIndicatorLabel->setColor({ 0, 255, 0 });
+
+            //no cheats, no before restart cheats, safe mode
+            else if (setting().cheatsCount == 0 &&
+                setting().beforeRestartCheatsCount == 0 &&
+                setting().NoclipByte == setting().CurrentNoclipByte &&
+                setting().onSafeMode)
+                CheatIndicatorLabel->setColor({ 255, 255, 0 });
+
+            //no cheats
+            else if (setting().cheatsCount == 0 &&
+                setting().NoclipByte == setting().CurrentNoclipByte)
+                CheatIndicatorLabel->setColor({ 255, 128, 0 });
+
+            else CheatIndicatorLabel->setColor({ 255, 0, 0 });
+        }
+    }
+
+    Scheduler::update(self, idk);
+}
+
+//DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
+
+void Scheduler::mem_init() {
+    auto cocosbase = GetModuleHandleA("libcocos2d.dll");
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(cocosbase + 0xff970),
+        Scheduler::update_H,
+        reinterpret_cast<void**>(Scheduler::update));
+}
+
 void PlayLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xe35d0),
@@ -218,4 +300,12 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf3b80),
         PlayLayer::onQuit_H,
         reinterpret_cast<void**>(&PlayLayer::onQuit));
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf0a00),
+        PlayLayer::pushButton_H,
+        reinterpret_cast<void**>(&PlayLayer::pushButton));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf0af0),
+        PlayLayer::releaseButton_H,
+        reinterpret_cast<void**>(&PlayLayer::releaseButton));*/
 }

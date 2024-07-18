@@ -1506,14 +1506,17 @@
     <ClInclude Include="ObjectToolbox.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="EditorUI.h">
-      <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
     <ClInclude Include="PauseLayer.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="EndLevelLayer.h">
       <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Scheduler.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Labels.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1577,14 +1580,17 @@
     <ClCompile Include="ObjectToolbox.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="EditorUI.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
     <ClCompile Include="PauseLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="EndLevelLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Scheduler.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Labels.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

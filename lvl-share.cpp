@@ -11,7 +11,6 @@
 using namespace cocos2d;
 
 
-
 template <class S>
 void dump_level(gd::GJGameLevel* level, S& stream) {
 	const auto song_key = level->m_songID ?
@@ -60,8 +59,12 @@ gd::GJGameLevel* import_level(S& stream) {
 
 bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&EditLevelLayer_init>(self, level)) return false;
-	auto menu = CCMenu::create();
+
+
 	auto director = CCDirector::sharedDirector();
+
+	auto menu = CCMenu::create();
+	
 	constexpr auto handler = [](CCObject* self, CCObject*) {
 		auto* const level = reinterpret_cast<gd::EditLevelLayer*>(self)->level();
 		nfdchar_t* path = nullptr;

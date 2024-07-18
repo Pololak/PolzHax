@@ -56,6 +56,17 @@ void save() {
     }
 }
 
+void cheatDec()
+{
+    setting().cheatsCount--;
+}
+
+void cheatAdd()
+{
+    setting().cheatsCount++;
+    setting().beforeRestartCheatsCount++;
+}
+
 bool oneX = true;
 
 void RenderMain() {
@@ -117,11 +128,18 @@ void RenderMain() {
             ImGui::SetWindowPos({ 528,454 });
             ImGui::EndTabItem();
         }
+
+        if (ImGui::Begin("Status", nullptr)) {
+            ImGui::SetWindowPos({ 1000, 5 });
+            ImGui::EndTabItem();
+        }
         
         if (ImGui::Begin("Interface", nullptr)) {
             ImGui::SetWindowPos({ 908,454 });
             ImGui::EndTabItem();
         }
+
+        
 
         // Fuck this stupid save function i have no fucking words
         // Ima need to copypaste 80+ patches for fucking saves
@@ -1026,9 +1044,11 @@ void RenderMain() {
             if (ImGui::Checkbox("Instant Mirror", &setting().onInstantMirror)) {
                 if (setting().onInstantMirror) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL); // E9 9B 01 00 00 90
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x3F", 7, NULL); // 0F 84 9A 01 00 00
+                    cheatDec();
                 }
             }
 
@@ -1131,9 +1151,11 @@ void RenderMain() {
             if (ImGui::Checkbox("No Mirror", &setting().onNoMirror)) {
                 if (setting().onNoMirror) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\xe9\x9b\x01\x00\x00\x90", 6, NULL); // E9 9B 01 00 00 90
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\x0f\x84\x9a\x01\x00\x00", 6, NULL);
+                    cheatDec();
                 }
             }
 
@@ -1545,9 +1567,11 @@ void RenderMain() {
             if (ImGui::Checkbox("Instant Complete", &setting().onInstantComplete)) {
                 if (setting().onInstantComplete) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e16f6), "\xC7\x87\x74\x04\x00\x00\x00\x00\x00\x70\x90\x90", 12, NULL);
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e16f6), "\xF3\x0F\x11\x8F\x74\x04\x00\x00\x9F\xF6\xC4\x44", 12, NULL);
+                    cheatDec();
                 }
             }
 
@@ -1564,19 +1588,23 @@ void RenderMain() {
                 if (setting().onJumpHack) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da510), "\x01", 1, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da295), "\x01", 1, NULL);
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da510), "\x00", 1, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4da295), "\x00", 1, NULL);
+                    cheatDec();
                 }
             }
 
             if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
                 if (setting().onNoclip) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\xe9\xf0\x02\x00\x00\x90", 6, NULL);
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\x0f\x85\xef\x02\x00\x00", 6, NULL);
+                    cheatDec();
                 }
             }
 
@@ -1584,10 +1612,12 @@ void RenderMain() {
                 if (setting().onPauseDurComp) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x00", 1, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x01", 1, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x88\x81\xf9\x02\x00\x00", 6, NULL);
+                    cheatDec();
                 }
             }
 
@@ -1608,7 +1638,7 @@ void RenderMain() {
                 }
             }
 
-            //ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
+            ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
 
             if (ImGui::Checkbox("Suicide", &setting().onSuicide)) {
                 if (setting().onSuicide) {
@@ -1865,6 +1895,24 @@ void RenderMain() {
             ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
         }
 
+        /*if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            ImGui::Checkbox("Cheat Indicator", &setting().onCheatIndicator);
+
+            if (ImGui::TreeNode("FPS Label")) {
+                ImGui::Checkbox("Enable##fps", &setting().onFPSLabel);
+                ImGui::Checkbox("Prefix##fps", &setting().fps_prefix);
+                ImGui::TreePop();
+            }
+            if (ImGui::TreeNode("CPS Label")) {
+                ImGui::Checkbox("Enable##cps", &setting().onCPSLabel);
+                ImGui::Checkbox("Prefix##cps", &setting().cps_prefix);
+                ImGui::Checkbox("Total clicks", &setting().cps_total);
+            }
+        }*/
+
         if (ImGui::Begin("Interface", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
@@ -1947,7 +1995,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.0-alpha.1");
+            ImGui::Text("v1.1.1-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

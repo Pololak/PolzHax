@@ -314,7 +314,7 @@ namespace gd {
 		}
 
 		void updateOrientedBox() {
-			return reinterpret_cast<void (__thiscall*)(GameObject*)>(base + 0x75300)(this);
+			return reinterpret_cast<void (__thiscall*)(GameObject*)>(base + 0x75a50)(this);
 		}
 
 		gd::OBB2D* getOrientedBox() {

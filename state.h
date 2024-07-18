@@ -9,6 +9,13 @@ struct LayersStruct {
 
 
 struct SettingStruct {
+
+    int cheatsCount = 0;
+    int beforeRestartCheatsCount = 0;
+
+    int NoclipByte;
+    int CurrentNoclipByte;
+
     // PolzHax
     bool onAutoSave = false;
     bool onExplorer = false;
@@ -126,6 +133,29 @@ struct SettingStruct {
 
     bool onSpeedhack = false;
     bool onSpeedhackMusic = false;
+
+    // Labels
+
+    bool onCheatIndicator = false;
+    bool onClock = false;
+
+    int status_opacity = 125;
+    float status_scale = 1.f;
+    bool onFPSLabel = false;
+    bool onAttemptsLabel = false;
+    bool onCPSLabel = false;
+    bool onBestRunLabel = false;
+    bool onMessageLabel = false;
+
+    std::string message_text = "Your Text";
+
+    bool fps_prefix = false;
+    bool cps_prefix = false;
+    bool cps_total = false;
+
+
+    bool onNoclipOutOfMe = false;
+    bool onSpeedhackCounted = false;
 
     float grid = 30;
     float gridDefault = 30;

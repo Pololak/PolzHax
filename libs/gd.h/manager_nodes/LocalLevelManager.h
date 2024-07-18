@@ -19,7 +19,7 @@ namespace gd {
 
         int updateLevelOrder() {
             return reinterpret_cast<bool(__thiscall*)(LocalLevelManager*)>(
-                base + 0xac250
+                base + 0xacce0
                 )(this);
         }
         auto getLocalLevels() {

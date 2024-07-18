@@ -1,3 +1,5 @@
+// USE THIS FILE AS EDITORUI, LEVELEDITORLAYER AND EDITORPAUSELAYER HOOKS.
+
 #define NOMINMAX
 #include "pch.h"
 //#include "Windows.h"
@@ -633,11 +635,20 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::CCBlockLayer* self) {
 		editor->getEditorUI()->pasteObjects(text);
 		};
 
+	
+
 	auto pssprite = gd::ButtonSprite::create("Paste\nString", 0x28, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
 	auto psbutton = gd::CCMenuItemSpriteExtra::create(pssprite, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+
+	auto optionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png");
+	auto optionsBtn = gd::CCMenuItemSpriteExtra::create(optionsSpr, nullptr, self, menu_selector(gd::MenuLayer::onOptions));
+	optionsBtn->setPosition({ -38, -66 });
+	optionsSpr->setScale(.66f);
+	
 	menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 	psbutton->setPosition({ -50.f, -30.f });
 	menu->addChild(psbutton);
+	menu->addChild(optionsBtn);
 
 	self->addChild(menu);
 }

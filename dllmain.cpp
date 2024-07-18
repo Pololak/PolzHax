@@ -3,9 +3,10 @@
 
 //#include "EditorPauseLayer.h"
 #include "ObjectToolbox.h"
-#include "EditorUI.h"
+//#include "EditorUI.h"
 #include "PauseLayer.h"
 #include "EndLevelLayer.h"
+//#include "Scheduler.h"
 
 #include <imgui-hook.hpp>
 #include <imgui.h>
@@ -25,12 +26,8 @@
 #include <io.h>
 #include <fcntl.h>
 #include "PlayLayer.h"
-//#include "HitboxNode.h"
-//#include "ObjectsIds.h"
-
-//CCLayer* LevelEditorLayerObject;
-//CCLayer* playLayer;
-//CCLayer* PlayLayerObject;
+#include "HitboxNode.h"
+#include "ObjectsIds.h"
 gd::ColorSelectPopup* colorSelectPopup;
 
 // Hitboxes thing by Taswert
@@ -190,12 +187,6 @@ void __fastcall UILayer_keyDown_H(gd::UILayer* self, void*, enumKeyCodes key) {
     UILayer_keyDown(self, key);
 }
 
-void(__thiscall* Scheduler_update)(void*, float);
-void __fastcall Scheduler_update_H(void* self, float dt) {
-
-    Scheduler_update(self, dt);
-}
-
 class CustomizeObjectLayer : public gd::FLAlertLayer
 {
 public:
@@ -266,6 +257,8 @@ void __stdcall ObjectToolbox_gridNodeSizeForKey_H(int id) {
     ObjectToolbox_gridNodeSizeForKey(id);
 }
 
+
+
 bool(__thiscall* CCDirector_end)(CCDirector* self);
 void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
     if (setting().onAutoSave)
@@ -279,13 +272,11 @@ void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
     CCDirector_end(self);
 }
 
-DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-
 DWORD WINAPI my_thread(void* hModule) {
 
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); //B8 01 00 00 00 90 90
 
-
+    ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
     if (MH_Initialize() != MH_OK) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
@@ -300,12 +291,8 @@ DWORD WINAPI my_thread(void* hModule) {
     EditorUI::mem_init();
     PauseLayer::mem_init();
     EndLevelLayer::mem_init();
+    Scheduler::mem_init();
 
-
-    MH_CreateHook(
-        reinterpret_cast<void*>(cocosbase + 0xff970),
-        reinterpret_cast<void**>(&Scheduler_update_H),
-        reinterpret_cast<void**>(&Scheduler_update));
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xff130),
         reinterpret_cast<void**>(&UILayer_keyDown_H),

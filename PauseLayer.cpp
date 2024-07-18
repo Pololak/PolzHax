@@ -1,5 +1,6 @@
 #include "PauseLayer.h"
 #include "state.h"
+#include "PlayLayer.h"
 
 CCLayer* playLayerObject;
 
@@ -27,6 +28,7 @@ bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
     bool result = PauseLayer::customSetup(self);
 
     auto director = CCDirector::sharedDirector();
+    auto menu = CCMenu::create();
 
     auto bg = (extension::CCScale9Sprite*)self->getChildren()->objectAtIndex(0);
     /*auto progressBarLabel = (CCLabelBMFont*)self->getChildren()->objectAtIndex(11);
@@ -43,6 +45,14 @@ bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
         bg->setVisible(1);
     }
 
+    menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
+
+    auto optionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png");
+    auto optionsBtn = gd::CCMenuItemSpriteExtra::create(optionsSpr, nullptr, self, menu_selector(gd::MenuLayer::onOptions));
+    optionsBtn->setPosition({ -42, -42 });
+    optionsSpr->setScale(.66f);
+    menu->addChild(optionsBtn);
+    self->addChild(menu);
 
     return result;
 }

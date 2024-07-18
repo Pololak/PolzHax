@@ -14,5 +14,21 @@ namespace PlayLayer {
 	inline bool(__thiscall* onQuit)(CCNode* self);
 	void __fastcall onQuit_H(CCNode* self);
 
+	inline bool(__thiscall* resetLevel)(gd::PlayLayer* self);
+	void __fastcall resetLevel_H(gd::PlayLayer* self);
+
+	inline bool(__thiscall* pushButton)(int idk1, bool idk2);
+	void __fastcall pushButton_H(int idk1, bool idk2);
+
+	inline bool(__thiscall* releaseButton)(int idk1, bool idk2);
+	void __fastcall releaseButton_H(int idk1, bool idk2);
+
+	void mem_init();
+}
+
+namespace Scheduler {
+	inline bool(__thiscall* update)(CCScheduler* self, float idk);
+	void __fastcall update_H(CCScheduler* self, void* edx, float idk);
+
 	void mem_init();
 }
