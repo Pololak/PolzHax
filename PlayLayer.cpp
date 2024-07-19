@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "state.h"
 #include "PlayLayer.h"
-#include "Scheduler.h"
-#include "Labels.h"
+//#include "Scheduler.h"
+//#include "Labels.h"
 #include "utils.hpp"
 
 CCArray* startPosArr;
@@ -12,7 +12,7 @@ std::time_t t;
 SYSTEMTIME st;
 
 bool hasClicked = false;
-Labels* labels = nullptr;
+//Labels* labels = nullptr;
 
 int currentStartPos = 0;
 bool fadedoutflag = 0;
@@ -219,18 +219,12 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
 }
 
 void __fastcall PlayLayer::pushButton_H(int idk1, bool idk2) {
-    labels->m_isHolding = true;
-    if (!hasClicked) {
-        labels->m_clickFrames.push_back(time::getTime());
-        labels->m_totalClicks++;
-        hasClicked = true;
-    }
+    
     PlayLayer::pushButton(idk1, idk2);
 }
 
 void __fastcall PlayLayer::releaseButton_H(int idk1, bool idk2) {
-    labels->m_isHolding = false;
-    PlayLayer::releaseButton(idk1, idk2);
+
 }
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float idk) {

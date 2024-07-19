@@ -275,6 +275,7 @@ void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
 DWORD WINAPI my_thread(void* hModule) {
 
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); //B8 01 00 00 00 90 90
+    //WriteProcessMemory(hModule, (LPVOID)0x518e29, "\x32", 1, NULL);
 
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
     if (MH_Initialize() != MH_OK) {

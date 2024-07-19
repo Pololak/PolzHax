@@ -542,7 +542,6 @@
     <ClInclude Include="gd.hpp" />
     <ClInclude Include="HitboxNode.h" />
     <ClInclude Include="hsv.hpp" />
-    <ClInclude Include="Labels.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
@@ -650,7 +649,6 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="preview-mode.hpp" />
-    <ClInclude Include="Scheduler.h" />
     <ClInclude Include="state.h" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
@@ -659,7 +657,6 @@
     <ClCompile Include="EndLevelLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
     <ClCompile Include="HitboxNode.cpp" />
-    <ClCompile Include="Labels.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp" />
@@ -677,7 +674,6 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
-    <ClCompile Include="Scheduler.cpp" />
     <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>
