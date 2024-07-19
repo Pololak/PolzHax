@@ -1650,8 +1650,10 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\xe8\xc6\xd7\xf2\xff", 5, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Requires confirmation when exiting a level.");
 
-            if (ImGui::Checkbox("Correct Music Sync", &setting().onMusicSync)) {
+            if (ImGui::Checkbox("Corrective Music Sync", &setting().onMusicSync)) {
                 if (setting().onMusicSync) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\xeb\x08", 2, NULL);
                 }
@@ -1659,6 +1661,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\x75\x08", 2, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Syncs music to checked speed-portals, instead of only ones the player hit.");
 
             if (ImGui::Checkbox("High FPS Rotation Fix", &setting().onHiFPSRotation)) {
                 if (setting().onHiFPSRotation) {
@@ -1668,6 +1672,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dc13b), "\x0f\x82\xd6\x00\x00\x00", 6, NULL); // 0f 82 d6 00 00 00
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Fixes vehicles rotation on high fps (affects hitboxes).");
 
             /*if (ImGui::Checkbox("Ignore ESC", &setting().onIgnoreEsc)) {
                 if (setting().onIgnoreEsc) {
@@ -1688,6 +1694,8 @@ void RenderMain() {
                     cheatDec();
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Teleports the player to the end of a level.");
 
             if (ImGui::Checkbox("Instant Triggers", &setting().onInstantTriggers)) {
                 if (setting().onInstantTriggers) {
@@ -1697,6 +1705,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x89780), "\xC1", 1, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Lets color triggers to ignore their fade time.");
 
             if (ImGui::Checkbox("Jump Hack", &setting().onJumpHack)) {
                 if (setting().onJumpHack) {
@@ -1710,6 +1720,8 @@ void RenderMain() {
                     cheatDec();
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Allows you for jumping in mid-air.");
 
             if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
                 if (setting().onNoclip) {
@@ -1721,6 +1733,8 @@ void RenderMain() {
                     cheatDec();
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Makes the player invincible.");
 
             if (ImGui::Checkbox("Pause During Completion", &setting().onPauseDurComp)) {
                 if (setting().onPauseDurComp) {
@@ -1734,6 +1748,8 @@ void RenderMain() {
                     cheatDec();
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Lets you pause during the level complete animation.");
 
             if (ImGui::Checkbox("Practice Music", &setting().onPracticeMusic)) {
                 if (setting().onPracticeMusic) {
@@ -1751,8 +1767,12 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\xe8\xaa\x42\xf2\xff", 5, NULL); // e8 aa 42 f2 ff
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Plays the level's song in-sync with your position.");
 
             ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Lets you switch between multiple start positions in-level.");
 
             if (ImGui::Checkbox("Suicide", &setting().onSuicide)) {
                 if (setting().onSuicide) {
@@ -1764,6 +1784,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\x0f\x87\x58\x02\x00\x00", 6, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Ouch.");
         }
 
         if (ImGui::Begin("Universal", nullptr,
@@ -1802,6 +1824,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x8b\x03\x8b\xcb\xff\x50\x18", 7, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Disables savefile saving on minimize.");
 
             if (ImGui::Checkbox("Force Visibility", &setting().onForceVis)) {
                 if (setting().onForceVis) {
@@ -1813,6 +1837,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60c9a), "\x0f\x84\xcb\x00\x00\x00", 6, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Sets all nodes to be visible.");
 
             if (ImGui::Checkbox("Free Window Resize", &setting().onFreeWinReSize)) {
                 if (setting().onFreeWinReSize) {
@@ -1822,8 +1848,12 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\xe8\xb0\xf3\xff\xff", 5, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Removes limits in place for window resizing.");
 
             ImGui::Checkbox("HUE Fix", &setting().onAlwaysHue);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Fixes that yellow and purple color bug.");
 
             if (ImGui::Checkbox("Ignore Slider", &setting().onIgnoreSlider)) {
                 if (setting().onIgnoreSlider) {
@@ -1833,6 +1863,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cec0), "\x55", 1, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Blocks sliders from moving.");
 
             if (ImGui::Checkbox("Immortal Icons", &setting().onImmortalIcons)) {
                 if (setting().onImmortalIcons) {
@@ -1842,6 +1874,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\x55", 1, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Makes icons in menu invincible.");
 
             if (ImGui::Checkbox("Instant Game Work", &setting().onInstantGameWork)) {
                 if (setting().onInstantGameWork) {
@@ -1851,6 +1885,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc1", 1, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Disables delays in the game.");
 
             if (ImGui::Checkbox("Krmal Mode", &setting().onKrmalMode)) {
                 if (setting().onKrmalMode) {
@@ -1860,6 +1896,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x0f\x45\xdb", 3, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Makes level invisible.");
 
             if (ImGui::Checkbox("No Rotation", &setting().onNoRotation)) {
                 if (setting().onNoRotation) {
@@ -1869,6 +1907,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\xf3\x0f\x11\x41\x1c\xf3\x0f\x11\x41\x18", 10, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Locks all rotation at 0 degrees.");
 
             if (ImGui::Checkbox("No Transition", &setting().onNoTransition)) {
                 if (setting().onNoTransition) {
@@ -1878,8 +1918,12 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Shorterns scene transition time to 0s.");
 
             ImGui::Checkbox("Retry Keybind", &setting().onRetryBind);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Lets you to restart level by pressing R.");
 
             if (ImGui::Checkbox("Safe Mode", &setting().onSafeMode)) {
                 if (setting().onSafeMode) {
@@ -1893,8 +1937,12 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Disables progress and completion of levels.");
 
             ImGui::Checkbox("Show Percentage", &setting().onShowPercentage);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Shows levels percentage.");
 
             if (ImGui::Checkbox("Show Restart Button", &setting().onRestartButton)) {
                 if (setting().onRestartButton) {
@@ -1904,6 +1952,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x75\x29", 2, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Shows the restart button in pause menu.");
 
             if (ImGui::Checkbox("Transparent BG", &setting().onTransparentBG)) {
                 if (setting().onTransparentBG) {
@@ -1935,6 +1985,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f984), "\x00\x66", 2, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Removes the blue filter from menu's backgrounds.");
 
             if (ImGui::Checkbox("Transparent Lists", &setting().onTransparentLists)) {
                 if (setting().onTransparentLists) {
@@ -1956,6 +2008,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c82), "\x3e", 1, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Makes the menu lists transparent.");
 
             if (ImGui::Checkbox("Transparent Labels", &setting().onTransparentTextLabels)) {
                 if (setting().onTransparentTextLabels) {
@@ -1977,6 +2031,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
                 }
             }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Makes the text input areas transparent.");
 
             //ImGui::Checkbox("Transparent Pause", &setting().onTransparentPause);
         }
