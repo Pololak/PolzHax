@@ -38,3 +38,10 @@ namespace EditorPauseLayer {
 
 	void mem_init();
 }
+
+namespace Scheduler {
+	inline bool(__thiscall* update)(CCScheduler* self, float dt);
+	void __fastcall update_H(CCScheduler* self, void* edx, float dt);
+
+	void mem_init();
+}

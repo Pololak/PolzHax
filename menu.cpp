@@ -1751,6 +1751,8 @@ void RenderMain() {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Lets you pause during the level complete animation.");
 
+            //ImGui::Checkbox("Practice Bug Fix", &setting().onPracticeFix);
+
             if (ImGui::Checkbox("Practice Music", &setting().onPracticeMusic)) {
                 if (setting().onPracticeMusic) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x90\x90\x90\x90\x90\x90", 6, NULL);
@@ -2165,7 +2167,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.2-alpha.1");
+            ImGui::Text("v1.1.3-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2177,7 +2179,7 @@ void RenderMain() {
             ImGui::EndTabItem();
             if (ImGui::Button("Special Thanks"))
             {
-                gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cl>TheSillyDoggo</c>, Absolute.", "Ok", nullptr, 320.f, false, 0)->show();
+                gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cj>TheSillyDoggo</c>, Absolute, <cl>HJFod</c>.", "Ok", nullptr, 320.f, false, 0)->show();
             }
             if (ImGui::Button("Cocos Explorer")) {
                 setting().onExplorer = !setting().onExplorer;

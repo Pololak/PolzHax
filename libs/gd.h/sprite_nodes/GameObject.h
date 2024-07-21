@@ -329,6 +329,10 @@ namespace gd {
 			return from<int>(this, 0x308);
 		}
 
+		int getObjectGroup() {
+			return from<int>(this, 0x324);
+		}
+
 		auto& triggerColor() {
 			return from<cocos2d::ccColor3B>(this, 0x2b8);
 		}

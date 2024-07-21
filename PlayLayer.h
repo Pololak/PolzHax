@@ -1,5 +1,8 @@
 #pragma once
 #include "pch.h"
+#include "CheckPoint.h"
+#include <vector>
+#include <Windows.h>
 
 namespace PlayLayer {
 	inline bool(__thiscall* init)(gd::PlayLayer* self, gd::GJGameLevel* level);
@@ -17,6 +20,18 @@ namespace PlayLayer {
 	inline bool(__thiscall* resetLevel)(gd::PlayLayer* self);
 	void __fastcall resetLevel_H(gd::PlayLayer* self);
 
+	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer* self, bool practice);
+	void __fastcall togglePracticeMode_H(gd::PlayLayer* self, int edx, bool practice);
+
+	inline int(__thiscall* createCheckpoint)(gd::PlayLayer* self);
+	int __fastcall createCheckpoint_H(gd::PlayLayer* self);
+
+	inline int(__thiscall* removeLastCheckpoint)(gd::PlayLayer* self);
+	int __fastcall removeLastCheckpoint_H(gd::PlayLayer* self);
+
+	inline bool(__thiscall* levelComplete)(gd::PlayLayer* self);
+	bool __fastcall levelComplete_H(gd::PlayLayer* self);
+
 	inline bool(__thiscall* pushButton)(int idk1, bool idk2);
 	void __fastcall pushButton_H(int idk1, bool idk2);
 
@@ -24,11 +39,9 @@ namespace PlayLayer {
 	void __fastcall releaseButton_H(int idk1, bool idk2);
 
 	void mem_init();
+
+	extern std::vector<CheckPoint> checkpoints;
+	extern bool inPractice;
 }
 
-namespace Scheduler {
-	inline bool(__thiscall* update)(CCScheduler* self, float idk);
-	void __fastcall update_H(CCScheduler* self, void* edx, float idk);
 
-	void mem_init();
-}

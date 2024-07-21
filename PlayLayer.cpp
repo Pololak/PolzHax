@@ -4,6 +4,7 @@
 //#include "Scheduler.h"
 //#include "Labels.h"
 #include "utils.hpp"
+#include "CheckPoint.h"
 
 CCArray* startPosArr;
 CCLayer* playLayer;
@@ -21,15 +22,23 @@ std::vector<bool> willFlip;
 std::vector<gd::StartPosObject*> sp;
 std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniPortals, speedChanges, mirrorPortals;
 
-
+std::vector<CheckPoint> PlayLayer::checkpoints;
+bool PlayLayer::inPractice = false;
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     
+    
+
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     layers().PauseLayerObject = self;
     playLayer = self;
 
     if (!PlayLayer::init(self, level)) return false;
+
+    /*if (setting().onPracticeFix) {
+        PlayLayer::checkpoints.clear();
+        PlayLayer::inPractice = false;
+    }*/
 
     auto director = CCDirector::sharedDirector();
     auto size = CCDirector::sharedDirector()->getWinSize();
@@ -208,12 +217,21 @@ bool __fastcall PlayLayer::resume_H(CCLayer* self) {
 
 void __fastcall PlayLayer::onQuit_H(CCNode* self) {
     layers().PauseLayerObject = nullptr;
+    /*if (setting().onPracticeFix) {
+        PlayLayer::checkpoints.clear();
+    }*/
     playLayer = nullptr;
     PlayLayer::onQuit(self);
 }
 
 void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     setting().beforeRestartCheatsCount = setting().cheatsCount;
+
+    /*if (setting().onPracticeFix) {
+        if (PlayLayer::inPractice && PlayLayer::checkpoints.size() > 0) {
+            PlayLayer::checkpoints.pop_back();
+        }
+    }*/
 
     PlayLayer::resetLevel(self);
 }
@@ -225,57 +243,52 @@ void __fastcall PlayLayer::pushButton_H(int idk1, bool idk2) {
 
 void __fastcall PlayLayer::releaseButton_H(int idk1, bool idk2) {
 
+    PlayLayer::releaseButton(idk1, idk2);
 }
 
-void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float idk) {
-
-    if (playLayer) {
-        auto CheatIndicatorLabel = reinterpret_cast<CCLabelBMFont*>(playLayer->getChildByTag(4572));
-
-        if (CheatIndicatorLabel)
-        {
-            ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().CurrentNoclipByte, 1, 0);
-            CheatIndicatorLabel->setColor({ 0, 255, 0 });
-
-            if (setting().NoclipByte != setting().CurrentNoclipByte && setting().onNoclipOutOfMe == false) { setting().cheatsCount++; setting().beforeRestartCheatsCount++; setting().onNoclipOutOfMe = true; }
-            else if (setting().NoclipByte == setting().CurrentNoclipByte && setting().onNoclipOutOfMe == true) { setting().cheatsCount--; setting().onNoclipOutOfMe = false; }
-
-            //no cheats, no before restart cheats, no safe mode
-            if (setting().cheatsCount == 0 &&
-                setting().beforeRestartCheatsCount == 0 &&
-                setting().NoclipByte == setting().CurrentNoclipByte &&
-                !setting().onSafeMode)
-                CheatIndicatorLabel->setColor({ 0, 255, 0 });
-
-            //no cheats, no before restart cheats, safe mode
-            else if (setting().cheatsCount == 0 &&
-                setting().beforeRestartCheatsCount == 0 &&
-                setting().NoclipByte == setting().CurrentNoclipByte &&
-                setting().onSafeMode)
-                CheatIndicatorLabel->setColor({ 255, 255, 0 });
-
-            //no cheats
-            else if (setting().cheatsCount == 0 &&
-                setting().NoclipByte == setting().CurrentNoclipByte)
-                CheatIndicatorLabel->setColor({ 255, 128, 0 });
-
-            else CheatIndicatorLabel->setColor({ 255, 0, 0 });
-        }
-    }
-
-    Scheduler::update(self, idk);
-}
+//void __fastcall PlayLayer::togglePracticeMode_H(gd::PlayLayer* self, int edx, bool practice) {
+//    if (setting().onPracticeFix) {
+//        PlayLayer::checkpoints.clear();
+//        PlayLayer::inPractice = practice;
+//    }
+//
+//    return PlayLayer::togglePracticeMode(self, practice);
+//}
+//
+//int __fastcall PlayLayer::createCheckpoint_H(gd::PlayLayer* self) {
+//    if (setting().onPracticeFix) {
+//        if (*(void**)((char*)self + 0x2a4) != nullptr) {
+//            PlayLayer::checkpoints.push_back({
+//                CheckPoint::from(self)
+//                });
+//        }
+//    }
+//    
+//    return PlayLayer::createCheckpoint(self);
+//
+//    //if (!PlayLayer::createCheckpoint) return false;
+//}
+//
+//int __fastcall PlayLayer::removeLastCheckpoint_H(gd::PlayLayer* self) {
+//    if (setting().onPracticeFix) {
+//        if (PlayLayer::checkpoints.size() > 0) {
+//            PlayLayer::checkpoints.pop_back();
+//        }
+//    }
+//
+//    return PlayLayer::removeLastCheckpoint(self);
+//}
+//
+//bool __fastcall PlayLayer::levelComplete_H(gd::PlayLayer* self) {
+//
+//    if (setting().onPracticeFix) {
+//        PlayLayer::checkpoints.clear();
+//        PlayLayer::inPractice = false;
+//    }
+//    return PlayLayer::levelComplete(self);
+//}
 
 //DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
-
-void Scheduler::mem_init() {
-    auto cocosbase = GetModuleHandleA("libcocos2d.dll");
-
-    MH_CreateHook(
-        reinterpret_cast<void*>(cocosbase + 0xff970),
-        Scheduler::update_H,
-        reinterpret_cast<void**>(Scheduler::update));
-}
 
 void PlayLayer::mem_init() {
     MH_CreateHook(
@@ -294,6 +307,27 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf3b80),
         PlayLayer::onQuit_H,
         reinterpret_cast<void**>(&PlayLayer::onQuit));
+    /*MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf3610),
+        PlayLayer::togglePracticeMode_H,
+        reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf1010),
+        PlayLayer::createCheckpoint_H,
+        reinterpret_cast<void**>(&PlayLayer::createCheckpoint));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf1d70),
+        PlayLayer::removeLastCheckpoint_H,
+        reinterpret_cast<void**>(&PlayLayer::removeLastCheckpoint));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf1f20),
+        PlayLayer::resetLevel_H,
+        reinterpret_cast<void**>(&PlayLayer::resetLevel));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xe52e0),
+        PlayLayer::levelComplete_H,
+        reinterpret_cast<void**>(&PlayLayer::levelComplete));*/
+
     /*MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xf0a00),
         PlayLayer::pushButton_H,

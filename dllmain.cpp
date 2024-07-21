@@ -155,10 +155,7 @@ gd::ColorSelectPopup* colorSelectPopup;
 
 // End of Hitboxes thing
 
-CCPoint* EditorUI_getLimitedPosition(CCPoint* retVal, CCPoint point) {
-    *retVal = point;
-    return retVal;
-}
+
 
 void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
     matdash::orig<&LevelInfoLayer_onClone>(self, foo);
@@ -303,7 +300,7 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void**>(&CustomizeObjectLayer_init_H),
         reinterpret_cast<void**>(&CustomizeObjectLayer_init));
 
-    matdash::add_hook<&EditorUI_getLimitedPosition, matdash::Stdcall>(gd::base + 0x4b500);
+    
 
     matdash::add_hook<&ColorSelectPopup_init>(gd::base + 0x29db0);
     matdash::add_hook<&ColorSelectPopup_dtor>(gd::base + 0x2b050);
@@ -316,6 +313,8 @@ DWORD WINAPI my_thread(void* hModule) {
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
+
+    
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?end@CCDirector@cocos2d@@QAEXXZ")),

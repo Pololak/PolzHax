@@ -1512,6 +1512,9 @@
     <ClInclude Include="EndLevelLayer.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="CheckPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

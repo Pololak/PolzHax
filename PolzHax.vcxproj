@@ -536,6 +536,7 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\SlotData.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine-cocos2dx.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
+    <ClInclude Include="CheckPoint.h" />
     <ClInclude Include="EndLevelLayer.h" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />

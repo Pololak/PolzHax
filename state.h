@@ -98,6 +98,7 @@ struct SettingStruct {
     bool onJumpHack = false;
     bool onNoclip = false;
     bool onPauseDurComp = false;
+    //bool onPracticeFix = false;
     bool onPracticeMusic = false;
     bool onSPSwitcher = false;
     bool onSuicide = false;

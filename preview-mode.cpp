@@ -570,6 +570,11 @@ void EditorUI_updateZoom(gd::EditorUI* self, float amt) {
 	}
 }
 
+CCPoint* EditorUI_getLimitedPosition(CCPoint* retVal, CCPoint point) {
+	*retVal = point;
+	return retVal;
+}
+
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	editUI = self;
 
@@ -589,6 +594,80 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 			self->updateButtons();
 		}
 	}
+
+	auto objcolorid = CCLabelBMFont::create("", "chatFont.fnt");
+	objcolorid->setString(CCString::createWithFormat("C: %d", 0)->getCString());
+	objcolorid->setVisible(0);
+	objcolorid->setTag(45011);
+	objcolorid->setScale(0.66f);
+	objcolorid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 70 });
+	objcolorid->setAnchorPoint({ 0, 0.5f });
+	self->addChild(objcolorid);
+
+	auto objgroupid = CCLabelBMFont::create("", "chatFont.fnt");
+	objgroupid->setString(CCString::createWithFormat("G: %d")->getCString());
+	objgroupid->setVisible(0);
+	objgroupid->setTag(45012);
+	objgroupid->setScale(0.66f);
+	objgroupid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 80 });
+	objgroupid->setAnchorPoint({ 0, 0.5f });
+	self->addChild(objgroupid);
+
+	auto objrot = CCLabelBMFont::create("", "chatFont.fnt");
+	objrot->setString(CCString::createWithFormat("Rot: %.0f%")->getCString());
+	objrot->setVisible(0);
+	objrot->setTag(45015);
+	objrot->setScale(0.66f);
+	objrot->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 90 });
+	objrot->setAnchorPoint({ 0, 0.5f });
+	self->addChild(objrot);
+
+	auto objposx = CCLabelBMFont::create("", "chatFont.fnt");
+	objposx->setString(CCString::createWithFormat("Pos X: %.0f%")->getCString());
+	objposx->setVisible(0);
+	objposx->setTag(45013);
+	objposx->setScale(0.66f);
+	objposx->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 100 });
+	objposx->setAnchorPoint({ 0, 0.5f });
+	self->addChild(objposx);
+
+	auto objposy = CCLabelBMFont::create("", "chatFont.fnt");
+	objposy->setString(CCString::createWithFormat("Pos Y: %.0f%")->getCString());
+	objposy->setVisible(0);
+	objposy->setTag(45014);
+	objposy->setScale(0.66f);
+	objposy->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 110 });
+	objposy->setAnchorPoint({ 0, 0.5f });
+	self->addChild(objposy);
+
+	auto objid = CCLabelBMFont::create("", "chatFont.fnt");
+	objid->setString(CCString::createWithFormat("ObjID: %d")->getCString());
+	objid->setVisible(0);
+	objid->setTag(45016);
+	objid->setScale(0.66f);
+	objid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 120 });
+	objid->setAnchorPoint({ 0, 0.5f });
+	self->addChild(objid);
+
+	gd::GameObject* selectedObject = from<gd::GameObject*>(self, 0x258);
+	auto objaddr = CCLabelBMFont::create("", "chatFont.fnt");
+	objaddr->setString(CCString::createWithFormat("Addr: 0x%p", selectedObject)->getCString());
+	objaddr->setVisible(0);
+	objaddr->setTag(45017);
+	objaddr->setAnchorPoint({ 0, 0.5f });
+	objaddr->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 130});
+	objaddr->setScale(0.66f);
+	self->addChild(objaddr);
+
+	std::vector<gd::GameObject*> gameObjectVector = self->getSelectedObjects();
+	auto objcounter = CCLabelBMFont::create("", "chatFont.fnt");
+	objcounter->setString(CCString::createWithFormat("Objects: %d", gameObjectVector.size())->getCString());
+	objcounter->setVisible(0);
+	objcounter->setTag(45018);
+	objcounter->setAnchorPoint({ 0, 0.5f });
+	objcounter->setPosition(director->getScreenLeft() + 80, director->getScreenTop() - 60);
+	objcounter->setScale(0.66f);
+	self->addChild(objcounter);
 
 	return result;
 }
@@ -671,6 +750,102 @@ void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, voi
 	EditorPauseLayer::onExitNoSave(self, sender);
 }
 
+void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
+	if (editUI) {
+		auto objcolorid = editUI->getChildByTag(45011);
+		auto objgroupid = editUI->getChildByTag(45012);
+		auto objposx = editUI->getChildByTag(45013);
+		auto objposy = editUI->getChildByTag(45014);
+		auto objrot = editUI->getChildByTag(45015);
+		auto objid = editUI->getChildByTag(45016);
+		auto objaddr = editUI->getChildByTag(45017);
+		auto objcounter = editUI->getChildByTag(45018);
+
+		if (objcolorid) {
+			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
+			else
+			{
+				reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: %d", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				objcolorid->setVisible(1);
+			}
+		}
+
+		if (objgroupid) {
+			if (editUI->getSingleSelectedObj() == 0) objgroupid->setVisible(0);
+			else {
+				reinterpret_cast<CCLabelBMFont*>(objgroupid)->setString(CCString::createWithFormat("G: %d", editUI->getSingleSelectedObj()->getObjectGroup())->getCString());
+				objgroupid->setVisible(1);
+			}
+		}
+
+		if (objrot) {
+			if (editUI->getSingleSelectedObj() == 0) objrot->setVisible(0);
+			else
+			{
+				reinterpret_cast<CCLabelBMFont*>(objrot)->setString(CCString::createWithFormat("Rot: %.0f%", std::floor(editUI->getSingleSelectedObj()->getRotation()))->getCString());
+				objrot->setVisible(1);
+			}
+		}
+
+		if (objposx) {
+			if (editUI->getSingleSelectedObj() == 0) objposx->setVisible(0);
+			else
+			{
+				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("Pos X: %.0f%", 
+					std::floor(editUI->getSingleSelectedObj()->getPositionX()))->getCString());
+				objposx->setVisible(1);
+			}
+		}
+
+		if (objposy) {
+			if (editUI->getSingleSelectedObj() == 0) objposy->setVisible(0);
+			else
+			{
+				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Pos Y: %.0f%", 
+					std::floor(editUI->getSingleSelectedObj()->getPositionY()))->getCString());
+				objposy->setVisible(1);
+			}
+		}
+
+		if (objid) {
+			if (editUI->getSingleSelectedObj() == 0) objid->setVisible(0);
+			else {
+				reinterpret_cast<CCLabelBMFont*>(objid)->setString(CCString::createWithFormat("ObjID: %d", editUI->getSingleSelectedObj()->getObjectID())->getCString());
+				objid->setVisible(1);
+			}
+		}
+
+		if (objaddr)
+		{
+			if (editUI->getSingleSelectedObj() == 0) objaddr->setVisible(0);
+			else {
+				reinterpret_cast<CCLabelBMFont*>(objaddr)->setString(CCString::createWithFormat("Addr: 0x%p", editUI->getSingleSelectedObj())->getCString());
+				objaddr->setVisible(1);
+			}
+		}
+
+		if (objcounter)
+		{
+			reinterpret_cast<CCLabelBMFont*>(objcounter)->setString(CCString::createWithFormat("Objects: %d", (editUI->getSelectedObjectsOfCCArray()->count()))->getCString());
+			if (editUI->getSelectedObjectsOfCCArray()->count() == 0) objcounter->setVisible(0);
+			else objcounter->setVisible(1);
+		}
+	}
+
+	Scheduler::update(self, dt);
+}
+
+void Scheduler::mem_init() {
+	DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
+	MH_CreateHook(
+		reinterpret_cast<void*>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?update@CCScheduler@cocos2d@@UAEXM@Z")),
+		Scheduler::update_H,
+		reinterpret_cast<void**>(&Scheduler::update));
+	/*MH_CreateHook(
+		reinterpret_cast<void*>(cocosbase + 0xff970),
+		Scheduler::update_H,
+		reinterpret_cast<void**>(Scheduler::update));*/
+}
 void EditorUI::mem_init() {
 	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x3fdc0),
@@ -703,6 +878,7 @@ void preview_mode::init() {
 
 	matdash::add_hook<&EditorUI_deselectAll>(gd::base + 0x48380);
 	matdash::add_hook<&EditorUI_updateZoom>(gd::base + 0x48c30);
+	matdash::add_hook<&EditorUI_getLimitedPosition, matdash::Stdcall>(gd::base + 0x4b500);
 
 	matdash::add_hook<&EditorPauseLayer_init>(gd::base + 0x3e2e0);
 	matdash::add_hook<&EditorPauseLayer_dtor>(gd::base + 0x3e280);
