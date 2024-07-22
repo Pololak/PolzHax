@@ -714,14 +714,14 @@ void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy
 //
 //}
 
-void __fastcall EditorUI::onPause_H(gd::EditorUI* self, void*, CCObject* sender) {
-	editUI->onDeselectAll(sender);
+//void __fastcall EditorUI::onPause_H(gd::EditorUI* self, void*, CCObject* sender) {
+//	editUI->onDeselectAll(sender);
+//
+//	EditorUI::onPause(self, sender);
+//}
 
-	EditorUI::onPause(self, sender);
-}
-
-void __fastcall EditorPauseLayer::customSetup_H(gd::CCBlockLayer* self) {
-	//editorPauseLayer = self;
+void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
+	editorPauseLayer = self;
 	EditorPauseLayer::customSetup(self);
 
 	auto director = CCDirector::sharedDirector();
@@ -750,6 +750,34 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::CCBlockLayer* self) {
 	menu->addChild(optionsBtn);
 
 	self->addChild(menu);
+}
+
+void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	EditorPauseLayer::onSaveAndPlay(self, sender);
+
+	editUI = nullptr;
+}
+
+void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	EditorPauseLayer::onSaveAndExit(self, sender);
+
+	editUI = nullptr;
+}
+
+void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	EditorPauseLayer::onExitNoSave(self, sender);
+
+	editUI = nullptr;
+}
+
+void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* edx, enumKeyCodes key) {
+
+	if (key == KEY_Escape) {
+		editorPauseLayer->onResume(nullptr);
+	}
+	else {
+		EditorPauseLayer::keyDown(self, key);
+	}
 }
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
@@ -840,24 +868,6 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	Scheduler::update(self, dt);
 }
 
-void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	editUI = nullptr;
-
-	EditorPauseLayer::onSaveAndPlay(self, sender);
-}
-
-void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	editUI = nullptr;
-
-	EditorPauseLayer::onSaveAndExit(self, sender);
-}
-
-void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	editUI = nullptr;
-
-	EditorPauseLayer::onExitNoSave(self, sender);
-}
-
 void Scheduler::mem_init() {
 	DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 	MH_CreateHook(
@@ -883,10 +893,10 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x4ee90),
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
-	MH_CreateHook(
+	/*MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x411f0),
 		EditorUI::onPause_H,
-		reinterpret_cast<void**>(&EditorUI::onPause));
+		reinterpret_cast<void**>(&EditorUI::onPause));*/
 	/*MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x49d20),
 		EditorUI::createMoveMenu_H,
@@ -899,6 +909,22 @@ void EditorPauseLayer::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x3e3d0),
 		EditorPauseLayer::customSetup_H,
 		reinterpret_cast<void**>(&EditorPauseLayer::customSetup));
+	MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x3f170),
+		EditorPauseLayer::onSaveAndPlay_H,
+		reinterpret_cast<void**>(&EditorPauseLayer::onSaveAndPlay));
+	MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x3f340),
+		EditorPauseLayer::onSaveAndExit_H,
+		reinterpret_cast<void**>(&EditorPauseLayer::onSaveAndExit));
+	MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x3f420),
+		EditorPauseLayer::onExitNoSave_H,
+		reinterpret_cast<void**>(&EditorPauseLayer::onExitNoSave));
+	MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x3f570),
+		EditorPauseLayer::keyDown_H,
+		reinterpret_cast<void**>(&EditorPauseLayer::keyDown));
 }
 
 void preview_mode::init() {

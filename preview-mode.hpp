@@ -26,12 +26,14 @@ namespace EditorUI {
 	inline void(__thiscall* onPause)(gd::EditorUI*, CCObject*);
 	void __fastcall onPause_H(gd::EditorUI* self, void*, CCObject* sender);
 
+	
+
 	void mem_init();
 }
 
 namespace EditorPauseLayer {
-	inline bool(__thiscall* customSetup)(gd::CCBlockLayer* self);
-	void __fastcall customSetup_H(gd::CCBlockLayer* self);
+	inline bool(__thiscall* customSetup)(gd::EditorPauseLayer* self);
+	void __fastcall customSetup_H(gd::EditorPauseLayer* self);
 
 	inline void(__thiscall* onSaveAndPlay)(gd::EditorPauseLayer*, CCObject*);
 	void __fastcall onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
@@ -41,6 +43,9 @@ namespace EditorPauseLayer {
 
 	inline void(__thiscall* onExitNoSave)(gd::EditorPauseLayer*, CCObject*);
 	void __fastcall onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
+
+	inline bool(__thiscall* keyDown)(gd::EditorPauseLayer*, cocos2d::enumKeyCodes);
+	void __fastcall keyDown_H(gd::EditorPauseLayer* self, void* edx, cocos2d::enumKeyCodes key);
 
 	void mem_init();
 }
