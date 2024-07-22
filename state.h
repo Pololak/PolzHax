@@ -10,6 +10,8 @@ struct LayersStruct {
 
 struct SettingStruct {
 
+    int selected_dart = 1;
+
     int cheatsCount = 0;
     int beforeRestartCheatsCount = 0;
 
@@ -17,6 +19,7 @@ struct SettingStruct {
     int CurrentNoclipByte;
 
     // PolzHax
+    //int priority = 2;
     bool onAutoSave = false;
     bool onExplorer = false;
     cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;

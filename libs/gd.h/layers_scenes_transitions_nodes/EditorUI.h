@@ -7,7 +7,10 @@
 
 namespace gd {
 
-class EditButtonBar : public cocos2d::CCNode {};
+class EditButtonBar : public cocos2d::CCNode {
+public:
+    cocos2d::CCArray* m_buttonArray;
+};
 class GJRotationControl : public cocos2d::CCLayer {};
 class GJScaleControl : public cocos2d::CCLayer {};
 
@@ -18,6 +21,9 @@ class GameObject;
 
 class EditorUI : public cocos2d::CCLayer {
 public:
+    EditButtonBar* m_pEditButtonBar;
+    EditButtonBar* m_pEditButtonBar2;
+
     auto pasteObjects(const std::string& str) {
         return reinterpret_cast<cocos2d::CCArray * (__thiscall*)(EditorUI*, gd::string)>(base + 0x492a0)(this, str);
     }
@@ -100,6 +106,10 @@ public:
 
     void onSettings(CCObject* sender) {
         return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x41190)(this, sender);
+    }
+
+    void onDeselectAll(CCObject* sender) {
+        return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x48340)(this, sender);
     }
 
     void getCreateBtn() {

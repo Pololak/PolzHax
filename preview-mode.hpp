@@ -20,6 +20,12 @@ namespace EditorUI {
 	inline bool(__thiscall* scrollWheel)(gd::EditorUI* _self, float dy, float dx);
 	void __fastcall scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx);
 
+	inline bool(__thiscall* createMoveMenu)(gd::EditorUI* self);
+	void __fastcall createMoveMenu_H(gd::EditorUI* self);
+
+	inline void(__thiscall* onPause)(gd::EditorUI*, CCObject*);
+	void __fastcall onPause_H(gd::EditorUI* self, void*, CCObject* sender);
+
 	void mem_init();
 }
 

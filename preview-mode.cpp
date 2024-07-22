@@ -26,6 +26,8 @@
 
 using namespace cocos2d;
 
+cocos2d::CCScheduler* scheduler;
+
 //enum class gd::GJCustomColorMode {
 //	Default = 0,
 //	PlayerCol1 = 1,
@@ -700,6 +702,24 @@ void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy
 	}
 }
 
+//void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
+//	EditorUI::createMoveMenu(self);
+//
+//	auto sprite = CCSprite::create("GJ_button_01.png");
+//	auto btn = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, 0);
+//
+//	if (btn) {
+//		self->m_pEditButtonBar2->m_buttonArray->addObject(btn);
+//	}
+//
+//}
+
+void __fastcall EditorUI::onPause_H(gd::EditorUI* self, void*, CCObject* sender) {
+	editUI->onDeselectAll(sender);
+
+	EditorUI::onPause(self, sender);
+}
+
 void __fastcall EditorPauseLayer::customSetup_H(gd::CCBlockLayer* self) {
 	//editorPauseLayer = self;
 	EditorPauseLayer::customSetup(self);
@@ -732,25 +752,10 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::CCBlockLayer* self) {
 	self->addChild(menu);
 }
 
-void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	editUI = nullptr;
-
-	EditorPauseLayer::onSaveAndPlay(self, sender);
-}
-
-void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	editUI = nullptr;
-
-	EditorPauseLayer::onSaveAndExit(self, sender);
-}
-
-void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	editUI = nullptr;
-
-	EditorPauseLayer::onExitNoSave(self, sender);
-}
-
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
+
+	scheduler = self;
+
 	if (editUI) {
 		auto objcolorid = editUI->getChildByTag(45011);
 		auto objgroupid = editUI->getChildByTag(45012);
@@ -835,6 +840,24 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	Scheduler::update(self, dt);
 }
 
+void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	editUI = nullptr;
+
+	EditorPauseLayer::onSaveAndPlay(self, sender);
+}
+
+void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	editUI = nullptr;
+
+	EditorPauseLayer::onSaveAndExit(self, sender);
+}
+
+void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	editUI = nullptr;
+
+	EditorPauseLayer::onExitNoSave(self, sender);
+}
+
 void Scheduler::mem_init() {
 	DWORD cocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 	MH_CreateHook(
@@ -846,6 +869,7 @@ void Scheduler::mem_init() {
 		Scheduler::update_H,
 		reinterpret_cast<void**>(Scheduler::update));*/
 }
+
 void EditorUI::mem_init() {
 	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x3fdc0),
@@ -859,6 +883,15 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x4ee90),
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
+	MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x411f0),
+		EditorUI::onPause_H,
+		reinterpret_cast<void**>(&EditorUI::onPause));
+	/*MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x49d20),
+		EditorUI::createMoveMenu_H,
+		reinterpret_cast<void**>(&EditorUI::createMoveMenu));*/
+
 }
 
 void EditorPauseLayer::mem_init() {

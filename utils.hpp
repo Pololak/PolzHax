@@ -26,7 +26,7 @@ static const auto cocos_base = reinterpret_cast<uintptr_t>(GetModuleHandleA("lib
 namespace {
 	template <class F>
 	struct ThiscallWrapper;
-	
+
 	template <class R, class... Args>
 	struct ThiscallWrapper<R(*)(Args...)> {
 		template <auto func>
@@ -72,7 +72,8 @@ template <class Stream, class... Args>
 void format_to(Stream& stream, const std::string_view& str, Args&&... args) {
 	if constexpr (sizeof...(Args) == 0) {
 		stream << str;
-	} else {
+	}
+	else {
 		const std::function<void(Stream&)> partials[sizeof...(Args)] = { [args](Stream& stream) { stream << args; }... };
 		size_t counter = 0;
 		for (size_t i = 0; i < str.size(); ++i) {
@@ -143,7 +144,7 @@ public:
 	}
 
 	friend bool operator== (const CCArrayIterator<T>& a, const CCArrayIterator<T>& b) { return a.m_ptr == b.m_ptr; };
-	friend bool operator!= (const CCArrayIterator<T>& a, const CCArrayIterator<T>& b) { return a.m_ptr != b.m_ptr; };   
+	friend bool operator!= (const CCArrayIterator<T>& a, const CCArrayIterator<T>& b) { return a.m_ptr != b.m_ptr; };
 };
 
 template <typename T>
@@ -167,7 +168,8 @@ public:
 	std::pair<K, T> operator*() {
 		if constexpr (std::is_same<K, std::string>::value) {
 			return { m_ptr->getStrKey(), reinterpret_cast<T>(m_ptr->getObject()) };
-		} else {
+		}
+		else {
 			return { m_ptr->getIntKey(), reinterpret_cast<T>(m_ptr->getObject()) };
 		}
 	}

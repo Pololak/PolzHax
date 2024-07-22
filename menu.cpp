@@ -2167,7 +2167,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.3-alpha.1");
+            ImGui::Text("v1.1.3-alpha.2");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2177,6 +2177,9 @@ void RenderMain() {
                 gd::FLAlertLayer::create(nullptr, "Saved!", "Your hack state is saved!", "Ok", nullptr, 240.f, false, 0)->show();
             }
             ImGui::EndTabItem();
+
+            //ImGui::Combo("Thread Priority", setting().priority, setting().priority, 5);
+
             if (ImGui::Button("Special Thanks"))
             {
                 gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cj>TheSillyDoggo</c>, Absolute, <cl>HJFod</c>.", "Ok", nullptr, 320.f, false, 0)->show();

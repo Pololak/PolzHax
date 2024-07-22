@@ -155,8 +155,6 @@ gd::ColorSelectPopup* colorSelectPopup;
 
 // End of Hitboxes thing
 
-
-
 void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
     matdash::orig<&LevelInfoLayer_onClone>(self, foo);
     if (!self->shouldDownloadLevel()) {
@@ -244,9 +242,6 @@ matdash::cc::c_decl<cocos2d::extension::RGBA> cocos_hsv2rgb(cocos2d::extension::
         color.h = 0.0;
     return matdash::orig<&cocos_hsv2rgb>(color);
 }
-
-
-
 
 bool(__thiscall* ObjectToolbox_gridNodeSizeForKey)(int id);
 void __stdcall ObjectToolbox_gridNodeSizeForKey_H(int id) {
