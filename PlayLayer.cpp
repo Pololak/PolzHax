@@ -98,11 +98,11 @@ bool lKeyFlag = true;
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
 
-    const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
+    //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
     auto size = CCDirector::sharedDirector()->getWinSize();
 
-    auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
+    //auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
     auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
 
     auto secarr = self->getSections();
@@ -160,7 +160,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         else if (!GetAsyncKeyState(0x51)) lKeyFlag = true;
     }
 
-    if (percentLabel) {
+    /*if (percentLabel) {
         const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
 
         percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
@@ -169,7 +169,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         if (value < 100.0f) percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
         else percentLabel->setString(CCString::create("100.00%")->getCString());
 
-    }
+    }*/
 
     if (setting().onHideAttempts) {
         self->attemptsLabel()->setVisible(false);
@@ -244,6 +244,13 @@ void __fastcall PlayLayer::pushButton_H(int idk1, bool idk2) {
 void __fastcall PlayLayer::releaseButton_H(int idk1, bool idk2) {
 
     PlayLayer::releaseButton(idk1, idk2);
+}
+
+void __fastcall HardStreak::updateStroke_H(gd::HardStreak* self, float dt) {
+
+    //self->m_pulseSize = 1;
+
+    HardStreak::updateStroke(self, dt);
 }
 
 //void __fastcall PlayLayer::togglePracticeMode_H(gd::PlayLayer* self, int edx, bool practice) {
@@ -336,4 +343,11 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf0af0),
         PlayLayer::releaseButton_H,
         reinterpret_cast<void**>(&PlayLayer::releaseButton));*/
+}
+
+void HardStreak::mem_init() {
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0x833e0),
+        HardStreak::updateStroke_H,
+        reinterpret_cast<void**>(&HardStreak::updateStroke));
 }

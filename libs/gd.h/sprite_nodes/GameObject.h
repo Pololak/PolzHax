@@ -78,7 +78,8 @@ namespace gd {
 		Col2 = 4,
 		Col3 = 6,
 		Col4 = 7,
-		DL = 8
+		DL = 8,
+		White = 9
 	};
 
 	class GJSpriteColor;

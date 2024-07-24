@@ -44,4 +44,11 @@ namespace PlayLayer {
 	extern bool inPractice;
 }
 
+namespace HardStreak {
+	inline void(__thiscall* updateStroke)(gd::HardStreak*, float);
+	void __fastcall updateStroke_H(gd::HardStreak* self, float dt);
+
+	void mem_init();
+}
+
 

@@ -919,7 +919,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x75\x04", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you input any character in text fields.");
 
             if (ImGui::Checkbox("Icons", &setting().onIcons)) {
@@ -946,7 +946,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x47EAAE), "\x75\x13", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Unlocks all icons and colors.");
 
             if (ImGui::Checkbox("Main Levels", &setting().onMainLevels)) {
@@ -959,8 +959,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A8C22), "\x0f\x8e\x97\x00\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Unlocks main demons levels.");
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Unlocks main demon levels.");
 
             if (ImGui::Checkbox("Slider Limit", &setting().onSliderLimit)) {
                 if (setting().onSliderLimit) {
@@ -972,7 +972,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf3b), "\x76\x07", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets sliders be dragged beyond the visible limit.");
 
             if (ImGui::Checkbox("Text Length", &setting().onTextLength)) {
@@ -983,7 +983,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\x7c\x04", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows for unlimited text length in text inputs.");
         }
 
@@ -1003,7 +1003,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4735CE), "\x0F\x44\xD9", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Forces coins show as uncollected.");
 
             if (ImGui::Checkbox("Coins in Practice", &setting().onCoinsPractice)) {
@@ -1014,7 +1014,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4eb138), "\x75\x4c", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows for coins to be picked up in practice mode.");
 
             if (ImGui::Checkbox("Don't Enter", &setting().onDontEnter)) {
@@ -1025,7 +1025,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x8B\xD9", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables transition trigger effects.");
 
             if (ImGui::Checkbox("Force Objects Invisible", &setting().onFObjectInvisible)) {
@@ -1036,11 +1036,11 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x0f\x84\xd1\x02\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes all objects act as invisible ones.");
 
             ImGui::Checkbox("Hide Attempts", &setting().onHideAttempts);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides the attemps counter in-game.");
 
             if (ImGui::Checkbox("Hide Pause Menu", &setting().onHidePauseMenu)) {
@@ -1050,12 +1050,12 @@ void RenderMain() {
                     else layers().PauseLayerObject->setVisible(1);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides the pause menu.");
 
 
             ImGui::Checkbox("Hide Player", &setting().onHidePlayer);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides the player.");
 
             if (ImGui::Checkbox("Hide Practice Buttons", &setting().onHidePracticeBtn)) {
@@ -1068,7 +1068,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4fee6a), "\xff\x92\xdc\x00\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides practice buttons.");
 
             if (ImGui::Checkbox("Instant Mirror", &setting().onInstantMirror)) {
@@ -1081,7 +1081,7 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the mirror portal animation.");
 
             if (ImGui::Checkbox("Max Particles", &setting().onMaxParticles)) {
@@ -1092,7 +1092,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xB64D7), "\x8b\x7d\x08", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Increases particles to the maximum.");
 
             if (ImGui::Checkbox("Mini Cube Icon", &setting().onMiniCube)) {
@@ -1103,7 +1103,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d8cf4), "\x0f\x4f\xf9", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Forces use of the mini cube icon.");
 
             if (ImGui::Checkbox("No Animations", &setting().onNoAnimations)) {
@@ -1116,7 +1116,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88da0), "\xc1", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes game animations instant (e.g. buttons).");
 
             /*if (ImGui::Checkbox("No Background Flash", &setting().onNoBGFlash)) {
@@ -1147,7 +1147,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("No visual effects on death.");
 
             /*if (ImGui::Checkbox("No Force Player Glow", &setting().onNoForceGlow)) {
@@ -1169,7 +1169,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f338d), "\xff\x75\x08", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables player ghost trail triggers.");
 
             if (ImGui::Checkbox("No Glow", &setting().onNoGlowObject)) {
@@ -1180,7 +1180,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x46d8a3), "\x0f\x85\x8e\x01\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables objects glow.");
 
             if (ImGui::Checkbox("No Gravity Effect", &setting().onNoGravityEffect)) {
@@ -1191,7 +1191,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f4586), "\x75\x07", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables gravity effect.");
 
             if (ImGui::Checkbox("No Mirror", &setting().onNoMirror)) {
@@ -1204,7 +1204,7 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables mirror portals.");
 
             if (ImGui::Checkbox("No New Best Popup", &setting().onNoNewBest)) {
@@ -1215,7 +1215,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5ff0), "\x55", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the new best popup.");
 
             if (ImGui::Checkbox("No Orb Ring", &setting().onNoOrbRing)) {
@@ -1226,7 +1226,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F6D40), "\x55", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables orb ring effect when touching it.");
 
             if (ImGui::Checkbox("No Particles", &setting().onNoParticles)) {
@@ -1237,7 +1237,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\x56", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the particle system.");
 
             if (ImGui::Checkbox("No Portal Lightning", &setting().onNoLightning)) {
@@ -1248,7 +1248,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\x75", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables portal lightning from size-changing portals.");
 
             if (ImGui::Checkbox("No Pulse", &setting().onNoPulse)) {
@@ -1259,7 +1259,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\xf3\x0f\x11\x87\xac\x01\x00\x00", 8, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables pulsing on objects.");
 
             if (ImGui::Checkbox("No Respawn Flash", &setting().onNoRespawnFlash)) {
@@ -1270,7 +1270,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\x0f\x85\x98\x00\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the respawn flash & circle effect.");
 
             if (ImGui::Checkbox("No Shade Effect", &setting().onNoShadeEffect)) {
@@ -1281,7 +1281,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\x77", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the disappearing effect on invisible blocks and etc.");
 
             //ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
@@ -1294,7 +1294,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\x74", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the hard wave trail.");
 
             if (ImGui::Checkbox("Practice Pulse", &setting().onPracticePulse)) {
@@ -1307,7 +1307,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\x74\x16", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Pulses orbs & wave in practice mode.");
 
             if (ImGui::Checkbox("Solid Player Trail", &setting().onSolidPlayerTrail)) {
@@ -1318,7 +1318,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac3dc), "\x89\x41\x10", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("No blending on player trail.");
 
             if (ImGui::Checkbox("Solid Wave Trail", &setting().onSolidWaveTrail)) {
@@ -1329,7 +1329,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d9ade), "\x75\x0c", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("No blending on the wave trail.");
 
             if (ImGui::Checkbox("Trail Always Off", &setting().onTrailAlwaysOff)) {
@@ -1340,8 +1340,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\x56", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Forces player trail to be always off");
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Forces player trail to be always off.");
 
             if (ImGui::Checkbox("Trail Always On", &setting().onTrailAlwaysOn)) {
                 if (setting().onTrailAlwaysOn) {
@@ -1351,7 +1351,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x00", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Forces player trail to be always on.");
 
             if (ImGui::Checkbox("Trail Bug Fix", &setting().onTrailBugFix)) {
@@ -1362,7 +1362,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC29D), "\xf3\x0f\x2c\xc1\x2b\xd8", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Fixes trail cutting on high refresh rates.");
 
             if (ImGui::Checkbox("Wave Trail on Death", &setting().onWaveTrailDeath)) {
@@ -1373,7 +1373,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdddfa), "\x74", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Keeps wave trail visible on death.");
         }
 
@@ -1393,7 +1393,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44B49D), "\x51\x8b\xcf\xff\x50\x5c", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Locks block position for rotation.");
 
             if (ImGui::Checkbox("Copy Hack", &setting().onCopyHack)) {
@@ -1406,7 +1406,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49dfe5), "\x75\x0e", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you copy any level, without a password.");
 
             if (ImGui::Checkbox("Default Song Bypass", &setting().onDefSongBypass)) {
@@ -1427,7 +1427,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49a41f), "\x0f\x48\xf1", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you use hidden default songs in the editor.");
 
             if (ImGui::Checkbox("Editor Extension", &setting().onEditorExtension)) {
@@ -1460,11 +1460,11 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\xb8\xa6\x54", 3, NULL); // Music Lines
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows you to build out of bounds.");
 
             ImGui::Checkbox("Editor Preview Mode", &setting().onEditorPreview);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows you to see colors in editor (little bit buggy).");
 
             if (ImGui::Checkbox("Free Scroll", &setting().onFreeScroll)) {
@@ -1481,11 +1481,11 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca8c), "\x77", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows you to scroll out the editor.");
 
             ImGui::Checkbox("Global Clipboard", &setting().onPersClip);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows you to copy objects between levels.");
 
             if (ImGui::Checkbox("Hide Grid", &setting().onHideGrid)) {
@@ -1498,7 +1498,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\x0f\x86\x53\x01\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides editor grid.");
 
             if (ImGui::Checkbox("Hide Trigger Lines", &setting().onHideTrigLine)) {
@@ -1509,7 +1509,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493e08), "\x0f\x84\xcd\x00\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides trigger lines.");
 
             if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
@@ -1520,7 +1520,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you edit any level through the pause menu.");
 
             if (ImGui::Checkbox("No (C) Mark", &setting().onNoCMark)) {
@@ -1531,7 +1531,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x454aa0), "\x8b\x81\x04\x02\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Removes the (C) mark when uploading copied levels.");
 
             if (ImGui::Checkbox("No Death X", &setting().onNoDeathX)) {
@@ -1542,7 +1542,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48c76a), "\xc7\x04\x24\x33\x33\x33\x3f", 7, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Removes big annoying red X when dying whilst playtesing.");
 
             if (ImGui::Checkbox("No Editor Trail", &setting().onNoEditorTrail)) {
@@ -1555,7 +1555,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49442c), "\xFF", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Removes the editor trail.");
 
             if (ImGui::Checkbox("Object Bypass", &setting().onObjBypass)) {
@@ -1571,7 +1571,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4476b2), "\x3D\x20\x4e\x00\x00", 5, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Uncaps the object limit.");
 
             if (ImGui::Checkbox("Place Over", &setting().onPlaceOver)) {
@@ -1582,7 +1582,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48D37F), "\x77", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you place the same object over itself in editor.");
 
             if (ImGui::Checkbox("Smooth Trail", &setting().onSmoothEditTrail)) {
@@ -1593,7 +1593,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x72\x79", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the editor trail smoother.");
 
             if (ImGui::Checkbox("Verify Hack", &setting().onVerifyHack)) {
@@ -1604,7 +1604,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\x75\x2f", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you upload unverified levels.");
 
             if (ImGui::Checkbox("Zoom Bypass", &setting().onZoomBypass)) {
@@ -1617,7 +1617,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x448bba), "\x0f\x28\xc8", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you zoom fully in & out.");
         }
 
@@ -1650,7 +1650,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\xe8\xc6\xd7\xf2\xff", 5, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Requires confirmation when exiting a level.");
 
             if (ImGui::Checkbox("Corrective Music Sync", &setting().onMusicSync)) {
@@ -1661,7 +1661,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\x75\x08", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Syncs music to checked speed-portals, instead of only ones the player hit.");
 
             if (ImGui::Checkbox("High FPS Rotation Fix", &setting().onHiFPSRotation)) {
@@ -1672,7 +1672,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dc13b), "\x0f\x82\xd6\x00\x00\x00", 6, NULL); // 0f 82 d6 00 00 00
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Fixes vehicles rotation on high fps (affects hitboxes).");
 
             /*if (ImGui::Checkbox("Ignore ESC", &setting().onIgnoreEsc)) {
@@ -1694,7 +1694,7 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Teleports the player to the end of a level.");
 
             if (ImGui::Checkbox("Instant Triggers", &setting().onInstantTriggers)) {
@@ -1705,8 +1705,8 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x89780), "\xC1", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Lets color triggers to ignore their fade time.");
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Lets color triggers ignore their fade time.");
 
             if (ImGui::Checkbox("Jump Hack", &setting().onJumpHack)) {
                 if (setting().onJumpHack) {
@@ -1720,8 +1720,8 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Allows you for jumping in mid-air.");
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Allows you to jump in mid-air.");
 
             if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
                 if (setting().onNoclip) {
@@ -1733,7 +1733,7 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the player invincible.");
 
             if (ImGui::Checkbox("Pause During Completion", &setting().onPauseDurComp)) {
@@ -1748,7 +1748,7 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you pause during the level complete animation.");
 
             //ImGui::Checkbox("Practice Bug Fix", &setting().onPracticeFix);
@@ -1769,11 +1769,11 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\xe8\xaa\x42\xf2\xff", 5, NULL); // e8 aa 42 f2 ff
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Plays the level's song in-sync with your position.");
 
             ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you switch between multiple start positions in-level.");
 
             if (ImGui::Checkbox("Suicide", &setting().onSuicide)) {
@@ -1786,7 +1786,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\x0f\x87\x58\x02\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Ouch.");
         }
 
@@ -1826,7 +1826,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x8b\x03\x8b\xcb\xff\x50\x18", 7, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables savefile saving on minimize.");
 
             if (ImGui::Checkbox("Force Visibility", &setting().onForceVis)) {
@@ -1839,7 +1839,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60c9a), "\x0f\x84\xcb\x00\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Sets all nodes to be visible.");
 
             if (ImGui::Checkbox("Free Window Resize", &setting().onFreeWinReSize)) {
@@ -1850,11 +1850,11 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\xe8\xb0\xf3\xff\xff", 5, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Removes limits in place for window resizing.");
 
             ImGui::Checkbox("HUE Fix", &setting().onAlwaysHue);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Fixes that yellow and purple color bug.");
 
             if (ImGui::Checkbox("Ignore Slider", &setting().onIgnoreSlider)) {
@@ -1865,7 +1865,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cec0), "\x55", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Blocks sliders from moving.");
 
             if (ImGui::Checkbox("Immortal Icons", &setting().onImmortalIcons)) {
@@ -1876,7 +1876,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\x55", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes icons in menu invincible.");
 
             if (ImGui::Checkbox("Instant Game Work", &setting().onInstantGameWork)) {
@@ -1887,7 +1887,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc1", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables delays in the game.");
 
             if (ImGui::Checkbox("Krmal Mode", &setting().onKrmalMode)) {
@@ -1898,7 +1898,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x0f\x45\xdb", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes level invisible.");
 
             if (ImGui::Checkbox("No Rotation", &setting().onNoRotation)) {
@@ -1909,7 +1909,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\xf3\x0f\x11\x41\x1c\xf3\x0f\x11\x41\x18", 10, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Locks all rotation at 0 degrees.");
 
             if (ImGui::Checkbox("No Transition", &setting().onNoTransition)) {
@@ -1920,12 +1920,12 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Shorterns scene transition time to 0s.");
 
             ImGui::Checkbox("Retry Keybind", &setting().onRetryBind);
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Lets you to restart level by pressing R.");
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Lets you restart level by pressing R.");
 
             if (ImGui::Checkbox("Safe Mode", &setting().onSafeMode)) {
                 if (setting().onSafeMode) {
@@ -1939,11 +1939,11 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables progress and completion of levels.");
 
             ImGui::Checkbox("Show Percentage", &setting().onShowPercentage);
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Shows levels percentage.");
 
             if (ImGui::Checkbox("Show Restart Button", &setting().onRestartButton)) {
@@ -1954,7 +1954,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x75\x29", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Shows the restart button in pause menu.");
 
             if (ImGui::Checkbox("Transparent BG", &setting().onTransparentBG)) {
@@ -1987,7 +1987,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49f984), "\x00\x66", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Removes the blue filter from menu's backgrounds.");
 
             if (ImGui::Checkbox("Transparent Lists", &setting().onTransparentLists)) {
@@ -2010,7 +2010,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x431c82), "\x3e", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the menu lists transparent.");
 
             if (ImGui::Checkbox("Transparent Labels", &setting().onTransparentTextLabels)) {
@@ -2033,7 +2033,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered())
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the text input areas transparent.");
 
             //ImGui::Checkbox("Transparent Pause", &setting().onTransparentPause);
@@ -2167,7 +2167,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.4-alpha.1");
+            ImGui::Text("v1.1.5-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

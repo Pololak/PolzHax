@@ -26,8 +26,6 @@
 
 using namespace cocos2d;
 
-cocos2d::CCScheduler* scheduler;
-
 //enum class gd::GJCustomColorMode {
 //	Default = 0,
 //	PlayerCol1 = 1,
@@ -44,6 +42,7 @@ gd::EditorPauseLayer* editorPauseLayer;
 CCLayer* levelEditorLayer;
 gd::EditorUI* editUI;
 std::string savedClipboard;
+CCScheduler* scheduler;
 
 bool hideUI = false;
 
@@ -702,17 +701,25 @@ void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy
 	}
 }
 
-//void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
-//	EditorUI::createMoveMenu(self);
-//
-//	auto sprite = CCSprite::create("GJ_button_01.png");
-//	auto btn = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, 0);
-//
-//	if (btn) {
-//		self->m_pEditButtonBar2->m_buttonArray->addObject(btn);
-//	}
-//
-//}
+void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
+	EditorUI::createMoveMenu(self);
+
+	//auto bar_array = from<CCArray*>(self, 0xa8);
+
+	//auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
+	//auto ccComponentContainer = from<CCComponentContainer*>(editButtonBar, 0xe4);
+	//auto boomScrollLayer = from<CCNode*>(ccComponentContainer, 0x8);
+	//auto array = from<CCArray*>(boomScrollLayer, 0xa8);
+
+	//auto sprite = CCSprite::create("GJ_button_01.png");
+	//auto btn = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, 0);
+
+	//array->addObject(sprite);
+
+	//editButtonBar->addChild(sprite);
+	
+
+}
 
 //void __fastcall EditorUI::onPause_H(gd::EditorUI* self, void*, CCObject* sender) {
 //	editUI->onDeselectAll(sender);
@@ -784,6 +791,31 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 
 	scheduler = self;
 
+	auto play_layer = gd::GameManager::sharedState()->getPlayLayer();
+	const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
+	auto size = CCDirector::sharedDirector()->getWinSize();
+
+	if (play_layer) {
+		auto percentLabel = reinterpret_cast<CCLabelBMFont*>(play_layer->getChildByTag(4571));
+
+		if (percentLabel) {
+			const auto value = play_layer->player1()->getPositionX() / play_layer->levelLength() * 100.f;
+
+			percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
+			percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
+
+			if (value < 100.0f) percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
+			else percentLabel->setString(CCString::create("100.00%")->getCString());
+
+			if (setting().onShowPercentage) {
+				percentLabel->setVisible(1);
+			}
+			else {
+				percentLabel->setVisible(0);
+			}
+		}
+	}
+
 	if (editUI) {
 		auto objcolorid = editUI->getChildByTag(45011);
 		auto objgroupid = editUI->getChildByTag(45012);
@@ -824,7 +856,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objposx->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("Pos X: %.0f%", 
+				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("Pos X: %.0f%",
 					std::floor(editUI->getSingleSelectedObj()->getPositionX()))->getCString());
 				objposx->setVisible(1);
 			}
@@ -834,7 +866,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objposy->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Pos Y: %.0f%", 
+				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Pos Y: %.0f%",
 					std::floor(editUI->getSingleSelectedObj()->getPositionY()))->getCString());
 				objposy->setVisible(1);
 			}
@@ -880,6 +912,8 @@ void Scheduler::mem_init() {
 		reinterpret_cast<void**>(Scheduler::update));*/
 }
 
+
+
 void EditorUI::mem_init() {
 	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x3fdc0),
@@ -897,10 +931,10 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x411f0),
 		EditorUI::onPause_H,
 		reinterpret_cast<void**>(&EditorUI::onPause));*/
-	/*MH_CreateHook(
+	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x49d20),
 		EditorUI::createMoveMenu_H,
-		reinterpret_cast<void**>(&EditorUI::createMoveMenu));*/
+		reinterpret_cast<void**>(&EditorUI::createMoveMenu));
 
 }
 

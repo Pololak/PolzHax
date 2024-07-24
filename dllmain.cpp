@@ -7,6 +7,7 @@
 #include "PauseLayer.h"
 #include "EndLevelLayer.h"
 //#include "Scheduler.h"
+//#include "CCSchedulerHook.h"
 
 #include <imgui-hook.hpp>
 #include <imgui.h>
@@ -194,15 +195,28 @@ bool(__thiscall* CustomizeObjectLayer_init)(CustomizeObjectLayer* self, gd::Game
 bool __fastcall CustomizeObjectLayer_init_H(CustomizeObjectLayer* self, void* edx, gd::GameObject* obj, CCArray* objs) {
     if (!CustomizeObjectLayer_init(self, obj, objs)) return false;
 
-    auto sprite = gd::ButtonSprite::create("3DL", 250, 0, 0.4, false, "bigFont.fnt", "GJ_button_04.png", 25.0);
-    auto button = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, union_cast<SEL_MenuHandler>(gd::base + 0x2e600));
-    button->setTag(static_cast<int>(gd::CustomColorMode::DL));
-    button->setPosition(100, 0);
-    from<CCArray*>(self, 0x1c4)->addObject(sprite);
-    self->getMenu()->addChild(button);
+    auto spr_3dl = gd::ButtonSprite::create("3D-Line", 250, 0, 0.4, false, "bigFont.fnt", "GJ_button_04.png", 25.0);
+    auto btn_3dl = gd::CCMenuItemSpriteExtra::create(spr_3dl, nullptr, self, union_cast<SEL_MenuHandler>(gd::base + 0x2e600));
+    btn_3dl ->setTag(static_cast<int>(gd::CustomColorMode::DL));
+    btn_3dl->setPosition({ 80,5 });
+
+    auto spr_wht = gd::ButtonSprite::create("White", 250, 0, 0.4, false, "bigFont.fnt", "GJ_button_04.png", 25.0);
+    auto btn_wht = gd::CCMenuItemSpriteExtra::create(spr_wht, nullptr, self, union_cast<SEL_MenuHandler>(gd::base + 0x2e600));
+    btn_wht->setTag(static_cast<int>(gd::CustomColorMode::White));
+    btn_wht->setPosition({ -82, 5 });
+
+    from<CCArray*>(self, 0x1c4)->addObject(spr_3dl);
+    from<CCArray*>(self, 0x1c4)->addObject(spr_wht);
+
+    self->getMenu()->addChild(btn_3dl);
+    self->getMenu()->addChild(btn_wht);
 
     if (obj && obj->getColorMode() == gd::CustomColorMode::DL) {
-        self->hightlightSelected(sprite);
+        self->hightlightSelected(spr_3dl);
+    }
+    
+    if (obj && obj->getColorMode() == gd::CustomColorMode::White) {
+        self->hightlightSelected(spr_wht);
     }
 
     return true;
@@ -285,6 +299,7 @@ DWORD WINAPI my_thread(void* hModule) {
     PauseLayer::mem_init();
     EndLevelLayer::mem_init();
     Scheduler::mem_init();
+    //HardStreak::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xff130),
