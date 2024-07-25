@@ -444,6 +444,7 @@ public:
 
 		GDColor p1_color(gm->colorForIdx(gm->getPlayerColor()), true);
 		GDColor p2_color(gm->colorForIdx(gm->getPlayerColor2()), true);
+		GDColor white(ccc3(255, 255, 255));
 
 		auto lbg_color = calculate_lbg(bg_color, p1_color);
 
@@ -482,6 +483,8 @@ public:
 				case gd::CustomColorMode::PlayerCol2:
 					this->update_object_color(object, p2_color);
 					break;
+				case gd::CustomColorMode::White:
+					this->update_object_color(object, white);
 				default:;
 				}
 			}
@@ -509,7 +512,8 @@ public:
 					{ gd::CustomColorMode::Col4, GDColor(150,255,150, false)},
 					{ gd::CustomColorMode::LightBG, GDColor(75,175,255, false)},
 					{ gd::CustomColorMode::PlayerCol1, GDColor(175,150,255, false)},
-					{ gd::CustomColorMode::PlayerCol2, GDColor(255,150,150, false)}
+					{ gd::CustomColorMode::PlayerCol2, GDColor(255,150,150, false)},
+					{ gd::CustomColorMode::White, GDColor(255,255,255, false)}
 				};
 				this->update_object_color(object, default_colors.at(mode));
 			}
