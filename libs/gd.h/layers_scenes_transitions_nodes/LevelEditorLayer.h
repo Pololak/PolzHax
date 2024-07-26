@@ -93,8 +93,7 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         void removeAllObjects() {
             return reinterpret_cast<void(__thiscall*)(LevelEditorLayer*)>(base + 0x8d770)(this);
         }
-        int getLayerGroup()
-        {
+        auto getLayerGroup() {
             return from<int>(this, 0x12C);
         }
         

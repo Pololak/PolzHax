@@ -76,7 +76,10 @@ bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 		}
 	};
 
-	auto btn_spr = CCSprite::create("BE_Export_File.png");
+	auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+	if (!btn_spr->initWithFile("BE_Export_File.png")) {
+		btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
+	}
 	auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
 
 	menu->setZOrder(1);
@@ -108,7 +111,11 @@ bool LevelBrowserLayer_init(gd::LevelBrowserLayer* self, gd::GJSearchObject* obj
 			}
 		};
 
-		auto btn_spr = CCSprite::create("BE_Import_File.png");
+		auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+		if (!btn_spr->initWithFile("BE_Import_File.png")) {
+			btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
+		}
+
 		auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
 
 		// auto button = CCMenuItemSpriteExtra::create(
@@ -122,7 +129,40 @@ bool LevelBrowserLayer_init(gd::LevelBrowserLayer* self, gd::GJSearchObject* obj
 	return true;
 }
 
+bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
+	if (!matdash::orig<&LevelInfoLayer_init>(self, level)) return false;
+
+	auto director = CCDirector::sharedDirector();
+
+	auto menu = from<CCMenu*>(self, 0x138);
+
+	constexpr auto handler = [](CCObject* self, CCObject*) {
+		auto* const level = reinterpret_cast<gd::LevelInfoLayer*>(self)->level();
+		nfdchar_t* path = nullptr;
+		if (NFD_SaveDialog("gmd", nullptr, &path) == NFD_OKAY) {
+			std::ofstream file(path);
+			dump_level(level, file);
+			free(path);
+			gd::FLAlertLayer::create(nullptr, "Success", "The level has been saved", "OK", nullptr, 320.f, false, 0)->show();
+		}
+		};
+
+	auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+	if (!btn_spr->initWithFile("BE_Export_File.png")) {
+		btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
+	}
+	auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+
+	//menu->setZOrder(1);
+	button->setPosition({ -254, 24});
+	menu->addChild(button);
+	//self->addChild(menu);
+
+	return true;
+}
+
 void lvl_share::init() {
 	matdash::add_hook<&EditLevelLayer_init>(gd::base + 0x3b5a0);
 	matdash::add_hook<&LevelBrowserLayer_init>(gd::base + 0x89590);
+	matdash::add_hook<&LevelInfoLayer_init>(gd::base + 0x9bc10);
 }

@@ -1515,6 +1515,9 @@
     <ClInclude Include="CheckPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MoreOptionsLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

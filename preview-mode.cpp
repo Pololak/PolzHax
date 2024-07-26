@@ -39,7 +39,7 @@ using namespace cocos2d;
 //};
 
 gd::EditorPauseLayer* editorPauseLayer;
-CCLayer* levelEditorLayer;
+gd::LevelEditorLayer* levelEditorLayer;
 gd::EditorUI* editUI;
 std::string savedClipboard;
 CCScheduler* scheduler;
@@ -239,8 +239,14 @@ public:
 		auto director = CCDirector::sharedDirector();
 		auto menuh = CCMenu::create();
 
-		auto unhide = CCSprite::create("BE_eye-off-btn.png");
-		auto hide = CCSprite::create("BE_eye-on-btn.png");
+		auto unhide = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+		if (!unhide->initWithFile("BE_eye-off-btn.png")) {
+			unhide->initWithSpriteFrameName("GJ_checkOff_001.png");
+		}
+		auto hide = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+		if (!hide->initWithFile("BE_eye-on-btn.png")) {
+			hide->initWithSpriteFrameName("GJ_checkOn_001.png");
+		}
 
 		unhide->setOpacity(100);
 
@@ -674,6 +680,19 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	objcounter->setScale(0.66f);
 	self->addChild(objcounter);
 
+	auto menu = CCMenu::create();
+
+	auto allgroups_spr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+	auto allgroups_btn = gd::CCMenuItemSpriteExtra::create(allgroups_spr, nullptr, self, 0);
+	allgroups_btn->setVisible(0);
+	allgroups_btn->setTag(45020);
+	allgroups_spr->setScale(0.6f);
+
+	//if (levelEditorLayer->getLayerGroup() == 5) exit(1);
+
+	menu->addChild(allgroups_btn);
+	self->addChild(menu);
+
 	return result;
 }
 
@@ -744,8 +763,6 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 		auto editor = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent());
 		editor->getEditorUI()->pasteObjects(text);
 		};
-
-	
 
 	auto pssprite = gd::ButtonSprite::create("Paste\nString", 0x28, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
 	auto psbutton = gd::CCMenuItemSpriteExtra::create(pssprite, nullptr, self, to_handler<SEL_MenuHandler, handler>);

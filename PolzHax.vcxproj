@@ -571,6 +571,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuGameLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MoreOptionsLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\NumberInputLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\OBB2D.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\PauseLayer.h" />
