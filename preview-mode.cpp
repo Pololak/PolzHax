@@ -216,6 +216,7 @@ public:
 	bool init(gd::GJGameLevel* level) {
 		if (!matdash::orig<&MyEditorLayer::init>(this, level)) return false;
 		s_instance = this;
+		levelEditorLayer = this;
 
 		auto& triggers = this->*m_color_triggers;
 		triggers[ColorTriggers::BG];
@@ -491,6 +492,7 @@ public:
 					break;
 				case gd::CustomColorMode::White:
 					this->update_object_color(object, white);
+					break; // bro
 				default:;
 				}
 			}
@@ -681,16 +683,20 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	self->addChild(objcounter);
 
 	auto menu = CCMenu::create();
+	menu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
 
-	auto allgroups_spr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
-	auto allgroups_btn = gd::CCMenuItemSpriteExtra::create(allgroups_spr, nullptr, self, 0);
-	allgroups_btn->setVisible(0);
-	allgroups_btn->setTag(45020);
-	allgroups_spr->setScale(0.6f);
+	auto deletespr = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
+	if (!deletespr->initWithFile("GJ_trashBtn_001.png")) {
+		deletespr->createWithSpriteFrameName("edit_delBtn_001.png");
+	}
+	auto deletebtn = gd::CCMenuItemSpriteExtra::create(deletespr, nullptr, self, menu_selector(gd::EditorUI::onDeleteSelected));
+	deletespr->setScale(0.925f);
+	deletebtn->setPosition({ 125.25 ,-20.75 });
+	deletebtn->setTag(5901);
+	deletebtn->setVisible(0);
 
-	//if (levelEditorLayer->getLayerGroup() == 5) exit(1);
 
-	menu->addChild(allgroups_btn);
+	menu->addChild(deletebtn);
 	self->addChild(menu);
 
 	return result;
@@ -846,6 +852,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		auto objid = editUI->getChildByTag(45016);
 		auto objaddr = editUI->getChildByTag(45017);
 		auto objcounter = editUI->getChildByTag(45018);
+		auto delbtn = editUI->getChildByTag(5901);
 
 		if (objcolorid) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
