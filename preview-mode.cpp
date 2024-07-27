@@ -626,7 +626,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	}
 
 	auto objcolorid = CCLabelBMFont::create("", "chatFont.fnt");
-	objcolorid->setString(CCString::createWithFormat("C: %d", 0)->getCString());
+	objcolorid->setString(CCString::createWithFormat("C: %s", 0)->getCString());
 	objcolorid->setVisible(0);
 	objcolorid->setTag(45011);
 	objcolorid->setScale(0.66f);
@@ -873,7 +873,36 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: %d", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 0) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Default", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 1) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 1", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 2) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 2", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 3) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col1", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 4) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col2", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 6) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col3", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 7) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col4", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 5) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Light BG", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 8) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: 3D-Line", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
+				if (editUI->getSingleSelectedObj()->getObjectColor() == 9) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: White", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				}
 				objcolorid->setVisible(1);
 			}
 		}
@@ -890,7 +919,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objrot->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objrot)->setString(CCString::createWithFormat("Rot: %.0f%", std::floor(editUI->getSingleSelectedObj()->getRotation()))->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objrot)->setString(CCString::createWithFormat("Rot: %.01f%", editUI->getSingleSelectedObj()->getRotation())->getCString());
 				objrot->setVisible(1);
 			}
 		}
@@ -899,8 +928,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objposx->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("Pos X: %.0f%",
-					std::floor(editUI->getSingleSelectedObj()->getPositionX()))->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("Pos X: %.01f%", editUI->getSingleSelectedObj()->getPositionX())->getCString());
 				objposx->setVisible(1);
 			}
 		}
@@ -909,8 +937,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objposy->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Pos Y: %.0f%",
-					std::floor(editUI->getSingleSelectedObj()->getPositionY()))->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Pos Y: %.01f%", editUI->getSingleSelectedObj()->getPositionY())->getCString());
 				objposy->setVisible(1);
 			}
 		}
