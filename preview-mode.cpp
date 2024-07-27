@@ -588,6 +588,23 @@ CCPoint* EditorUI_getLimitedPosition(CCPoint* retVal, CCPoint point) {
 	return retVal;
 }
 
+static bool g_holding_in_editor = false;
+
+void EditorUI_onPlaytest(gd::EditorUI* self, void* btn) {
+	if (!g_holding_in_editor)
+		return matdash::orig<&EditorUI_onPlaytest>(self, btn);
+}
+
+void EditorUI_ccTouchBegan(gd::EditorUI* self, void* idc, void* idc2) {
+	g_holding_in_editor = true;
+	return matdash::orig<&EditorUI_ccTouchBegan>(self, idc, idc2);
+}
+
+void EditorUI_ccTouchEnded(gd::EditorUI* self, void* idc, void* idc2) {
+	g_holding_in_editor = false;
+	return matdash::orig<&EditorUI_ccTouchEnded>(self, idc, idc2);
+}
+
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	editUI = self;
 
@@ -682,8 +699,8 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	objcounter->setScale(0.66f);
 	self->addChild(objcounter);
 
-	auto menu = CCMenu::create();
-	menu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
+	auto custommenu = CCMenu::create();
+	custommenu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
 
 	auto deletespr = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
 	if (!deletespr->initWithFile("GJ_trashBtn_001.png")) {
@@ -692,12 +709,11 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	auto deletebtn = gd::CCMenuItemSpriteExtra::create(deletespr, nullptr, self, menu_selector(gd::EditorUI::onDeleteSelected));
 	deletespr->setScale(0.925f);
 	deletebtn->setPosition({ 125.25 ,-20.75 });
-	deletebtn->setTag(5901);
-	deletebtn->setVisible(0);
+	
+	deletebtn->setVisible(1);
 
-
-	menu->addChild(deletebtn);
-	self->addChild(menu);
+	custommenu->addChild(deletebtn);
+	self->addChild(custommenu);
 
 	return result;
 }
@@ -852,8 +868,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		auto objid = editUI->getChildByTag(45016);
 		auto objaddr = editUI->getChildByTag(45017);
 		auto objcounter = editUI->getChildByTag(45018);
-		auto delbtn = editUI->getChildByTag(5901);
-
+		
 		if (objcolorid) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
 			else
@@ -963,7 +978,9 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x49d20),
 		EditorUI::createMoveMenu_H,
 		reinterpret_cast<void**>(&EditorUI::createMoveMenu));
-
+	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
+	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
+	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);
 }
 
 void EditorPauseLayer::mem_init() {

@@ -117,6 +117,7 @@ struct SettingStruct {
     bool onImmortalIcons = false;
     bool onInstantGameWork = false;
     bool onKrmalMode = false;
+    bool onLockCursor = false; // CURSOS
     bool onNoRotation = false;
     bool onNoTransition = false;
     bool onRestartButton = false;
@@ -132,6 +133,16 @@ struct SettingStruct {
 
     // Icons
     bool onSameDualColor = false;
+
+    float GlowPulse[3] = { 1.f, 1.f, 1.f };
+    float SecondaryPulse[3] = { 1.f, 1.f, 1.f };
+    float PrimaryPulse[3] = { 1.f, 1.f, 1.f };
+    float WaveTrailPulse[3] = { 1.f, 1.f, 1.f };
+
+    bool onGlowPulse = false;
+    bool onSecondaryPulse = false;
+    bool onPrimaryPulse = false;
+    bool onWaveTrailPulse = false;
 
     // SpeedHack
 

@@ -138,7 +138,7 @@ void RenderMain() {
         }
         
         if (ImGui::Begin("Interface", nullptr)) {
-            ImGui::SetWindowPos({ 864,512 });
+            ImGui::SetWindowPos({ 864, 538 });
             ImGui::EndTabItem();
         }
 
@@ -1901,6 +1901,10 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes level invisible.");
 
+            ImGui::Checkbox("Lock Cursor", &setting().onLockCursor);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Locks cursor position while playing.");
+
             if (ImGui::Checkbox("No Rotation", &setting().onNoRotation)) {
                 if (setting().onNoRotation) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90", 10, NULL);
@@ -2046,6 +2050,22 @@ void RenderMain() {
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
             ImGui::Checkbox("Same Dual Color", &setting().onSameDualColor);
+
+            //ImGui::ColorEdit3("##primarycolorpulse", setting().PrimaryPulse, ImGuiColorEditFlags_NoInputs);
+            //ImGui::SameLine();
+            //ImGui::Checkbox("P1-Col Pulse", &setting().onPrimaryPulse);
+
+            //ImGui::ColorEdit3("##secondarycolorpulse", setting().SecondaryPulse, ImGuiColorEditFlags_NoInputs);
+            //ImGui::SameLine();
+            //ImGui::Checkbox("P2-Col Pulse", &setting().onSecondaryPulse);
+
+            //ImGui::ColorEdit3("##GlowColorPulse", setting().GlowPulse, ImGuiColorEditFlags_NoInputs);
+            //ImGui::SameLine();
+            //ImGui::Checkbox("Glow Color Pulse", &setting().onGlowPulse);
+
+            //ImGui::ColorEdit3("##WaveTrailColorPulse", setting().WaveTrailPulse, ImGuiColorEditFlags_NoInputs);
+            //ImGui::SameLine();
+            //ImGui::Checkbox("Wave Trail Color Pulse", &setting().onWaveTrailPulse);
         }
 
         if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));

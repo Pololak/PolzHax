@@ -38,6 +38,9 @@ namespace PlayLayer {
 	inline bool(__thiscall* releaseButton)(int idk1, bool idk2);
 	void __fastcall releaseButton_H(int idk1, bool idk2);
 
+	inline void(__thiscall* spawnPlayer2)(gd::PlayLayer* self);
+	void __fastcall spawnPlayer2_H(gd::PlayLayer* self);
+
 	void mem_init();
 
 	extern std::vector<CheckPoint> checkpoints;

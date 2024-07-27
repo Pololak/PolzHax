@@ -8,12 +8,17 @@
 
 CCArray* startPosArr;
 CCLayer* playLayer;
+ccColor3B playerColor1;
+ccColor3B playerColor2;
+ccColor3B playerColorG;
 
 std::time_t t;
 SYSTEMTIME st;
 
 bool hasClicked = false;
 //Labels* labels = nullptr;
+bool isPlayerColorGot = false;
+
 
 int currentStartPos = 0;
 bool fadedoutflag = 0;
@@ -32,6 +37,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     layers().PauseLayerObject = self;
     playLayer = self;
+    isPlayerColorGot = false;
 
     if (!PlayLayer::init(self, level)) return false;
 
@@ -101,7 +107,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
     auto size = CCDirector::sharedDirector()->getWinSize();
-
+    auto audioScale = self->player1()->getAudioScale() > 1.f ? 1.f : self->player1()->getAudioScale();
     //auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
     auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
 
@@ -178,6 +184,14 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->attemptsLabel()->setVisible(true);
     }
 
+    if (isPlayerColorGot == false)
+    {
+        playerColor1 = self->player1()->getFirstColor();
+        playerColor2 = self->player1()->getSecondColor();
+        playerColorG = self->player1()->getGlowColor();
+        isPlayerColorGot = true;
+    }
+
     if (setting().onSameDualColor)
     {
         self->player2()->setColor(self->player1()->getColor());
@@ -206,7 +220,55 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->player2()->setVisible(1);
     }
 
+    if (setting().onLockCursor) {
+        SetCursorPos(size.width / 2, size.height / 2);
+    }
+
+    if (setting().onPrimaryPulse)
+    {
+        unsigned char
+            RR = playerColor1.r + ((setting().PrimaryPulse[0] * 255 - playerColor1.r) * audioScale),
+            RG = playerColor1.g + ((setting().PrimaryPulse[1] * 255 - playerColor1.g) * audioScale),
+            RB = playerColor1.b + ((setting().PrimaryPulse[2] * 255 - playerColor1.b) * audioScale);
+        self->player1()->setColor({ RR, RG, RB });
+    }
+    if (setting().onSecondaryPulse)
+    {
+        unsigned char
+            RR = playerColor2.r + ((setting().SecondaryPulse[0] * 255 - playerColor2.r) * audioScale),
+            RG = playerColor2.g + ((setting().SecondaryPulse[1] * 255 - playerColor2.g) * audioScale),
+            RB = playerColor2.b + ((setting().SecondaryPulse[2] * 255 - playerColor2.b) * audioScale);
+        self->player1()->setSecondColor({ RR, RG, RB });
+        self->player1()->setColorSecondVehicle({ RR, RG, RB });
+    }
+
+    if (setting().onGlowPulse)
+    {
+        unsigned char
+            RR = playerColorG.r + ((setting().GlowPulse[0] * 255 - playerColorG.r) * audioScale),
+            RG = playerColorG.g + ((setting().GlowPulse[1] * 255 - playerColorG.g) * audioScale),
+            RB = playerColorG.b + ((setting().GlowPulse[2] * 255 - playerColorG.b) * audioScale);
+        self->player1()->setGlowColor({ RR, RG, RB });
+        self->player1()->setColorGlowVehicle({ RR, RG, RB });
+    }
+
+    if (setting().onWaveTrailPulse)
+    {
+        unsigned char
+            RR = playerColor1.r + ((setting().WaveTrailPulse[0] * 255 - playerColor1.r) * audioScale),
+            RG = playerColor1.g + ((setting().WaveTrailPulse[1] * 255 - playerColor1.g) * audioScale),
+            RB = playerColor1.b + ((setting().WaveTrailPulse[2] * 255 - playerColor1.b) * audioScale);
+        self->player1()->setWaveTrailColor({ RR, RG, RB });
+    }
+
     PlayLayer::update(self, dt);
+}
+
+void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {
+
+    self->player2()->setVisible(1);
+
+    PlayLayer::spawnPlayer2(self);
 }
 
 bool __fastcall PlayLayer::resume_H(CCLayer* self) {
