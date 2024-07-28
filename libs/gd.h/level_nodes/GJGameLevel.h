@@ -43,6 +43,9 @@ public:
     auto& songID() {
         return from<int>(this, 0x1a4);
     }
+    auto getLevelLength() {
+        return from<int>(this, 0x1e8);
+    }
 
     cocos2d::CCDictionary* m_lastBuildSave;
     int m_levelID;

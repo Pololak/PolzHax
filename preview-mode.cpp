@@ -793,9 +793,37 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	auto optionsBtn = gd::CCMenuItemSpriteExtra::create(optionsSpr, nullptr, self, menu_selector(gd::MenuLayer::onOptions));
 	optionsBtn->setPosition({ -38, -66 });
 	optionsSpr->setScale(.66f);
-	
+
 	menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 	psbutton->setPosition({ -50.f, -30.f });
+
+	auto levellength = CCLabelBMFont::create("", "goldFont.fnt");
+	levellength->setString(CCString::createWithFormat("", 0)->getCString());
+	levellength->setTag(49001);
+	levellength->setAnchorPoint({ 0, 0.5f });
+	levellength->setPosition({ director->getScreenLeft() + 10, director->getScreenTop() - 30 });
+	levellength->setScale(0.5f);
+
+	if (levellength) {
+		if (levelEditorLayer->getLevel()->getLevelLength() == 0) {
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Tiny", levelEditorLayer->getLevel()->getLevelLength())->getCString());
+		}
+		if (levelEditorLayer->getLevel()->getLevelLength() == 1) {
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Short", levelEditorLayer->getLevel()->getLevelLength())->getCString());
+		}
+		if (levelEditorLayer->getLevel()->getLevelLength() == 2) {
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Medium", levelEditorLayer->getLevel()->getLevelLength())->getCString());
+		}
+		if (levelEditorLayer->getLevel()->getLevelLength() == 3) {
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
+		}
+		if (levelEditorLayer->getLevel()->getLevelLength() == 4) {
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
+		}
+	}
+
+	self->addChild(levellength);
+
 	menu->addChild(psbutton);
 	menu->addChild(optionsBtn);
 
@@ -812,12 +840,22 @@ void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, vo
 	EditorPauseLayer::onSaveAndExit(self, sender);
 
 	editUI = nullptr;
+
+	/*auto levellength = self->getChildByTag(49001);
+	levellength = nullptr;*/
 }
 
 void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
 	EditorPauseLayer::onExitNoSave(self, sender);
 
 	editUI = nullptr;
+	//self = nullptr;
+}
+
+void __fastcall EditorPauseLayer::onExitEditor_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
+	EditorPauseLayer::onExitEditor(self, sender);
+	editUI = nullptr;
+	//self->removeFromParentAndCleanup(true);
 }
 
 void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* edx, enumKeyCodes key) {
@@ -858,6 +896,12 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			}
 		}
 	}
+
+	/*if (editorPauseLayer) {
+		auto levellength = editorPauseLayer->getChildByTag(49001);
+
+		
+	}*/
 
 	if (editUI) {
 		auto objcolorid = editUI->getChildByTag(45011);
@@ -1027,6 +1071,10 @@ void EditorPauseLayer::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x3f420),
 		EditorPauseLayer::onExitNoSave_H,
 		reinterpret_cast<void**>(&EditorPauseLayer::onExitNoSave));
+	/*MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x3f380),
+		EditorPauseLayer::onExitEditor_H,
+		reinterpret_cast<void**>(&EditorPauseLayer::onExitEditor));*/
 	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x3f570),
 		EditorPauseLayer::keyDown_H,

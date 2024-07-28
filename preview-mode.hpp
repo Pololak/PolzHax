@@ -45,6 +45,9 @@ namespace EditorPauseLayer {
 	inline void(__thiscall* onExitNoSave)(gd::EditorPauseLayer*, CCObject*);
 	void __fastcall onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
 
+	inline void(__thiscall* onExitEditor)(gd::EditorPauseLayer*, CCObject*);
+	void __fastcall onExitEditor_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
+
 	inline bool(__thiscall* keyDown)(gd::EditorPauseLayer*, cocos2d::enumKeyCodes);
 	void __fastcall keyDown_H(gd::EditorPauseLayer* self, void* edx, cocos2d::enumKeyCodes key);
 

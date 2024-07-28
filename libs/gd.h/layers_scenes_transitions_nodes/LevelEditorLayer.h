@@ -10,6 +10,7 @@ namespace gd {
 class GJBaseGameLayer;
 class EditorUI;
 class GameObject;
+class GJGameLevel;
 class DrawGridLayer;
 class PlayerObject;
 class LevelSettingsObject;
@@ -51,6 +52,9 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         }
         auto getObjectBatchNode() {
             return from<cocos2d::CCSpriteBatchNode*>(this, 0x164);
+        }
+        GJGameLevel* getLevel() {
+            return from<GJGameLevel*>(this, 0x18c);
         }
 
         void removeObject(GameObject * obj, bool idk) {
