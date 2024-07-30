@@ -94,7 +94,20 @@ struct SettingStruct {
     bool onConfirmExit = false;
     bool onMusicSync = false;
     bool onHiFPSRotation = false;
+    // Hitboxes
     bool onHitboxes = false;
+    bool onHitboxesOnDeath = false;
+
+    bool onPlayerHitbox = false;
+    bool onSolidsHitbox = false;
+    bool onHazardsHitbox = false;
+    bool onSpecialsHitbox = false;
+
+    float solidsColor[3] = { 0, 0, 1 };
+    float hazardsColor[3] = { 1, 0, 0 };
+    float specialsColor[3] = { 0, 1, 0 };
+    int hitboxOpacity = 255;
+    //
     bool onIgnoreEsc = false;
     bool onInstantComplete = false;
     bool onInstantTriggers = false;

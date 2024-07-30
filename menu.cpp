@@ -138,7 +138,7 @@ void RenderMain() {
         }
         
         if (ImGui::Begin("Interface", nullptr)) {
-            ImGui::SetWindowPos({ 864, 538 });
+            ImGui::SetWindowPos({ 5, 142 });
             ImGui::EndTabItem();
         }
 
@@ -889,6 +889,7 @@ void RenderMain() {
         colors[ImGuiCol_Header] = color1;
         colors[ImGuiCol_HeaderHovered] = color1;
         colors[ImGuiCol_HeaderActive] = color2;
+        colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
 
         oneX = false;
     }
@@ -1675,14 +1676,41 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Fixes vehicles rotation on high fps (affects hitboxes).");
 
-            /*if (ImGui::Checkbox("Ignore ESC", &setting().onIgnoreEsc)) {
-                if (setting().onIgnoreEsc) {
+            
+            //ImGui::Checkbox("Show Object Hitbox", &setting().onObjHitbox);
+            ImGui::Checkbox("Hitboxes", &setting().onHitboxes);
+            ImGui::SameLine();
+            if (ImGui::ArrowButton("hit", 1))
+                ImGui::OpenPopup("Hitbox Settings");
 
-                }
-                else {
+            ImGui::SetNextWindowBgAlpha(setting().BGcolor[3]);
+            if (ImGui::BeginPopupModal("Hitbox Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                
+                ImGui::SetNextItemWidth(setting().UISize * 80);
+                ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
 
+                ImGui::Checkbox("Player", &setting().onPlayerHitbox);
+
+                ImGui::Checkbox("Solids", &setting().onSolidsHitbox);
+                ImGui::SameLine();
+                ImGui::ColorEdit3("##solidsHitboxColor", setting().solidsColor, ImGuiColorEditFlags_NoInputs);
+
+                ImGui::Checkbox("Hazards", &setting().onHazardsHitbox);
+                ImGui::SameLine();
+                ImGui::ColorEdit3("##hazardsHitboxColor", setting().hazardsColor, ImGuiColorEditFlags_NoInputs);
+
+                ImGui::Checkbox("Specials", &setting().onSpecialsHitbox);
+                ImGui::SameLine();
+                ImGui::ColorEdit3("##specialsHitboxColor", setting().specialsColor, ImGuiColorEditFlags_NoInputs);
+
+                if (ImGui::Button("Close") || GetAsyncKeyState(KEY_Escape)) {
+                    ImGui::CloseCurrentPopup();
                 }
-            }*/
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::Checkbox("Hitboxes on Death", &setting().onHitboxesOnDeath);
 
             if (ImGui::Checkbox("Instant Complete", &setting().onInstantComplete)) {
                 if (setting().onInstantComplete) {
@@ -2109,7 +2137,7 @@ void RenderMain() {
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
-            if (ImGui::ColorEdit4("Color Style", setting().Overlaycolor)) {
+            if (ImGui::ColorEdit4("Color Style", setting().Overlaycolor, ImGuiColorEditFlags_NoInputs)) {
 
                 auto* colors = ImGui::GetStyle().Colors;
 
@@ -2161,9 +2189,10 @@ void RenderMain() {
                 colors[ImGuiCol_Header] = color1;
                 colors[ImGuiCol_HeaderHovered] = color1;
                 colors[ImGuiCol_HeaderActive] = color2;
+                colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
             }
 
-            if (ImGui::ColorEdit4("Background Color", setting().BGcolor)) {
+            if (ImGui::ColorEdit4("Background Color", setting().BGcolor, ImGuiColorEditFlags_NoInputs)) {
 
                 auto* colors = ImGui::GetStyle().Colors;
 
@@ -2175,19 +2204,18 @@ void RenderMain() {
                 colors[ImGuiCol_WindowBg] = color6;
             }
 
-
+            ImGui::SetNextItemWidth(setting().UISize * 80);
             ImGui::DragFloat("UI Size", &setting().UISize, 0.01f, 0.5f, 3.25f);
             if (setting().UISize < 0.5f) setting().UISize = 0.5f;
             if (setting().UISize > 3.25f) setting().UISize = 3.25f;
 
-            
         }
 
         if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.6-alpha.1");
+            ImGui::Text("v1.1.7-beta");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

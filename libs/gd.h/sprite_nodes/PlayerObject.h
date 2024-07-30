@@ -52,7 +52,7 @@ namespace gd {
 			return from<gd::OBB2D*>(this, 0x1D0);
 		}
 		auto getOrientedBox() {
-			return reinterpret_cast<gd::OBB2D * (__thiscall*)(PlayerObject*)>(base + 0xdf7a0)(this);
+			return reinterpret_cast<gd::OBB2D * (__thiscall*)(PlayerObject*)>(base + 0xe1260)(this);
 		}
 		auto getFirstColor() {
 			return from<cocos2d::CCSprite*>(this, 0x370)->getColor();

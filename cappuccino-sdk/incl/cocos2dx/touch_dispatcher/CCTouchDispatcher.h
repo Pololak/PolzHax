@@ -198,7 +198,9 @@ public:
     CCTouchHandler* findHandler(CCTouchDelegate *pDelegate);
 
     RT_ADD(
-        void incrementForcePrio(int priority);
+        void incrementForcePrio() {
+        return reinterpret_cast<void(__thiscall*)(CCTouchDispatcher*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?incrementForcePrio@CCTouchDispatcher@cocos2d@@QAEXXZ"))(this);
+    }
         void decrementForcePrio(int priority);
     )
 protected:

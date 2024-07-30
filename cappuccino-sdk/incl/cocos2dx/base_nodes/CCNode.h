@@ -1263,7 +1263,9 @@ public:
      * Returns the matrix that transform parent's space coordinates to the node's (local) space coordinates.
      * The matrix is in Pixels.
      */
-    virtual const CCAffineTransform parentToNodeTransform(void);
+    virtual const CCAffineTransform parentToNodeTransform(void) {
+        return reinterpret_cast<CCAffineTransform(__thiscall*)()>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?parentToNodeTransform@CCNode@cocos2d@@UAE?BUCCAffineTransform@2@XZ"))();
+    }
 
     /** 
      * Returns the world affine transform matrix. The matrix is in Pixels.

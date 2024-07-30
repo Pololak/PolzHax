@@ -541,6 +541,7 @@
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gd.hpp" />
+    <ClInclude Include="Hitboxes.h" />
     <ClInclude Include="HitboxNode.h" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
@@ -658,6 +659,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EndLevelLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
+    <ClCompile Include="Hitboxes.cpp" />
     <ClCompile Include="HitboxNode.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />

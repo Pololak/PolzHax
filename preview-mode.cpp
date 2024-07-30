@@ -797,12 +797,16 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 	psbutton->setPosition({ -50.f, -30.f });
 
+	menu->addChild(psbutton);
+	menu->addChild(optionsBtn);
+
 	auto levellength = CCLabelBMFont::create("", "goldFont.fnt");
 	levellength->setString(CCString::createWithFormat("", 0)->getCString());
 	levellength->setTag(49001);
 	levellength->setAnchorPoint({ 0, 0.5f });
 	levellength->setPosition({ director->getScreenLeft() + 10, director->getScreenTop() - 30 });
 	levellength->setScale(0.5f);
+	self->addChild(levellength);
 
 	if (levellength) {
 		if (levelEditorLayer->getLevel()->getLevelLength() == 0) {
@@ -821,11 +825,6 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
 	}
-
-	self->addChild(levellength);
-
-	menu->addChild(psbutton);
-	menu->addChild(optionsBtn);
 
 	self->addChild(menu);
 }

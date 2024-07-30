@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "HitboxNode.h"
 
-//HitboxNode* HitboxNode::create() {
-//	 		auto ret = new HitboxNode;
-//	 		if (ret) {
-//	 			ret->init();
-//	 			return ret;
-//	 		}
-//	 		return nullptr;
-//	 	}
+HitboxNode* HitboxNode::create() {
+	 		auto ret = new HitboxNode;
+	 		if (ret) {
+	 			ret->init();
+	 			return ret;
+	 		}
+	 		return nullptr;
+	 	}
 
 	 	void HitboxNode::drawCircleObj(gd::GameObject* ob, _ccColor4B col) {
 	 		ob->updateOrientedBox();
