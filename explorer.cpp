@@ -159,6 +159,30 @@ void render_node_properties(CCNode* node) {
 			rgb->setColor(ccc3(colors[0] * 255.f, colors[1] * 255.f, colors[2] * 255.f));
 		rgb->setOpacity((colors[3] * 255.f));
 	}
+	if (auto sprite_node = dynamic_cast<CCSprite*>(node); sprite_node) {
+		auto* texture = sprite_node->getTexture();
+
+		auto* texture_cache = CCTextureCache::sharedTextureCache();
+		auto* cached_textures = public_cast(texture_cache, m_pTextures);
+		CCDictElement* el;
+		CCDICT_FOREACH(cached_textures, el) {
+			if (el->getObject() == texture) {
+				ImGui::TextWrapped("Texture name: %s", el->getStrKey());
+				break;
+			}
+		}
+
+		//auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+		//auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
+		//const auto rect = sprite_node->getTextureRect();
+		//CCDICT_FOREACH(cached_frames, el) {
+		//	auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
+		//	if (frame->getTexture() == texture && frame->getRect() == rect) {
+		//		ImGui::Text("Frame name: %s", el->getStrKey());
+		//		break;
+		//	}
+		//}
+	}
 }
 
 void render_explorer_window(bool& open) {

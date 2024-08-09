@@ -23,6 +23,8 @@
 #include "hsv.hpp"
 #include <stdint.h>
 #include "matdash/detail/impl.hpp"
+#include "Hitboxes.h"
+#include "moveForCommand.h"
 
 using namespace cocos2d;
 
@@ -91,7 +93,8 @@ template <class T>
 struct Field{};
 
 template <class T>
-struct ExtendBase {
+class ExtendBase {
+public:
 	static auto& get_extra_fields() {
 		static std::unordered_map<void*, ValueContainer<>*> fields;
 		return fields;
@@ -315,7 +318,8 @@ public:
 		else {
 			auto trigger = triggers[bound - 1];
 			GDColor color_to = trigger;
-			auto dist = time_between_pos(trigger->getPosition().x, pos) / trigger->triggerDuration();
+			if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
+			auto dist = time_between_pos(trigger->getPosition().x, pos) / (trigger->triggerDuration());
 			auto color_from = starting_color;
 			if (bound > 1) {
 				auto trigger = triggers[bound - 2];
@@ -605,6 +609,71 @@ void EditorUI_ccTouchEnded(gd::EditorUI* self, void* idc, void* idc2) {
 	return matdash::orig<&EditorUI_ccTouchEnded>(self, idc, idc2);
 }
 
+void __fastcall EditorUI::moveForCommand_H(gd::EditorUI* self, CCPoint* pos, gd::EditCommand com) {
+	switch (com) {
+	case kEditCommandHalfRight:
+		*pos = CCPoint(15.f, 0);
+		return;
+	}
+
+	EditorUI::moveForCommand(self, pos, com);
+}
+
+//void addMoveButton(gd::EditorUI* self, const char* spr, const char* sizeTxt, gd::EditCommand command, const char* keybind = nullptr, float scale = 1.0f) {
+//	auto btn = self->getSpriteButton(spr, menu_selector(gd::EditorUI::moveObjectCall), nullptr, 0.9f);
+//	btn->setTag(command);
+//
+//	auto label = CCLabelBMFont::create(sizeTxt, "bigFont.fnt");
+//	label->setScale(.35f);
+//	label->setZOrder(50);
+//	label->setPosition(btn->getContentSize().width / 2, 11.0f);
+//	btn->addChild(label);
+//
+//	auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
+//	auto ccComponentContainer = from<CCComponentContainer*>(editButtonBar, 0xe4);
+//	auto boomScrollLayer = from<CCNode*>(ccComponentContainer, 0x8);
+//	auto btnarray = from<CCArray*>(boomScrollLayer, 0xa8);
+//
+//	btnarray->addObject(btn);
+//}
+
+void EditorUI::Callback::onGoToBaseLayer(CCObject* sender) {
+	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = -1;
+	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString("All");
+}
+
+void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
+	auto leveleditor = from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer();
+	bool foundClear = false;
+	bool nextCycle = false;
+	int currentLayer = 0;
+
+	while (!foundClear && !nextCycle)
+	{
+		from<int>(leveleditor, 0x12C) = currentLayer;
+		auto objs = CCArray::create();
+		for (int i = 0; i < (leveleditor->getAllObjects()->count()); i++)
+		{
+			objs->addObjectsFromArray(reinterpret_cast<CCArray*>(leveleditor->getAllObjects()->objectAtIndex(i)));
+		}
+
+		auto objs2 = CCArray::create();
+		for (int i = 0; i < (objs->count()); i++)
+		{
+			if (reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i))->getGroup() == leveleditor->getLayerGroup() || leveleditor->getLayerGroup() == -1)
+				objs2->addObject(objs->objectAtIndex(i));
+		}
+
+		if (objs2->count() > 0) currentLayer++;
+		else foundClear = true;
+
+		if (leveleditor->getLayerGroup() == -1)
+			nextCycle = true;
+	}
+	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = currentLayer;
+	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(currentLayer).c_str());
+}
+
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	editUI = self;
 
@@ -685,7 +754,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	objaddr->setVisible(0);
 	objaddr->setTag(45017);
 	objaddr->setAnchorPoint({ 0, 0.5f });
-	objaddr->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 130});
+	objaddr->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 130 });
 	objaddr->setScale(0.66f);
 	self->addChild(objaddr);
 
@@ -702,26 +771,66 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	auto custommenu = CCMenu::create();
 	custommenu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
 
+	auto leftMenu = from<CCMenu*>(self->getRedoBtn(), 0xac);
+	auto rightMenu = from<CCMenu*>(self->getDeselectBtn(), 0xac);
+	auto leftGroupArrow = from<gd::CCMenuItemSpriteExtra*>(self, 0x210);
+	auto rightGroupArrow = from<gd::CCMenuItemSpriteExtra*>(self, 0x214);
+
+	leftGroupArrow->setPositionX(leftGroupArrow->getPositionX() - 10);
+	rightGroupArrow->setPositionX(rightGroupArrow->getPositionX() - 10);
+
+	CCLabelBMFont* groupLabel = from<CCLabelBMFont*>(self, 0x20c);
+	groupLabel->setPositionX(groupLabel->getPositionX() - 10);
+
+	auto onBaseLayerSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+	auto onBaseLayerBtn = gd::CCMenuItemSpriteExtra::create(onBaseLayerSpr, nullptr, self, menu_selector(EditorUI::Callback::onGoToBaseLayer));
+	onBaseLayerBtn->setTag(45028);
+	onBaseLayerBtn->setPosition({ -90, -172 });
+	onBaseLayerSpr->setScale(0.5f);
+	onBaseLayerSpr->setOpacity(175);
+	rightMenu->addChild(onBaseLayerBtn);
+
+	auto onFreeLayerSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+	auto onFreeLayerBtn = gd::CCMenuItemSpriteExtra::create(onFreeLayerSpr, nullptr, self, menu_selector(EditorUI::Callback::onGoToNextFreeLayer));
+	onFreeLayerBtn->setTag(45029);
+	onFreeLayerBtn->setPosition({ 10, -172 });
+	onFreeLayerSpr->setScale(0.5f);
+	onFreeLayerSpr->setFlipX(1);
+	onFreeLayerSpr->setOpacity(175);
+	rightMenu->addChild(onFreeLayerBtn);
+
 	auto deletespr = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
 	if (!deletespr->initWithFile("GJ_trashBtn_001.png")) {
 		deletespr->createWithSpriteFrameName("edit_delBtn_001.png");
 	}
 	auto deletebtn = gd::CCMenuItemSpriteExtra::create(deletespr, nullptr, self, menu_selector(gd::EditorUI::onDeleteSelected));
 	deletespr->setScale(0.925f);
-	deletebtn->setPosition({ 125.25 ,-20.75 });
+	deletebtn->setPosition({ -160 , 139.35 });
+	deletebtn->setTag(45030);
 	
 	deletebtn->setVisible(1);
 
-	custommenu->addChild(deletebtn);
-	self->addChild(custommenu);
+	leftMenu->addChild(deletebtn);
+
+	//auto testBtn = self->getSpriteButton("", );
+
+	/*auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
+	auto boomScrollLayer = from<gd::BoomScrollLayer*>(editButtonBar, 0xe8);
+	auto array = from<CCArray*>(boomScrollLayer, 0x118);
+
+	auto sprite = CCSprite::create("GJ_button_01.png");
+	auto btn = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, 0);
+
+	array->addObject(btn);*/
 
 	return result;
 }
 
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
+	if (!EditorUI::dtor) return false;
 	editUI = nullptr;
 	if (setting().onPersClip) savedClipboard = self->clipboard();
-	EditorUI::dtor(self);
+	return true;
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -751,19 +860,12 @@ void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
 
 	//auto bar_array = from<CCArray*>(self, 0xa8);
 
-	//auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
-	//auto ccComponentContainer = from<CCComponentContainer*>(editButtonBar, 0xe4);
-	//auto boomScrollLayer = from<CCNode*>(ccComponentContainer, 0x8);
-	//auto array = from<CCArray*>(boomScrollLayer, 0xa8);
-
-	//auto sprite = CCSprite::create("GJ_button_01.png");
-	//auto btn = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, 0);
-
-	//array->addObject(sprite);
-
-	//editButtonBar->addChild(sprite);
 	
 
+	//array->addObject(sprite);
+	//editButtonBar->addChild(sprite);
+	
+	//addMoveButton(self, "edit_rightBtn2_001.png", "1/2", kEditCommandHalfRight, nullptr);
 }
 
 //void __fastcall EditorUI::onPause_H(gd::EditorUI* self, void*, CCObject* sender) {
@@ -772,6 +874,32 @@ void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
 //	EditorUI::onPause(self, sender);
 //}
 
+void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
+	setting().onEditorPreview = !setting().onEditorPreview;
+}
+
+bool SEP = false;
+
+void EditorPauseLayer::Callback::SmallEditorStepToggler(CCObject*) {
+	SEP = !SEP;
+		if (SEP) {
+			gd::GameManager::sharedState()->setGameVariable("0035", true);
+		}
+		else {
+			gd::GameManager::sharedState()->setGameVariable("0035", false);
+		}
+}
+
+auto EPMTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
+{
+	return (setting().onEditorPreview) ? toggleOn : toggleOff;
+}
+
+auto SEPTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
+{
+	return (SEP) ? toggleOn : toggleOff;
+}
+
 void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	editorPauseLayer = self;
 	EditorPauseLayer::customSetup(self);
@@ -779,6 +907,31 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	auto director = CCDirector::sharedDirector();
 	auto size = director->getWinSize();
 	auto menu = CCMenu::create();
+	auto togglerMenu = CCMenu::create();
+	togglerMenu->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
+
+	auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+	auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+
+	auto EPMButton = gd::CCMenuItemToggler::create(EPMTogglerSprite(toggleOn, toggleOff), EPMTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::PreviewModeToggler));
+	auto EPMLabel = CCLabelBMFont::create("Preview Mode", "bigFont.fnt");
+	EPMButton->setScale(0.70f);
+	EPMButton->setPosition({ 30, 150 });
+	EPMLabel->setScale(0.35f);
+	EPMLabel->setPosition({ 50,150 });
+	EPMLabel->setAnchorPoint({ 0.f, 0.5f });
+	togglerMenu->addChild(EPMButton);
+	togglerMenu->addChild(EPMLabel);
+
+	auto SEPButton = gd::CCMenuItemToggler::create(SEPTogglerSprite(toggleOn, toggleOff), SEPTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::SmallEditorStepToggler));
+	auto SEPLabel = CCLabelBMFont::create("Small Editor Step", "bigFont.fnt");
+	SEPButton->setScale(0.70f);
+	SEPButton->setPosition({ 30, 120 });
+	SEPLabel->setScale(0.35f);
+	SEPLabel->setPosition({ 50, 120 });
+	SEPLabel->setAnchorPoint({ 0.f, 0.5f });
+	togglerMenu->addChild(SEPButton);
+	togglerMenu->addChild(SEPLabel);
 
 	constexpr auto handler = [](CCObject* self, CCObject*) {
 		auto text = clipboard::read();
@@ -826,6 +979,8 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 		}
 	}
 
+
+	self->addChild(togglerMenu);
 	self->addChild(menu);
 }
 
@@ -911,40 +1066,70 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		auto objid = editUI->getChildByTag(45016);
 		auto objaddr = editUI->getChildByTag(45017);
 		auto objcounter = editUI->getChildByTag(45018);
+
+		auto leftMenu = from<CCMenu*>(editUI->getRedoBtn(), 0xac);
+		auto deleteBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(45030));
+
+		auto rightMenu = from<CCMenu*>(editUI->getDeselectBtn(), 0xac);
+		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45028));
+
+		if (deleteBtn) {
+			if (editUI->getSelectedObjectsOfCCArray()->count() == 0) {
+				deleteBtn->setOpacity(175);
+				deleteBtn->setColor({ 166, 166, 166 });
+				deleteBtn->setEnabled(false);
+			}
+			else {
+				deleteBtn->setOpacity(255);
+				deleteBtn->setColor({ 255, 255, 255 });
+				deleteBtn->setEnabled(true);
+			}
+		}
+
+		if (onBaseLayerBtn) {
+			if (editUI->getLevelEditorLayer()->getLayerGroup() == -1) {
+				onBaseLayerBtn->setVisible(0);
+				onBaseLayerBtn->setEnabled(false);
+			}
+			else {
+				onBaseLayerBtn->setVisible(1);
+				onBaseLayerBtn->setEnabled(true);
+			}
+		}
 		
 		if (objcolorid) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
 			else
 			{
 				if (editUI->getSingleSelectedObj()->getObjectColor() == 0) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Default", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Default (0)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 1) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 1", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 1) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 1 (1)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 2) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 2", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 2) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 2 (2)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 3) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col1", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 3) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col1 (3)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 4) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col2", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 4) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col2 (4)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 6) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col3", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 6) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col3 (6)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 7) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col4", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 7) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col4 (7)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 5) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Light BG", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 5) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Light BG (5)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 8) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: 3D-Line", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 8) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: 3D-Line (8)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 9) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: White", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				else if (editUI->getSingleSelectedObj()->getObjectColor() == 9) {
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: White (9)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
 				}
 				objcolorid->setVisible(1);
 			}

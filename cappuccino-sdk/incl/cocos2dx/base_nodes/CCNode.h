@@ -789,7 +789,9 @@ public:
      * @return A interger that identifies the node.
      */
      //Robtop Modification
-    virtual int getTag() const;
+    virtual int getTag() const {
+        return reinterpret_cast<int(__thiscall*)()>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?getTag@CCNode@cocos2d@@UBEHXZ"))();
+    }
     /**
      * Changes the tag that is used to identify the node easily.
      *
@@ -798,8 +800,10 @@ public:
      * @param A interger that indentifies the node.
      */
 
-    //Robtop Modification
-    virtual void setTag(int nTag);
+     //Robtop Modification
+    virtual void setTag(int nTag) {
+        return reinterpret_cast<void(__thiscall*)()>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?setTag@CCNode@cocos2d@@UAEXH@Z"))();
+    }
 
     /**
      * Returns a custom user data pointer

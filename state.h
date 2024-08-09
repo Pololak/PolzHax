@@ -12,6 +12,8 @@ struct SettingStruct {
 
     int selected_dart = 1;
 
+    float waveSize;
+
     int cheatsCount = 0;
     int beforeRestartCheatsCount = 0;
 
@@ -59,7 +61,7 @@ struct SettingStruct {
     bool onNoPulse = false;
     bool onNoRespawnFlash = false;
     bool onNoShadeEffect = false;
-    //bool onNoWavePulse = false;
+    bool onNoWavePulse = false;
     bool onNoWaveTrail = false;
     bool onPracticePulse = false;
     bool onSolidPlayerTrail = false;

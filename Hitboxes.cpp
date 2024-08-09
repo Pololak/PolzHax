@@ -64,6 +64,22 @@ void Hitboxes::drawRectObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col
     vert[3] = ob->getOrientedBox()->getPoint4();
 
     drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+
+    /*if (setting().onSolidsHitbox && solids.contains(ob->getObjectID())) {
+        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+    }
+    else if (setting().onSolidsHitbox && ramps.contains(ob->getObjectID())) {
+        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+    }
+    else if (setting().onHazardsHitbox && hazard.contains(ob->getObjectID())) {
+        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+    }
+    else if (setting().onHazardsHitbox && saws.contains(ob->getObjectID())) {
+        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+    }
+    else if (setting().onSpecialsHitbox && orbsnportals.contains(ob->getObjectID())) {
+        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
+    }*/
 }
 
 void Hitboxes::drawCircleObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col) {
@@ -105,9 +121,9 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
     rectRectangle.setRect(player->getPositionX() - distance1 / 2, player->getPositionY() - distance2 / 2, distance1, distance2);
     rectRectangleSmall.setRect(player->getPositionX() - distanceS1 / 2, player->getPositionY() - distanceS2 / 2, distanceS1, distanceS2);
 
-    Hitboxes::drawRect(drawNode, rectRectangleSmall, { 0, 0, 1, 1 });
-    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0 }, 0.5, { 0.5, 0, 0, 1 });
-    Hitboxes::drawRect(drawNode, rectRectangle, { 1, 0, 0, 1 });
+    Hitboxes::drawRect(drawNode, rectRectangleSmall, { 0, 0, 1, (setting().hitboxOpacity * 255.f) });
+    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0 }, 0.5, { 0.5, 0, 0, (setting().hitboxOpacity * 255.f) });
+    Hitboxes::drawRect(drawNode, rectRectangle, { 1, 0, 0, (setting().hitboxOpacity * 255.f) });
 }
 
 //void Hitboxes::drawObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {

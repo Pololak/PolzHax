@@ -36,6 +36,8 @@ namespace gd {
 		void releaseButton(int button) {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde150)(this, button);
 		}
+
+		
 		//bool collidedWithObject(float fl, gd::GameObject* obj)
 		//{
 		//	int myRect = 0;
@@ -52,7 +54,7 @@ namespace gd {
 			return from<gd::OBB2D*>(this, 0x1D0);
 		}
 		auto getOrientedBox() {
-			return reinterpret_cast<gd::OBB2D * (__thiscall*)(PlayerObject*)>(base + 0xe1260)(this);
+			return reinterpret_cast<gd::OBB2D * (__fastcall*)(PlayerObject*)>(base + 0xe1260)(this);
 		}
 		auto getFirstColor() {
 			return from<cocos2d::CCSprite*>(this, 0x370)->getColor();
@@ -96,12 +98,26 @@ namespace gd {
 			from<cocos2d::CCSprite*>(this, 0x380)->setColor(color);
 		}
 
+		auto getRealPlayerPosX() {
+			return from<float>(this, 0x4c8);
+		}
+
+		auto getRealPlayerPosY() {
+			return from<float>(this, 0x4cc);
+		}
 		/*auto getColor5() {
 			return from<cocos2d::CCSprite*>(this, 0x384)->getColor();
 		}
 		auto setColor5(cocos2d::ccColor3B color) {
 			from<cocos2d::CCSprite*>(this, 0x384)->setColor(color);
 		}*/
+
+		cocos2d::CCPoint getPoint1() {
+			auto f1 = from<float>(this, 0x234);
+			auto f2 = from<float>(this, 0x238);
+			cocos2d::CCPoint point = { f1, f2 };
+			return point;
+		}
 
 		auto getGlowVehicle() {
 			return from<cocos2d::CCSprite*>(this, 0x388);
@@ -137,6 +153,14 @@ namespace gd {
 
 		bool getIsDead() {
 			return from<bool>(this, 0x46D);
+		}
+
+		auto getCubeSprite() {
+			return from<CCSprite*>(this, 0x370);
+		}
+
+		HardStreak* waveTrail() {
+			return from<HardStreak*>(this, 0x394);
 		}
 	};
 }

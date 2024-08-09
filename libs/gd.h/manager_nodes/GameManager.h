@@ -213,7 +213,7 @@ namespace gd {
 		}
 		void reloadAll(bool bSwitch, bool bFullscreen, bool bReloadedInSession) {
 			return reinterpret_cast<void(__thiscall*)(GameManager*, bool, bool, bool)>(
-				base + 0xCE950
+				base + 0x6c990
 				)(this, bSwitch, bFullscreen, bReloadedInSession);
 		}
 		void setQuality(cocos2d::TextureQuality quality) {
@@ -221,12 +221,12 @@ namespace gd {
 		}
 		bool getGameVariable(const char* key) {
 			return reinterpret_cast<bool(__thiscall*)(GameManager*, const char*)>(
-				base + 0xC9D30
+				base + 0x6ade0
 				)(this, key);
 		}
 		void setGameVariable(const char* key, bool value) {
 			return reinterpret_cast<void(__thiscall*)(GameManager*, const char*, bool)>(
-				base + 0xC9B50
+				base + 0x6abe0
 				)(this, key, value);
 		}
 		int getIntGameVariable(const char* key) {
@@ -243,6 +243,9 @@ namespace gd {
 			return reinterpret_cast<void(__thiscall*)(GameManager*, const char*)>(
 				base + 0xC4BD0
 				)(this, filename);
+		}
+		static void toggleGameVariable(const char* key) {
+			reinterpret_cast<void(__stdcall*)(const char*)>(base + 0x6add0)(key);
 		}
 		PlayLayer* getPlayLayer() {
 			return from<PlayLayer*>(this, 0x144);

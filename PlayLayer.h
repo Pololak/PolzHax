@@ -14,8 +14,8 @@ namespace PlayLayer {
 	inline bool(__thiscall* resume)(CCLayer* self);
 	bool __fastcall resume_H(CCLayer* self);
 
-	inline bool(__thiscall* onQuit)(CCNode* self);
-	void __fastcall onQuit_H(CCNode* self);
+	inline bool(__thiscall* onQuit)(gd::PlayLayer* self);
+	void __fastcall onQuit_H(gd::PlayLayer* self, void* edx);
 
 	inline bool(__thiscall* resetLevel)(gd::PlayLayer* self);
 	void __fastcall resetLevel_H(gd::PlayLayer* self);

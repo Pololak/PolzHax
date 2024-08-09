@@ -121,6 +121,9 @@ namespace gd {
 		void setAttempts(int atts) {
 			from<int>(this, 0x2e8) = atts; 
 		}
+		bool getPracticeMode() {
+			return from<bool>(this, 0x2b9);
+		}
 		auto getAudioEffectsLayer() {
 			return from<gd::AudioEffectsLayer*>(this, 0x198);
 		}

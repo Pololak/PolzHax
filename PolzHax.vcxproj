@@ -646,6 +646,8 @@
     <ClInclude Include="lvl-share.hpp" />
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="MenuLayer.h" />
+    <ClInclude Include="moveForCommand.h" />
     <ClInclude Include="ObjectsIds.h" />
     <ClInclude Include="ObjectToolbox.h" />
     <ClInclude Include="PauseLayer.h" />
@@ -673,6 +675,7 @@
     <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
     <ClCompile Include="lvl-share.cpp" />
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="ObjectToolbox.cpp" />
     <ClCompile Include="PauseLayer.cpp" />
     <ClCompile Include="pch.cpp" />

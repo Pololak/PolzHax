@@ -2,7 +2,9 @@
 #include "state.h"
 #include "PlayLayer.h"
 
-CCLayer* playLayerObject;
+//gd::PlayLayer* playLayerObject;
+
+auto playLayerObject = gd::GameManager::sharedState()->getPlayLayer();
 
 class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
 protected:
@@ -13,6 +15,7 @@ protected:
         {
             gd::GameManager::sharedState()->getPlayLayer()->onQuit();
             gd::GameSoundManager::sharedState()->playSound("quitSound_01.ogg");
+            playLayerObject = nullptr;
         }
     }
 };
@@ -74,7 +77,9 @@ void __fastcall PauseLayer::onRestart_H(CCObject* sender) {
 void __fastcall PauseLayer::onQuit_H(CCObject* btn)
 {
     playLayerObject = nullptr;
-    if (setting().onConfirmExit) gd::FLAlertLayer::create(&eaProtocol, "Confirm", "Are you sure you want to exit the level?", "Cancel", "Exit", 320.f, false, 0)->show();
+    /*if (setting().onConfirmExit) {
+        gd::FLAlertLayer::create(&eaProtocol, "Confirm", "Are you sure you want to exit the level?", "Cancel", "Exit", 320.f, false, 0)->show();
+    }*/
     PauseLayer::onQuit(btn);
 }
 

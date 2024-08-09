@@ -588,7 +588,7 @@ void RenderMain() {
 
         // Level
 
-        if (setting().onConfirmExit) {
+        /*if (setting().onConfirmExit) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\x90\x90\x90\x90\x90", 5, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x90\x90", 2, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f9d), "\x90\x90\x90\x90\x90", 5, NULL);
@@ -599,7 +599,7 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x6a\x10", 2, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f9d), "\x68\x7c\x42\x51\x00", 5, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7fa5), "\xe8\xc6\xd7\xf2\xff", 5, NULL);
-        }
+        }*/
 
         if (setting().onMusicSync) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee59e), "\xeb\x08", 2, NULL);
@@ -728,7 +728,7 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x8b\xd8\x90", 3, NULL);
         }
         else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x0f\x45\xdb", 3, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x472a8e), "\x0f\x45\xd8", 3, NULL);
         }
 
         if (setting().onNoRotation) {
@@ -1637,7 +1637,7 @@ void RenderMain() {
                 }
             }*/
 
-            if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
+            /*if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
                 if (setting().onConfirmExit) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\x90\x90\x90\x90\x90", 5, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f8d), "\x90\x90", 2, NULL);
@@ -1652,7 +1652,7 @@ void RenderMain() {
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
-                ImGui::SetTooltip("Requires confirmation when exiting a level.");
+                ImGui::SetTooltip("Requires confirmation when exiting a level.");*/
 
             if (ImGui::Checkbox("Corrective Music Sync", &setting().onMusicSync)) {
                 if (setting().onMusicSync) {
@@ -1689,7 +1689,7 @@ void RenderMain() {
                 ImGui::SetNextItemWidth(setting().UISize * 80);
                 ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
 
-                ImGui::Checkbox("Player", &setting().onPlayerHitbox);
+                //ImGui::Checkbox("Player", &setting().onPlayerHitbox);
 
                 ImGui::Checkbox("Solids", &setting().onSolidsHitbox);
                 ImGui::SameLine();
@@ -2215,7 +2215,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.7-beta");
+            ImGui::Text("v1.1.7-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2230,7 +2230,7 @@ void RenderMain() {
 
             if (ImGui::Button("Special Thanks"))
             {
-                gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cj>TheSillyDoggo</c>, Absolute, <cl>HJFod</c>.", "Ok", nullptr, 320.f, false, 0)->show();
+                gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cj>TheSillyDoggo</c>, Absolute, <cl>HJFod</c>, qimiko (zmx).", "Ok", nullptr, 320.f, false, 0)->show();
             }
             if (ImGui::Button("Cocos Explorer")) {
                 setting().onExplorer = !setting().onExplorer;

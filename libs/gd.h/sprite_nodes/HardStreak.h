@@ -12,7 +12,11 @@ namespace gd {
             //float m_pulseSize; // 0x012C
             bool m_isSolid; // 0x0130
 
-            auto pulseSize() {
+            auto getStrokeScale() {
+                return from<float>(this, 0x124);
+            } // m_waveSize
+
+            auto& pulseSize() {
                 return from<float>(this, 0x128);
             }
     }; // size = 0x134

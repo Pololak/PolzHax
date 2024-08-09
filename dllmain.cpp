@@ -1,6 +1,9 @@
 #define NOMINMAX
 #include "pch.h"
+#include <DbgHelp.h>
+#include <sstream>
 
+#pragma comment(lib, "dbghelp.lib")
 //#include "EditorPauseLayer.h"
 #include "ObjectToolbox.h"
 //#include "EditorUI.h"
@@ -8,6 +11,7 @@
 #include "EndLevelLayer.h"
 //#include "Scheduler.h"
 //#include "CCSchedulerHook.h"
+#include "MenuLayer.h"
 
 #include <imgui-hook.hpp>
 #include <imgui.h>
@@ -33,9 +37,101 @@ gd::ColorSelectPopup* colorSelectPopup;
 
 // Hitboxes thing by Taswert
 
+std::ostringstream crashInfo;
 
+void printRegisters(CONTEXT* context) {
+    crashInfo << "=== Registers ===\n";
+    crashInfo << "EIP: " << std::hex << context->Eip << "\n";
+    crashInfo << "ESP: " << std::hex << context->Esp << "\n";
+    crashInfo << "EBP: " << std::hex << context->Ebp << "\n";
+    crashInfo << "EAX: " << std::hex << context->Eax << "\n";
+    crashInfo << "EBX: " << std::hex << context->Ebx << "\n";
+    crashInfo << "ECX: " << std::hex << context->Ecx << "\n";
+    crashInfo << "EDX: " << std::hex << context->Edx << "\n";
+    crashInfo << "ESI: " << std::hex << context->Esi << "\n";
+    crashInfo << "EDI: " << std::hex << context->Edi << "\n\n";
+}
 
-// End of Hitboxes thing
+void printStackTrace(CONTEXT* context) {
+    HANDLE process = GetCurrentProcess();
+    HANDLE thread = GetCurrentThread();
+
+    SymInitialize(process, NULL, TRUE);
+
+    STACKFRAME64 stackFrame;
+    memset(&stackFrame, 0, sizeof(STACKFRAME64));
+
+    DWORD machineType;
+#ifdef _M_X64
+    machineType = IMAGE_FILE_MACHINE_AMD64;
+    stackFrame.AddrPC.Offset = context->Rip;
+    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrFrame.Offset = context->Rsp;
+    stackFrame.AddrFrame.Mode = AddrModeFlat;
+    stackFrame.AddrStack.Offset = context->Rsp;
+    stackFrame.AddrStack.Mode = AddrModeFlat;
+#elif _M_IX86
+    machineType = IMAGE_FILE_MACHINE_I386;
+    stackFrame.AddrPC.Offset = context->Eip;
+    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrFrame.Offset = context->Ebp;
+    stackFrame.AddrFrame.Mode = AddrModeFlat;
+    stackFrame.AddrStack.Offset = context->Esp;
+    stackFrame.AddrStack.Mode = AddrModeFlat;
+#endif
+
+    crashInfo << "=== Stack trace ===\n";
+    while (StackWalk64(machineType, process, thread, &stackFrame, context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL)) {
+        DWORD64 address = stackFrame.AddrPC.Offset;
+        DWORD64 moduleBase = SymGetModuleBase64(process, address);
+
+        crashInfo << "Address: " << std::hex << address;
+
+        // Получение информации о символе
+        char symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+        SYMBOL_INFO* symbol = reinterpret_cast<SYMBOL_INFO*>(symbolBuffer);
+        symbol->MaxNameLen = MAX_SYM_NAME;
+        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+        DWORD64 displacement = 0;
+        if (SymFromAddr(process, address, &displacement, symbol)) {
+            crashInfo << " (" << symbol->Name << "+" << std::hex << displacement << ")";
+        }
+        else {
+            crashInfo << " (No symbol)";
+        }
+
+        // Получение информации о модуле
+        if (moduleBase) {
+            IMAGEHLP_MODULE64 moduleInfo;
+            memset(&moduleInfo, 0, sizeof(IMAGEHLP_MODULE64));
+            moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
+            if (SymGetModuleInfo64(process, moduleBase, &moduleInfo)) {
+                crashInfo << " [" << moduleInfo.ModuleName << "+" << std::hex << (address - moduleBase) << "]";
+            }
+        }
+
+        crashInfo << "\n";
+    }
+
+    SymCleanup(process);
+}
+
+LONG WINAPI exceptionHandler(EXCEPTION_POINTERS* exceptionInfo) {
+    crashInfo << "Exception code: " << std::hex << exceptionInfo->ExceptionRecord->ExceptionCode << "\n";
+    crashInfo << "Exception address: " << exceptionInfo->ExceptionRecord->ExceptionAddress << "\n\n";
+
+    printRegisters(exceptionInfo->ContextRecord);
+    printStackTrace(exceptionInfo->ContextRecord);
+
+    MessageBoxA(NULL, crashInfo.str().c_str(), "Crash Info", MB_OK | MB_ICONERROR);
+
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+void setupExceptionHandler() {
+    SetUnhandledExceptionFilter(exceptionHandler);
+}
 
 void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
     matdash::orig<&LevelInfoLayer_onClone>(self, foo);
@@ -144,8 +240,6 @@ void __stdcall ObjectToolbox_gridNodeSizeForKey_H(int id) {
     ObjectToolbox_gridNodeSizeForKey(id);
 }
 
-
-
 bool(__thiscall* CCDirector_end)(CCDirector* self);
 void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
     if (setting().onAutoSave)
@@ -162,6 +256,7 @@ void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
 DWORD WINAPI my_thread(void* hModule) {
 
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); //B8 01 00 00 00 90 90
+    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x428bd5), "\x6a\x00", 2, NULL); // rgba8888 format (better texture quality and colors)
     //WriteProcessMemory(hModule, (LPVOID)0x518e29, "\x32", 1, NULL);
 
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
@@ -178,9 +273,10 @@ DWORD WINAPI my_thread(void* hModule) {
     //LevelEditorLayer::mem_init();
     EditorUI::mem_init();
     PauseLayer::mem_init();
-    EndLevelLayer::mem_init();
+    //EndLevelLayer::mem_init();
     Scheduler::mem_init();
     //HardStreak::mem_init();
+    MenuLayer::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xff130),
@@ -218,6 +314,8 @@ DWORD WINAPI my_thread(void* hModule) {
     setup_imgui_menu();
 
     MH_EnableHook(MH_ALL_HOOKS);
+
+    return true;
 }
 
     BOOL APIENTRY DllMain(HMODULE hModule,
@@ -234,5 +332,6 @@ DWORD WINAPI my_thread(void* hModule) {
         case DLL_PROCESS_DETACH:
             break;
         }
+        setupExceptionHandler();
         return TRUE;
     }

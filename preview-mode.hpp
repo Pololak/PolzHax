@@ -27,7 +27,14 @@ namespace EditorUI {
 	inline void(__thiscall* onPause)(gd::EditorUI*, CCObject*);
 	void __fastcall onPause_H(gd::EditorUI* self, void*, CCObject* sender);
 
-	
+	inline bool(__thiscall* moveForCommand)(gd::EditorUI*, CCPoint*, gd::EditCommand);
+	void __fastcall moveForCommand_H(gd::EditorUI* self, CCPoint* pos, gd::EditCommand command);
+
+	class Callback {
+	public:
+		void onGoToBaseLayer(CCObject*);
+		void onGoToNextFreeLayer(CCObject*);
+	};
 
 	void mem_init();
 }
@@ -50,6 +57,12 @@ namespace EditorPauseLayer {
 
 	inline bool(__thiscall* keyDown)(gd::EditorPauseLayer*, cocos2d::enumKeyCodes);
 	void __fastcall keyDown_H(gd::EditorPauseLayer* self, void* edx, cocos2d::enumKeyCodes key);
+
+	class Callback {
+	public:
+		void SmallEditorStepToggler(CCObject*);
+		void PreviewModeToggler(CCObject*);
+	};
 
 	void mem_init();
 }

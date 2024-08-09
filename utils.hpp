@@ -115,6 +115,20 @@ inline void patch(uintptr_t addr, const std::vector<uint8_t>& bytes) {
 	VirtualProtect(reinterpret_cast<void*>(addr), bytes.size(), old_prot, &old_prot);
 }
 
+#define public_cast(value, member) [](auto* v) { \
+	class FriendClass__; \
+	using T = std::remove_pointer<decltype(v)>::type; \
+	class FriendeeClass__: public T { \
+	protected: \
+		friend FriendClass__; \
+	}; \
+	class FriendClass__ { \
+	public: \
+		auto& get(FriendeeClass__* v) { return v->member; } \
+	} c; \
+	return c.get(reinterpret_cast<FriendeeClass__*>(v)); \
+}(value)
+
 namespace {
 	template <class F>
 	struct transform_member_fn_type_idk { using type = F; };

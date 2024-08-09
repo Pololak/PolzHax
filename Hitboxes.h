@@ -9,6 +9,7 @@ namespace Hitboxes {
 	void drawCircleObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col);
 	void drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode);
 	void drawSolidsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode);
+	void drawObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode);
 	void drawHazardsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode);
 	void drawSpecialsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode);
 }

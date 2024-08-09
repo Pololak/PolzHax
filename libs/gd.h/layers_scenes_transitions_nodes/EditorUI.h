@@ -7,9 +7,44 @@
 
 namespace gd {
 
+    enum EditCommand {
+        kEditCommandSmallLeft = 1,
+        kEditCommandSmallRight = 2,
+        kEditCommandSmallUp = 3,
+        kEditCommandSmallDown = 4,
+
+        kEditCommandLeft = 5,
+        kEditCommandRight = 6,
+        kEditCommandUp = 7,
+        kEditCommandDown = 8,
+
+        kEditCommandBigLeft = 9,
+        kEditCommandBigRight = 10,
+        kEditCommandBigUp = 11,
+        kEditCommandBigDown = 12,
+
+        kEditCommandTinyLeft = 13,
+        kEditCommandTinyRight = 14,
+        kEditCommandTinyUp = 15,
+        kEditCommandTinyDown = 16,
+
+        kEditCommandFlipX = 17,
+        kEditCommandFlipY = 18,
+        kEditCommandRotateCW = 19,
+        kEditCommandRotateCCW = 20,
+        kEditCommandRotateCW45 = 21,
+        kEditCommandRotateCCW45 = 22,
+        kEditCommandRotateFree = 23,
+        kEditCommandRotateSnap = 24,
+
+        kEditCommandScale = 25,
+    };
+
 class EditButtonBar : public cocos2d::CCNode {
 public:
     cocos2d::CCArray* m_buttonArray;
+
+
 };
 class GJRotationControl : public cocos2d::CCLayer {};
 class GJScaleControl : public cocos2d::CCLayer {};
@@ -19,16 +54,53 @@ class CCMenuItemToggler;
 class Slider;
 class GameObject;
 
+class BoomScrollLayer : public cocos2d::CCLayer {
+public:
+    
+};
+
 class EditorUI : public cocos2d::CCLayer {
 public:
     EditButtonBar* m_pEditButtonBar;
     EditButtonBar* m_pEditButtonBar2;
 
+
+
     auto pasteObjects(const std::string& str) {
         return reinterpret_cast<cocos2d::CCArray * (__thiscall*)(EditorUI*, gd::string)>(base + 0x492a0)(this, str);
     }
 
+    void moveForCommand(cocos2d::CCPoint* pos, EditCommand* command) {
+        reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCPoint*, EditCommand*)>(base + 0x4b040)(this, pos, command);
+    }
 
+    CCMenuItemSpriteExtra* getSpriteButton(
+        const char* sprite,
+        cocos2d::SEL_MenuHandler callback,
+        cocos2d::CCMenu* menu,
+        float scale
+    ) {
+        return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(
+            EditorUI*, const char*, cocos2d::SEL_MenuHandler,
+            cocos2d::CCMenu*, float
+            )>(
+                base + 0x41790
+                )(
+                    this, sprite, callback, menu, scale
+                    );
+    }
+
+    void moveObjectCall(cocos2d::CCObject* pSender) {
+        reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(
+            base + 0x4b2a0
+            )(this, pSender);
+    }
+
+    void moveObjectCall(EditCommand command) {
+        reinterpret_cast<void(__thiscall*)(EditorUI*, EditCommand)>(
+            base + 0x4b2c0
+            )(this, command);
+    }
 
     auto& clipboard() {
         return from<gd::string>(this, 0x264);
@@ -62,8 +134,20 @@ public:
         return reinterpret_cast<void(__thiscall*)(EditorUI*, gd::GameObject*)>(base + 0x47f10)(this, obj);
     }
 
+    EditButtonBar* editButtonBar() {
+        return from<EditButtonBar*>(this, 0x160);
+    }
+
     cocos2d::CCArray* getSomeObjects() {
         return from<cocos2d::CCArray*>(this, 0x1E8);
+    }
+
+    CCMenuItemSpriteExtra* getRedoBtn() {
+        return from<CCMenuItemSpriteExtra*>(this, 0x1c4);
+    }
+
+    CCMenuItemSpriteExtra* getDeselectBtn() {
+        return from<CCMenuItemSpriteExtra*>(this, 0x1a8);
     }
 
     cocos2d::CCArray* getSelectedObjectsOfCCArray() {
