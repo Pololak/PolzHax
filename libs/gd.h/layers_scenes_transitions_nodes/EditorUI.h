@@ -74,20 +74,45 @@ public:
         reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCPoint*, EditCommand*)>(base + 0x4b040)(this, pos, command);
     }
 
+    //CCMenuItemSpriteExtra* getSpriteButton(
+    //    const char* sprite,
+    //    cocos2d::SEL_MenuHandler callback,
+    //    cocos2d::CCMenu* menu,
+    //    float scale
+    //) {
+    //    return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(
+    //        EditorUI*, const char*, cocos2d::SEL_MenuHandler,
+    //        cocos2d::CCMenu*, float
+    //        )>(
+    //            base + 0x41790
+    //            )(
+    //                this, sprite, callback, menu, scale
+    //                );
+    //}
+
     CCMenuItemSpriteExtra* getSpriteButton(
         const char* sprite,
         cocos2d::SEL_MenuHandler callback,
         cocos2d::CCMenu* menu,
-        float scale
+        float scale,
+        int idk,
+        cocos2d::CCPoint* idk2,
+        cocos2d::CCPoint* idk3
     ) {
-        return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(
-            EditorUI*, const char*, cocos2d::SEL_MenuHandler,
-            cocos2d::CCMenu*, float
+        return reinterpret_cast<CCMenuItemSpriteExtra*(__thiscall*)(
+            EditorUI*,
+            const char*,
+            cocos2d::SEL_MenuHandler,
+            cocos2d::CCMenu*,
+            float,
+            int,
+            cocos2d::CCPoint*,
+            cocos2d::CCPoint*
             )>(
                 base + 0x41790
-                )(
-                    this, sprite, callback, menu, scale
-                    );
+            )(
+            this, sprite, callback, menu, scale, idk, idk2, idk3
+            );
     }
 
     void moveObjectCall(cocos2d::CCObject* pSender) {
@@ -109,7 +134,7 @@ public:
     auto selectedObjectToolboxID() {
         return from<int>(this, 0x220);
     }
-
+    
     void updateButtons() {
         reinterpret_cast<void(__thiscall*)(EditorUI*)>(base + 0x41450)(this);
     }

@@ -20,16 +20,10 @@ bool hasClicked = false;
 //Labels* labels = nullptr;
 bool isPlayerColorGot = false;
 
-HitboxNode* drawer;
-
 gd::HardStreak* hardStreak;
 
 int currentStartPos = 0;
 bool fadedoutflag = 0;
-
-std::vector<bool> willFlip;
-std::vector<gd::StartPosObject*> sp;
-std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniPortals, speedChanges, mirrorPortals;
 
 std::vector<CheckPoint> PlayLayer::checkpoints;
 bool inPractice = false;
@@ -159,10 +153,33 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         }
     }
 
-    //if (setting().onPlayerHitbox) {
+    if (setting().onPlayerHitbox) {
         if (self->player1()) Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
-        if (self->player2()) Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
-    //}
+        if (self->player2()) Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+    }
+
+    int labelCount = 0;
+
+    if (setting().onCheatIndicator)
+    {
+        labelCount++;
+        auto CheatIndicatorLabel = CCLabelBMFont::create(".", "bigFont.fnt");
+        CheatIndicatorLabel->setScale(setting().labelScale);
+        CheatIndicatorLabel->setZOrder(5);
+        CheatIndicatorLabel->setAnchorPoint({ 0.f, 0.5f });
+        CheatIndicatorLabel->setPosition({ 2.f, size.height + 4.f * labelCount });
+        CheatIndicatorLabel->setTag(45072);
+        //CheatIndicatorLabel->setAnchorPoint({ 0.5f, 0.5f });
+        ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f04e9), &setting().CurrentNoclipByte, 1, 0);
+        if (setting().NoclipByte != setting().CurrentNoclipByte && setting().onNoclipOutOfMe == false) { setting().cheatsCount++; setting().beforeRestartCheatsCount++; setting().onNoclipOutOfMe = true; }
+        else if (setting().NoclipByte == setting().CurrentNoclipByte && setting().onNoclipOutOfMe == true) { setting().cheatsCount--; setting().onNoclipOutOfMe = false; }
+        if (setting().cheatsCount == 0 && !setting().onSafeMode) CheatIndicatorLabel->setColor({ 0, 255, 0 });
+        else if (setting().cheatsCount == 0 && setting().onSafeMode) CheatIndicatorLabel->setColor({ 255, 255, 0 });
+        else CheatIndicatorLabel->setColor({ 255, 0, 0 });
+
+        //CheatIndicatorLabel->
+        self->addChild(CheatIndicatorLabel);
+    }
 }
 
 bool rKeyFlag = true;
@@ -174,7 +191,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
     auto size = CCDirector::sharedDirector()->getWinSize();
-    auto audioScale = self->player1()->getAudioScale() > 1.f ? 1.f : self->player1()->getAudioScale();
+    //auto audioScale = self->player1()->getAudioScale() > 1.f ? 1.f : self->player1()->getAudioScale();
     //auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
     auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
 
@@ -246,9 +263,9 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
     playerDrawNode->clear();
 
-    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) /* || setting().onHitboxes */ ) {
-        //if (setting().onPlayerHitbox)
-        //{
+    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) || setting().onHitboxes) {
+        if (setting().onPlayerHitbox)
+        {
             if (self->player1())
             {
                 Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
@@ -257,7 +274,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
             {
                 Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
             }
-        //}
+        }
     }
 
     auto objDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
@@ -359,7 +376,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->player2()->setVisible(1);
     }
 
-    if (setting().onLockCursor) {
+    if (setting().onLockCursor && !setting().show && !self->hasCompletedLevel() && !self->isDead()) {
         SetCursorPos(size.width / 2, size.height / 2);
     }
 

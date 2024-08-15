@@ -9,6 +9,7 @@ namespace gd {
 	class GameObject;
 	class HardStreak;
 	class PlayLayer;
+	class OBB2D;
 
 	class PlayerObject : public GameObject {
 	public:
@@ -51,10 +52,10 @@ namespace gd {
 		}
 
 		auto getOBB2D() {
-			return from<gd::OBB2D*>(this, 0x1D0);
+			return from<OBB2D*>(this, 0x1D0);
 		}
 		auto getOrientedBox() {
-			return reinterpret_cast<gd::OBB2D * (__fastcall*)(PlayerObject*)>(base + 0xe1260)(this);
+			return reinterpret_cast<OBB2D*(__fastcall*)(PlayerObject*)>(base + 0xe1260)(this);
 		}
 		auto getFirstColor() {
 			return from<cocos2d::CCSprite*>(this, 0x370)->getColor();

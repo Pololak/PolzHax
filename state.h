@@ -10,6 +10,8 @@ struct LayersStruct {
 
 struct SettingStruct {
 
+    bool show = false;
+
     int selected_dart = 1;
 
     float waveSize;
@@ -166,7 +168,9 @@ struct SettingStruct {
 
     // Labels
 
-    bool onCheatIndicator = false;
+    float labelScale = 1.f;
+
+    bool onCheatIndicator = true;
     bool onClock = false;
 
     int status_opacity = 125;

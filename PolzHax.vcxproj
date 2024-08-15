@@ -540,7 +540,6 @@
     <ClInclude Include="EndLevelLayer.h" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="gd.hpp" />
     <ClInclude Include="Hitboxes.h" />
     <ClInclude Include="HitboxNode.h" />
     <ClInclude Include="hsv.hpp" />
@@ -568,6 +567,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingCircle.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuGameLayer.h" />

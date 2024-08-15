@@ -13,7 +13,7 @@
 
 DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 
-bool show = false;
+
 
 
 
@@ -897,7 +897,7 @@ void RenderMain() {
     //const auto& font = ImGui::GetIO().Fonts->Fonts.back();
     //ImGui::PushFont(font);
 
-    if (show) {
+    if (setting().show) {
         
 
         
@@ -1689,7 +1689,7 @@ void RenderMain() {
                 ImGui::SetNextItemWidth(setting().UISize * 80);
                 ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
 
-                //ImGui::Checkbox("Player", &setting().onPlayerHitbox);
+                ImGui::Checkbox("Player", &setting().onPlayerHitbox);
 
                 ImGui::Checkbox("Solids", &setting().onSolidsHitbox);
                 ImGui::SameLine();
@@ -1768,12 +1768,12 @@ void RenderMain() {
                 if (setting().onPauseDurComp) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x00", 1, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x90\x90\x90\x90\x90\x90", 6, NULL);
-                    cheatAdd();
+                    //cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x01", 1, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x88\x81\xf9\x02\x00\x00", 6, NULL);
-                    cheatDec();
+                    //cheatDec();
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1910,9 +1910,11 @@ void RenderMain() {
             if (ImGui::Checkbox("Instant Game Work", &setting().onInstantGameWork)) {
                 if (setting().onInstantGameWork) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc0", 1, NULL);
+                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc1", 1, NULL);
+                    cheatDec();
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -2215,7 +2217,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.7-alpha.1");
+            ImGui::Text("v1.1.7-alpha.2");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2281,7 +2283,7 @@ void imgui_init() {
 }
 
 void setup_imgui_menu() {
-    ImGuiHook::setToggleCallback([]() {show = !show; });
+    ImGuiHook::setToggleCallback([]() {setting().show = !setting().show; });
     ImGuiHook::setRenderFunction(RenderMain);
     ImGuiHook::setInitFunction(imgui_init);
     ImGuiHook::setupHooks([](auto addr, auto hook, auto orig) {

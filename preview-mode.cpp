@@ -317,12 +317,13 @@ public:
 		}
 		else {
 			auto trigger = triggers[bound - 1];
-			GDColor color_to = trigger;
 			if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
+			GDColor color_to = trigger;
 			auto dist = time_between_pos(trigger->getPosition().x, pos) / (trigger->triggerDuration());
 			auto color_from = starting_color;
 			if (bound > 1) {
 				auto trigger = triggers[bound - 2];
+				if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
 				auto dist = time_between_pos(trigger->getPosition().x, pos) / trigger->triggerDuration();
 				color_from = trigger;
 				if (dist < 1.f)
@@ -674,7 +675,7 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(currentLayer).c_str());
 }
 
-bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
+bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer* editor) {
 	editUI = self;
 
 	bool result = EditorUI::init(self, editor);
@@ -775,6 +776,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	auto rightMenu = from<CCMenu*>(self->getDeselectBtn(), 0xac);
 	auto leftGroupArrow = from<gd::CCMenuItemSpriteExtra*>(self, 0x210);
 	auto rightGroupArrow = from<gd::CCMenuItemSpriteExtra*>(self, 0x214);
+	auto redoBtn = self->getRedoBtn();
 
 	leftGroupArrow->setPositionX(leftGroupArrow->getPositionX() - 10);
 	rightGroupArrow->setPositionX(rightGroupArrow->getPositionX() - 10);
@@ -805,14 +807,29 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 	}
 	auto deletebtn = gd::CCMenuItemSpriteExtra::create(deletespr, nullptr, self, menu_selector(gd::EditorUI::onDeleteSelected));
 	deletespr->setScale(0.925f);
-	deletebtn->setPosition({ -160 , 139.35 });
+	//deletebtn->setPosition({ -160 , 139.35 });
+	deletebtn->setPositionX(redoBtn->getPositionX() + 50);
+	deletebtn->setPositionY(redoBtn->getPositionY());
 	deletebtn->setTag(45030);
-	
-	deletebtn->setVisible(1);
 
 	leftMenu->addChild(deletebtn);
 
-	//auto testBtn = self->getSpriteButton("", );
+	//auto testmenu = CCMenu::create();
+
+	//auto testspr = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
+
+	//auto testBtn = self->getSpriteButton(
+	//	"edit_rightBtn_001.png",
+	//	menu_selector(gd::EditorUI::onDeselectAll),
+	//	nullptr,
+	//	0.9f,
+	//	0,
+	//	0,
+	//	0
+	//);
+
+	//leftMenu->addChild(testBtn);
+
 
 	/*auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
 	auto boomScrollLayer = from<gd::BoomScrollLayer*>(editButtonBar, 0xe8);
@@ -827,10 +844,12 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, CCLayer* editor) {
 }
 
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
-	if (!EditorUI::dtor) return false;
+	bool result = EditorUI::dtor(self);
+
 	editUI = nullptr;
 	if (setting().onPersClip) savedClipboard = self->clipboard();
-	return true;
+
+	return result;
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -953,6 +972,8 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	menu->addChild(psbutton);
 	menu->addChild(optionsBtn);
 
+	
+
 	auto levellength = CCLabelBMFont::create("", "goldFont.fnt");
 	levellength->setString(CCString::createWithFormat("", 0)->getCString());
 	levellength->setTag(49001);
@@ -965,16 +986,16 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 		if (levelEditorLayer->getLevel()->getLevelLength() == 0) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Tiny", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
-		if (levelEditorLayer->getLevel()->getLevelLength() == 1) {
+		else if (levelEditorLayer->getLevel()->getLevelLength() == 1) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Short", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
-		if (levelEditorLayer->getLevel()->getLevelLength() == 2) {
+		else if (levelEditorLayer->getLevel()->getLevelLength() == 2) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Medium", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
-		if (levelEditorLayer->getLevel()->getLevelLength() == 3) {
+		else if (levelEditorLayer->getLevel()->getLevelLength() == 3) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
-		if (levelEditorLayer->getLevel()->getLevelLength() == 4) {
+		else if (levelEditorLayer->getLevel()->getLevelLength() == 4) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
 	}
@@ -1032,6 +1053,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 
 	if (play_layer) {
 		auto percentLabel = reinterpret_cast<CCLabelBMFont*>(play_layer->getChildByTag(4571));
+		auto cheatIndicator = reinterpret_cast<CCLabelBMFont*>(play_layer->getChildByTag(45072));
 
 		if (percentLabel) {
 			const auto value = play_layer->player1()->getPositionX() / play_layer->levelLength() * 100.f;
@@ -1048,6 +1070,36 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			else {
 				percentLabel->setVisible(0);
 			}
+		}
+
+		if (cheatIndicator)
+		{
+			ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee9d9), &setting().CurrentNoclipByte, 1, 0);
+			cheatIndicator->setColor({ 0, 255, 0 });
+
+			if (setting().NoclipByte != setting().CurrentNoclipByte && setting().onNoclipOutOfMe == false) { setting().cheatsCount++; setting().beforeRestartCheatsCount++; setting().onNoclipOutOfMe = true; }
+			else if (setting().NoclipByte == setting().CurrentNoclipByte && setting().onNoclipOutOfMe == true) { setting().cheatsCount--; setting().onNoclipOutOfMe = false; }
+
+			//no cheats, no before restart cheats, no safe mode
+			if (setting().cheatsCount == 0 &&
+				setting().beforeRestartCheatsCount == 0 &&
+				setting().NoclipByte == setting().CurrentNoclipByte &&
+				!setting().onSafeMode)
+				cheatIndicator->setColor({ 0, 255, 0 });
+
+			//no cheats, no before restart cheats, safe mode
+			else if (setting().cheatsCount == 0 &&
+				setting().beforeRestartCheatsCount == 0 &&
+				setting().NoclipByte == setting().CurrentNoclipByte &&
+				setting().onSafeMode)
+				cheatIndicator->setColor({ 255, 255, 0 });
+
+			//no cheats
+			else if (setting().cheatsCount == 0 &&
+				setting().NoclipByte == setting().CurrentNoclipByte)
+				cheatIndicator->setColor({ 255, 128, 0 });
+
+			else cheatIndicator->setColor({ 255, 0, 0 });
 		}
 	}
 

@@ -124,6 +124,15 @@ namespace gd {
 		bool getPracticeMode() {
 			return from<bool>(this, 0x2b9);
 		}
+		bool hasLevelCompleteMenu() {
+			return from<bool>(this, 0x2f8);
+		}
+		bool hasCompletedLevel() {
+			return from<bool>(this, 0x2f9);
+		}
+		bool isDead() {
+			return from<bool>(this, 0x1b4);
+		}
 		auto getAudioEffectsLayer() {
 			return from<gd::AudioEffectsLayer*>(this, 0x198);
 		}

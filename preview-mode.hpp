@@ -12,8 +12,8 @@ namespace preview_mode {
 
 namespace EditorUI {
 
-	inline bool(__thiscall* init)(gd::EditorUI* self, CCLayer* editor);
-	bool __fastcall init_H(gd::EditorUI* self, void*, CCLayer* editor);
+	inline bool(__thiscall* init)(gd::EditorUI* self, gd::LevelEditorLayer* editor);
+	bool __fastcall init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer* editor);
 
 	inline bool(__thiscall* dtor)(gd::EditorUI* self);
 	bool __fastcall dtor_H(gd::EditorUI* self);

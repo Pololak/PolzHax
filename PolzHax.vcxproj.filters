@@ -1494,9 +1494,6 @@
     <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="gd.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1526,6 +1523,9 @@
     </ClInclude>
     <ClInclude Include="moveForCommand.h">
       <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h">
+      <Filter>libs\gd.h</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
