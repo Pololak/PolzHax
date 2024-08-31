@@ -178,10 +178,10 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         }
     }
 
-    if (setting().onPlayerHitbox) {
+    //if (setting().onPlayerHitbox) {
         if (self->player1()) Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
         if (self->player2()) Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
-    }
+    //}
 
     int labelCount = 0;
 
@@ -579,18 +579,18 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
     playerDrawNode->clear();
 
-    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) || setting().onHitboxes) {
-        if (setting().onPlayerHitbox)
+    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) /* || setting().onHitboxes */) {
+        //if (setting().onPlayerHitbox)
+        //{
+        if (self->player1())
         {
-            if (self->player1())
-            {
-                Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
-            }
-            if (self->player2())
-            {
-                Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
-            }
+            Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
         }
+        if (self->player2())
+        {
+            Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+        }
+        //}
     }
 
     auto objDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
