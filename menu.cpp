@@ -33,14 +33,6 @@ void update_speed_hack() {
     CCDirector::sharedDirector()->m_pScheduler->setTimeScale(value);
 }
 
-void update_pitch_shifter() {
-    const auto value = setting().onPitch ? setting().pitchshift : 1.f;
-    if (auto fme = gd::FMODAudioEngine::sharedEngine())
-        if (auto sound = fme->currentSound())
-            sound->setPitch(value);
-        else sound->setPitch(1.f);
-}
-
 // Pitch Shifter is currently unused.
 
 void update_fps_bypass() {
@@ -123,7 +115,7 @@ void RenderMain() {
         }
 
         if (ImGui::Begin("Icons", nullptr)) {
-            ImGui::SetWindowPos({ 1109,5 });
+            ImGui::SetWindowPos({ 1109,252 });
             ImGui::EndTabItem();
         }
         
@@ -131,14 +123,14 @@ void RenderMain() {
             ImGui::SetWindowPos({ 491,512 });
             ImGui::EndTabItem();
         }
-
-        if (ImGui::Begin("Status", nullptr)) {
-            ImGui::SetWindowPos({ 1000, 5 });
-            ImGui::EndTabItem();
-        }
         
         if (ImGui::Begin("Interface", nullptr)) {
             ImGui::SetWindowPos({ 5, 142 });
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::Begin("Status", nullptr)) {
+            ImGui::SetWindowPos({ 1109,5 });
             ImGui::EndTabItem();
         }
 
@@ -1276,10 +1268,12 @@ void RenderMain() {
 
             if (ImGui::Checkbox("No Shade Effect", &setting().onNoShadeEffect)) {
                 if (setting().onNoShadeEffect) {
+                    cheatAdd();
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\xeb", 1, NULL);
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\x77", 1, NULL);
+                    cheatDec();
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1689,7 +1683,7 @@ void RenderMain() {
                 ImGui::SetNextItemWidth(setting().UISize * 80);
                 ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
 
-                ImGui::Checkbox("Player", &setting().onPlayerHitbox);
+                //ImGui::Checkbox("Player", &setting().onPlayerHitbox);
 
                 ImGui::Checkbox("Solids", &setting().onSolidsHitbox);
                 ImGui::SameLine();
@@ -1846,6 +1840,8 @@ void RenderMain() {
                 }
             }*/
 
+            //ImGui::Checkbox("Auto Safe Mode", &setting().onAutoSafe);
+
             if (ImGui::Checkbox("Fast Alt-Tab", &setting().onFastAlt)) {
                 if (setting().onFastAlt) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
@@ -1910,11 +1906,9 @@ void RenderMain() {
             if (ImGui::Checkbox("Instant Game Work", &setting().onInstantGameWork)) {
                 if (setting().onInstantGameWork) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc0", 1, NULL);
-                    cheatAdd();
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc1", 1, NULL);
-                    cheatDec();
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -2073,6 +2067,24 @@ void RenderMain() {
             //ImGui::Checkbox("Transparent Pause", &setting().onTransparentPause);
         }
 
+        if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            ImGui::Checkbox("Hide All", &setting().onHideLabels);
+            ImGui::Checkbox("Cheat Indicator", &setting().onCheatIndicator);
+            ImGui::Checkbox("Attempt", &setting().onAttemptsLabel);
+            ImGui::Checkbox("Clock", &setting().onClock);
+            ImGui::Checkbox("FPS Counter", &setting().onFPSLabel);
+            //ImGui::Checkbox("CPS Counter", &setting().onCPSLabel);
+            ImGui::Checkbox("Message", &setting().onMessageLabel);
+            ImGui::SetNextItemWidth(150 * setting().UISize);
+            ImGui::InputText("##message", setting().message, IM_ARRAYSIZE(setting().message));
+            //ImGui::Checkbox("Noclip Accuracy", &setting().onNoclipAccuracy);
+            //ImGui::Checkbox("Noclip Deaths", &setting().onNoclipDeaths);
+            ImGui::Checkbox("Meta", &setting().onMeta);
+        }
+
         if (ImGui::Begin("Icons", nullptr,
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
@@ -2080,6 +2092,8 @@ void RenderMain() {
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
             ImGui::Checkbox("Same Dual Color", &setting().onSameDualColor);
+
+            //ImGui::Checkbox("Swap Wave Trail", &setting().onSwapWaveColors);
 
             //ImGui::ColorEdit3("##primarycolorpulse", setting().PrimaryPulse, ImGuiColorEditFlags_NoInputs);
             //ImGui::SameLine();
@@ -2211,13 +2225,55 @@ void RenderMain() {
             if (setting().UISize < 0.5f) setting().UISize = 0.5f;
             if (setting().UISize > 3.25f) setting().UISize = 3.25f;
 
+            if (ImGui::Button("Sort Tabs")) {
+                if (ImGui::Begin("PolzHax", nullptr)) {
+                    ImGui::SetWindowPos({ 5,5 });
+                }
+
+                if (ImGui::Begin("Bypass", nullptr)) {
+                    ImGui::SetWindowPos({ 160,5 });
+                }
+
+                if (ImGui::Begin("Cosmetic", nullptr)) {
+                    ImGui::SetWindowPos({ 300,5 });
+                }
+
+                if (ImGui::Begin("Creator", nullptr)) {
+                    ImGui::SetWindowPos({ 491,5 });
+                }
+
+                if (ImGui::Begin("Level", nullptr)) {
+                    ImGui::SetWindowPos({ 664,5 });
+                }
+
+                if (ImGui::Begin("Universal", nullptr)) {
+                    ImGui::SetWindowPos({ 864,5 });
+                }
+
+                if (ImGui::Begin("Icons", nullptr)) {
+                    ImGui::SetWindowPos({ 1109,252 });
+                }
+
+                if (ImGui::Begin("Speedhack", nullptr)) {
+                    ImGui::SetWindowPos({ 491,512 });
+                }
+
+                if (ImGui::Begin("Interface", nullptr)) {
+                    ImGui::SetWindowPos({ 5, 142 });
+                }
+
+                if (ImGui::Begin("Status", nullptr)) {
+                    ImGui::SetWindowPos({ 1109,5 });
+                }
+            }
+
         }
 
         if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.7-alpha.2");
+            ImGui::Text("v1.1.8-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

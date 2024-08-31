@@ -100,11 +100,23 @@ namespace gd {
 		}
 
 		auto getRealPlayerPosX() {
-			return from<float>(this, 0x4c8);
+			return from<float>(this, 0x234);
 		}
 
 		auto getRealPlayerPosY() {
-			return from<float>(this, 0x4cc);
+			return from<float>(this, 0x238);
+		}
+
+		auto getVelocity() {
+			return from<double>(this, 0x45c);
+		}
+
+		auto getPlayerSize() {
+			return from<float>(this, 0x25c);
+		}
+
+		auto getPlayerSpeed() {
+			return from<float>(this, 0x398);
 		}
 		/*auto getColor5() {
 			return from<cocos2d::CCSprite*>(this, 0x384)->getColor();

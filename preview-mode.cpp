@@ -25,6 +25,7 @@
 #include "matdash/detail/impl.hpp"
 #include "Hitboxes.h"
 #include "moveForCommand.h"
+#include <array>
 
 using namespace cocos2d;
 
@@ -61,6 +62,52 @@ void preview_mode::Callback::hideUI_btn(CCObject*) {
 		editUI->setVisible(1);
 	}
 }
+
+std::map<gd::GameObject*, float> g_startRotations;
+std::array<int, 100> g_sawIDs = {
+	88, 89, 98,
+	397, 398, 399,
+	675, 676, 677,
+	186, 187, 188,
+	740, 741, 742,
+	678, 679, 680,
+	183, 184, 185,
+	85, 86, 87, 97,
+	137, 138, 139,
+	154, 155, 156,
+	180, 181, 182,
+	222, 223, 224,
+	375, 376, 377, 378,
+	394, 395, 396
+};
+
+//bool objectIsSaw(gd::GameObject* obj) {
+//	for (auto id : g_sawIDs)
+//		if (id == obj->getObjectID())
+//			return true;
+//
+//	return false;
+//}
+//
+//void beginRotateSaw(gd::GameObject* obj) {
+//	if (obj->m_pMyAction)
+//		return;
+//
+//	if (obj->m_bSawIsDisabled)
+//		return;
+//
+//	cocos2d::CCAction* r;
+//	switch (obj->m_nObjectID) {
+//		// the big invisible saw, for some reason
+//	case 0xba: r = obj->createRotateAction(300.0f, 0); break;
+//	default: r = obj->createRotateAction(360.0f, 0); break;
+//	}
+//	r->setTag(ROTATEACTION_TAG);
+//	g_startRotations[obj] = obj->getRotation();
+//	obj->m_pMyAction = r;
+//	obj->m_pMyAction->retain();
+//	obj->runAction(r);
+//}
 
 struct CompareTriggers {
 	bool operator()(gd::GameObject* a, gd::GameObject* b) const {
@@ -675,6 +722,11 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(currentLayer).c_str());
 }
 
+void EditorUI::Callback::onGoToGroup(CCObject* sender) {
+	/*auto group = gd::GameObject::getObjectGroup;
+	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) == group;*/
+}
+
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer* editor) {
 	editUI = self;
 
@@ -777,9 +829,12 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	auto leftGroupArrow = from<gd::CCMenuItemSpriteExtra*>(self, 0x210);
 	auto rightGroupArrow = from<gd::CCMenuItemSpriteExtra*>(self, 0x214);
 	auto redoBtn = self->getRedoBtn();
+	auto editObjectBtn = from<gd::CCMenuItemSpriteExtra*>(self, 0x1c8);
+	auto previewTogger = from<gd::CCMenuItemToggler*>(self, 0x1dc);
 
 	leftGroupArrow->setPositionX(leftGroupArrow->getPositionX() - 10);
 	rightGroupArrow->setPositionX(rightGroupArrow->getPositionX() - 10);
+	previewTogger->setPositionX(previewTogger->getPositionX() - 20);
 
 	CCLabelBMFont* groupLabel = from<CCLabelBMFont*>(self, 0x20c);
 	groupLabel->setPositionX(groupLabel->getPositionX() - 10);
@@ -814,6 +869,18 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 	leftMenu->addChild(deletebtn);
 
+	auto goToGroupSpr = CCSprite::create("GJ_button_04.png");
+	if (!goToGroupSpr->initWithFile("GJ_goToGroupBtn_001.png")) {
+		goToGroupSpr->create("GJ_button_04.png");
+	}
+	auto goToGroupBtn = gd::CCMenuItemSpriteExtra::create(goToGroupSpr, nullptr, self, 0);
+	goToGroupBtn->setTag(45031);
+	goToGroupSpr->setScale(0.75f);
+	goToGroupBtn->setPosition({self->getDeselectBtn()->getPositionX() - 84, self->getDeselectBtn()->getPositionY() - 1});
+	rightMenu->addChild(goToGroupBtn);
+	goToGroupBtn->setVisible(0);
+	goToGroupBtn->setEnabled(false);
+
 	//auto testmenu = CCMenu::create();
 
 	//auto testspr = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
@@ -844,12 +911,9 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 }
 
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
-	bool result = EditorUI::dtor(self);
-
 	editUI = nullptr;
 	if (setting().onPersClip) savedClipboard = self->clipboard();
-
-	return result;
+	EditorUI::dtor(self);
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -1074,7 +1138,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 
 		if (cheatIndicator)
 		{
-			ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ee9d9), &setting().CurrentNoclipByte, 1, 0);
+			ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().CurrentNoclipByte, 1, 0);
 			cheatIndicator->setColor({ 0, 255, 0 });
 
 			if (setting().NoclipByte != setting().CurrentNoclipByte && setting().onNoclipOutOfMe == false) { setting().cheatsCount++; setting().beforeRestartCheatsCount++; setting().onNoclipOutOfMe = true; }
@@ -1100,6 +1164,13 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				cheatIndicator->setColor({ 255, 128, 0 });
 
 			else cheatIndicator->setColor({ 255, 0, 0 });
+
+			if (setting().onHideLabels) {
+				cheatIndicator->setVisible(0);
+			}
+			else {
+				cheatIndicator->setVisible(1);
+			}
 		}
 	}
 
@@ -1124,6 +1195,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 
 		auto rightMenu = from<CCMenu*>(editUI->getDeselectBtn(), 0xac);
 		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45028));
+		//auto goToGroupBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45031));
 
 		if (deleteBtn) {
 			if (editUI->getSelectedObjectsOfCCArray()->count() == 0) {
@@ -1148,6 +1220,17 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				onBaseLayerBtn->setEnabled(true);
 			}
 		}
+
+		//if (goToGroupBtn) {
+		//	if (editUI->getSelectedObjectsOfCCArray()->count() == 0) {
+		//		goToGroupBtn->setVisible(0);
+		//		goToGroupBtn->setEnabled(false);
+		//	}
+		//	else {
+		//		goToGroupBtn->setVisible(1);
+		//		goToGroupBtn->setEnabled(true);
+		//	}
+		//}
 		
 		if (objcolorid) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);

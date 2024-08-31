@@ -118,15 +118,15 @@ struct SettingStruct {
     bool onJumpHack = false;
     bool onNoclip = false;
     bool onPauseDurComp = false;
-    //bool onPracticeFix = false;
+    bool onPracticeFix = false;
     bool onPracticeMusic = false;
     bool onSPSwitcher = false;
     bool onSuicide = false;
     
     // Universal
     bool onFPSBypass = false;
-    bool onPitch = false;
     bool onAllowLowVolume = false;
+    bool onAutoSafe = false;
     bool onFastAlt = false;
     bool onForceVis = false;
     bool onFreeWinReSize = false;
@@ -150,6 +150,7 @@ struct SettingStruct {
 
     // Icons
     bool onSameDualColor = false;
+    bool onSwapWaveColors = false;
 
     float GlowPulse[3] = { 1.f, 1.f, 1.f };
     float SecondaryPulse[3] = { 1.f, 1.f, 1.f };
@@ -168,38 +169,31 @@ struct SettingStruct {
 
     // Labels
 
-    float labelScale = 1.f;
-
-    bool onCheatIndicator = true;
+    bool onCheatIndicator = false;
     bool onClock = false;
-
-    int status_opacity = 125;
-    float status_scale = 1.f;
     bool onFPSLabel = false;
     bool onAttemptsLabel = false;
     bool onCPSLabel = false;
     bool onBestRunLabel = false;
     bool onMessageLabel = false;
-
-    std::string message_text = "Your Text";
-
-    bool fps_prefix = false;
-    bool cps_prefix = false;
-    bool cps_total = false;
-
+    bool onNoclipAccuracy = false;
+    bool onNoclipDeaths = false;
+    bool onMeta = false;
 
     bool onNoclipOutOfMe = false;
     bool onSpeedhackCounted = false;
 
-    float grid = 30;
-    float gridDefault = 30;
+    bool onHideLabels = false;
+
     float fps = 60.f;
     float speedhack = 1.f;
-    float pitchshift = 1.f;
     float UISize = 1.0f;
 
     float Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 };
     float BGcolor[4] = { 0, 0, 0, 0.902 };
+
+    char message[50] = "Your Text";
+
 };
 
 SettingStruct& setting();

@@ -23,14 +23,14 @@ namespace PlayLayer {
 	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer* self, bool practice);
 	void __fastcall togglePracticeMode_H(gd::PlayLayer* self, int edx, bool practice);
 
-	inline int(__thiscall* createCheckpoint)(gd::PlayLayer* self);
-	int __fastcall createCheckpoint_H(gd::PlayLayer* self);
+	inline void(__thiscall* createCheckpoint)(gd::PlayLayer* self);
+	void __fastcall createCheckpoint_H(gd::PlayLayer* self);
 
-	inline int(__thiscall* removeLastCheckpoint)(gd::PlayLayer* self);
-	int __fastcall removeLastCheckpoint_H(gd::PlayLayer* self);
+	inline void(__thiscall* removeLastCheckpoint)(gd::PlayLayer* self);
+	void __fastcall removeLastCheckpoint_H(gd::PlayLayer* self);
 
 	inline bool(__thiscall* levelComplete)(gd::PlayLayer* self);
-	bool __fastcall levelComplete_H(gd::PlayLayer* self);
+	void __fastcall levelComplete_H(gd::PlayLayer* self);
 
 	inline bool(__thiscall* pushButton)(int idk1, bool idk2);
 	void __fastcall pushButton_H(int idk1, bool idk2);
@@ -41,9 +41,12 @@ namespace PlayLayer {
 	inline void(__thiscall* spawnPlayer2)(gd::PlayLayer* self);
 	void __fastcall spawnPlayer2_H(gd::PlayLayer* self);
 
+	inline bool(__thiscall* destroyPlayer)(gd::PlayLayer* self, gd::PlayerObject* player);
+	void __fastcall destroyPlayer_H(gd::PlayLayer* self, void*, gd::PlayerObject* player);
+
 	void mem_init();
 
-	extern std::vector<CheckPoint> checkpoints;
+	//extern std::vector<CheckPoint> checkpoints;
 	extern bool inPractice;
 }
 

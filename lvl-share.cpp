@@ -14,9 +14,9 @@ using namespace cocos2d;
 template <class S>
 void dump_level(gd::GJGameLevel* level, S& stream) {
 	const auto song_key = level->m_songID ?
-		format("<k>k45</k><i>{}</i>", level->m_songID) : 
-			level->m_audioTrack ?
-				format("<k>k8</k><i>{}</i>", level->m_audioTrack) : "";
+		format("<k>k45</k><i>{}</i>", level->m_songID) :
+		level->m_audioTrack ?
+		format("<k>k8</k><i>{}</i>", level->m_audioTrack) : "";
 	// encode it twice because gdshare does too
 	// why? i dont know fod is stupid
 	const auto encoded_desc = base64_encode(base64_encode(level->m_levelDesc.sv()));
@@ -42,14 +42,18 @@ gd::GJGameLevel* import_level(S& stream) {
 		using namespace std::literals;
 		if (key == "k2"sv) {
 			level->m_levelName = value.value;
-		} else if (key == "k3"sv) {
+		}
+		else if (key == "k3"sv) {
 			level->m_levelDesc = base64_decode(base64_decode(value.value));
-		} else if (key == "k4"sv) {
+		}
+		else if (key == "k4"sv) {
 			level->m_levelString = value.value;
-		} else if (key == "k8"sv) {
+		}
+		else if (key == "k8"sv) {
 			const auto text = value.value;
 			level->m_audioTrack = std::stoi(text);
-		} else if (key == "k45"sv) {
+		}
+		else if (key == "k45"sv) {
 			const auto text = value.value;
 			level->m_songID = std::stoi(text);
 		}
@@ -64,7 +68,7 @@ bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 	auto director = CCDirector::sharedDirector();
 
 	auto menu = CCMenu::create();
-	
+
 	constexpr auto handler = [](CCObject* self, CCObject*) {
 		auto* const level = reinterpret_cast<gd::EditLevelLayer*>(self)->level();
 		nfdchar_t* path = nullptr;
@@ -74,7 +78,7 @@ bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 			free(path);
 			gd::FLAlertLayer::create(nullptr, "Success", "The level has been saved", "OK", nullptr, 320.f, false, 0)->show();
 		}
-	};
+		};
 
 	auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
 	if (!btn_spr->initWithFile("BE_Export_File.png")) {
@@ -109,7 +113,7 @@ bool LevelBrowserLayer_init(gd::LevelBrowserLayer* self, gd::GJSearchObject* obj
 				auto scene = gd::EditLevelLayer::scene(level);
 				CCDirector::sharedDirector()->pushScene(scene);
 			}
-		};
+			};
 
 		auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
 		if (!btn_spr->initWithFile("BE_Import_File.png")) {
@@ -154,7 +158,7 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
 
 	//menu->setZOrder(1);
-	button->setPosition({ -254, 24});
+	button->setPosition({ -254, 24 });
 	menu->addChild(button);
 	//self->addChild(menu);
 

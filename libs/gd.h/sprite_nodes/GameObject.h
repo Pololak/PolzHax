@@ -242,6 +242,10 @@ namespace gd {
 			return pRet;
 		}
 
+		cocos2d::CCAction* myAction() {
+			return from<cocos2d::CCAction*>(this, 0x160);
+		}
+
 		void deselectObject() {
 			this->m_bIsSelected = false;
 
@@ -279,6 +283,16 @@ namespace gd {
 			if (active == CustomColorMode::Default)
 				active = default_color;
 			return active;
+		}
+
+		cocos2d::CCRepeatForever* createRotateAction(float f, int n) {
+			__asm movss xmm1, f
+
+			auto pRet = reinterpret_cast<cocos2d::CCRepeatForever * (__thiscall*)(GameObject*, int)>(
+				base + 0x72230
+				)(this, n);
+
+			return pRet;
 		}
 
 		/*bool isOnValidGroup() {
@@ -330,7 +344,7 @@ namespace gd {
 			return from<int>(this, 0x308);
 		}
 
-		int getObjectGroup() {
+		auto getObjectGroup() {
 			return from<int>(this, 0x324);
 		}
 
@@ -340,6 +354,14 @@ namespace gd {
 
 		auto& triggerBlending() {
 			return from<bool>(this, 0x314);
+		}
+
+		auto& triggerP1() {
+			return from<bool>(this, 0x312);
+		}
+
+		auto& triggerP2() {
+			return from<bool>(this, 0x313);
 		}
 
 		bool getIsTintObject() const {
