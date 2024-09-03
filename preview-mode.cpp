@@ -1400,6 +1400,13 @@ void EditorPauseLayer::mem_init() {
 		reinterpret_cast<void**>(&EditorPauseLayer::keyDown));
 }
 
+//void LevelSettingsLayer::mem_init() {
+//	MH_CreateHook(
+//		reinterpret_cast<void*>(gd::base + 0x97050),
+//		LevelSettingsLayer::init_H,
+//		reinterpret_cast<void**>(&LevelSettingsLayer::init));
+//}
+
 void preview_mode::init() {
 	matdash::add_hook<&MyEditorLayer::updateVisibility, matdash::Thiscall>(gd::base + 0x8ef20);
 	matdash::add_hook<&MyEditorLayer::addSpecial>(gd::base + 0x8ed10);

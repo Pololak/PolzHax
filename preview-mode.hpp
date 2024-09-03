@@ -68,6 +68,13 @@ namespace EditorPauseLayer {
 	void mem_init();
 }
 
+//namespace LevelSettingsLayer {
+//	inline bool(__thiscall* init)(CCLayer*, gd::LevelSettingsObject*);
+//	bool __fastcall init_H(CCLayer* self, gd::LevelSettingsObject* lso);
+//
+//	void mem_init();
+//}
+
 namespace Scheduler {
 	inline bool(__thiscall* update)(CCScheduler* self, float dt);
 	void __fastcall update_H(CCScheduler* self, void* edx, float dt);

@@ -104,18 +104,16 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     //    self->addChild(xPos);
     //}
 
-    if (setting().onShowPercentage)
-    {
-        const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
+    const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
-        auto percentLabel = CCLabelBMFont::create("0.00%", "bigFont.fnt");
-        percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
-        percentLabel->setScale(0.5f);
-        percentLabel->setZOrder(5);
-        percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
-        percentLabel->setTag(4571);
-        self->addChild(percentLabel);
-    }
+    auto percentLabel = CCLabelBMFont::create("0.00%", "bigFont.fnt");
+    percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
+    percentLabel->setScale(0.5f);
+    percentLabel->setZOrder(5);
+    percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
+    percentLabel->setTag(4571);
+    self->addChild(percentLabel);
+    
 
     auto playerDrawNode = CCDrawNode::create();
     playerDrawNode->setZOrder(1000);
@@ -297,7 +295,12 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     //    self->addChild(noclDeath);
     //}
 
-    
+    auto clickindisprite = CCSprite::createWithSpriteFrameName("playerSquare_001.png");
+    clickindisprite->setZOrder(5);
+    clickindisprite->setTag(141207);
+    clickindisprite->setOpacity(100);
+    self->addChild(clickindisprite);
+
 
     
 
@@ -402,6 +405,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     //auto vel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69062));
     auto rot = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69063));
     auto psize = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69064));
+    auto clickindi = reinterpret_cast<CCSprite*>(self->getChildByTag(141207));
     //auto speed = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69065));
 
     if (spswitcherlbl)
@@ -561,6 +565,15 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
+    if (clickindi) {
+        if (!hasClicked) {
+            clickindi->setColor({ 0, 255, 0 });
+        }
+        else {
+            clickindi->setColor({ 255, 255, 255 });
+        }
+    }
+
     //if (speed) {
     //    speed->setString(CCString::createWithFormat("Speed: %.06f%", self->player1()->getPlayerSpeed())->getCString());
     //}
@@ -704,6 +717,8 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     if (setting().onLockCursor && !setting().show && !self->hasCompletedLevel() && !self->isDead()) {
         SetCursorPos(size.width / 2, size.height / 2);
     }
+
+    //vvhasClicked = false;
 
     PlayLayer::update(self, dt);
 }
@@ -870,14 +885,14 @@ void PlayLayer::mem_init() {
     //    PlayLayer::levelComplete_H,
     //    reinterpret_cast<void**>(&PlayLayer::levelComplete));
 
-    /*MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xf0a00),
-        PlayLayer::pushButton_H,
-        reinterpret_cast<void**>(&PlayLayer::pushButton));
-    MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xf0af0),
-        PlayLayer::releaseButton_H,
-        reinterpret_cast<void**>(&PlayLayer::releaseButton));*/
+    //MH_CreateHook(
+    //    reinterpret_cast<void*>(gd::base + 0xf0a00),
+    //    PlayLayer::pushButton_H,
+    //    reinterpret_cast<void**>(&PlayLayer::pushButton));
+    //MH_CreateHook(
+    //    reinterpret_cast<void*>(gd::base + 0xf0af0),
+    //    PlayLayer::releaseButton_H,
+    //    reinterpret_cast<void**>(&PlayLayer::releaseButton));
 }
 
 void HardStreak::mem_init() {

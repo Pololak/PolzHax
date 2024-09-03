@@ -277,6 +277,7 @@ DWORD WINAPI my_thread(void* hModule) {
     Scheduler::mem_init();
     //HardStreak::mem_init();
     MenuLayer::mem_init();
+    //LevelSettingsLayer::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xff130),

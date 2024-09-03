@@ -14,5 +14,9 @@ namespace PauseLayer {
 	inline bool(__thiscall* onQuit)(CCObject* btn);
 	void __fastcall onQuit_H(CCObject* btn);
 
+	class Callback {
+		void PercentageToggler(CCObject*);
+	};
+
 	void mem_init();
 }

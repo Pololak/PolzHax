@@ -1,12 +1,96 @@
 #include "MenuLayer.h"
 
 bool isReload = false;
+CCLayer* testLayer;
 
 //void reload() {
 //	isReload = true;
 //
 //	gd::GameManager::sharedState()->reloadAll(false, false, true);
 //}
+
+class TestFLAlertProtocol : public CCLayer {
+private:
+	void cancelButtonCallback(CCObject*)
+	{
+		this->removeMeAndCleanup();
+		testLayer = nullptr;
+	}
+public:
+	virtual void keyBackClicked()
+	{
+		this->removeMeAndCleanup();
+		testLayer = nullptr;
+	}
+
+	bool init() {
+		CCLayer::init();
+		CCLayerColor* cclcol = CCLayerColor::create(ccc4(0, 0, 0, 0));
+		cclcol->setZOrder(1);
+		cclcol->setScale(10.f);
+		this->addChild(cclcol);
+		auto actionCol = CCFadeTo::create(0.1f, 75);
+		cclcol->runAction(actionCol);
+		auto addingLayer = CCLayer::create();
+
+		auto touchDispatcher = CCDirector::sharedDirector()->m_pTouchDispatcher;
+		touchDispatcher->incrementForcePrio();
+		touchDispatcher->incrementForcePrio();
+		registerWithTouchDispatcher();
+		setTouchEnabled(true);
+		setKeypadEnabled(true);
+		setMouseEnabled(true);
+
+		auto bgSprite = CCSprite::create("GJ_button_03.png"); //Background button. Ik this is so bad, but i can't do anything better than that
+		bgSprite->setScale(100.f);
+		bgSprite->setOpacity(0);
+		auto bgButton = gd::CCMenuItemSpriteExtra::create(bgSprite, nullptr, this, nullptr);
+		auto bgMenu = CCMenu::create();
+		bgMenu->addChild(bgButton);
+		bgMenu->setZOrder(0);
+		bgMenu->setPosition((CCDirector::sharedDirector()->getScreenRight()) - 25, (CCDirector::sharedDirector()->getScreenTop()) - 25);
+		this->addChild(bgMenu);
+
+		cocos2d::extension::CCScale9Sprite* bg = cocos2d::extension::CCScale9Sprite::create("GJ_square01.png");
+		auto director = CCDirector::sharedDirector();
+		bg->setContentSize({ 360, 180 });
+		bg->setPosition((director->getScreenRight()) / 2, (director->getScreenTop()) / 2);
+		bg->setZOrder(2);
+		this->addChild(bg);
+		auto appearAction = CCEaseBackOut::create(CCScaleTo::create(.25f, 1.f));
+
+		auto closeMenu = CCMenu::create();
+		closeMenu->setZOrder(3);
+
+		auto closeSpr = CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png");
+		auto closeBtn = gd::CCMenuItemSpriteExtra::create(closeSpr, nullptr, this, menu_selector(TestFLAlertProtocol::cancelButtonCallback));
+		closeMenu->addChild(closeBtn);
+
+		this->addChild(closeMenu);
+		this->setScale(0.1f);
+		this->runAction(appearAction);
+
+		return true;
+	}
+
+	TestFLAlertProtocol* create() {
+		TestFLAlertProtocol* obj = new TestFLAlertProtocol;
+		if (obj->init()) obj->autorelease();
+		else CC_SAFE_DELETE(obj);
+		return obj;
+	}
+
+	void showCallback(CCObject* btn)
+	{
+		auto director = CCDirector::sharedDirector();
+		auto testLayer = TestFLAlertProtocol::create();
+		testLayer->setZOrder(100000);
+		auto myLayer = static_cast<CCLayer*>(static_cast<CCNode*>(btn)->getUserObject());
+
+		myLayer->addChild(testLayer);
+		testLayer = testLayer;
+	}
+};
 
 class ReloadTexAlertProtocol : public gd::FLAlertLayerProtocol {
 protected:
@@ -52,12 +136,12 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	reloadSpr->setScale(0.525f);
 	auto reloadBtn = gd::CCMenuItemSpriteExtra::create(reloadSpr, nullptr, self, menu_selector(MenuLayer::Callback::onReload));
 	reloadBtn->setPosition({ director->getScreenLeft() + 18.750f, director->getScreenTop() - 55 });
+
+	auto somespr = CCSprite::create("GJ_button_01.png");
+	auto somebtn = gd::CCMenuItemSpriteExtra::create(somespr, nullptr, self, menu_selector(TestFLAlertProtocol::showCallback));
+	menu->addChild(somebtn);
 	menu->addChild(reloadBtn);
 	self->addChild(menu);
-
-	/*auto smthSpr = CCSprite::createWithSpriteFrameName("GJ_playBtn_001.png");
-	auto smthBtn = gd::CCMenuItemSpriteExtra::create(reloadSpr, nullptr, self, menu_selector(MenuLayer::Callback::onSmallEditorStep));
-	menu->addChild(smthBtn);*/
 
 	return true;
 }
