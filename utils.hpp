@@ -11,6 +11,9 @@
 #include <vector>
 #include <gd.h>
 #include <../support/base64.h>
+//#include <zlib.h>
+//#include <openssl/bio.h>
+//#include <openssl/evp.h>
 
 using u8 = uint8_t;
 using i8 = int8_t;
@@ -324,3 +327,32 @@ struct time {
 		).count();
 	}
 };
+
+//std::string base64_decode(const std::string& in)
+//{
+//	BIO* bio = BIO_new_mem_buf(in.data(), in.size());
+//	BIO* b64 = BIO_new(BIO_f_base64());
+//	bio = BIO_push(b64, bio);
+//
+//	std::vector<char> buffer(in.size());
+//	int length = BIO_read(bio, buffer.data(), buffer.size());
+//	BIO_free_all(bio);
+//
+//	return std::string(buffer.data(), length);
+//}
+//
+//// Функция для распаковки данных с помощью zlib
+//std::string decompress(const std::string& compressed)
+//{
+//	uLongf decompressed_size = compressed.size() * 4; // Ожидаемый размер распакованных данных
+//	std::vector<char> decompressed(decompressed_size);
+//
+//	int result = uncompress(reinterpret_cast<Bytef*>(decompressed.data()), &decompressed_size,
+//		reinterpret_cast<const Bytef*>(compressed.data()), compressed.size());
+//
+//	if (result != Z_OK) {
+//		throw std::runtime_error("Failed to decompress data");
+//	}
+//
+//	return std::string(decompressed.data(), decompressed_size);
+//}

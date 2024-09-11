@@ -85,10 +85,11 @@ public:
 		auto director = CCDirector::sharedDirector();
 		auto testLayer = TestFLAlertProtocol::create();
 		testLayer->setZOrder(100000);
-		auto myLayer = static_cast<CCLayer*>(static_cast<CCNode*>(btn)->getUserObject());
-
+		auto myScene = director->getRunningScene();
+		auto myLayer = static_cast<CCLayer*>(static_cast<CCNode*>(btn)->getParent()->getParent());
+		//std::cout << myScene << std::endl;
 		myLayer->addChild(testLayer);
-		testLayer = testLayer;
+		//testLayer = testLayer;
 	}
 };
 
@@ -137,9 +138,9 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	auto reloadBtn = gd::CCMenuItemSpriteExtra::create(reloadSpr, nullptr, self, menu_selector(MenuLayer::Callback::onReload));
 	reloadBtn->setPosition({ director->getScreenLeft() + 18.750f, director->getScreenTop() - 55 });
 
-	//auto somespr = CCSprite::create("GJ_button_01.png");
-	//auto somebtn = gd::CCMenuItemSpriteExtra::create(somespr, nullptr, self, menu_selector(TestFLAlertProtocol::showCallback));
-	//menu->addChild(somebtn);
+	auto somespr = CCSprite::create("GJ_button_01.png");
+	auto somebtn = gd::CCMenuItemSpriteExtra::create(somespr, nullptr, self, menu_selector(TestFLAlertProtocol::showCallback));
+	menu->addChild(somebtn);
 	menu->addChild(reloadBtn);
 	self->addChild(menu);
 

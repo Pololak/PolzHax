@@ -1782,7 +1782,7 @@ void RenderMain() {
 
             //ImGui::Checkbox("Practice Bug Fix", &setting().onPracticeFix);
 
-            if (ImGui::Checkbox("Practice Music", &setting().onPracticeMusic)) {
+            if (ImGui::Checkbox("Practice Music Sync", &setting().onPracticeMusic)) {
                 if (setting().onPracticeMusic) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F284F), "\x90\x90\x90\x90\x90\x90", 6, NULL);
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3663), "\x90\x90", 2, NULL);
@@ -2100,23 +2100,23 @@ void RenderMain() {
 
             ImGui::Checkbox("Same Dual Color", &setting().onSameDualColor);
 
-            //ImGui::Checkbox("Swap Wave Trail", &setting().onSwapWaveColors);
+            ImGui::Checkbox("Swap Wave Trail", &setting().onSwapWaveColors);
 
-            //ImGui::ColorEdit3("##primarycolorpulse", setting().PrimaryPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("P1-Col Pulse", &setting().onPrimaryPulse);
+            ImGui::ColorEdit3("##primarycolorpulse", setting().PrimaryPulse, ImGuiColorEditFlags_NoInputs);
+            ImGui::SameLine();
+            ImGui::Checkbox("P1-Col Pulse", &setting().onPrimaryPulse);
 
-            //ImGui::ColorEdit3("##secondarycolorpulse", setting().SecondaryPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("P2-Col Pulse", &setting().onSecondaryPulse);
+            ImGui::ColorEdit3("##secondarycolorpulse", setting().SecondaryPulse, ImGuiColorEditFlags_NoInputs);
+            ImGui::SameLine();
+            ImGui::Checkbox("P2-Col Pulse", &setting().onSecondaryPulse);
 
-            //ImGui::ColorEdit3("##GlowColorPulse", setting().GlowPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("Glow Color Pulse", &setting().onGlowPulse);
+            ImGui::ColorEdit3("##GlowColorPulse", setting().GlowPulse, ImGuiColorEditFlags_NoInputs);
+            ImGui::SameLine();
+            ImGui::Checkbox("Glow Color Pulse", &setting().onGlowPulse);
 
-            //ImGui::ColorEdit3("##WaveTrailColorPulse", setting().WaveTrailPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("Wave Trail Color Pulse", &setting().onWaveTrailPulse);
+            ImGui::ColorEdit3("##WaveTrailColorPulse", setting().WaveTrailPulse, ImGuiColorEditFlags_NoInputs);
+            ImGui::SameLine();
+            ImGui::Checkbox("Wave Trail Color Pulse", &setting().onWaveTrailPulse);
         }
 
         if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));

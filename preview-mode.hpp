@@ -63,6 +63,8 @@ namespace EditorPauseLayer {
 	public:
 		void SmallEditorStepToggler(CCObject*);
 		void PreviewModeToggler(CCObject*);
+		void VanillaSelectAllButton(CCObject*);
+		void SelectAbsolutelyAllButton(CCObject*);
 	};
 
 	void mem_init();

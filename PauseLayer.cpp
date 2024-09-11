@@ -16,6 +16,7 @@ protected:
             gd::GameManager::sharedState()->getPlayLayer()->onQuit();
             gd::GameSoundManager::sharedState()->playSound("quitSound_01.ogg");
             playLayerObject = nullptr;
+            layers().PauseLayerObject = nullptr;
         }
     }
 };
@@ -70,7 +71,7 @@ void __fastcall PauseLayer::onEdit_H(CCLayer* self)
 void __fastcall PauseLayer::onRestart_H(CCObject* sender) {
 
     CCEGLView::sharedOpenGLView()->showCursor(false);
-
+    layers().PauseLayerObject = nullptr;
     PauseLayer::onRestart(sender);
 }
 
@@ -78,7 +79,7 @@ void __fastcall PauseLayer::onQuit_H(CCObject* btn)
 {
     playLayerObject = nullptr;
     if (setting().onConfirmExit) {
-        gd::FLAlertLayer::create(&eaProtocol, "Confirm", "Are you sure you want to exit the level?", "Cancel", "Exit", 320.f, false, 0)->show();
+        gd::FLAlertLayer::create(&eaProtocol, "Exit Level", "Are you sure you want to <cr>exit</c> the level?", "Cancel", "Exit", 320.f, false, 0)->show();
     }
     PauseLayer::onQuit(btn);
 }

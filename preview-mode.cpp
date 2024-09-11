@@ -957,6 +957,42 @@ void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
 //	EditorUI::onPause(self, sender);
 //}
 
+void EditorPauseLayer::Callback::SelectAbsolutelyAllButton(CCObject*)
+{
+	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
+	auto editorUI = leveleditor->getEditorUI();
+
+	auto objs = CCArray::create();
+	for (int i = 0; i < (leveleditor->getAllObjects()->count()); i++)
+	{
+		objs->addObjectsFromArray(reinterpret_cast<CCArray*>(leveleditor->getAllObjects()->objectAtIndex(i)));
+	}
+	editorUI->selectObjects(objs);
+	editorUI->updateButtons();
+}
+
+void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
+{
+	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
+	auto editorUI = leveleditor->getEditorUI();
+
+	auto objs = CCArray::create();
+	for (int i = 0; i < (leveleditor->getAllObjects()->count()); i++)
+	{
+		objs->addObjectsFromArray(reinterpret_cast<CCArray*>(leveleditor->getAllObjects()->objectAtIndex(i)));
+	}
+
+	auto objs2 = CCArray::create();
+	for (int i = 0; i < (objs->count()); i++)
+	{
+		if (reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i))->getGroup() == leveleditor->getLayerGroup() || leveleditor->getLayerGroup() == -1)
+			objs2->addObject(objs->objectAtIndex(i));
+	}
+	editorUI->selectObjects(objs2);
+	editorUI->updateButtons();
+}
+
+
 void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
 	setting().onEditorPreview = !setting().onEditorPreview;
 }
@@ -990,6 +1026,7 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	auto director = CCDirector::sharedDirector();
 	auto size = director->getWinSize();
 	auto menu = CCMenu::create();
+	menu->setPosition({ 30, 0 });
 	auto togglerMenu = CCMenu::create();
 	togglerMenu->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
 
@@ -1016,26 +1053,44 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	togglerMenu->addChild(SEPButton);
 	togglerMenu->addChild(SEPLabel);
 
-	constexpr auto handler = [](CCObject* self, CCObject*) {
+	constexpr auto pshandler = [](CCObject* self, CCObject*) {
 		auto text = clipboard::read();
 		auto editor = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent());
 		editor->getEditorUI()->pasteObjects(text);
 		};
 
+	constexpr auto cshandler = [](CCObject* self, CCObject*) {
+		std::string lvlstr = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent())->getLevel()->getLevelString();
+		clipboard::write(lvlstr);
+		};
+
 	auto pssprite = gd::ButtonSprite::create("Paste\nString", 0x28, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
-	auto psbutton = gd::CCMenuItemSpriteExtra::create(pssprite, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+	auto psbutton = gd::CCMenuItemSpriteExtra::create(pssprite, nullptr, self, to_handler<SEL_MenuHandler, pshandler>);
+	psbutton->setPosition({ size.width - 80, size.height - 30 });
+
+	auto cssprite = gd::ButtonSprite::create("Copy\nString", 0x28, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
+	auto csbutton = gd::CCMenuItemSpriteExtra::create(cssprite, nullptr, self, to_handler<SEL_MenuHandler, cshandler>);
+	csbutton->setPosition({ size.width - 80, size.height - 75 });
 
 	auto optionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png");
 	auto optionsBtn = gd::CCMenuItemSpriteExtra::create(optionsSpr, nullptr, self, menu_selector(gd::MenuLayer::onOptions));
-	optionsBtn->setPosition({ -38, -66 });
+	optionsBtn->setPosition({ size.width - 140, size.height - 30 });
 	optionsSpr->setScale(.66f);
 
-	menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
-	psbutton->setPosition({ -50.f, -30.f });
+	auto vanillaSelectAllSprite = gd::ButtonSprite::create("Select All\non layer", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
+	auto vanillaSelectAllButton = gd::CCMenuItemSpriteExtra::create(vanillaSelectAllSprite, nullptr, self, menu_selector(EditorPauseLayer::Callback::VanillaSelectAllButton));
+	vanillaSelectAllButton->setPosition({ size.width - 80, 30 + 80 });
+	
 
+	auto SelectAbsolutelyAllSprite = gd::ButtonSprite::create("Select \nAll", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
+	auto SelectAbsolutelyAllButton = gd::CCMenuItemSpriteExtra::create(SelectAbsolutelyAllSprite, nullptr, self, menu_selector(EditorPauseLayer::Callback::SelectAbsolutelyAllButton));
+	SelectAbsolutelyAllButton->setPosition({ size.width - 80, 75 + 80 });
+	
+	menu->addChild(csbutton);
 	menu->addChild(psbutton);
 	menu->addChild(optionsBtn);
-
+	menu->addChild(vanillaSelectAllButton);
+	menu->addChild(SelectAbsolutelyAllButton);
 	
 
 	auto levellength = CCLabelBMFont::create("", "goldFont.fnt");
@@ -1063,7 +1118,6 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
 		}
 	}
-
 
 	self->addChild(togglerMenu);
 	self->addChild(menu);

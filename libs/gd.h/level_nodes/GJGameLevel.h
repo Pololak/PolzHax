@@ -46,6 +46,9 @@ public:
     auto getLevelLength() {
         return from<int>(this, 0x1e8);
     }
+    auto getLevelString() {
+        return from<gd::string>(this, 0x120);
+    }
 
     cocos2d::CCDictionary* m_lastBuildSave;
     int m_levelID;

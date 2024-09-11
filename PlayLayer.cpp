@@ -39,7 +39,6 @@ float deathPos = 0.f;
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     setting().beforeRestartCheatsCount = setting().cheatsCount;
-    layers().PauseLayerObject = self;
     playLayer = self;
     isPlayerColorGot = false;
     fadedoutflag = 0;
@@ -409,6 +408,8 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto psize = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69064));
     //auto clickindi = reinterpret_cast<CCSprite*>(self->getChildByTag(141207));
     //auto speed = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69065));
+    auto audioScale = self->player1()->getAudioScale() > 1.f ? 1.f : self->player1()->getAudioScale();
+
 
     auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
     playerDrawNode->clear();
@@ -452,7 +453,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
                 }
             }
         }
-
+        
         if (setting().onHazardsHitbox)
         {
             for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
@@ -701,6 +702,47 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->player2()->setColorSecondVehicle(self->player1()->getColor());
         self->player2()->setColorGlowVehicle(self->player1()->getGlowColor());
         self->player2()->setWaveTrailColor(self->player1()->getSecondColor());
+    }
+
+    if (setting().onPrimaryPulse)
+    {
+        unsigned char
+            RR = playerColor1.r + ((setting().PrimaryPulse[0] * 255 - playerColor1.r) * audioScale),
+            RG = playerColor1.g + ((setting().PrimaryPulse[1] * 255 - playerColor1.g) * audioScale),
+            RB = playerColor1.b + ((setting().PrimaryPulse[2] * 255 - playerColor1.b) * audioScale);
+        self->player1()->setColor({ RR, RG, RB });
+        //PRIMARY COLOR
+    }
+    if (setting().onSecondaryPulse)
+    {
+        unsigned char
+            RR = playerColor2.r + ((setting().SecondaryPulse[0] * 255 - playerColor2.r) * audioScale),
+            RG = playerColor2.g + ((setting().SecondaryPulse[1] * 255 - playerColor2.g) * audioScale),
+            RB = playerColor2.b + ((setting().SecondaryPulse[2] * 255 - playerColor2.b) * audioScale);
+        self->player1()->setSecondColor({ RR, RG, RB });
+        self->player1()->setColorSecondVehicle({ RR, RG, RB });
+        //SECONDARY COLOR
+    }
+
+    if (setting().onGlowPulse)
+    {
+        unsigned char
+            RR = playerColorG.r + ((setting().GlowPulse[0] * 255 - playerColorG.r) * audioScale),
+            RG = playerColorG.g + ((setting().GlowPulse[1] * 255 - playerColorG.g) * audioScale),
+            RB = playerColorG.b + ((setting().GlowPulse[2] * 255 - playerColorG.b) * audioScale);
+        self->player1()->setGlowColor({ RR, RG, RB });
+        self->player1()->setColorGlowVehicle({ RR, RG, RB });
+        //GLOW COLOR
+    }
+
+    if (setting().onWaveTrailPulse)
+    {
+        unsigned char
+            RR = playerColor1.r + ((setting().WaveTrailPulse[0] * 255 - playerColor1.r) * audioScale),
+            RG = playerColor1.g + ((setting().WaveTrailPulse[1] * 255 - playerColor1.g) * audioScale),
+            RB = playerColor1.b + ((setting().WaveTrailPulse[2] * 255 - playerColor1.b) * audioScale);
+        self->player1()->setWaveTrailColor({ RR, RG, RB });
+        //WAVE TRAIL COLOR
     }
 
     if (setting().onHidePlayer) {
