@@ -63,7 +63,16 @@ namespace EditorPauseLayer {
 	public:
 		void SmallEditorStepToggler(CCObject*);
 		void PreviewModeToggler(CCObject*);
+		void VanillaSelectAllButton(CCObject*);
+		void SelectAbsolutelyAllButton(CCObject*);
 	};
+
+	void mem_init();
+}
+
+namespace CustomSongLayer {
+	inline bool(__thiscall* init)(CCLayer*, gd::LevelSettingsObject*);
+	bool __fastcall init_H(CCLayer* self, gd::LevelSettingsObject* object);
 
 	void mem_init();
 }

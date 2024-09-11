@@ -184,6 +184,11 @@ struct SettingStruct {
     bool onSpeedhackCounted = false;
 
     bool onHideLabels = false;
+    bool onZeroDelay = false;
+
+    int hitboxFillOpacity = 255;
+
+    bool isSafeMode;
 
     float fps = 60.f;
     float speedhack = 1.f;

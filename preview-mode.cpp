@@ -63,52 +63,6 @@ void preview_mode::Callback::hideUI_btn(CCObject*) {
 	}
 }
 
-std::map<gd::GameObject*, float> g_startRotations;
-std::array<int, 100> g_sawIDs = {
-	88, 89, 98,
-	397, 398, 399,
-	675, 676, 677,
-	186, 187, 188,
-	740, 741, 742,
-	678, 679, 680,
-	183, 184, 185,
-	85, 86, 87, 97,
-	137, 138, 139,
-	154, 155, 156,
-	180, 181, 182,
-	222, 223, 224,
-	375, 376, 377, 378,
-	394, 395, 396
-};
-
-//bool objectIsSaw(gd::GameObject* obj) {
-//	for (auto id : g_sawIDs)
-//		if (id == obj->getObjectID())
-//			return true;
-//
-//	return false;
-//}
-//
-//void beginRotateSaw(gd::GameObject* obj) {
-//	if (obj->m_pMyAction)
-//		return;
-//
-//	if (obj->m_bSawIsDisabled)
-//		return;
-//
-//	cocos2d::CCAction* r;
-//	switch (obj->m_nObjectID) {
-//		// the big invisible saw, for some reason
-//	case 0xba: r = obj->createRotateAction(300.0f, 0); break;
-//	default: r = obj->createRotateAction(360.0f, 0); break;
-//	}
-//	r->setTag(ROTATEACTION_TAG);
-//	g_startRotations[obj] = obj->getRotation();
-//	obj->m_pMyAction = r;
-//	obj->m_pMyAction->retain();
-//	obj->runAction(r);
-//}
-
 struct CompareTriggers {
 	bool operator()(gd::GameObject* a, gd::GameObject* b) const {
 		return a->getPosition().x < b->getPosition().x;
@@ -311,9 +265,81 @@ public:
 		menuh->setScale(.5f);
 		menuh->setPosition({ director->getScreenLeft() + 20, director->getScreenTop() - 100.5f });
 
-
 		menuh->addChild(hideui_btn);
 		this->addChild(menuh);
+
+		auto playerDrawNode = CCDrawNode::create();
+		playerDrawNode->setZOrder(1000);
+		playerDrawNode->setTag(124);
+		this->gameLayer()->addChild(playerDrawNode);
+
+		if (setting().onHitboxes) {
+			if (setting().onPlayerHitbox) {
+				if (this->player1()) Hitboxes::drawPlayerHitbox(this->player1(), playerDrawNode);
+				if (this->player2()) Hitboxes::drawPlayerHitbox(this->player2(), playerDrawNode);
+			}
+		}
+
+		auto objDrawNode = CCDrawNode::create();
+		objDrawNode->setZOrder(1000);
+		objDrawNode->setTag(125);
+		this->gameLayer()->addChild(objDrawNode);
+
+		auto secarr = this->getAllObjects();
+		auto arrcount = secarr->count();
+
+		if (setting().onHitboxes) {
+			if (setting().onSolidsHitbox)
+			{
+				for (int i = this->getFirstVisibleSection() + 1; i < this->getLastVisibleSection() - 1; i++)
+				{
+					if (i < 0) continue;
+					if (i >= arrcount) break;
+					auto objAtInd = secarr->objectAtIndex(i);
+					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+					for (int j = 0; j < objarr->count(); j++)
+					{
+						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+						Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
+					}
+				}
+			}
+
+			if (setting().onHazardsHitbox)
+			{
+				for (int i = this->getFirstVisibleSection() + 1; i < this->getLastVisibleSection() - 1; i++)
+				{
+					if (i < 0) continue;
+					if (i >= arrcount) break;
+					auto objAtInd = secarr->objectAtIndex(i);
+					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+					for (int j = 0; j < objarr->count(); j++)
+					{
+						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+						Hitboxes::drawHazardsObjectHitbox(obj, objDrawNode);
+					}
+				}
+			}
+
+			if (setting().onSpecialsHitbox)
+			{
+				for (int i = this->getFirstVisibleSection() + 1; i < this->getLastVisibleSection() - 1; i++)
+				{
+					if (i < 0) continue;
+					if (i >= arrcount) break;
+					auto objAtInd = secarr->objectAtIndex(i);
+					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+					for (int j = 0; j < objarr->count(); j++)
+					{
+						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+						Hitboxes::drawSpecialsObjectHitbox(obj, objDrawNode);
+					}
+				}
+			}
+		}
 
 		return true;
 	}
@@ -912,8 +938,8 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
 	editUI = nullptr;
-	if (setting().onPersClip) savedClipboard = self->clipboard();
 	EditorUI::dtor(self);
+	if (setting().onPersClip) savedClipboard = self->clipboard();
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -951,11 +977,40 @@ void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
 	//addMoveButton(self, "edit_rightBtn2_001.png", "1/2", kEditCommandHalfRight, nullptr);
 }
 
-//void __fastcall EditorUI::onPause_H(gd::EditorUI* self, void*, CCObject* sender) {
-//	editUI->onDeselectAll(sender);
-//
-//	EditorUI::onPause(self, sender);
-//}
+void EditorPauseLayer::Callback::SelectAbsolutelyAllButton(CCObject*)
+{
+	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
+	auto editorUI = leveleditor->getEditorUI();
+
+	auto objs = CCArray::create();
+	for (int i = 0; i < (leveleditor->getAllObjects()->count()); i++)
+	{
+		objs->addObjectsFromArray(reinterpret_cast<CCArray*>(leveleditor->getAllObjects()->objectAtIndex(i)));
+	}
+	editorUI->selectObjects(objs);
+	editorUI->updateButtons();
+}
+
+void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
+{
+	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
+	auto editorUI = leveleditor->getEditorUI();
+
+	auto objs = CCArray::create();
+	for (int i = 0; i < (leveleditor->getAllObjects()->count()); i++)
+	{
+		objs->addObjectsFromArray(reinterpret_cast<CCArray*>(leveleditor->getAllObjects()->objectAtIndex(i)));
+	}
+
+	auto objs2 = CCArray::create();
+	for (int i = 0; i < (objs->count()); i++)
+	{
+		if (reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i))->getGroup() == leveleditor->getLayerGroup() || leveleditor->getLayerGroup() == -1)
+			objs2->addObject(objs->objectAtIndex(i));
+	}
+	editorUI->selectObjects(objs2);
+	editorUI->updateButtons();
+}
 
 void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
 	setting().onEditorPreview = !setting().onEditorPreview;
@@ -1016,14 +1071,14 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	togglerMenu->addChild(SEPButton);
 	togglerMenu->addChild(SEPLabel);
 
-	constexpr auto handler = [](CCObject* self, CCObject*) {
+	constexpr auto pshandler = [](CCObject* self, CCObject*) {
 		auto text = clipboard::read();
 		auto editor = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent());
 		editor->getEditorUI()->pasteObjects(text);
 		};
 
 	auto pssprite = gd::ButtonSprite::create("Paste\nString", 0x28, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
-	auto psbutton = gd::CCMenuItemSpriteExtra::create(pssprite, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+	auto psbutton = gd::CCMenuItemSpriteExtra::create(pssprite, nullptr, self, to_handler<SEL_MenuHandler, pshandler>);
 
 	auto optionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png");
 	auto optionsBtn = gd::CCMenuItemSpriteExtra::create(optionsSpr, nullptr, self, menu_selector(gd::MenuLayer::onOptions));
@@ -1064,6 +1119,22 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 		}
 	}
 
+	auto bottommenu = from<CCMenu*>(self->bpmButton(), 0xac);
+	auto keysButton = (gd::CCMenuItemSpriteExtra*)bottommenu->getChildren()->objectAtIndex(7);
+	keysButton->setPositionY(110);
+
+	auto vanillaSelectAllSprite = gd::ButtonSprite::create("Select All\non Layer", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
+	auto vanillaSelectAllButton = gd::CCMenuItemSpriteExtra::create(vanillaSelectAllSprite, nullptr, self, menu_selector(EditorPauseLayer::Callback::VanillaSelectAllButton));
+	vanillaSelectAllButton->setPosition({ 234.5f, 30 });
+
+
+	auto SelectAbsolutelyAllSprite = gd::ButtonSprite::create("Select \nAll", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
+	auto SelectAbsolutelyAllButton = gd::CCMenuItemSpriteExtra::create(SelectAbsolutelyAllSprite, nullptr, self, menu_selector(EditorPauseLayer::Callback::SelectAbsolutelyAllButton));
+	SelectAbsolutelyAllButton->setPosition({ 234.5f, 70 });
+
+	bottommenu->addChild(vanillaSelectAllButton);
+	bottommenu->addChild(SelectAbsolutelyAllButton);
+
 
 	self->addChild(togglerMenu);
 	self->addChild(menu);
@@ -1071,30 +1142,50 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 
 void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
 	EditorPauseLayer::onSaveAndPlay(self, sender);
-
+	auto lel = self->getEditorLayer();
+	if (lel) {
+		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
+		auto objDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(125));
+		playerDrawNode->clear();
+		objDrawNode->clear();
+	}
 	editUI = nullptr;
 }
 
 void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
 	EditorPauseLayer::onSaveAndExit(self, sender);
-
+	auto lel = self->getEditorLayer();
+	if (lel) {
+		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
+		auto objDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(125));
+		playerDrawNode->clear();
+		objDrawNode->clear();
+	}
 	editUI = nullptr;
-
-	/*auto levellength = self->getChildByTag(49001);
-	levellength = nullptr;*/
 }
 
 void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
 	EditorPauseLayer::onExitNoSave(self, sender);
-
+	auto lel = self->getEditorLayer();
+	if (lel) {
+		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
+		auto objDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(125));
+		playerDrawNode->clear();
+		objDrawNode->clear();
+	}
 	editUI = nullptr;
-	//self = nullptr;
 }
 
 void __fastcall EditorPauseLayer::onExitEditor_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
 	EditorPauseLayer::onExitEditor(self, sender);
+	auto lel = self->getEditorLayer();
+	if (lel) {
+		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
+		auto objDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(125));
+		playerDrawNode->clear();
+		objDrawNode->clear();
+	}
 	editUI = nullptr;
-	//self->removeFromParentAndCleanup(true);
 }
 
 void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* edx, enumKeyCodes key) {
@@ -1107,9 +1198,18 @@ void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* ed
 	}
 }
 
-void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
+//bool __fastcall CustomSongLayer::init_H(CCLayer* self, gd::LevelSettingsObject* object) {
+//	bool result = CustomSongLayer::init(self, object);
+//
+//	auto menu = from<CCMenu*>(self, 0x194);
+//	menu->setVisible(0);
+//
+//	return result;
+//}
 
+void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	scheduler = self;
+	Scheduler::update(self, dt);
 
 	auto play_layer = gd::GameManager::sharedState()->getPlayLayer();
 	const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
@@ -1148,19 +1248,23 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (setting().cheatsCount == 0 &&
 				setting().beforeRestartCheatsCount == 0 &&
 				setting().NoclipByte == setting().CurrentNoclipByte &&
-				!setting().onSafeMode)
+				!(setting().onSafeMode || setting().isSafeMode))
 				cheatIndicator->setColor({ 0, 255, 0 });
 
 			//no cheats, no before restart cheats, safe mode
 			else if (setting().cheatsCount == 0 &&
 				setting().beforeRestartCheatsCount == 0 &&
 				setting().NoclipByte == setting().CurrentNoclipByte &&
-				setting().onSafeMode)
+				(setting().onSafeMode || setting().isSafeMode))
 				cheatIndicator->setColor({ 255, 255, 0 });
 
 			//no cheats
 			else if (setting().cheatsCount == 0 &&
 				setting().NoclipByte == setting().CurrentNoclipByte)
+				cheatIndicator->setColor({ 255, 128, 0 });
+
+			else if (setting().cheatsCount != 0 &&
+				(setting().onSafeMode || setting().isSafeMode))
 				cheatIndicator->setColor({ 255, 128, 0 });
 
 			else cheatIndicator->setColor({ 255, 0, 0 });
@@ -1174,13 +1278,8 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		}
 	}
 
-	/*if (editorPauseLayer) {
-		auto levellength = editorPauseLayer->getChildByTag(49001);
-
-		
-	}*/
-
 	if (editUI) {
+		auto lel = editUI->getLevelEditorLayer();
 		auto objcolorid = editUI->getChildByTag(45011);
 		auto objgroupid = editUI->getChildByTag(45012);
 		auto objposx = editUI->getChildByTag(45013);
@@ -1196,6 +1295,22 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		auto rightMenu = from<CCMenu*>(editUI->getDeselectBtn(), 0xac);
 		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45028));
 		//auto goToGroupBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45031));
+
+		if (lel) {
+			auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
+			playerDrawNode->clear();
+			if ((setting().onPlayerHitbox && setting().onHitboxes))
+			{
+				if (lel->player1())
+				{
+					Hitboxes::drawPlayerHitbox(lel->player1(), playerDrawNode);
+				}
+				if (lel->player2())
+				{
+					Hitboxes::drawPlayerHitbox(lel->player2(), playerDrawNode);
+				}
+			}
+		}
 
 		if (deleteBtn) {
 			if (editUI->getSelectedObjectsOfCCArray()->count() == 0) {
@@ -1329,8 +1444,6 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			else objcounter->setVisible(1);
 		}
 	}
-
-	Scheduler::update(self, dt);
 }
 
 void Scheduler::mem_init() {
@@ -1345,7 +1458,12 @@ void Scheduler::mem_init() {
 		reinterpret_cast<void**>(Scheduler::update));*/
 }
 
-
+//void CustomSongLayer::mem_init() {
+//	MH_CreateHook(
+//		reinterpret_cast<void*>(gd::base + 0x36540),
+//		CustomSongLayer::init_H,
+//		reinterpret_cast<void**>(&CustomSongLayer::init));
+//}
 
 void EditorUI::mem_init() {
 	MH_CreateHook(

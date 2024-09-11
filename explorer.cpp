@@ -3,6 +3,7 @@
 #include <filesystem>
 #include "utils.hpp"
 
+
 using namespace cocos2d;
 
 static CCNode* selected_node = nullptr;
@@ -14,6 +15,7 @@ auto name_for_node(const CCNode* node) {
 }
 
 void render_node_tree(CCNode* node, const size_t index) {
+	std::stringstream stream;
 	if (!node) return;
 	auto flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanFullWidth;
 	if (selected_node == node) {
@@ -22,7 +24,8 @@ void render_node_tree(CCNode* node, const size_t index) {
 	}
 	if (node->getChildrenCount() == 0)
 		flags |= ImGuiTreeNodeFlags_Leaf;
-	const bool open = ImGui::TreeNodeEx(node, flags, "[%d] %s", index, name_for_node(node));
+	const auto children_count = node->getChildrenCount();
+	const bool open = ImGui::TreeNodeEx(node, flags, "[%d] %s {%d}", index, name_for_node(node), children_count);
 	if (ImGui::IsItemClicked()) {
 		selected_node = node;
 		reached_selected_node = true;
@@ -69,6 +72,85 @@ void render_node_properties(CCNode* node) {
 	if (ImGui::Button("Copy")) {
 		clipboard::write(CCString::createWithFormat("%p", node)->getCString());
 	}
+	ImGui::SameLine();
+	if (ImGui::Button("Add Child")) {
+		ImGui::OpenPopup("Add Child");
+	}
+
+	if (ImGui::BeginPopupModal("Add Child")) {
+		static int item = 0;
+		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0");
+
+		static int tag = -1;
+		ImGui::InputInt("Tag", &tag);
+
+		static char text[256];
+		static char labelFont[256] = "bigFont.fnt";
+		if (item == 1) {
+			ImGui::InputText("Text", text, 256);
+			ImGui::InputText("Font", labelFont, 256);
+		}
+		static int fontSize = 20;
+		if (item == 2) {
+			ImGui::InputText("Text", text, 256);
+			ImGui::InputInt("Font Size", &fontSize);
+		}
+		static bool frame = false;
+		if (item == 3 || item == 4) {
+			ImGui::InputText("Texture", text, 256);
+			ImGui::Checkbox("Frame", &frame);
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Button("Add")) {
+			CCNode* _child = nullptr;
+			switch (item) {
+			case 0:
+				_child = CCNode::create();
+				break;
+			case 1: {
+				auto child = CCLabelBMFont::create(text, labelFont);
+				_child = child;
+				break;
+			}
+			case 2: {
+				auto child = CCLabelTTF::create(text, "Arial", fontSize);
+				_child = child;
+				break;
+			}
+			case 3: {
+				CCSprite* child;
+				if (frame)
+					child = CCSprite::createWithSpriteFrameName(text);
+				else
+					child = CCSprite::create(text);
+				_child = child;
+				break;
+			}
+			case 4: {
+				CCSprite* sprite;
+				if (frame)
+					sprite = CCSprite::createWithSpriteFrameName(text);
+				else
+					sprite = CCSprite::create(text);
+				_child = gd::CCMenuItemSpriteExtra::create(sprite, sprite, nullptr, 0);
+				break;
+			}
+			}
+			if (_child != nullptr) {
+				_child->setTag(tag);
+				node->addChild(_child);
+			}
+
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
 	ImGui::Text("Tag: %d", node->getTag());
 	{
 		auto value = node->getPosition();
@@ -85,31 +167,6 @@ void render_node_properties(CCNode* node) {
 		ImGui::DragFloat2("Content Size", (float*)&value);
 		if (value != node->getContentSize()) node->setContentSize(value);
 	}
-	{
-		auto value = node->getRotation();
-		ImGui::DragFloat("Rotation", &value, 0.05f);
-		if (value != node->getRotation()) node->setRotation(value);
-	}
-	{
-		auto value = node->getRotationX();
-		ImGui::DragFloat("Rotation X", &value, 0.05f);
-		if (value != node->getRotationX()) node->setRotationX(value);
-	}
-	{
-		auto value = node->getRotationY();
-		ImGui::DragFloat("Rotation Y", &value, 0.05f);
-		if (value != node->getRotationY()) node->setRotationY(value);
-	}
-	{
-		auto value = node->getSkewX();
-		ImGui::DragFloat("Skew X", &value, 0.05f);
-		if (value != node->getSkewX()) node->setSkewX(value);
-	}
-	{
-		auto value = node->getSkewY();
-		ImGui::DragFloat("Skew Y", &value, 0.05f);
-		if (value != node->getSkewY()) node->setSkewY(value);
-	}
 	if (ImGui::TreeNode("Advanced Position PRO")) {
 		if (node->getParent()) {
 			const auto pos = node->getParent()->convertToWorldSpace(node->getPosition());
@@ -125,14 +182,27 @@ void render_node_properties(CCNode* node) {
 		if (value != node->getScale()) node->setScale(value);
 	}
 	{
-		auto value = node->getScaleX();
-		ImGui::DragFloat("Scale X", &value, 0.05f);
-		if (value != node->getScaleX()) node->setScaleX(value);
+		float value[2] = { node->getScaleX(), node->getScaleY()};
+		ImGui::DragFloat2("Scale X/Y", value, 0.05f);
+		if (value[0] != node->getScaleX()) node->setScaleX(value[0]);
+		if (value[1] != node->getScaleY()) node->setScaleY(value[1]);
 	}
 	{
-		auto value = node->getScaleY();
-		ImGui::DragFloat("Scale Y", &value, 0.05f);
-		if (value != node->getScaleY()) node->setScaleY(value);
+		auto value = node->getRotation();
+		ImGui::DragFloat("Rotation", &value, 0.05f);
+		if (value != node->getRotation()) node->setRotation(value);
+	}
+	{
+		float value[2] = { node->getRotationX(), node->getRotationY() };
+		ImGui::DragFloat2("Rotation X/Y", value, 0.05f);
+		if (value[0] != node->getRotationX()) node->setRotationX(value[0]);
+		if (value[1] != node->getRotationY()) node->setRotationY(value[1]);
+	}
+	{
+		float value[2] = { node->getSkewX(), node->getSkewY() };
+		ImGui::DragFloat2("Skew X/Y", value, 0.05f);
+		if (value[0] != node->getSkewX()) node->setSkewX(value[0]);
+		if (value[1] != node->getSkewY()) node->setSkewY(value[1]);
 	}
 	if (auto item = dynamic_cast<CCMenuItemSprite*>(node)) {
 		auto thing = format_addr(union_cast<void*>(item->getSelector())).c_str();
@@ -158,6 +228,12 @@ void render_node_properties(CCNode* node) {
 		if (ImGui::ColorEdit4("Color", colors))
 			rgb->setColor(ccc3(colors[0] * 255.f, colors[1] * 255.f, colors[2] * 255.f));
 		rgb->setOpacity((colors[3] * 255.f));
+	}
+	if (auto label_node = dynamic_cast<CCLabelProtocol*>(node); label_node) {
+		ImGui::Text("NOTE: Entering more than 16 chars will CRASH your game!");
+		std::string str = label_node->getString();
+		if (ImGui::InputTextMultiline("Text", (char*)&str, 16, {0, 40}))
+			label_node->setString(str.c_str());
 	}
 	if (auto sprite_node = dynamic_cast<CCSprite*>(node); sprite_node) {
 		auto* texture = sprite_node->getTexture();

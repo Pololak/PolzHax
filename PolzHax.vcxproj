@@ -537,11 +537,10 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine-cocos2dx.h" />
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
     <ClInclude Include="CheckPoint.h" />
-    <ClInclude Include="EndLevelLayer.h" />
+    <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Hitboxes.h" />
-    <ClInclude Include="HitboxNode.h" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
@@ -650,7 +649,6 @@
     <ClInclude Include="moveForCommand.h" />
     <ClInclude Include="ObjectsIds.h" />
     <ClInclude Include="ObjectToolbox.h" />
-    <ClInclude Include="PauseLayer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="preview-mode.hpp" />
@@ -658,11 +656,10 @@
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="EndLevelLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
-    <ClCompile Include="HitboxNode.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp" />
@@ -677,7 +674,6 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="ObjectToolbox.cpp" />
-    <ClCompile Include="PauseLayer.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />

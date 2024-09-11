@@ -15,6 +15,8 @@ namespace gd {
 	public:
 
 		HardStreak* m_waveTrail;
+		float m_yVelocity;
+		bool m_isDead;
 
 		virtual void setVisible(bool visible) {
 			return reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(

@@ -1482,9 +1482,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="HitboxNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectsIds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1501,12 +1498,6 @@
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="ObjectToolbox.h">
-      <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="PauseLayer.h">
-      <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="EndLevelLayer.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="CheckPoint.h">
@@ -1526,6 +1517,9 @@
     </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h">
       <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashLogger.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1580,19 +1574,10 @@
     <ClCompile Include="libs\nfd\src\nfd_win.cpp">
       <Filter>libs\nfd</Filter>
     </ClCompile>
-    <ClCompile Include="HitboxNode.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlayLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="ObjectToolbox.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="PauseLayer.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="EndLevelLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="Hitboxes.cpp">
@@ -1600,6 +1585,9 @@
     </ClCompile>
     <ClCompile Include="MenuLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLogger.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

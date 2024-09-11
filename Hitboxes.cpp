@@ -94,7 +94,7 @@ void Hitboxes::drawCircleObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F c
     for (size_t i = 0; i < N; ++i) {
         vert[i] = ob->getOrientedBox()->getCenterPoint() + CCPointMake(std::cos(2 * PI * i / N), std::sin(2 * PI * i / N)) * rad;
     }
-    drawer->drawPolygon(vert, N, { 0, 0, 0, 0 }, 0.5, col);
+    drawer->drawPolygon(vert, N, { 0, 0, 0, 0}, 0.5, col);
 }
 
 void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
@@ -122,7 +122,7 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
     rectRectangleSmall.setRect(player->getPositionX() - distanceS1 / 2, player->getPositionY() - distanceS2 / 2, distanceS1, distanceS2);
 
     Hitboxes::drawRect(drawNode, rectRectangleSmall, { 0, 0, 1, (setting().hitboxOpacity * 255.f) });
-    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0 }, 0.5, { 0.5, 0, 0, (setting().hitboxOpacity * 255.f) });
+    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0}, 0.5, {0.5, 0, 0, (setting().hitboxOpacity * 255.f)});
     Hitboxes::drawRect(drawNode, rectRectangle, { 1, 0, 0, (setting().hitboxOpacity * 255.f) });
 }
 

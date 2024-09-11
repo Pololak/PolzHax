@@ -152,11 +152,7 @@ public:
     }
 
     void selectObjects(cocos2d::CCArray* arr) {
-        return reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*)>(base + 0xf1f20)(this, arr); //0xf1f20 - GHS 1.92
-    }
-
-    void selectObject(gd::GameObject* obj) {
-        return reinterpret_cast<void(__thiscall*)(EditorUI*, gd::GameObject*)>(base + 0x47f10)(this, obj);
+        return reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*)>(base + 0x47fa0)(this, arr); //0xf1f20 - GHS 1.92 // - Taswert: wtf is this??? Why did I put it here???
     }
 
     EditButtonBar* editButtonBar() {
@@ -244,6 +240,14 @@ public:
         reinterpret_cast<void(__thiscall*)(EditorPauseLayer*, cocos2d::CCObject*)>(
             base + 0x3eec0
             )(this, pSender);
+    }
+
+    CCMenuItemSpriteExtra* bpmButton() {
+        return from<CCMenuItemSpriteExtra*>(this, 0x1a4);
+    }
+
+    LevelEditorLayer* getEditorLayer() {
+        return from<LevelEditorLayer*>(this, 0xac);
     }
 };
 

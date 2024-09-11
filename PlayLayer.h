@@ -20,24 +20,6 @@ namespace PlayLayer {
 	inline bool(__thiscall* resetLevel)(gd::PlayLayer* self);
 	void __fastcall resetLevel_H(gd::PlayLayer* self);
 
-	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer* self, bool practice);
-	void __fastcall togglePracticeMode_H(gd::PlayLayer* self, int edx, bool practice);
-
-	inline void(__thiscall* createCheckpoint)(gd::PlayLayer* self);
-	void __fastcall createCheckpoint_H(gd::PlayLayer* self);
-
-	inline void(__thiscall* removeLastCheckpoint)(gd::PlayLayer* self);
-	void __fastcall removeLastCheckpoint_H(gd::PlayLayer* self);
-
-	inline bool(__thiscall* levelComplete)(gd::PlayLayer* self);
-	void __fastcall levelComplete_H(gd::PlayLayer* self);
-
-	inline bool(__thiscall* pushButton)(int idk1, bool idk2);
-	void __fastcall pushButton_H(int idk1, bool idk2);
-
-	inline bool(__thiscall* releaseButton)(int idk1, bool idk2);
-	void __fastcall releaseButton_H(int idk1, bool idk2);
-
 	inline void(__thiscall* spawnPlayer2)(gd::PlayLayer* self);
 	void __fastcall spawnPlayer2_H(gd::PlayLayer* self);
 
@@ -46,15 +28,33 @@ namespace PlayLayer {
 
 	void mem_init();
 
-	//extern std::vector<CheckPoint> checkpoints;
 	extern bool inPractice;
 }
 
-namespace HardStreak {
-	inline void(__thiscall* updateStroke)(gd::HardStreak*, float);
-	void __fastcall updateStroke_H(gd::HardStreak* self, float dt);
+namespace PauseLayer {
+	inline bool(__thiscall* customSetup)(gd::CCBlockLayer* self);
+	bool __fastcall customSetup_H(gd::CCBlockLayer* self);
+
+	inline bool(__thiscall* onEdit)(CCLayer* self);
+	void __fastcall onEdit_H(CCLayer* self);
+
+	inline bool(__thiscall* onRestart)(CCObject* sender);
+	void __fastcall onRestart_H(CCObject* sender);
+
+	inline bool(__thiscall* onQuit)(CCObject* btn);
+	void __fastcall onQuit_H(CCObject* btn);
+
+	class Callback {
+	public:
+		void PercentageToggler(CCObject*);
+	};
 
 	void mem_init();
 }
 
+namespace EndLevelLayer {
+	inline void(__thiscall* customSetup)(gd::GJDropDownLayer*);
+	void __fastcall customSetup_H(gd::GJDropDownLayer* self);
 
+	void mem_init();
+}

@@ -46,6 +46,9 @@ public:
     auto getLevelLength() {
         return from<int>(this, 0x1e8);
     }
+    auto getLevelString() {
+        return from<gd::string>(this, 0x120);
+    }
 
     cocos2d::CCDictionary* m_lastBuildSave;
     int m_levelID;
@@ -56,6 +59,7 @@ public:
     gd::string m_recordString;
     gd::string m_uploadDate;
     gd::string m_updateDate;
+    gd::string m_audioFileName;
     int m_userID;
     int m_difficulty;
     int m_audioTrack;

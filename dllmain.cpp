@@ -4,134 +4,25 @@
 #include <sstream>
 
 #pragma comment(lib, "dbghelp.lib")
-//#include "EditorPauseLayer.h"
 #include "ObjectToolbox.h"
-//#include "EditorUI.h"
-#include "PauseLayer.h"
-#include "EndLevelLayer.h"
-//#include "Scheduler.h"
-//#include "CCSchedulerHook.h"
 #include "MenuLayer.h"
-
 #include <imgui-hook.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include "state.h"
 #include "lvl-share.hpp"
 #include "preview-mode.hpp"
-
 #include "menu.h"
 #include "utils.hpp"
-
 #include <matdash.hpp>
 #include <matdash/minhook.hpp>
-
 #include <cocos-ext.h>
 #include <fstream>
 #include <io.h>
 #include <fcntl.h>
 #include "PlayLayer.h"
-//#include "HitboxNode.h"
-//#include "ObjectsIds.h"
+#include "CrashLogger.hpp"
 gd::ColorSelectPopup* colorSelectPopup;
-
-// Hitboxes thing by Taswert
-
-std::ostringstream crashInfo;
-
-void printRegisters(CONTEXT* context) {
-    crashInfo << "=== Registers ===\n";
-    crashInfo << "EIP: " << std::hex << context->Eip << "\n";
-    crashInfo << "ESP: " << std::hex << context->Esp << "\n";
-    crashInfo << "EBP: " << std::hex << context->Ebp << "\n";
-    crashInfo << "EAX: " << std::hex << context->Eax << "\n";
-    crashInfo << "EBX: " << std::hex << context->Ebx << "\n";
-    crashInfo << "ECX: " << std::hex << context->Ecx << "\n";
-    crashInfo << "EDX: " << std::hex << context->Edx << "\n";
-    crashInfo << "ESI: " << std::hex << context->Esi << "\n";
-    crashInfo << "EDI: " << std::hex << context->Edi << "\n\n";
-}
-
-void printStackTrace(CONTEXT* context) {
-    HANDLE process = GetCurrentProcess();
-    HANDLE thread = GetCurrentThread();
-
-    SymInitialize(process, NULL, TRUE);
-
-    STACKFRAME64 stackFrame;
-    memset(&stackFrame, 0, sizeof(STACKFRAME64));
-
-    DWORD machineType;
-#ifdef _M_X64
-    machineType = IMAGE_FILE_MACHINE_AMD64;
-    stackFrame.AddrPC.Offset = context->Rip;
-    stackFrame.AddrPC.Mode = AddrModeFlat;
-    stackFrame.AddrFrame.Offset = context->Rsp;
-    stackFrame.AddrFrame.Mode = AddrModeFlat;
-    stackFrame.AddrStack.Offset = context->Rsp;
-    stackFrame.AddrStack.Mode = AddrModeFlat;
-#elif _M_IX86
-    machineType = IMAGE_FILE_MACHINE_I386;
-    stackFrame.AddrPC.Offset = context->Eip;
-    stackFrame.AddrPC.Mode = AddrModeFlat;
-    stackFrame.AddrFrame.Offset = context->Ebp;
-    stackFrame.AddrFrame.Mode = AddrModeFlat;
-    stackFrame.AddrStack.Offset = context->Esp;
-    stackFrame.AddrStack.Mode = AddrModeFlat;
-#endif
-
-    crashInfo << "=== Stack trace ===\n";
-    while (StackWalk64(machineType, process, thread, &stackFrame, context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL)) {
-        DWORD64 address = stackFrame.AddrPC.Offset;
-        DWORD64 moduleBase = SymGetModuleBase64(process, address);
-
-        crashInfo << "Address: " << std::hex << address;
-
-        // Получение информации о символе
-        char symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
-        SYMBOL_INFO* symbol = reinterpret_cast<SYMBOL_INFO*>(symbolBuffer);
-        symbol->MaxNameLen = MAX_SYM_NAME;
-        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-        DWORD64 displacement = 0;
-        if (SymFromAddr(process, address, &displacement, symbol)) {
-            crashInfo << " (" << symbol->Name << "+" << std::hex << displacement << ")";
-        }
-        else {
-            crashInfo << " (No symbol)";
-        }
-
-        // Получение информации о модуле
-        if (moduleBase) {
-            IMAGEHLP_MODULE64 moduleInfo;
-            memset(&moduleInfo, 0, sizeof(IMAGEHLP_MODULE64));
-            moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
-            if (SymGetModuleInfo64(process, moduleBase, &moduleInfo)) {
-                crashInfo << " [" << moduleInfo.ModuleName << "+" << std::hex << (address - moduleBase) << "]";
-            }
-        }
-
-        crashInfo << "\n";
-    }
-
-    SymCleanup(process);
-}
-
-LONG WINAPI exceptionHandler(EXCEPTION_POINTERS* exceptionInfo) {
-    crashInfo << "Exception code: " << std::hex << exceptionInfo->ExceptionRecord->ExceptionCode << "\n";
-    crashInfo << "Exception address: " << exceptionInfo->ExceptionRecord->ExceptionAddress << "\n\n";
-
-    printRegisters(exceptionInfo->ContextRecord);
-    printStackTrace(exceptionInfo->ContextRecord);
-
-    MessageBoxA(NULL, crashInfo.str().c_str(), "Crash Info", MB_OK | MB_ICONERROR);
-
-    return EXCEPTION_EXECUTE_HANDLER;
-}
-
-void setupExceptionHandler() {
-    SetUnhandledExceptionFilter(exceptionHandler);
-}
 
 void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
     matdash::orig<&LevelInfoLayer_onClone>(self, foo);
@@ -147,17 +38,24 @@ void EditLevelLayer_onClone(gd::EditLevelLayer* self) {
     level->songID() = self->level()->songID();
 }
 
-bool(__thiscall* UILayer_keyDown)(gd::UILayer* self, enumKeyCodes key);
-void __fastcall UILayer_keyDown_H(gd::UILayer* self, void*, enumKeyCodes key) {
-    if ((key == KEY_R) && setting().onRetryBind) {
-        auto pl = gd::GameManager::sharedState()->getPlayLayer();
-        if (pl) {
-            pl->resetLevel();
-            pl->resume();
-            return;
+bool(__thiscall* CCKeyboardDispatcher_dispatchKeyboardMSG)(cocos2d::CCKeyboardDispatcher* self, int key, bool down);
+void __fastcall CCKeyboardDispatcher_dispatchKeyboardMSG_H(CCKeyboardDispatcher* self, void* edx, int key, bool down) {
+    if (down) {
+        if ((key == 'R') && setting().onRetryBind) {
+            auto pl = gd::GameManager::sharedState()->getPlayLayer();
+            if (pl) {
+                pl->resetLevel();
+                if (layers().PauseLayerObject)
+                {
+                    layers().PauseLayerObject->removeMeAndCleanup();
+                    layers().PauseLayerObject = nullptr;
+                }
+                pl->resume();
+                return;
+            }
         }
     }
-    UILayer_keyDown(self, key);
+    CCKeyboardDispatcher_dispatchKeyboardMSG(self, key, down);
 }
 
 class CustomizeObjectLayer : public gd::FLAlertLayer
@@ -204,8 +102,6 @@ bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int 
     setting().onShouldHue = true;
     if (!matdash::orig<&ColorSelectPopup_init>(self, obj, color_id, idk, idk2)) return false;
 
-    //gd::ColorSelectPopup* fadeTimeOk = from<gd::ColorSelectPopup*>(self, 0x1ec);
-
     constexpr auto handler = [](CCObject* _self, CCObject* button) {
         auto self = reinterpret_cast<gd::ColorSelectPopup*>(_self);
         auto picker = self->colorPicker();
@@ -218,7 +114,6 @@ bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int 
     const auto menu = self->menu();
     button->setPosition(menu->convertToNodeSpace({ win_size.width - 50.f, win_size.height - 110 }));
     menu->addChild(button);
-
 
     return true;
 }
@@ -255,9 +150,13 @@ void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
 
 DWORD WINAPI my_thread(void* hModule) {
 
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); //B8 01 00 00 00 90 90
+    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); // Play Music Button
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x428bd5), "\x6a\x00", 2, NULL); // rgba8888 format (better texture quality and colors)
     //WriteProcessMemory(hModule, (LPVOID)0x518e29, "\x32", 1, NULL);
+    DWORD old;
+    VirtualProtect(reinterpret_cast<void*>(0x518e1c), 0xF, PAGE_READWRITE, &old); // FadeTime string
+
+    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x518e29), "\x33", 1, NULL); // FadeTime: 0.000
 
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
     if (MH_Initialize() != MH_OK) {
@@ -267,42 +166,34 @@ DWORD WINAPI my_thread(void* hModule) {
    /* AllocConsole();
     freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);*/
 
+    auto cocos = GetModuleHandleA("libcocos2d.dll");
+    auto cocos_ext = GetModuleHandleA("libExtensions.dll");
+
     PlayLayer::mem_init();
     EditorPauseLayer::mem_init();
     ObjectToolbox::mem_init();
-    //LevelEditorLayer::mem_init();
     EditorUI::mem_init();
     PauseLayer::mem_init();
-    //EndLevelLayer::mem_init();
+    EndLevelLayer::mem_init();
     Scheduler::mem_init();
-    //HardStreak::mem_init();
     MenuLayer::mem_init();
-    //LevelSettingsLayer::mem_init();
 
     MH_CreateHook(
-        reinterpret_cast<void*>(gd::base + 0xff130),
-        reinterpret_cast<void**>(&UILayer_keyDown_H),
-        reinterpret_cast<void**>(&UILayer_keyDown));
+        reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),
+        reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG_H),
+        reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x2dc70),
         reinterpret_cast<void**>(&CustomizeObjectLayer_init_H),
         reinterpret_cast<void**>(&CustomizeObjectLayer_init));
-
-    
 
     matdash::add_hook<&ColorSelectPopup_init>(gd::base + 0x29db0);
     matdash::add_hook<&ColorSelectPopup_dtor>(gd::base + 0x2b050);
 
     matdash::add_hook<&LevelInfoLayer_onClone>(gd::base + 0x9e2c0);
     matdash::add_hook<&EditLevelLayer_onClone>(gd::base + 0x3da30);
-
-    auto cocos_ext = GetModuleHandleA("libExtensions.dll");
     
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
-
-    auto cocos = GetModuleHandleA("libcocos2d.dll");
-
-    
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?end@CCDirector@cocos2d@@QAEXXZ")),

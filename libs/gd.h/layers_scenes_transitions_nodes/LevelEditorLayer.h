@@ -57,6 +57,14 @@ class LevelEditorLayer : public cocos2d::CCLayer {
             return from<GJGameLevel*>(this, 0x18c);
         }
 
+        PlayerObject* player1() {
+            return from<PlayerObject*>(this, 0x19c);
+        }
+
+        PlayerObject* player2() {
+            return from<PlayerObject*>(this, 0x1a0);
+        }
+
         void removeObject(GameObject * obj, bool idk) {
             reinterpret_cast<void(__thiscall*)(
                 LevelEditorLayer *,GameObject *,bool
@@ -92,7 +100,7 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         }
     
         cocos2d::CCArray* getAllObjects() {
-            return from<cocos2d::CCArray*>(this, 0x16C);
+            return from<cocos2d::CCArray*>(this, 0x16c);
         }
         void removeAllObjects() {
             return reinterpret_cast<void(__thiscall*)(LevelEditorLayer*)>(base + 0x8d770)(this);
@@ -101,9 +109,12 @@ class LevelEditorLayer : public cocos2d::CCLayer {
             return from<int>(this, 0x12C);
         }
         
-        
-        
-        
+        auto getFirstVisibleSection() {
+            return from<int>(this, 0x124);
+        }
+        auto getLastVisibleSection() {
+            return from<int>(this, 0x128);
+        }
         
         
         
@@ -111,9 +122,7 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         /*auto gameLayer() {
             return from<CCLayer*>(this, 0x188);
         }
-        CCArray* getLevelSections() {
-            return from<CCArray*>(this, 0x16c);
-        }
+        
         auto getDrawGrid() {
             return from<gd::DrawGridLayer*>(this, 0x184);
         }

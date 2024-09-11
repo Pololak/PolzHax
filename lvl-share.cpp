@@ -90,6 +90,7 @@ bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 	menu->setPosition({ director->getScreenRight() - 29.5f, director->getScreenBottom() + 109 });
 	menu->addChild(button);
 	self->addChild(menu);
+
 	return true;
 }
 
@@ -149,13 +150,14 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 			free(path);
 			gd::FLAlertLayer::create(nullptr, "Success", "The level has been saved", "OK", nullptr, 320.f, false, 0)->show();
 		}
-		};
+	};
 
 	auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
 	if (!btn_spr->initWithFile("BE_Export_File.png")) {
 		btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
 	}
 	auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+
 
 	//menu->setZOrder(1);
 	button->setPosition({ -254, 24 });

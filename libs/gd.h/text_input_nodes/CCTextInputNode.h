@@ -31,6 +31,14 @@ namespace gd {
 		//own vtable
 		void onClickTrackNode(bool) {}
 
+		//static CCTextInputNode* create(const char* caption, cocos2d::CCObject* target, const char* font) {
+		//	auto pRet = reinterpret_cast<CCTextInputNode * (__thiscall*)(const char*, cocos2d::CCObject*, const char*)>(
+		//		base + 0x13a90)(
+		//			caption, target, font);
+		//	__asm add esp, 0x8
+		//	return pRet;
+		//}
+
 		static CCTextInputNode* create(const char* caption, cocos2d::CCObject* target, 
 			const char* fntFile, float width, float height) {
 			__asm {
@@ -57,10 +65,12 @@ namespace gd {
 			this->refreshLabel();
 		}
 		void setMaxLabelLength(int length) { m_nMaxLabelLength = length; }
-		void setAllowedChars(std::string filter) { m_sFilter = filter; }
+		void setAllowedChars(std::string filter) {
+			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*, std::string)>(base + 0x5770)(this, filter);
+		}
 		void refreshLabel() {
 			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*)>(
-				base + 0x21330
+				base + 0x5770
 				)(this);
 		}
 		cocos2d::CCTextFieldTTF* getTextField() { return m_pTextField; }
