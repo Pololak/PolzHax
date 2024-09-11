@@ -176,10 +176,10 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         }
     }
 
-    //if (setting().onPlayerHitbox) {
+    if (setting().onHitboxes && setting().onPlayerHitbox) {
         if (self->player1()) Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
         if (self->player2()) Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
-    //}
+    }
 
     int labelCount = 0;
 
@@ -295,11 +295,11 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     //    self->addChild(noclDeath);
     //}
 
-    auto clickindisprite = CCSprite::createWithSpriteFrameName("playerSquare_001.png");
-    clickindisprite->setZOrder(5);
-    clickindisprite->setTag(141207);
-    clickindisprite->setOpacity(100);
-    self->addChild(clickindisprite);
+    //auto clickindisprite = CCSprite::createWithSpriteFrameName("playerSquare_001.png");
+    //clickindisprite->setZOrder(5);
+    //clickindisprite->setTag(141207);
+    //clickindisprite->setOpacity(100);
+    //self->addChild(clickindisprite);
 
 
     
@@ -380,7 +380,9 @@ inline bool playerTouchesObject(CCRect* playerRect, CCRect* hitboxRect)
 }
 
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
+
     layers().PauseLayerObject = nullptr;
+    PlayLayer::update(self, dt);
 
     //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
@@ -405,8 +407,86 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     //auto vel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69062));
     auto rot = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69063));
     auto psize = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69064));
-    auto clickindi = reinterpret_cast<CCSprite*>(self->getChildByTag(141207));
+    //auto clickindi = reinterpret_cast<CCSprite*>(self->getChildByTag(141207));
     //auto speed = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69065));
+
+    auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
+    playerDrawNode->clear();
+
+    if (setting().onHitboxes && setting().onPlayerHitbox) {
+        if (self->player1()) Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
+        if (self->player2()) Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+    }
+
+    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) /* || setting().onHitboxes */) {
+        //if (setting().onPlayerHitbox)
+        //{
+        if (self->player1())
+        {
+            Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
+        }
+        if (self->player2())
+        {
+            Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+        }
+        //}
+    }
+
+    auto objDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
+    objDrawNode->clear();
+
+    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) || setting().onHitboxes) {
+        if (setting().onSolidsHitbox)
+        {
+            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+            {
+                if (i < 0) continue;
+                if (i >= arrcount) break;
+                auto objAtInd = secarr->objectAtIndex(i);
+                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+                for (int j = 0; j < objarr->count(); j++)
+                {
+                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                    Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
+                }
+            }
+        }
+
+        if (setting().onHazardsHitbox)
+        {
+            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+            {
+                if (i < 0) continue;
+                if (i >= arrcount) break;
+                auto objAtInd = secarr->objectAtIndex(i);
+                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+                for (int j = 0; j < objarr->count(); j++)
+                {
+                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                    Hitboxes::drawHazardsObjectHitbox(obj, objDrawNode);
+                }
+            }
+        }
+
+        if (setting().onSpecialsHitbox)
+        {
+            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+            {
+                if (i < 0) continue;
+                if (i >= arrcount) break;
+                auto objAtInd = secarr->objectAtIndex(i);
+                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+                for (int j = 0; j < objarr->count(); j++)
+                {
+                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                    Hitboxes::drawSpecialsObjectHitbox(obj, objDrawNode);
+                }
+            }
+        }
+    }
 
     if (spswitcherlbl)
     {
@@ -565,14 +645,14 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    if (clickindi) {
-        if (!hasClicked) {
-            clickindi->setColor({ 0, 255, 0 });
-        }
-        else {
-            clickindi->setColor({ 255, 255, 255 });
-        }
-    }
+    //if (clickindi) {
+    //    if (!hasClicked) {
+    //        clickindi->setColor({ 0, 255, 0 });
+    //    }
+    //    else {
+    //        clickindi->setColor({ 255, 255, 255 });
+    //    }
+    //}
 
     //if (speed) {
     //    speed->setString(CCString::createWithFormat("Speed: %.06f%", self->player1()->getPlayerSpeed())->getCString());
@@ -588,79 +668,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         else percentLabel->setString(CCString::create("100.00%")->getCString());
 
     }*/
-
-    auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
-    playerDrawNode->clear();
-
-    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) /* || setting().onHitboxes */) {
-        //if (setting().onPlayerHitbox)
-        //{
-        if (self->player1())
-        {
-            Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
-        }
-        if (self->player2())
-        {
-            Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
-        }
-        //}
-    }
-
-    auto objDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
-    objDrawNode->clear();
-
-    if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) || setting().onHitboxes) {
-        if (setting().onSolidsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                    Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-
-        if (setting().onHazardsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                    Hitboxes::drawHazardsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-
-        if (setting().onSpecialsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                    Hitboxes::drawSpecialsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-    }
 
     if (setting().onHideAttempts) {
         self->attemptsLabel()->setVisible(false);
@@ -720,7 +727,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
 
     //vvhasClicked = false;
 
-    PlayLayer::update(self, dt);
+    
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {

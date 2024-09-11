@@ -137,9 +137,9 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	auto reloadBtn = gd::CCMenuItemSpriteExtra::create(reloadSpr, nullptr, self, menu_selector(MenuLayer::Callback::onReload));
 	reloadBtn->setPosition({ director->getScreenLeft() + 18.750f, director->getScreenTop() - 55 });
 
-	auto somespr = CCSprite::create("GJ_button_01.png");
-	auto somebtn = gd::CCMenuItemSpriteExtra::create(somespr, nullptr, self, menu_selector(TestFLAlertProtocol::showCallback));
-	menu->addChild(somebtn);
+	//auto somespr = CCSprite::create("GJ_button_01.png");
+	//auto somebtn = gd::CCMenuItemSpriteExtra::create(somespr, nullptr, self, menu_selector(TestFLAlertProtocol::showCallback));
+	//menu->addChild(somebtn);
 	menu->addChild(reloadBtn);
 	self->addChild(menu);
 

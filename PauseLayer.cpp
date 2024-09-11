@@ -48,13 +48,6 @@ bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
         bg->setVisible(1);
     }
 
-    auto autoretry_lbl = (CCLabelBMFont*)self->getChildren()->objectAtIndex(9);
-    auto autocheck_lbl = (CCLabelBMFont*)self->getChildren()->objectAtIndex(10);
-    auto bar_lbl = (CCLabelBMFont*)self->getChildren()->objectAtIndex(11);
-    autoretry_lbl->setVisible(0);
-    autocheck_lbl->setVisible(0);
-    bar_lbl->setVisible(0);
-
     menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 
     auto optionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn_001.png");
@@ -84,9 +77,9 @@ void __fastcall PauseLayer::onRestart_H(CCObject* sender) {
 void __fastcall PauseLayer::onQuit_H(CCObject* btn)
 {
     playLayerObject = nullptr;
-    /*if (setting().onConfirmExit) {
+    if (setting().onConfirmExit) {
         gd::FLAlertLayer::create(&eaProtocol, "Confirm", "Are you sure you want to exit the level?", "Cancel", "Exit", 320.f, false, 0)->show();
-    }*/
+    }
     PauseLayer::onQuit(btn);
 }
 

@@ -141,19 +141,44 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
 
 void Hitboxes::drawSolidsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
     if (solids.contains(obj->getObjectID()))
-        Hitboxes::drawRectObj(drawNode, obj, { (setting().solidsColor[0]), (setting().solidsColor[1]), (setting().solidsColor[2]), (setting().hitboxOpacity * 255.f) });
+        Hitboxes::drawRectObj(drawNode, obj, { 
+        (setting().solidsColor[0]), 
+        (setting().solidsColor[1]), 
+        (setting().solidsColor[2]), 
+        (setting().hitboxOpacity * 255.f) 
+            });
     else if (ramps.contains(obj->getObjectID()))
-        Hitboxes::drawTriangleObj(drawNode, obj, { (setting().solidsColor[0]), (setting().solidsColor[1]), (setting().solidsColor[2]), (setting().hitboxOpacity * 255.f) });
+        Hitboxes::drawTriangleObj(drawNode, obj, { 
+        (setting().solidsColor[0]), 
+        (setting().solidsColor[1]), 
+        (setting().solidsColor[2]), 
+        (setting().hitboxOpacity * 255.f) 
+            });
 }
 
 void Hitboxes::drawHazardsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
     if (hazard.contains(obj->getObjectID()))
-        Hitboxes::drawRectObj(drawNode, obj, { (setting().hazardsColor[0]), (setting().hazardsColor[1]), (setting().hazardsColor[2]), (setting().hitboxOpacity * 255.f) });
+        Hitboxes::drawRectObj(drawNode, obj, { 
+        (setting().hazardsColor[0]), 
+        (setting().hazardsColor[1]), 
+        (setting().hazardsColor[2]), 
+        (setting().hitboxOpacity * 255.f) 
+            });
     else if (saws.contains(obj->getObjectID()))
-        Hitboxes::drawCircleObj(drawNode, obj, { (setting().hazardsColor[0]), (setting().hazardsColor[1]), (setting().hazardsColor[2]), (setting().hitboxOpacity * 255.f) });
+        Hitboxes::drawCircleObj(drawNode, obj, { 
+        (setting().hazardsColor[0]), 
+        (setting().hazardsColor[1]), 
+        (setting().hazardsColor[2]), 
+        (setting().hitboxOpacity * 255.f) 
+            });
 }
 
 void Hitboxes::drawSpecialsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
     if (orbsnportals.contains(obj->getObjectID()))
-        Hitboxes::drawRectObj(drawNode, obj, { (setting().specialsColor[0]), (setting().specialsColor[1]), (setting().specialsColor[2]), (setting().hitboxOpacity * 255.f) });
+        Hitboxes::drawRectObj(drawNode, obj, { 
+        (setting().specialsColor[0]), 
+        (setting().specialsColor[1]), 
+        (setting().specialsColor[2]), 
+        (setting().hitboxOpacity * 255.f) 
+            });
 }

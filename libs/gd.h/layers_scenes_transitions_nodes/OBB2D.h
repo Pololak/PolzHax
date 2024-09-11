@@ -12,6 +12,7 @@ namespace gd {
             return reinterpret_cast<cocos2d::CCRect * (__thiscall*)(OBB2D*, cocos2d::CCRect*)>(base + 0x722a0)(this, rect);
         }
 
+
         cocos2d::CCPoint getPoint1() {
             auto f1 = from<float>(this, 0xE8);
             auto f2 = from<float>(this, 0xEC);
