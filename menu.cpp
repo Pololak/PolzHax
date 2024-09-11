@@ -744,16 +744,8 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
         }
 
-        if (setting().onSafeMode) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\xe9\x14\x00\x00\x00\x90", 6, NULL);
-        }
-        else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\x75\x6c", 2, NULL);
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\x0f\x85\x76\x01\x00\x00", 6, NULL);
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
-        }
+        if (setting().onSafeMode) safeModeON();
+        else safeModeOFF();
 
         if (setting().onRestartButton) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D64D9), "\x90\x90", 2, NULL);
@@ -1963,19 +1955,15 @@ void RenderMain() {
                 ImGui::SetTooltip("Lets you restart level by pressing R.");
 
             if (ImGui::Checkbox("Safe Mode", &setting().onSafeMode)) {
-                if (setting().onSafeMode) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\xe9\x14\x00\x00\x00\x90", 6, NULL);
-                }
-                else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\x75\x6c", 2, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\x0f\x85\x76\x01\x00\x00", 6, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
-                }
+                if (setting().onSafeMode) safeModeON();
+                else safeModeOFF();
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables progress and completion of levels.");
+
+            ImGui::Checkbox("Auto Safe Mode", &setting().onAutoSafeMode);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Safe mode, but it toggles only when hacks are active.");
 
             ImGui::Checkbox("Show Percentage", &setting().onShowPercentage);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)

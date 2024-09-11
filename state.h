@@ -140,6 +140,7 @@ struct SettingStruct {
     bool onRestartButton = false;
     bool onRetryBind = false;
     bool onSafeMode = false;
+    bool onAutoSafeMode = false;
     bool onShowPercentage = false;
     bool onTransparentBG = false;
     bool onTransparentLists = false;

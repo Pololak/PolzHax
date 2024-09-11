@@ -124,7 +124,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     objDrawNode->setTag(125);
     self->layer()->addChild(objDrawNode);
 
-    if (setting().onSolidsHitbox)
+    if (setting().onSolidsHitbox && setting().onHitboxes)
     {
         for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
         {
@@ -141,7 +141,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         }
     }
     
-    if (setting().onHazardsHitbox)
+    if (setting().onHazardsHitbox && setting().onHitboxes)
     {
         for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
         {
@@ -158,7 +158,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         }
     }
 
-    if (setting().onSpecialsHitbox)
+    if (setting().onSpecialsHitbox && setting().onHitboxes)
     {
         for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
         {
@@ -205,6 +205,9 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
 
 
     }
+
+    if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON();
+    else if (!setting().onSafeMode) safeModeOFF();
 
     if (setting().onMessageLabel)
     {
@@ -488,6 +491,9 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
             }
         }
     }
+
+    if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON();
+    else if (!setting().onSafeMode) safeModeOFF();
 
     if (spswitcherlbl)
     {
