@@ -24,7 +24,14 @@ namespace PlayLayer {
 	void __fastcall spawnPlayer2_H(gd::PlayLayer* self);
 
 	inline bool(__thiscall* destroyPlayer)(gd::PlayLayer* self, gd::PlayerObject* player);
-	void __fastcall destroyPlayer_H(gd::PlayLayer* self, void*, gd::PlayerObject* player);
+	void __fastcall destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player);
+
+	inline bool(__thiscall* pushButton)(gd::PlayLayer* self, int idk1, bool idk2);
+	void __fastcall pushButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2);
+
+	inline void(__thiscall* releaseButton)(gd::PlayLayer*, int, bool);
+	void __fastcall releaseButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2);
+
 
 	void mem_init();
 
@@ -55,6 +62,16 @@ namespace PauseLayer {
 namespace EndLevelLayer {
 	inline void(__thiscall* customSetup)(gd::GJDropDownLayer*);
 	void __fastcall customSetup_H(gd::GJDropDownLayer* self);
+
+	void mem_init();
+}
+
+namespace PlayerObject {
+	inline void(__thiscall* updatePlayerFrame)(gd::PlayerObject*, int);
+	void __fastcall updatePlayerFrame_H(gd::PlayerObject* self, void* edx, int frameID);
+
+	inline void(__thiscall* updatePlayerRollFrame)(gd::PlayerObject*, int);
+	void __fastcall updatePlayerRollFrame_H(gd::PlayerObject* self, void* edx, int frameID);
 
 	void mem_init();
 }

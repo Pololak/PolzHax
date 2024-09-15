@@ -151,7 +151,7 @@ void render_node_properties(CCNode* node) {
 		}
 		ImGui::EndPopup();
 	}
-	ImGui::Text("Tag: %d", node->getTag());
+	//ImGui::Text("Tag: %d", node->getTag());
 	{
 		auto value = node->getPosition();
 		ImGui::DragFloat2("Position", (float*)&value);

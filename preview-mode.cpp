@@ -273,73 +273,10 @@ public:
 		playerDrawNode->setTag(124);
 		this->gameLayer()->addChild(playerDrawNode);
 
-		if (setting().onHitboxes) {
-			if (setting().onPlayerHitbox) {
-				if (this->player1()) Hitboxes::drawPlayerHitbox(this->player1(), playerDrawNode);
-				if (this->player2()) Hitboxes::drawPlayerHitbox(this->player2(), playerDrawNode);
-			}
-		}
-
 		auto objDrawNode = CCDrawNode::create();
 		objDrawNode->setZOrder(1000);
 		objDrawNode->setTag(125);
 		this->gameLayer()->addChild(objDrawNode);
-
-		auto secarr = this->getAllObjects();
-		auto arrcount = secarr->count();
-
-		if (setting().onHitboxes) {
-			if (setting().onSolidsHitbox)
-			{
-				for (int i = this->getFirstVisibleSection() + 1; i < this->getLastVisibleSection() - 1; i++)
-				{
-					if (i < 0) continue;
-					if (i >= arrcount) break;
-					auto objAtInd = secarr->objectAtIndex(i);
-					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-					for (int j = 0; j < objarr->count(); j++)
-					{
-						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-						Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
-					}
-				}
-			}
-
-			if (setting().onHazardsHitbox)
-			{
-				for (int i = this->getFirstVisibleSection() + 1; i < this->getLastVisibleSection() - 1; i++)
-				{
-					if (i < 0) continue;
-					if (i >= arrcount) break;
-					auto objAtInd = secarr->objectAtIndex(i);
-					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-					for (int j = 0; j < objarr->count(); j++)
-					{
-						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-						Hitboxes::drawHazardsObjectHitbox(obj, objDrawNode);
-					}
-				}
-			}
-
-			if (setting().onSpecialsHitbox)
-			{
-				for (int i = this->getFirstVisibleSection() + 1; i < this->getLastVisibleSection() - 1; i++)
-				{
-					if (i < 0) continue;
-					if (i >= arrcount) break;
-					auto objAtInd = secarr->objectAtIndex(i);
-					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-					for (int j = 0; j < objarr->count(); j++)
-					{
-						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-						Hitboxes::drawSpecialsObjectHitbox(obj, objDrawNode);
-					}
-				}
-			}
-		}
 
 		return true;
 	}
@@ -609,6 +546,10 @@ public:
 
 MyEditorLayer* MyEditorLayer::s_instance = nullptr;
 
+void __fastcall LevelEditorLayer::updateHook(gd::LevelEditorLayer* self, void*, float dt) {
+	LevelEditorLayer::updateOrig(self, dt);
+}
+
 bool EditorPauseLayer_init(void* self, void* idc) {
 	is_editor_paused = true;
 	return matdash::orig<&EditorPauseLayer_init>(self, idc);
@@ -749,9 +690,30 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 }
 
 void EditorUI::Callback::onGoToGroup(CCObject* sender) {
-	/*auto group = gd::GameObject::getObjectGroup;
-	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) == group;*/
+
 }
+
+void EditorUI::Callback::rotate45CW(CCObject* sender) {
+	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
+	editUI->rotateObjects(selectedObjects, 45.f, { 0, 0 });
+}
+
+void EditorUI::Callback::rotate45CCW(CCObject* sender) {
+	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
+	editUI->rotateObjects(selectedObjects, -45.f, { 0, 0 });
+}
+
+void EditorUI::Callback::rotate265CW(CCObject* sender) {
+	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
+	editUI->rotateObjects(selectedObjects, 26.5f, { 0, 0 });
+}
+
+void EditorUI::Callback::rotate265CCW(CCObject* sender) {
+	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
+	editUI->rotateObjects(selectedObjects, -26.5f, { 0, 0 });
+}
+
+
 
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer* editor) {
 	editUI = self;
@@ -773,59 +735,64 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 		}
 	}
 
+	auto moreObjInfoMenu = CCMenu::create();
+	moreObjInfoMenu->setPosition({ 0, 0 });
+	moreObjInfoMenu->setTag(8900);
+	self->addChild(moreObjInfoMenu);
+
 	auto objcolorid = CCLabelBMFont::create("", "chatFont.fnt");
 	objcolorid->setString(CCString::createWithFormat("C: %s", 0)->getCString());
 	objcolorid->setVisible(0);
 	objcolorid->setTag(45011);
 	objcolorid->setScale(0.66f);
-	objcolorid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 70 });
+	objcolorid->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 60 });
 	objcolorid->setAnchorPoint({ 0, 0.5f });
-	self->addChild(objcolorid);
+	moreObjInfoMenu->addChild(objcolorid);
 
 	auto objgroupid = CCLabelBMFont::create("", "chatFont.fnt");
 	objgroupid->setString(CCString::createWithFormat("G: %d")->getCString());
 	objgroupid->setVisible(0);
 	objgroupid->setTag(45012);
 	objgroupid->setScale(0.66f);
-	objgroupid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 80 });
+	objgroupid->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 70 });
 	objgroupid->setAnchorPoint({ 0, 0.5f });
-	self->addChild(objgroupid);
+	moreObjInfoMenu->addChild(objgroupid);
 
 	auto objrot = CCLabelBMFont::create("", "chatFont.fnt");
 	objrot->setString(CCString::createWithFormat("Rot: %.0f%")->getCString());
 	objrot->setVisible(0);
 	objrot->setTag(45015);
 	objrot->setScale(0.66f);
-	objrot->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 90 });
+	objrot->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 80 });
 	objrot->setAnchorPoint({ 0, 0.5f });
-	self->addChild(objrot);
+	moreObjInfoMenu->addChild(objrot);
 
 	auto objposx = CCLabelBMFont::create("", "chatFont.fnt");
 	objposx->setString(CCString::createWithFormat("Pos X: %.0f%")->getCString());
 	objposx->setVisible(0);
 	objposx->setTag(45013);
 	objposx->setScale(0.66f);
-	objposx->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 100 });
+	objposx->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 90 });
 	objposx->setAnchorPoint({ 0, 0.5f });
-	self->addChild(objposx);
+	moreObjInfoMenu->addChild(objposx);
 
 	auto objposy = CCLabelBMFont::create("", "chatFont.fnt");
 	objposy->setString(CCString::createWithFormat("Pos Y: %.0f%")->getCString());
 	objposy->setVisible(0);
 	objposy->setTag(45014);
 	objposy->setScale(0.66f);
-	objposy->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 110 });
+	objposy->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 100 });
 	objposy->setAnchorPoint({ 0, 0.5f });
-	self->addChild(objposy);
+	moreObjInfoMenu->addChild(objposy);
 
 	auto objid = CCLabelBMFont::create("", "chatFont.fnt");
 	objid->setString(CCString::createWithFormat("ObjID: %d")->getCString());
 	objid->setVisible(0);
 	objid->setTag(45016);
 	objid->setScale(0.66f);
-	objid->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 120 });
+	objid->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 110 });
 	objid->setAnchorPoint({ 0, 0.5f });
-	self->addChild(objid);
+	moreObjInfoMenu->addChild(objid);
 
 	gd::GameObject* selectedObject = from<gd::GameObject*>(self, 0x258);
 	auto objaddr = CCLabelBMFont::create("", "chatFont.fnt");
@@ -833,9 +800,9 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	objaddr->setVisible(0);
 	objaddr->setTag(45017);
 	objaddr->setAnchorPoint({ 0, 0.5f });
-	objaddr->setPosition({ director->getScreenLeft() + 80, director->getScreenTop() - 130 });
+	objaddr->setPosition({ director->getScreenLeft() + 50, director->getScreenTop() - 120 });
 	objaddr->setScale(0.66f);
-	self->addChild(objaddr);
+	moreObjInfoMenu->addChild(objaddr);
 
 	std::vector<gd::GameObject*> gameObjectVector = self->getSelectedObjects();
 	auto objcounter = CCLabelBMFont::create("", "chatFont.fnt");
@@ -843,9 +810,9 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	objcounter->setVisible(0);
 	objcounter->setTag(45018);
 	objcounter->setAnchorPoint({ 0, 0.5f });
-	objcounter->setPosition(director->getScreenLeft() + 80, director->getScreenTop() - 60);
+	objcounter->setPosition(director->getScreenLeft() + 50, director->getScreenTop() - 50);
 	objcounter->setScale(0.66f);
-	self->addChild(objcounter);
+	moreObjInfoMenu->addChild(objcounter);
 
 	auto custommenu = CCMenu::create();
 	custommenu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
@@ -906,6 +873,24 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	rightMenu->addChild(goToGroupBtn);
 	goToGroupBtn->setVisible(0);
 	goToGroupBtn->setEnabled(false);
+
+	auto rotate45CWspr = gd::ButtonSprite::create("45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate45CWbtn = gd::CCMenuItemSpriteExtra::create(rotate45CWspr, rotate45CWspr, self, menu_selector(EditorUI::Callback::rotate45CW));
+	leftMenu->addChild(rotate45CWbtn);
+
+	auto rotate45CCWspr = gd::ButtonSprite::create("-45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate45CCWbtn = gd::CCMenuItemSpriteExtra::create(rotate45CCWspr, rotate45CCWspr, self, menu_selector(EditorUI::Callback::rotate45CCW));
+	leftMenu->addChild(rotate45CCWbtn);
+
+	auto rotate265CWspr = gd::ButtonSprite::create("45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate265CWbtn = gd::CCMenuItemSpriteExtra::create(rotate265CWspr, rotate265CWspr, self, menu_selector(EditorUI::Callback::rotate265CW));
+	leftMenu->addChild(rotate265CWbtn);
+
+	auto rotate265CCWspr = gd::ButtonSprite::create("-45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate265CCWbtn = gd::CCMenuItemSpriteExtra::create(rotate265CCWspr, rotate265CCWspr, self, menu_selector(EditorUI::Callback::rotate265CCW));
+	leftMenu->addChild(rotate265CCWbtn);
+
+
 
 	//auto testmenu = CCMenu::create();
 
@@ -975,20 +960,6 @@ void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
 	//editButtonBar->addChild(sprite);
 	
 	//addMoveButton(self, "edit_rightBtn2_001.png", "1/2", kEditCommandHalfRight, nullptr);
-}
-
-void EditorPauseLayer::Callback::SelectAbsolutelyAllButton(CCObject*)
-{
-	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
-	auto editorUI = leveleditor->getEditorUI();
-
-	auto objs = CCArray::create();
-	for (int i = 0; i < (leveleditor->getAllObjects()->count()); i++)
-	{
-		objs->addObjectsFromArray(reinterpret_cast<CCArray*>(leveleditor->getAllObjects()->objectAtIndex(i)));
-	}
-	editorUI->selectObjects(objs);
-	editorUI->updateButtons();
 }
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
@@ -1121,20 +1092,13 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 
 	auto bottommenu = from<CCMenu*>(self->bpmButton(), 0xac);
 	auto keysButton = (gd::CCMenuItemSpriteExtra*)bottommenu->getChildren()->objectAtIndex(7);
-	keysButton->setPositionY(110);
+	keysButton->setPositionY(70);
 
-	auto vanillaSelectAllSprite = gd::ButtonSprite::create("Select All\non Layer", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
+	auto vanillaSelectAllSprite = gd::ButtonSprite::create("Select \nAll", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
 	auto vanillaSelectAllButton = gd::CCMenuItemSpriteExtra::create(vanillaSelectAllSprite, nullptr, self, menu_selector(EditorPauseLayer::Callback::VanillaSelectAllButton));
 	vanillaSelectAllButton->setPosition({ 234.5f, 30 });
 
-
-	auto SelectAbsolutelyAllSprite = gd::ButtonSprite::create("Select \nAll", 0x32, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
-	auto SelectAbsolutelyAllButton = gd::CCMenuItemSpriteExtra::create(SelectAbsolutelyAllSprite, nullptr, self, menu_selector(EditorPauseLayer::Callback::SelectAbsolutelyAllButton));
-	SelectAbsolutelyAllButton->setPosition({ 234.5f, 70 });
-
 	bottommenu->addChild(vanillaSelectAllButton);
-	bottommenu->addChild(SelectAbsolutelyAllButton);
-
 
 	self->addChild(togglerMenu);
 	self->addChild(menu);
@@ -1216,8 +1180,9 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	auto size = CCDirector::sharedDirector()->getWinSize();
 
 	if (play_layer) {
+		auto labelsMenu = reinterpret_cast<CCMenu*>(play_layer->getChildByTag(7900));
 		auto percentLabel = reinterpret_cast<CCLabelBMFont*>(play_layer->getChildByTag(4571));
-		auto cheatIndicator = reinterpret_cast<CCLabelBMFont*>(play_layer->getChildByTag(45072));
+		auto cheatIndicator = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45072));
 
 		if (percentLabel) {
 			const auto value = play_layer->player1()->getPositionX() / play_layer->levelLength() * 100.f;
@@ -1268,26 +1233,20 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				cheatIndicator->setColor({ 255, 128, 0 });
 
 			else cheatIndicator->setColor({ 255, 0, 0 });
-
-			if (setting().onHideLabels) {
-				cheatIndicator->setVisible(0);
-			}
-			else {
-				cheatIndicator->setVisible(1);
-			}
 		}
 	}
 
 	if (editUI) {
 		auto lel = editUI->getLevelEditorLayer();
-		auto objcolorid = editUI->getChildByTag(45011);
-		auto objgroupid = editUI->getChildByTag(45012);
-		auto objposx = editUI->getChildByTag(45013);
-		auto objposy = editUI->getChildByTag(45014);
-		auto objrot = editUI->getChildByTag(45015);
-		auto objid = editUI->getChildByTag(45016);
-		auto objaddr = editUI->getChildByTag(45017);
-		auto objcounter = editUI->getChildByTag(45018);
+		auto moreObjInfoMenu = reinterpret_cast<CCMenu*>(editUI->getChildByTag(8900));
+		auto objcolorid = moreObjInfoMenu->getChildByTag(45011);
+		auto objgroupid = moreObjInfoMenu->getChildByTag(45012);
+		auto objposx = moreObjInfoMenu->getChildByTag(45013);
+		auto objposy = moreObjInfoMenu->getChildByTag(45014);
+		auto objrot = moreObjInfoMenu->getChildByTag(45015);
+		auto objid = moreObjInfoMenu->getChildByTag(45016);
+		auto objaddr = moreObjInfoMenu->getChildByTag(45017);
+		auto objcounter = moreObjInfoMenu->getChildByTag(45018);
 
 		auto leftMenu = from<CCMenu*>(editUI->getRedoBtn(), 0xac);
 		auto deleteBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(45030));
@@ -1308,6 +1267,53 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				if (lel->player2())
 				{
 					Hitboxes::drawPlayerHitbox(lel->player2(), playerDrawNode);
+				}
+			}
+			auto secarr = lel->getLevelSections();
+			auto arrcount = secarr->count();
+			auto objectDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(125));
+			objectDrawNode->clear();
+			if (setting().onHitboxes) {
+				if (setting().onSolidsHitbox) {
+					for (int i = 0; i < arrcount; i++) {
+						if (i < 0) continue;
+						if (i > arrcount) break;
+						auto objAtInd = secarr->objectAtIndex(i);
+						auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+						for (int j = 0; j < objarr->count(); j++) {
+							auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+							Hitboxes::drawSolidsObjectHitbox(obj, objectDrawNode);
+						}
+					}
+				}
+
+				if (setting().onHazardsHitbox) {
+					for (int i = 0; i < arrcount; i++) {
+						if (i < 0) continue;
+						if (i > arrcount) break;
+						auto objAtInd = secarr->objectAtIndex(i);
+						auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+						for (int j = 0; j < objarr->count(); j++) {
+							auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+							Hitboxes::drawHazardsObjectHitbox(obj, objectDrawNode);
+						}
+					}
+				}
+
+				if (setting().onSpecialsHitbox) {
+					for (int i = 0; i < arrcount; i++) {
+						if (i < 0) continue;
+						if (i > arrcount) break;
+						auto objAtInd = secarr->objectAtIndex(i);
+						auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+						for (int j = 0; j < objarr->count(); j++) {
+							auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+							Hitboxes::drawSpecialsObjectHitbox(obj, objectDrawNode);
+						}
+					}
 				}
 			}
 		}
@@ -1464,6 +1470,13 @@ void Scheduler::mem_init() {
 //		CustomSongLayer::init_H,
 //		reinterpret_cast<void**>(&CustomSongLayer::init));
 //}
+
+void LevelEditorLayer::mem_init() {
+	MH_CreateHook(
+		reinterpret_cast<void*>(gd::base + 0x91620),
+		LevelEditorLayer::updateHook,
+		reinterpret_cast<void**>(&LevelEditorLayer::updateOrig));
+}
 
 void EditorUI::mem_init() {
 	MH_CreateHook(

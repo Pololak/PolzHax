@@ -90,6 +90,13 @@ public:
     //                );
     //}
 
+    void rotateObjects(cocos2d::CCArray* objects, float angle, cocos2d::CCPoint center) {
+        __asm movss xmm2, angle;
+        reinterpret_cast<void(__thiscall*)(
+            EditorUI*, cocos2d::CCArray*, cocos2d::CCPoint
+            )>(base + 0x4c280)(this, objects, center);
+    }
+
     CCMenuItemSpriteExtra* getSpriteButton(
         const char* sprite,
         cocos2d::SEL_MenuHandler callback,

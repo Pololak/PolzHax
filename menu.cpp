@@ -1183,6 +1183,10 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables gravity effect.");
 
+            ImGui::Checkbox("No Mini Icon", &setting().onNoMiniIcon);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Replaces default mini icon with normal one.");
+
             if (ImGui::Checkbox("No Mirror", &setting().onNoMirror)) {
                 if (setting().onNoMirror) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0BF2), "\xe9\x9b\x01\x00\x00\x90", 6, NULL); // E9 9B 01 00 00 90
@@ -1676,10 +1680,10 @@ void RenderMain() {
             ImGui::SetNextWindowBgAlpha(setting().BGcolor[3]);
             if (ImGui::BeginPopupModal("Hitbox Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
                 
-                ImGui::SetNextItemWidth(setting().UISize * 80);
+                ImGui::SetNextItemWidth(setting().UISize * 60);
                 ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
 
-                ImGui::SetNextItemWidth(setting().UISize * 80);
+                ImGui::SetNextItemWidth(setting().UISize * 60);
                 ImGui::DragInt("Fill Opacity", &setting().hitboxFillOpacity, 1.f, 0, 255);
 
                 ImGui::Checkbox("Player", &setting().onPlayerHitbox);
@@ -2065,16 +2069,22 @@ void RenderMain() {
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
             ImGui::Checkbox("Hide All", &setting().onHideLabels);
+            ImGui::SetNextItemWidth(setting().UISize * 80);
+            ImGui::DragFloat("Scale", &setting().labelsScale, 0.1f, 0.1f, 1.f);
+            ImGui::SetNextItemWidth(setting().UISize * 80);
+            ImGui::DragInt("Opacity", &setting().labelsOpacity, 1.f, 0, 255);
             ImGui::Checkbox("Cheat Indicator", &setting().onCheatIndicator);
             ImGui::Checkbox("Attempt", &setting().onAttemptsLabel);
+            ImGui::Checkbox("Best Run", &setting().onBestRunLabel);
             ImGui::Checkbox("Clock", &setting().onClock);
+            ImGui::Checkbox("CPS Counter", &setting().onCPSLabel);
             ImGui::Checkbox("FPS Counter", &setting().onFPSLabel);
-            //ImGui::Checkbox("CPS Counter", &setting().onCPSLabel);
             ImGui::Checkbox("Message", &setting().onMessageLabel);
             ImGui::SetNextItemWidth(150 * setting().UISize);
             ImGui::InputText("##message", setting().message, IM_ARRAYSIZE(setting().message));
-            //ImGui::Checkbox("Noclip Accuracy", &setting().onNoclipAccuracy);
-            //ImGui::Checkbox("Noclip Deaths", &setting().onNoclipDeaths);
+            ImGui::Checkbox("Noclip Accuracy", &setting().onNoclipAccuracy);
+            ImGui::Checkbox("Noclip Deaths", &setting().onNoclipDeaths);
+            ImGui::Checkbox("Session Time", &setting().onSessionTime);
             ImGui::Checkbox("Meta", &setting().onMeta);
         }
 

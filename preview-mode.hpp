@@ -10,6 +10,13 @@ namespace preview_mode {
 	};
 }
 
+namespace LevelEditorLayer {
+	inline bool(__thiscall* updateOrig)(gd::LevelEditorLayer*, float);
+	void __fastcall updateHook(gd::LevelEditorLayer* self, void*, float dt);
+
+	void mem_init();
+}
+
 namespace EditorUI {
 
 	inline bool(__thiscall* init)(gd::EditorUI* self, gd::LevelEditorLayer* editor);
@@ -35,6 +42,10 @@ namespace EditorUI {
 		void onGoToBaseLayer(CCObject*);
 		void onGoToNextFreeLayer(CCObject*);
 		void onGoToGroup(CCObject*);
+		void rotate45CW(CCObject*);
+		void rotate45CCW(CCObject*);
+		void rotate265CW(CCObject*);
+		void rotate265CCW(CCObject*);
 	};
 
 	void mem_init();
@@ -64,7 +75,6 @@ namespace EditorPauseLayer {
 		void SmallEditorStepToggler(CCObject*);
 		void PreviewModeToggler(CCObject*);
 		void VanillaSelectAllButton(CCObject*);
-		void SelectAbsolutelyAllButton(CCObject*);
 	};
 
 	void mem_init();
@@ -91,12 +101,3 @@ namespace Scheduler {
 	void mem_init();
 }
 
-bool objectIsSaw(gd::GameObject* obj);
-void beginRotations(gd::LevelEditorLayer* self);
-void stopRotations(gd::LevelEditorLayer* self);
-void pauseRotations(gd::LevelEditorLayer* self);
-void resumeRotations(gd::LevelEditorLayer* self);
-void beginRotateSaw(gd::GameObject* obj);
-void stopRotateSaw(gd::GameObject* obj);
-bool shouldRotateSaw();
-void enableRotations(bool);

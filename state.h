@@ -187,8 +187,12 @@ struct SettingStruct {
     bool onZeroDelay = false;
 
     int hitboxFillOpacity = 255;
+    int labelsOpacity = 255;
+    float labelsScale = 1.f;
 
     bool isSafeMode;
+    bool onSessionTime = false;
+    bool onNoMiniIcon = false;
 
     float fps = 60.f;
     float speedhack = 1.f;

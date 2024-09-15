@@ -13,4 +13,3 @@ namespace MenuLayer {
 
 	void mem_init();
 }
-

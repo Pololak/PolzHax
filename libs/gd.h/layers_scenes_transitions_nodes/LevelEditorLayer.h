@@ -14,6 +14,15 @@ class GJGameLevel;
 class DrawGridLayer;
 class PlayerObject;
 class LevelSettingsObject;
+class UndoCommand;
+
+//class UndoObject {
+//public:
+//    static auto createWithArray(cocos2d::CCArray* objects, UndoCommand command) {
+//        return reinterpret_cast<UndoObject * (__thiscall*)(cocos2d::CCArray*, UndoCommand)>
+//            (base + 0x92970)(objects, command);
+//    }
+//};
 
 class LevelEditorLayer : public cocos2d::CCLayer {
     public:
@@ -116,8 +125,9 @@ class LevelEditorLayer : public cocos2d::CCLayer {
             return from<int>(this, 0x128);
         }
         
-        
-        
+        //void addToUndoList(UndoObject* undoObj, bool add) {
+        //    reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, UndoObject*, bool)>(base + 0x8ea60)(this, undoObj, add);
+        //}
         
         /*auto gameLayer() {
             return from<CCLayer*>(this, 0x188);

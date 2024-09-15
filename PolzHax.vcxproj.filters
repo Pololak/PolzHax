@@ -1455,9 +1455,6 @@
     <ClInclude Include="libs\matplist.hpp">
       <Filter>libs</Filter>
     </ClInclude>
-    <ClInclude Include="preview-mode.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="hsv.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1465,9 +1462,6 @@
       <Filter>libs\gd.h</Filter>
     </ClInclude>
     <ClInclude Include="matplist.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lvl-share.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libs\nfd\src\common.h">
@@ -1521,6 +1515,12 @@
     <ClInclude Include="CrashLogger.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="preview-mode.hpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="lvl-share.hpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1562,12 +1562,6 @@
     <ClCompile Include="explorer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="preview-mode.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lvl-share.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="libs\nfd\src\nfd_common.c">
       <Filter>libs\nfd</Filter>
     </ClCompile>
@@ -1588,6 +1582,12 @@
     </ClCompile>
     <ClCompile Include="CrashLogger.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="preview-mode.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="lvl-share.cpp">
+      <Filter>Header Files\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

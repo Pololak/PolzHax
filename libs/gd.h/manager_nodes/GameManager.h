@@ -131,9 +131,9 @@ namespace gd {
 		cocos2d::TextureQuality m_eQuality; //more after that i havent re'd
 
 	public:
-		int getPlayerFrame() { return m_nPlayerFrame; }
+		//int getPlayerFrame() { return m_nPlayerFrame; }
 		int getPlayerShip() { return m_nPlayerShip; }
-		int getPlayerBall() { return m_nPlayerBall; }
+		//int getPlayerBall() { return m_nPlayerBall; }
 		int getPlayerBird() { return m_nPlayerBird; }
 		int getPlayerDart() { return m_nPlayerDart; }
 		int getPlayerRobot() { return m_nPlayerRobot; }
@@ -255,6 +255,14 @@ namespace gd {
 		}
 		//PlayLayer* getPlayLayer() { return m_pPlayLayer; }
 		LevelEditorLayer* getEditorLayer() { return m_pLevelEditorLayer; }
+
+		int getPlayerBall() {
+			return from<int>(this, 0x1b8);
+		}
+
+		int getPlayerFrame() {
+			return from<int>(this, 0x1b0);
+		}
 	};
 }
 

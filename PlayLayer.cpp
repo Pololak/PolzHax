@@ -16,32 +16,32 @@ ccColor3B playerColorG;
 
 std::time_t t;
 SYSTEMTIME st;
-
-bool hasClicked = false;
-//Labels* labels = nullptr;
+float NoclipAcc = 0.f;
+bool isPlayerColliding = false;
 bool isPlayerColorGot = false;
 bool isPlayerDead = false;
-
 gd::HardStreak* hardStreak;
-
 int currentStartPos = 0;
 bool fadedoutflag = 0;
-
 int deaths = 0;
-float NoclipAcc = 0.f;
-float deathDifference = 0.f;
+int currentBest = 0;
 bool wasDead = 0;
-
 float deathPos = 0.f;
+float deathDifference = 0.f;
 
-//std::vector<CheckPoint> PlayLayer::checkpoints;
-//bool PlayLayer::inPractice = false;
+bool hasClicked = false;
+std::vector<time_t> m_clickFrames;
+int m_totalClicks = 0;
+bool m_isHolding = false;
+
+
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     playLayer = self;
     isPlayerColorGot = false;
     fadedoutflag = 0;
+    currentBest = 0;
 
     if (!PlayLayer::init(self, level)) return false;
 
@@ -56,7 +56,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     auto secarr = self->getSections();
     auto objarr1 = self->getObjects();
     auto arrcount = secarr->count();
-    
+
     if (startPosArr) delete startPosArr;
     auto sposarr = new CCArray;
     auto firstStartPosObj = gd::StartPosObject::create();
@@ -112,7 +112,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
     percentLabel->setTag(4571);
     self->addChild(percentLabel);
-    
+
 
     auto playerDrawNode = CCDrawNode::create();
     playerDrawNode->setZOrder(1000);
@@ -184,6 +184,14 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
 
     }
 
+    auto labelsMenu = CCMenu::create();
+    labelsMenu->setPosition({ 0, 0 });
+    labelsMenu->setTag(7900);
+    labelsMenu->setZOrder(5);
+    labelsMenu->setAnchorPoint({ 0, 1 });
+    labelsMenu->setScale(setting().labelsScale);
+    self->addChild(labelsMenu);
+
     int labelCount = 0;
 
     if (setting().onCheatIndicator)
@@ -206,7 +214,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
 
         
         //CheatIndicatorLabel->
-        self->addChild(CheatIndicatorLabel);
+        labelsMenu->addChild(CheatIndicatorLabel);
 
 
     }
@@ -221,10 +229,10 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         messageLabel->setScale(0.35f);
         messageLabel->setZOrder(5);
         messageLabel->setAnchorPoint({ 0.f, 0.f });
-        messageLabel->setOpacity(100);
+        messageLabel->setOpacity(setting().labelsOpacity);
         messageLabel->setTag(45077);
         messageLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
-        self->addChild(messageLabel);
+        labelsMenu->addChild(messageLabel);
     }
 
     if (setting().onAttemptsLabel)
@@ -234,11 +242,25 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         AttemptsLabel->setScale(0.35f);
         AttemptsLabel->setZOrder(5);
         AttemptsLabel->setAnchorPoint({ 0.f, 0.f });
-        AttemptsLabel->setOpacity(100);
+        AttemptsLabel->setOpacity(setting().labelsOpacity);
         AttemptsLabel->setTag(45073);
         AttemptsLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
-        self->addChild(AttemptsLabel);
+        labelsMenu->addChild(AttemptsLabel);
     }
+
+
+    if (setting().onBestRunLabel) {
+        labelCount++;
+        auto BestRunLabel = CCLabelBMFont::create("Best Run: 0%", "bigFont.fnt");
+        BestRunLabel->setScale(0.35f);
+        BestRunLabel->setZOrder(5);
+        BestRunLabel->setAnchorPoint({ 0.f,0.f });
+        BestRunLabel->setOpacity(setting().labelsOpacity);
+        BestRunLabel->setTag(45080);
+        BestRunLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
+        labelsMenu->addChild(BestRunLabel);
+    }
+
 
     if (setting().onClock)
     {
@@ -253,16 +275,27 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         Clock->setScale(0.35f);
         Clock->setZOrder(5);
         Clock->setAnchorPoint({ 0.f, 0.f });
-        Clock->setOpacity(100);
+        Clock->setOpacity(setting().labelsOpacity);
         Clock->setTag(45075);
         Clock->setPosition({ 2.f, size.height - 11.f * labelCount });
-        self->addChild(Clock);
+        labelsMenu->addChild(Clock);
+    }
+
+    if (setting().onSessionTime) {
+        labelCount++;
+        auto SessionTimeLabel = CCLabelBMFont::create("0s", "bigFont.fnt");
+        SessionTimeLabel->setScale(0.35f);
+        SessionTimeLabel->setZOrder(5);
+        SessionTimeLabel->setAnchorPoint({ 0.f,0.f });
+        SessionTimeLabel->setOpacity(setting().labelsOpacity);
+        SessionTimeLabel->setTag(45082);
+        SessionTimeLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
+        labelsMenu->addChild(SessionTimeLabel);
     }
 
     if (setting().onFPSLabel)
     {
         labelCount++;
-        //int fps = 1 / CCDirector::sharedDirector()->getAnimationInterval();
 
         float fps = ImGui::GetIO().Framerate;
         auto FPSLabel = CCLabelBMFont::create("0 FPS", "bigFont.fnt");
@@ -270,37 +303,49 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         FPSLabel->setScale(0.35f);
         FPSLabel->setZOrder(5);
         FPSLabel->setAnchorPoint({ 0.f, 0.f });
-        FPSLabel->setOpacity(100);
+        FPSLabel->setOpacity(setting().labelsOpacity);
         FPSLabel->setTag(45076);
         FPSLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
-        self->addChild(FPSLabel);
+        labelsMenu->addChild(FPSLabel);
     }
 
-    //if (setting().onNoclipAccuracy)
-    //{
-    //    labelCount++;
-    //    auto noclipAccLabel = CCLabelBMFont::create("100.00%", "bigFont.fnt");
-    //    noclipAccLabel->setScale(0.35f);
-    //    noclipAccLabel->setZOrder(5);
-    //    noclipAccLabel->setAnchorPoint({ 0.f, 0.f });
-    //    noclipAccLabel->setOpacity(100);
-    //    noclipAccLabel->setTag(45079);
-    //    noclipAccLabel->setPosition({ 2.f, size.height - 13.f * labelCount });
-    //    self->addChild(noclipAccLabel);
-    //}
+    if (setting().onCPSLabel) {
+        labelCount++;
+        auto CPSLabel = CCLabelBMFont::create("0/0 CPS", "bigFont.fnt");
+        CPSLabel->setScale(0.35f);
+        CPSLabel->setZOrder(5);
+        CPSLabel->setAnchorPoint({ 0.f, 0.f });
+        CPSLabel->setOpacity(setting().labelsOpacity);
+        CPSLabel->setTag(45081);
+        CPSLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
+        labelsMenu->addChild(CPSLabel);
+    }
 
-    //if (setting().onNoclipDeaths)
-    //{
-    //    labelCount++;
-    //    auto noclDeath = CCLabelBMFont::create("0 Deaths", "bigFont.fnt");
-    //    noclDeath->setScale(0.35f);
-    //    noclDeath->setZOrder(5);
-    //    noclDeath->setAnchorPoint({ 0.f, 0.f });
-    //    noclDeath->setOpacity(100);
-    //    noclDeath->setTag(45078);
-    //    noclDeath->setPosition({ 2.f, size.height - 13.f * labelCount });
-    //    self->addChild(noclDeath);
-    //}
+    if (setting().onNoclipAccuracy)
+    {
+        labelCount++;
+        auto noclipAccLabel = CCLabelBMFont::create("100.00%", "bigFont.fnt");
+        noclipAccLabel->setScale(0.35f);
+        noclipAccLabel->setZOrder(5);
+        noclipAccLabel->setAnchorPoint({ 0.f, 0.f });
+        noclipAccLabel->setOpacity(setting().labelsOpacity);
+        noclipAccLabel->setTag(45079);
+        noclipAccLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
+        labelsMenu->addChild(noclipAccLabel);
+    }
+
+    if (setting().onNoclipDeaths)
+    {
+        labelCount++;
+        auto noclDeath = CCLabelBMFont::create("0 Deaths", "bigFont.fnt");
+        noclDeath->setScale(0.35f);
+        noclDeath->setZOrder(5);
+        noclDeath->setAnchorPoint({ 0.f, 0.f });
+        noclDeath->setOpacity(setting().labelsOpacity);
+        noclDeath->setTag(45078);
+        noclDeath->setPosition({ 2.f, size.height - 11.f * labelCount });
+        labelsMenu->addChild(noclDeath);
+    }
 
     if (setting().onMeta)
     {
@@ -324,15 +369,15 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         yPos->setPosition({ 2.f, 20 });
         self->addChild(yPos);
 
-        auto vel = CCLabelBMFont::create("Vel: 0", "bigFont.fnt");
-        vel->setString(CCString::createWithFormat("Vel: %.d")->getCString());
-        vel->setScale(0.35f);
-        vel->setZOrder(5);
-        vel->setAnchorPoint({ 0.f, 0.f });
-        vel->setOpacity(100);
-        vel->setTag(69062);
-        vel->setPosition({ 2.f, 30 });
-        self->addChild(vel);
+        //auto vel = CCLabelBMFont::create("Vel: 0", "bigFont.fnt");
+        //vel->setString(CCString::createWithFormat("Vel: %.d")->getCString());
+        //vel->setScale(0.35f);
+        //vel->setZOrder(5);
+        //vel->setAnchorPoint({ 0.f, 0.f });
+        //vel->setOpacity(100);
+        //vel->setTag(69062);
+        //vel->setPosition({ 2.f, 30 });
+        //self->addChild(vel);
 
         auto rot = CCLabelBMFont::create("Rot: 0", "bigFont.fnt");
         rot->setString(CCString::createWithFormat("Rot: %.f")->getCString());
@@ -391,12 +436,16 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto secarr = self->getSections();
     auto arrcount = secarr->count();
 
-    auto FPSLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45076));
-    auto AttemptsLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45073));
-    auto Clock = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45075));
-    auto MessageLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45077));
-    //auto noclDeath = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45078));
-    //auto noclipAccLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45079));
+    auto labelsMenu = reinterpret_cast<CCMenu*>(self->getChildByTag(7900));
+    auto FPSLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45076));
+    auto CPSLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45081));
+    auto BestRunLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45080));
+    auto SessionTimeLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45082));
+    auto AttemptsLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45073));
+    auto Clock = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45075));
+    auto MessageLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45077));
+    auto noclDeath = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45078));
+    auto noclipAccLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45079));
     auto xPos = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69060));
     auto yPos = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69061));
     auto vel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69062));
@@ -459,26 +508,54 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         else if (!GetAsyncKeyState(0x51)) lKeyFlag = true;
     }
 
-    if (FPSLabel)
-    {
-        FPSLabel->setString(CCString::createWithFormat("%.f FPS", roundf(fps)/*CCDirector::sharedDirector()->getTotalFrames()*/)->getCString());
+    if (labelsMenu) {
         if (setting().onHideLabels) {
-            FPSLabel->setVisible(0);
+            labelsMenu->setVisible(0);
         }
         else {
-            FPSLabel->setVisible(1);
+            labelsMenu->setVisible(1);
         }
+        labelsMenu->setScale(setting().labelsScale);
+    }
+
+    if (FPSLabel)
+    {
+        FPSLabel->setString(CCString::createWithFormat("%.f FPS", roundf(fps))->getCString());
+        FPSLabel->setOpacity(setting().labelsOpacity);
+    }
+
+    if (CPSLabel) {
+        std::string cpsCurrent = CCString::createWithFormat("%i", m_clickFrames.size())->getCString();
+        std::string cpsTotal = CCString::createWithFormat("/%i", m_totalClicks)->getCString();
+        std::string prefix = " CPS";
+        CPSLabel->setString(std::string(cpsCurrent + cpsTotal + prefix).c_str());
+        if (m_isHolding) {
+            CPSLabel->setColor({ 0, 255, 0 });
+        }
+        else {
+            CPSLabel->setColor({ 255, 255, 255 });
+        }
+        CPSLabel->setOpacity(setting().labelsOpacity);
+    }
+
+    if (SessionTimeLabel) {
+        SessionTimeLabel->setString(CCString::createWithFormat("%.01fs", self->getClkTimer())->getCString());
+        SessionTimeLabel->setOpacity(setting().labelsOpacity);
+    }
+
+    if (BestRunLabel) {
+        int newBest = self->getLastRunPercent();
+        if (newBest >= currentBest) {
+            currentBest = newBest;
+            BestRunLabel->setString(CCString::createWithFormat("Best Run: %i%%", newBest)->getCString());
+        }
+        BestRunLabel->setOpacity(setting().labelsOpacity);
     }
 
     if (AttemptsLabel)
     {
         AttemptsLabel->setString(CCString::createWithFormat("Attempt %d", self->attemptsCount())->getCString());
-        if (setting().onHideLabels) {
-            AttemptsLabel->setVisible(0);
-        }
-        else {
-            AttemptsLabel->setVisible(1);
-        }
+        AttemptsLabel->setOpacity(setting().labelsOpacity);
     }
 
     if (Clock)
@@ -488,35 +565,27 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         std::ostringstream s;
         s << std::put_time(&tm, "%H:%M:%S");
         Clock->setString(CCString::create(s.str().c_str())->getCString());
-        if (setting().onHideLabels) {
-            Clock->setVisible(0);
-        }
-        else {
-            Clock->setVisible(1);
-        }
+        Clock->setOpacity(setting().labelsOpacity);
     }
 
-    //NoclipAcc = ((self->player1()->getPositionX() - deathDifference) / self->player1()->getPositionX()) * 100;
-    //if (noclipAccLabel)
-    //{
-    //    const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
-    //    if (value < 100.0f) reinterpret_cast<CCLabelBMFont*>(noclipAccLabel)->setString(CCString::createWithFormat("%.2f%%", NoclipAcc)->getCString());
-    //}
+    NoclipAcc = ((self->player1()->getPositionX() - deathDifference) / self->player1()->getPositionX()) * 100;
+    if (noclipAccLabel)
+    {
+        const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
+        if (value < 100.0f) reinterpret_cast<CCLabelBMFont*>(noclipAccLabel)->setString(CCString::createWithFormat("%.2f%%", NoclipAcc)->getCString());
+        noclipAccLabel->setOpacity(setting().labelsOpacity);
+    }
 
-    //if (noclDeath)
-    //{
-    //    noclDeath->setString(CCString::createWithFormat("%d Deaths", deaths)->getCString());
-    //}
+    if (noclDeath)
+    {
+        noclDeath->setString(CCString::createWithFormat("%d Deaths", deaths)->getCString());
+        noclDeath->setOpacity(setting().labelsOpacity);
+    }
 
     if (MessageLabel)
     {
         MessageLabel->setString(CCString::create(setting().message)->getCString());
-        if (setting().onHideLabels) {
-            MessageLabel->setVisible(0);
-        }
-        else {
-            MessageLabel->setVisible(1);
-        }
+        MessageLabel->setOpacity(setting().labelsOpacity);
     }
 
     
@@ -541,9 +610,9 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    if (vel) {
-        vel->setString(CCString::createWithFormat("Vel: %.06d%", self->player1()->m_yVelocity)->getCString());
-    }
+    //if (vel) {
+    //    vel->setString(CCString::createWithFormat("Vel: %.06d%", self->player1()->m_yVelocity)->getCString());
+    //}
 
     if (rot) {
         rot->setString(CCString::createWithFormat("Rot: %.06f%", self->player1()->getRotation())->getCString());
@@ -562,15 +631,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
         else {
             psize->setVisible(1);
-        }
-    }
-
-    if (clickindi) {
-        if (!hasClicked) {
-            clickindi->setColor({ 0, 255, 0 });
-        }
-        else {
-            clickindi->setColor({ 255, 255, 255 });
         }
     }
 
@@ -714,6 +774,13 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     if (setting().onLockCursor && !setting().show && !self->hasCompletedLevel() && !self->isDead()) {
         SetCursorPos(size.width / 2, size.height / 2);
     }
+
+    time_t currentTick = time::getTime();
+    m_clickFrames.erase(std::remove_if(m_clickFrames.begin(), m_clickFrames.end(), [currentTick](float tick) {
+        return currentTick - tick > 1000;
+        }), m_clickFrames.end());
+
+    hasClicked = false;
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {
@@ -741,16 +808,7 @@ void __fastcall PlayLayer::onQuit_H(gd::PlayLayer* self, void* edx) {
     PlayLayer::onQuit(self);
 }
 
-void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
-    setting().beforeRestartCheatsCount = setting().cheatsCount;
-    deaths = 0;
-    wasDead = 0;
-    deathDifference = 0.f;
-    deathPos = 0.f;
-    PlayLayer::resetLevel(self);
-}
-
-void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void*, gd::PlayerObject* player)
+void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player)
 {
     isPlayerDead = true;
     if (!wasDead) {
@@ -762,6 +820,34 @@ void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void*, gd::Playe
     deathPos = player->getPositionX();
     wasDead = true;
     PlayLayer::destroyPlayer(self, player);
+}
+
+void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
+    setting().beforeRestartCheatsCount = setting().cheatsCount;
+    deaths = 0;
+    wasDead = 0;
+    deathDifference = 0.f;
+    deathPos = 0.f;
+    m_clickFrames.clear();
+    m_totalClicks = 0;
+    PlayLayer::resetLevel(self);
+}
+
+
+
+void __fastcall PlayLayer::pushButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2) {
+    m_isHolding = true;
+    if (!hasClicked) {
+        m_clickFrames.push_back(time::getTime());
+        m_totalClicks++;
+        hasClicked = true;
+    }
+    PlayLayer::pushButton(self, idk1, idk2);
+}
+
+void __fastcall PlayLayer::releaseButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2) {
+    m_isHolding = false;
+    PlayLayer::releaseButton(self, idk1, idk2);
 }
 
 class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
@@ -882,6 +968,20 @@ void __fastcall EndLevelLayer::customSetup_H(gd::GJDropDownLayer* self) {
     }
 }
 
+void __fastcall PlayerObject::updatePlayerFrame_H(gd::PlayerObject* self, void* edx, int frameID) {
+    if (setting().onNoMiniIcon) {
+        return PlayerObject::updatePlayerFrame(self, gd::GameManager::sharedState()->getPlayerFrame());
+    }
+    PlayerObject::updatePlayerFrame(self, frameID);
+}
+
+void __fastcall PlayerObject::updatePlayerRollFrame_H(gd::PlayerObject* self, void* edx, int frameID) {
+    if (setting().onNoMiniIcon) {
+        return PlayerObject::updatePlayerRollFrame(self, gd::GameManager::sharedState()->getPlayerBall());
+    }
+    PlayerObject::updatePlayerRollFrame(self, frameID);
+}
+
 void PauseLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xd5f50),
@@ -922,10 +1022,18 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf1f20),
         PlayLayer::resetLevel_H,
         reinterpret_cast<void**>(&PlayLayer::resetLevel));
-    //MH_CreateHook(
-    //    reinterpret_cast<void*>(gd::base + 0xf04a0),
-    //    PlayLayer::destroyPlayer_H,
-    //    reinterpret_cast<void**>(&PlayLayer::destroyPlayer));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf04a0),
+        PlayLayer::destroyPlayer_H,
+        reinterpret_cast<void**>(&PlayLayer::destroyPlayer));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf0a00),
+        PlayLayer::pushButton_H,
+        reinterpret_cast<void**>(&PlayLayer::pushButton));
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0xf0af0),
+        PlayLayer::releaseButton_H,
+        reinterpret_cast<void**>(&PlayLayer::releaseButton));
 }
 
 void EndLevelLayer::mem_init() {
@@ -933,4 +1041,9 @@ void EndLevelLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0x50430),
         EndLevelLayer::customSetup_H,
         reinterpret_cast<void**>(&EndLevelLayer::customSetup));
+}
+
+void PlayerObject::mem_init() {
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
 }
