@@ -542,6 +542,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Hitboxes.h" />
     <ClInclude Include="hsv.hpp" />
+    <ClInclude Include="Icons.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
@@ -652,6 +653,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="preview-mode.hpp" />
+    <ClInclude Include="SimplePlayer.h" />
     <ClInclude Include="state.h" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
@@ -677,6 +679,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
+    <ClCompile Include="SimplePlayer.cpp" />
     <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>

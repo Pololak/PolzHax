@@ -9,15 +9,12 @@
 
 namespace gd {
 	enum IconType {
-		kIconTypeCube           = 0,
-		kIconTypeShip           = 1,
-		kIconTypeBall           = 2,
-		kIconTypeUfo            = 3,
-		kIconTypeWave           = 4,
-		kIconTypeRobot          = 5,
-		kIconTypeSpider         = 6,
-		kIconTypeDeathEffect    = 98,
-		kIconTypeSpecial        = 99,
+		Cube = 0,
+		Ship = 1,
+		Ball = 2,
+		UFO = 3,
+		Wave = 4,
+		Special = 99
 	};
 	
 	enum UnlockType {

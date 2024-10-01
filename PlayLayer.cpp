@@ -34,7 +34,30 @@ std::vector<time_t> m_clickFrames;
 int m_totalClicks = 0;
 bool m_isHolding = false;
 
+void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player)
+{
+    isPlayerDead = true;
+    if (!wasDead) {
+        deaths++;
+    }
+    else {
+        deathDifference += player->getPositionX() - deathPos;
+    }
+    deathPos = player->getPositionX();
+    wasDead = true;
+    PlayLayer::destroyPlayer(self, player);
+}
 
+void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
+    setting().beforeRestartCheatsCount = setting().cheatsCount;
+    deaths = 0;
+    wasDead = 0;
+    deathDifference = 0.f;
+    deathPos = 0.f;
+    m_clickFrames.clear();
+    m_totalClicks = 0;
+    PlayLayer::resetLevel(self);
+}
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     setting().beforeRestartCheatsCount = setting().cheatsCount;
@@ -422,7 +445,9 @@ inline bool playerTouchesObject(CCRect* playerRect, CCRect* hitboxRect)
 
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
+    isPlayerDead = false;
     PlayLayer::update(self, dt);
+    if (!isPlayerDead) wasDead = false;
 
     //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
@@ -587,8 +612,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         MessageLabel->setString(CCString::create(setting().message)->getCString());
         MessageLabel->setOpacity(setting().labelsOpacity);
     }
-
-    
 
     if (xPos) {
         xPos->setString(CCString::createWithFormat("X: %.06f%", self->player1()->getPositionX())->getCString());
@@ -808,33 +831,6 @@ void __fastcall PlayLayer::onQuit_H(gd::PlayLayer* self, void* edx) {
     PlayLayer::onQuit(self);
 }
 
-void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player)
-{
-    isPlayerDead = true;
-    if (!wasDead) {
-        deaths++;
-    }
-    else {
-        deathDifference += player->getPositionX() - deathPos;
-    }
-    deathPos = player->getPositionX();
-    wasDead = true;
-    PlayLayer::destroyPlayer(self, player);
-}
-
-void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
-    setting().beforeRestartCheatsCount = setting().cheatsCount;
-    deaths = 0;
-    wasDead = 0;
-    deathDifference = 0.f;
-    deathPos = 0.f;
-    m_clickFrames.clear();
-    m_totalClicks = 0;
-    PlayLayer::resetLevel(self);
-}
-
-
-
 void __fastcall PlayLayer::pushButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2) {
     m_isHolding = true;
     if (!hasClicked) {
@@ -848,6 +844,11 @@ void __fastcall PlayLayer::pushButton_H(gd::PlayLayer* self, void* edx, int idk1
 void __fastcall PlayLayer::releaseButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2) {
     m_isHolding = false;
     PlayLayer::releaseButton(self, idk1, idk2);
+}
+
+void __fastcall PlayLayer::applyEnterEffect_H(gd::PlayLayer* self, void* edx, gd::GameObject* obj) {
+
+    PlayLayer::applyEnterEffect(self, obj);
 }
 
 class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
@@ -958,7 +959,7 @@ void __fastcall EndLevelLayer::customSetup_H(gd::GJDropDownLayer* self) {
     auto director = CCDirector::sharedDirector();
     auto size = director->getWinSize();
 
-    if (setting().isSafeMode) {
+    if (setting().isSafeMode || setting().onSafeMode) {
         auto safeModeLabel = CCLabelBMFont::create("Safe Mode", "bigFont.fnt");
         safeModeLabel->setPosition({ size.width / 2, director->getScreenTop() - 85 });
         safeModeLabel->setScale(1.25f);
@@ -981,6 +982,13 @@ void __fastcall PlayerObject::updatePlayerRollFrame_H(gd::PlayerObject* self, vo
     }
     PlayerObject::updatePlayerRollFrame(self, frameID);
 }
+
+//void __fastcall GameObject::setOpacity_H(gd::GameObject* self, void* edx, GLubyte opacity) {
+//    if (setting().onDontFade) {
+//        return GameObject::setOpacity(self, 255.f);
+//    }
+//    GameObject::setOpacity((self->getObjectID() = 1), opacity);
+//}
 
 void PauseLayer::mem_init() {
     MH_CreateHook(
@@ -1034,6 +1042,8 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf0af0),
         PlayLayer::releaseButton_H,
         reinterpret_cast<void**>(&PlayLayer::releaseButton));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xec510), PlayLayer::applyEnterEffect_H, reinterpret_cast<void**>(&PlayLayer::applyEnterEffect));
+        // Hi.
 }
 
 void EndLevelLayer::mem_init() {
@@ -1046,4 +1056,8 @@ void EndLevelLayer::mem_init() {
 void PlayerObject::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
+}
+
+void GameObject::mem_init() {
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setOpacity_H, reinterpret_cast<void**>(&GameObject::setOpacity));
 }

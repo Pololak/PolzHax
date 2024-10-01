@@ -687,6 +687,11 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 	}
 	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = currentLayer;
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(currentLayer).c_str());
+
+	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
+	auto undo = gd::UndoObject::createWithArray(selectedObjects, gd::UndoCommand::Select);
+	auto undoList = from<CCArray*>(leveleditor, 0x170);
+	undoList->addObject(undo);
 }
 
 void EditorUI::Callback::onGoToGroup(CCObject* sender) {
@@ -695,7 +700,12 @@ void EditorUI::Callback::onGoToGroup(CCObject* sender) {
 
 void EditorUI::Callback::rotate45CW(CCObject* sender) {
 	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
+	//editUI->getLevelEditorLayer()->addToUndoList(undo, false);
 	editUI->rotateObjects(selectedObjects, 45.f, { 0, 0 });
+	auto undoList = from<CCArray*>(editUI->getLevelEditorLayer(), 0x170);
+	auto undo = gd::UndoObject::createWithArray(selectedObjects, gd::UndoCommand::Transform);
+	//undoList->addObject(undo);
+	editUI->getLevelEditorLayer()->addToUndoList(undo, false);
 }
 
 void EditorUI::Callback::rotate45CCW(CCObject* sender) {
@@ -713,7 +723,11 @@ void EditorUI::Callback::rotate265CCW(CCObject* sender) {
 	editUI->rotateObjects(selectedObjects, -26.5f, { 0, 0 });
 }
 
-
+bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
+	editUI = nullptr;
+	if (setting().onPersClip) savedClipboard = self->clipboard();
+	EditorUI::dtor(self);
+}
 
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer* editor) {
 	editUI = self;
@@ -726,14 +740,6 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 	auto director = CCDirector::sharedDirector();
 	auto size = director->getWinSize();
-
-	if (setting().onPersClip)
-	{
-		if (!savedClipboard.empty()) {
-			self->clipboard() = savedClipboard;
-			self->updateButtons();
-		}
-	}
 
 	auto moreObjInfoMenu = CCMenu::create();
 	moreObjInfoMenu->setPosition({ 0, 0 });
@@ -874,57 +880,49 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	goToGroupBtn->setVisible(0);
 	goToGroupBtn->setEnabled(false);
 
-	auto rotate45CWspr = gd::ButtonSprite::create("45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotateButtonsMenu = CCMenu::create();
+	rotateButtonsMenu->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
+	if (setting().extraFeatures) {
+		rotateButtonsMenu->setVisible(1);
+	}
+	else {
+		rotateButtonsMenu->setVisible(0);
+	}
+	self->addChild(rotateButtonsMenu);
+
+	auto rotate45CWspr = gd::ButtonSprite::create("45", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
+	rotate45CWspr->setScale(0.70f);
 	auto rotate45CWbtn = gd::CCMenuItemSpriteExtra::create(rotate45CWspr, rotate45CWspr, self, menu_selector(EditorUI::Callback::rotate45CW));
-	leftMenu->addChild(rotate45CWbtn);
+	rotate45CWbtn->setPosition({ 105, 165 });
+	rotateButtonsMenu->addChild(rotate45CWbtn);
 
-	auto rotate45CCWspr = gd::ButtonSprite::create("-45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate45CCWspr = gd::ButtonSprite::create("-45", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
+	rotate45CCWspr->setScale(0.70f);
 	auto rotate45CCWbtn = gd::CCMenuItemSpriteExtra::create(rotate45CCWspr, rotate45CCWspr, self, menu_selector(EditorUI::Callback::rotate45CCW));
-	leftMenu->addChild(rotate45CCWbtn);
+	rotate45CCWbtn->setPosition({ 65, 165 });
+	rotateButtonsMenu->addChild(rotate45CCWbtn);
 
-	auto rotate265CWspr = gd::ButtonSprite::create("45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate265CWspr = gd::ButtonSprite::create("26.5", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
+	rotate265CWspr->setScale(0.70f);
 	auto rotate265CWbtn = gd::CCMenuItemSpriteExtra::create(rotate265CWspr, rotate265CWspr, self, menu_selector(EditorUI::Callback::rotate265CW));
-	leftMenu->addChild(rotate265CWbtn);
+	rotate265CWbtn->setPosition({ 105, 135 });
+	rotateButtonsMenu->addChild(rotate265CWbtn);
 
-	auto rotate265CCWspr = gd::ButtonSprite::create("-45", 0x24, 40.f, 16.f, false, "bigFont.fnt", "GJ_button_01.png", 24.f);
+	auto rotate265CCWspr = gd::ButtonSprite::create("-26.5", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
+	rotate265CCWspr->setScale(0.70f);
 	auto rotate265CCWbtn = gd::CCMenuItemSpriteExtra::create(rotate265CCWspr, rotate265CCWspr, self, menu_selector(EditorUI::Callback::rotate265CCW));
-	leftMenu->addChild(rotate265CCWbtn);
+	rotate265CCWbtn->setPosition({ 65, 135 });
+	rotateButtonsMenu->addChild(rotate265CCWbtn);
 
-
-
-	//auto testmenu = CCMenu::create();
-
-	//auto testspr = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
-
-	//auto testBtn = self->getSpriteButton(
-	//	"edit_rightBtn_001.png",
-	//	menu_selector(gd::EditorUI::onDeselectAll),
-	//	nullptr,
-	//	0.9f,
-	//	0,
-	//	0,
-	//	0
-	//);
-
-	//leftMenu->addChild(testBtn);
-
-
-	/*auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
-	auto boomScrollLayer = from<gd::BoomScrollLayer*>(editButtonBar, 0xe8);
-	auto array = from<CCArray*>(boomScrollLayer, 0x118);
-
-	auto sprite = CCSprite::create("GJ_button_01.png");
-	auto btn = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, 0);
-
-	array->addObject(btn);*/
+	if (setting().onPersClip)
+	{
+		if (!savedClipboard.empty()) {
+			self->clipboard() = savedClipboard;
+			self->updateButtons();
+		}
+	}
 
 	return result;
-}
-
-bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
-	editUI = nullptr;
-	EditorUI::dtor(self);
-	if (setting().onPersClip) savedClipboard = self->clipboard();
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -999,6 +997,14 @@ void EditorPauseLayer::Callback::SmallEditorStepToggler(CCObject*) {
 		}
 }
 
+void EditorPauseLayer::Callback::extraFeaturesToggler(CCObject*) {
+	setting().extraFeatures = !setting().extraFeatures;
+}
+
+void EditorPauseLayer::Callback::extraInfoPopup(CCObject*) {
+	gd::FLAlertLayer::create(nullptr, "Extra Features", "This toggler enables some extra features, like 45/26.5 rotate buttons. \nMight be <cr>unstable</c>, so use at <cr>your own risk</c>. \n<cr>Requires re-entering the editor.</c>", "Ok", nullptr, 320.f, false, 120.f)->show();
+}
+
 auto EPMTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
 {
 	return (setting().onEditorPreview) ? toggleOn : toggleOff;
@@ -1007,6 +1013,10 @@ auto EPMTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
 auto SEPTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
 {
 	return (SEP) ? toggleOn : toggleOff;
+}
+
+auto extraFeaturesTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff) {
+	return (setting().extraFeatures) ? toggleOn : toggleOff;
 }
 
 void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
@@ -1042,6 +1052,21 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	togglerMenu->addChild(SEPButton);
 	togglerMenu->addChild(SEPLabel);
 
+	auto EFToggler = gd::CCMenuItemToggler::create(extraFeaturesTogglerSprite(toggleOn, toggleOff), extraFeaturesTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::extraFeaturesToggler));
+	EFToggler->setPosition({ 30, 180 });
+	EFToggler->setScale(0.70f);
+	auto EFInfoIcon = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+	EFInfoIcon->setScale(0.5f);
+	auto EFInfoBtn = gd::CCMenuItemSpriteExtra::create(EFInfoIcon, EFInfoIcon, self, menu_selector(EditorPauseLayer::Callback::extraInfoPopup));
+	EFInfoBtn->setPosition({ 12, 196 });
+	auto EFLabel = CCLabelBMFont::create("Extra features", "bigFont.fnt");
+	EFLabel->setScale(0.35f);
+	EFLabel->setPosition({ 50, 180 });
+	EFLabel->setAnchorPoint({ 0.f, 0.5f });
+	togglerMenu->addChild(EFToggler);
+	togglerMenu->addChild(EFLabel);
+	togglerMenu->addChild(EFInfoBtn);
+
 	constexpr auto pshandler = [](CCObject* self, CCObject*) {
 		auto text = clipboard::read();
 		auto editor = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent());
@@ -1073,20 +1098,25 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	self->addChild(levellength);
 
 	if (levellength) {
-		if (levelEditorLayer->getLevel()->getLevelLength() == 0) {
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Tiny", levelEditorLayer->getLevel()->getLevelLength())->getCString());
-		}
-		else if (levelEditorLayer->getLevel()->getLevelLength() == 1) {
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Short", levelEditorLayer->getLevel()->getLevelLength())->getCString());
-		}
-		else if (levelEditorLayer->getLevel()->getLevelLength() == 2) {
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Medium", levelEditorLayer->getLevel()->getLevelLength())->getCString());
-		}
-		else if (levelEditorLayer->getLevel()->getLevelLength() == 3) {
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
-		}
-		else if (levelEditorLayer->getLevel()->getLevelLength() == 4) {
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelEditorLayer->getLevel()->getLevelLength())->getCString());
+		auto levelLength = levelEditorLayer->getLevel()->getLevelLength();
+		switch (levelLength) {
+		case 0:
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Tiny", levelLength)->getCString());
+			break;
+		case 1:
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Short", levelLength)->getCString());
+			break;
+		case 2:
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Medium", levelLength)->getCString());
+			break;
+		case 3:
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Long", levelLength)->getCString());
+			break;
+		case 4:
+			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelLength)->getCString());
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -1105,7 +1135,6 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 }
 
 void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	EditorPauseLayer::onSaveAndPlay(self, sender);
 	auto lel = self->getEditorLayer();
 	if (lel) {
 		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
@@ -1114,10 +1143,10 @@ void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, vo
 		objDrawNode->clear();
 	}
 	editUI = nullptr;
+	EditorPauseLayer::onSaveAndPlay(self, sender);
 }
 
 void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	EditorPauseLayer::onSaveAndExit(self, sender);
 	auto lel = self->getEditorLayer();
 	if (lel) {
 		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
@@ -1126,10 +1155,10 @@ void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, vo
 		objDrawNode->clear();
 	}
 	editUI = nullptr;
+	EditorPauseLayer::onSaveAndExit(self, sender);
 }
 
 void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	EditorPauseLayer::onExitNoSave(self, sender);
 	auto lel = self->getEditorLayer();
 	if (lel) {
 		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
@@ -1138,10 +1167,10 @@ void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, voi
 		objDrawNode->clear();
 	}
 	editUI = nullptr;
+	EditorPauseLayer::onExitNoSave(self, sender);
 }
 
 void __fastcall EditorPauseLayer::onExitEditor_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
-	EditorPauseLayer::onExitEditor(self, sender);
 	auto lel = self->getEditorLayer();
 	if (lel) {
 		auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
@@ -1150,6 +1179,7 @@ void __fastcall EditorPauseLayer::onExitEditor_H(gd::EditorPauseLayer* self, voi
 		objDrawNode->clear();
 	}
 	editUI = nullptr;
+	EditorPauseLayer::onExitEditor(self, sender);
 }
 
 void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* edx, enumKeyCodes key) {
@@ -1357,35 +1387,40 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
 			else
 			{
-				if (editUI->getSingleSelectedObj()->getObjectColor() == 0) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Default (0)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 1) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 1 (1)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 2) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 2 (2)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 3) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col1 (3)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 4) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col2 (4)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 6) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col3 (6)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 7) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col4 (7)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 5) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Light BG (5)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 8) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: 3D-Line (8)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
-				}
-				else if (editUI->getSingleSelectedObj()->getObjectColor() == 9) {
-					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: White (9)", editUI->getSingleSelectedObj()->getObjectColor())->getCString());
+				auto colorID = editUI->getSingleSelectedObj()->getObjectColor();
+				switch (colorID) {
+				case 0:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Default (0)", colorID)->getCString());
+					break;
+				case 1:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 1 (1)", colorID)->getCString());
+					break;
+				case 2:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: P-Col 2 (2)", colorID)->getCString());
+					break;
+				case 3:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col1 (3)", colorID)->getCString());
+					break;
+				case 4:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col2 (4)", colorID)->getCString());
+					break;
+				case 5:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Light BG (5)", colorID)->getCString());
+					break;
+				case 6:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col3 (6)", colorID)->getCString());
+					break;
+				case 7:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: Col4 (7)", colorID)->getCString());
+					break;
+				case 8:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: 3D-Line (8)", colorID)->getCString());
+					break;
+				case 9:
+					reinterpret_cast<CCLabelBMFont*>(objcolorid)->setString(CCString::createWithFormat("C: White (9)", colorID)->getCString());
+					break;
+				default:
+					break;
 				}
 				objcolorid->setVisible(1);
 			}

@@ -37,6 +37,11 @@ namespace gd {
 			return reinterpret_cast<void(__thiscall*)(MenuLayer*, CCObject*)>(base + 0xb0200)(this, sender);
 		}
 	};
+
+	class GJMoreGamesLayer : public GJDropDownLayer {
+	public:
+		cocos2d::CCArray* getMoreGamesList();
+	};
 }
 
 #endif

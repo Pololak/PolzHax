@@ -70,6 +70,13 @@ namespace gd {
 			m_bHasGlowOutline = value;
 			updateColors();
 		}
+
+		auto baseSpr() {
+			return from<cocos2d::CCSprite*>(this, 0x1b8);
+		}
+		auto colorSpr() {
+			return from<cocos2d::CCSprite*>(this, 0x1bc);
+		}
 	};
 }
 

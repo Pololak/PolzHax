@@ -14,15 +14,26 @@ class GJGameLevel;
 class DrawGridLayer;
 class PlayerObject;
 class LevelSettingsObject;
-class UndoCommand;
 
-//class UndoObject {
-//public:
-//    static auto createWithArray(cocos2d::CCArray* objects, UndoCommand command) {
-//        return reinterpret_cast<UndoObject * (__thiscall*)(cocos2d::CCArray*, UndoCommand)>
-//            (base + 0x92970)(objects, command);
-//    }
-//};
+enum class UndoCommand {
+    Delete = 1,
+    New = 2,
+    Paste = 3,
+    DeleteMulti = 4,
+    Transform = 5,
+    Select = 6,
+};
+
+class UndoObject : public cocos2d::CCObject {
+public:
+    static UndoObject* createWithArray(cocos2d::CCArray* objects, UndoCommand command) {
+        return reinterpret_cast<UndoObject * (__fastcall*)(cocos2d::CCArray*, UndoCommand)>(base + 0x92970)(objects, command);
+    }
+
+    static UndoObject* createWithTransformObjects(cocos2d::CCArray* objects, UndoCommand nCommand) {
+        return reinterpret_cast<UndoObject*(__fastcall*)(cocos2d::CCArray*, UndoCommand)>(base + 0x92770)(objects, nCommand);
+    }
+};
 
 class LevelEditorLayer : public cocos2d::CCLayer {
     public:
@@ -128,6 +139,10 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         //void addToUndoList(UndoObject* undoObj, bool add) {
         //    reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, UndoObject*, bool)>(base + 0x8ea60)(this, undoObj, add);
         //}
+
+        void addToUndoList(UndoObject* undoObj, bool idk) {
+            reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, UndoObject*, bool)>(base + 0x8ea60)(this, undoObj, idk);
+        }
         
         /*auto gameLayer() {
             return from<CCLayer*>(this, 0x188);

@@ -1017,6 +1017,8 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables transition trigger effects.");
 
+            ImGui::Checkbox("Don't Fade", &setting().onDontFade);
+
             if (ImGui::Checkbox("Force Objects Invisible", &setting().onFObjectInvisible)) {
                 if (setting().onFObjectInvisible) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x90\x90\x90\x90\x90\x90", 6, NULL);
@@ -2293,7 +2295,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.1");
+            ImGui::Text("v1.1.9 Beta");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2305,11 +2307,6 @@ void RenderMain() {
             ImGui::EndTabItem();
 
             //ImGui::Combo("Thread Priority", setting().priority, setting().priority, 5);
-
-            if (ImGui::Button("Special Thanks"))
-            {
-                gd::FLAlertLayer::create(nullptr, "Special Thanks", "<co>Taswert</c>, <cp>Capeling</c>, <cg>Mat</c>, <cj>TheSillyDoggo</c>, Absolute, <cl>HJFod</c>, qimiko (zmx).", "Ok", nullptr, 320.f, false, 0)->show();
-            }
             if (ImGui::Button("Cocos Explorer")) {
                 setting().onExplorer = !setting().onExplorer;
             }

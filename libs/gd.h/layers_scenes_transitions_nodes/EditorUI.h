@@ -204,6 +204,8 @@ public:
         return output;
     }
 
+
+
     gd::GameObject* getSingleSelectedObj() {
         return from<gd::GameObject*>(this, 0x258);
     }

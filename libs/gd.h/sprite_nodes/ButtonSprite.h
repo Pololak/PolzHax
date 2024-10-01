@@ -32,12 +32,12 @@ namespace gd {
 	};
 	class ButtonSprite : public cocos2d::CCSprite {
 	public:
-		static auto create(const char* label, int idk, int width, float scale, bool absolute, const char* font, const char* sprite, float height) {
+		static auto create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float labelHeight) {
 			auto ret = reinterpret_cast<ButtonSprite * (__vectorcall*)(
 				float, float, float, float, float, float, // xmm registers
 				const char*, int, // ecx and edx
 				int, bool, const char*, const char*, float // stack
-				)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, idk, width, absolute, font, sprite, height); //0x9800 - GD 1.92
+				)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, buttonWidth, widthLimit, limitWidth, font, sprite, labelHeight); //0x9800 - GD 1.92
 			// TODO: fix vectorcall version to work with clang
 			// __asm movss xmm3, scale
 			// auto ret = reinterpret_cast<ButtonSprite*(__fastcall*)(

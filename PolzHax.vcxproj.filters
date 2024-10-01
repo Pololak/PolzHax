@@ -1521,6 +1521,12 @@
     <ClInclude Include="lvl-share.hpp">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="Icons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimplePlayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1587,6 +1593,9 @@
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="lvl-share.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SimplePlayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
   </ItemGroup>

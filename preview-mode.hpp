@@ -75,6 +75,8 @@ namespace EditorPauseLayer {
 		void SmallEditorStepToggler(CCObject*);
 		void PreviewModeToggler(CCObject*);
 		void VanillaSelectAllButton(CCObject*);
+		void extraFeaturesToggler(CCObject*);
+		void extraInfoPopup(CCObject*);
 	};
 
 	void mem_init();

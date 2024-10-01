@@ -184,25 +184,23 @@ struct SettingStruct {
     bool onSpeedhackCounted = false;
 
     bool onHideLabels = false;
-    bool onZeroDelay = false;
 
+    bool onZeroDelay = false;
     int hitboxFillOpacity = 255;
     int labelsOpacity = 255;
     float labelsScale = 1.f;
-
     bool isSafeMode;
     bool onSessionTime = false;
     bool onNoMiniIcon = false;
+    bool onDontFade = false;
+    bool extraFeatures = false;
 
     float fps = 60.f;
     float speedhack = 1.f;
     float UISize = 1.0f;
-
     float Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 };
     float BGcolor[4] = { 0, 0, 0, 0.902 };
-
     char message[50] = "Your Text";
-
 };
 
 SettingStruct& setting();

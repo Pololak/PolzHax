@@ -32,6 +32,8 @@ namespace PlayLayer {
 	inline void(__thiscall* releaseButton)(gd::PlayLayer*, int, bool);
 	void __fastcall releaseButton_H(gd::PlayLayer* self, void* edx, int idk1, bool idk2);
 
+	inline void(__thiscall* applyEnterEffect)(gd::PlayLayer*, gd::GameObject*);
+	void __fastcall applyEnterEffect_H(gd::PlayLayer* self, void* edx, gd::GameObject* obj);
 
 	void mem_init();
 
@@ -72,6 +74,13 @@ namespace PlayerObject {
 
 	inline void(__thiscall* updatePlayerRollFrame)(gd::PlayerObject*, int);
 	void __fastcall updatePlayerRollFrame_H(gd::PlayerObject* self, void* edx, int frameID);
+
+	void mem_init();
+}
+
+namespace GameObject {
+	inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
+	void __fastcall setOpacity_H(gd::GameObject* self, void* edx, GLubyte opacity);
 
 	void mem_init();
 }

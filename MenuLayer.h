@@ -13,3 +13,10 @@ namespace MenuLayer {
 
 	void mem_init();
 }
+
+namespace GJMoreGamesLayer {
+	inline void(__thiscall* getMoreGamesList)(gd::GJMoreGamesLayer*);
+	void __fastcall getMoreGamesList_H(gd::GJMoreGamesLayer* self);
+
+	void mem_init();
+}

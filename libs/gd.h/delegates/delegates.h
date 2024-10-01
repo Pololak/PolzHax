@@ -103,6 +103,10 @@ namespace gd {
     class SetIDPopupDelegate {
         virtual void setIDPopupClosed(SetIDPopup *,int);
     };
+
+    class AppDelegate : public cocos2d::CCApplication {
+
+    };
 }
 
 #endif

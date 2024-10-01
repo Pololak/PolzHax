@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include "PlayLayer.h"
 #include "CrashLogger.hpp"
+#include "SimplePlayer.h"
 gd::ColorSelectPopup* colorSelectPopup;
 
 void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
@@ -135,8 +136,8 @@ void __stdcall ObjectToolbox_gridNodeSizeForKey_H(int id) {
     ObjectToolbox_gridNodeSizeForKey(id);
 }
 
-bool(__thiscall* CCDirector_end)(CCDirector* self);
-void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
+void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
+void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     if (setting().onAutoSave)
     {
         auto file = fopen("Resources/polzsave.dat", "wb");
@@ -145,7 +146,8 @@ void __fastcall CCDirector_end_H(CCDirector* self, void* edx) {
             fclose(file);
         }
     }
-    CCDirector_end(self);
+
+    AppDelegate_trySaveGame(self);
 }
 
 DWORD WINAPI my_thread(void* hModule) {
@@ -179,6 +181,8 @@ DWORD WINAPI my_thread(void* hModule) {
     MenuLayer::mem_init();
     LevelEditorLayer::mem_init();
     PlayerObject::mem_init();
+    //SimplePlayer::mem_init();
+    GameObject::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),
@@ -197,10 +201,15 @@ DWORD WINAPI my_thread(void* hModule) {
     
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 
+    //MH_CreateHook(
+    //    reinterpret_cast<void*>(GetProcAddress(cocos, "?end@CCDirector@cocos2d@@QAEXXZ")),
+    //    reinterpret_cast<void**>(&CCDirector_end_H),
+    //    reinterpret_cast<void**>(&CCDirector_end));
+
     MH_CreateHook(
-        reinterpret_cast<void*>(GetProcAddress(cocos, "?end@CCDirector@cocos2d@@QAEXXZ")),
-        reinterpret_cast<void**>(&CCDirector_end_H),
-        reinterpret_cast<void**>(&CCDirector_end));
+        reinterpret_cast<void*>(gd::base + 0x293f0), 
+        reinterpret_cast<void**>(&AppDelegate_trySaveGame_H), 
+        reinterpret_cast<void**>(&AppDelegate_trySaveGame));
 
     lvl_share::init();
     preview_mode::init();
