@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cocos2d.h>
 #include "imgui-hook.hpp"
+#include <gd.h>
 
 using namespace cocos2d;
 
@@ -173,7 +174,7 @@ void ImGuiHook::setupHooks(std::function<void(void*, void*, void**)> hookFunc) {
         reinterpret_cast<void**>(&CCEGLView_toggleFullScreen)
     );
     hookFunc(
-        reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandleA(0)) + 0x28f00),
+        reinterpret_cast<void*>(gd::base + 0x28f00),
         reinterpret_cast<void*>(&AppDelegate_applicationWillEnterForeground_H),
         reinterpret_cast<void**>(&AppDelegate_applicationWillEnterForeground)
     );

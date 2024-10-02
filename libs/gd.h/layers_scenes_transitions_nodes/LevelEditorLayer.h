@@ -144,6 +144,14 @@ class LevelEditorLayer : public cocos2d::CCLayer {
             reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, UndoObject*, bool)>(base + 0x8ea60)(this, undoObj, idk);
         }
         
+        void pushButton(int idk, bool idk2) {
+            reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, int, bool)>(base + 0x90800)(this, idk, idk2);
+        }
+
+        void releaseButton(int idk, bool idk2) {
+            reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, int, bool)>(base + 0x908f0)(this, idk, idk2);
+        }
+
         /*auto gameLayer() {
             return from<CCLayer*>(this, 0x188);
         }

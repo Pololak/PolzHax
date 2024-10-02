@@ -158,7 +158,7 @@ DWORD WINAPI my_thread(void* hModule) {
     DWORD old;
     VirtualProtect(reinterpret_cast<void*>(0x518e1c), 0xF, PAGE_READWRITE, &old); // FadeTime string
 
-    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x518e29), "\x33", 1, NULL); // FadeTime: 0.000
+    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x518e29), "\x32", 1, NULL); // FadeTime: 0.000
 
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
     if (MH_Initialize() != MH_OK) {
@@ -179,10 +179,7 @@ DWORD WINAPI my_thread(void* hModule) {
     EndLevelLayer::mem_init();
     Scheduler::mem_init();
     MenuLayer::mem_init();
-    LevelEditorLayer::mem_init();
     PlayerObject::mem_init();
-    //SimplePlayer::mem_init();
-    GameObject::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),

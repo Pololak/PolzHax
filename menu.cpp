@@ -65,9 +65,7 @@ bool oneX = true;
 
 void RenderMain() {
 	unsigned long long pointervalue;
-    
-    
-    
+
     if (oneX) {
         auto file = fopen("Resources/polzsave.dat", "rb");
         if (file) {
@@ -566,6 +564,15 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x72\x79", 2, NULL);
         }
 
+        if (setting().onSwitchToUpArrow) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x26", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x26", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x20", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x20", 1, NULL);
+        }
+
         if (setting().onVerifyHack) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\xeb\x2f", 2, NULL);
         }
@@ -1016,8 +1023,6 @@ void RenderMain() {
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables transition trigger effects.");
-
-            ImGui::Checkbox("Don't Fade", &setting().onDontFade);
 
             if (ImGui::Checkbox("Force Objects Invisible", &setting().onFObjectInvisible)) {
                 if (setting().onFObjectInvisible) {
@@ -1593,6 +1598,19 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the editor trail smoother.");
 
+            if (ImGui::Checkbox("Up Arrow Jump", &setting().onSwitchToUpArrow)) {
+                if (setting().onSwitchToUpArrow) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x26", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x26", 1, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x20", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x20", 1, NULL);
+                }
+            }
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Rebinds jump to up arrow.");
+
             if (ImGui::Checkbox("Verify Hack", &setting().onVerifyHack)) {
                 if (setting().onVerifyHack) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43d760), "\xeb\x2f", 2, NULL);
@@ -1623,15 +1641,6 @@ void RenderMain() {
         {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
-
-            /*if (ImGui::Checkbox("Ball Rotation Fix", &setting().onBallRotationFix)) {
-                if (setting().onBallRotationFix) {
-
-                }
-                else {
-
-                }
-            }*/
 
             if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
                 if (setting().onConfirmExit) {
@@ -1672,21 +1681,10 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Fixes vehicles rotation on high fps (affects hitboxes).");
 
-            
-            //ImGui::Checkbox("Show Object Hitbox", &setting().onObjHitbox);
             ImGui::Checkbox("Hitboxes", &setting().onHitboxes);
-            ImGui::SameLine();
-            if (ImGui::ArrowButton("hit", 1))
-                ImGui::OpenPopup("Hitbox Settings");
-
-            ImGui::SetNextWindowBgAlpha(setting().BGcolor[3]);
-            if (ImGui::BeginPopupModal("Hitbox Settings", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                
+            if (ImGui::TreeNode("Hitboxes settings")) {
                 ImGui::SetNextItemWidth(setting().UISize * 60);
                 ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
-
-                ImGui::SetNextItemWidth(setting().UISize * 60);
-                ImGui::DragInt("Fill Opacity", &setting().hitboxFillOpacity, 1.f, 0, 255);
 
                 ImGui::Checkbox("Player", &setting().onPlayerHitbox);
 
@@ -1701,12 +1699,7 @@ void RenderMain() {
                 ImGui::Checkbox("Specials", &setting().onSpecialsHitbox);
                 ImGui::SameLine();
                 ImGui::ColorEdit3("##specialsHitboxColor", setting().specialsColor, ImGuiColorEditFlags_NoInputs);
-
-                if (ImGui::Button("Close") || GetAsyncKeyState(KEY_Escape)) {
-                    ImGui::CloseCurrentPopup();
-                }
-
-                ImGui::EndPopup();
+                ImGui::TreePop();
             }
 
             ImGui::Checkbox("Hitboxes on Death", &setting().onHitboxesOnDeath);
@@ -2295,7 +2288,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9 Beta");
+            ImGui::Text("v1.1.9-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

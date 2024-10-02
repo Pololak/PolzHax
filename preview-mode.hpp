@@ -10,13 +10,6 @@ namespace preview_mode {
 	};
 }
 
-namespace LevelEditorLayer {
-	inline bool(__thiscall* updateOrig)(gd::LevelEditorLayer*, float);
-	void __fastcall updateHook(gd::LevelEditorLayer* self, void*, float dt);
-
-	void mem_init();
-}
-
 namespace EditorUI {
 
 	inline bool(__thiscall* init)(gd::EditorUI* self, gd::LevelEditorLayer* editor);
@@ -28,14 +21,11 @@ namespace EditorUI {
 	inline bool(__thiscall* scrollWheel)(gd::EditorUI* _self, float dy, float dx);
 	void __fastcall scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx);
 
-	inline bool(__thiscall* createMoveMenu)(gd::EditorUI* self);
-	void __fastcall createMoveMenu_H(gd::EditorUI* self);
+	//inline bool(__thiscall* keyDown)(gd::EditorUI*, cocos2d::enumKeyCodes);
+	//void __fastcall keyDown_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
 
-	inline void(__thiscall* onPause)(gd::EditorUI*, CCObject*);
-	void __fastcall onPause_H(gd::EditorUI* self, void*, CCObject* sender);
-
-	inline bool(__thiscall* moveForCommand)(gd::EditorUI*, CCPoint*, gd::EditCommand);
-	void __fastcall moveForCommand_H(gd::EditorUI* self, CCPoint* pos, gd::EditCommand command);
+	//inline bool(__thiscall* keyUp)(gd::EditorUI*, cocos2d::enumKeyCodes);
+	//void __fastcall keyUp_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
 
 	class Callback {
 	public:
@@ -81,20 +71,6 @@ namespace EditorPauseLayer {
 
 	void mem_init();
 }
-
-namespace CustomSongLayer {
-	inline bool(__thiscall* init)(CCLayer*, gd::LevelSettingsObject*);
-	bool __fastcall init_H(CCLayer* self, gd::LevelSettingsObject* object);
-
-	void mem_init();
-}
-
-//namespace LevelSettingsLayer {
-//	inline bool(__thiscall* init)(CCLayer*, gd::LevelSettingsObject*);
-//	bool __fastcall init_H(CCLayer* self, gd::LevelSettingsObject* lso);
-//
-//	void mem_init();
-//}
 
 namespace Scheduler {
 	inline bool(__thiscall* update)(CCScheduler* self, float dt);

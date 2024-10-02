@@ -194,6 +194,7 @@ struct SettingStruct {
     bool onNoMiniIcon = false;
     bool onDontFade = false;
     bool extraFeatures = false;
+    bool onSwitchToUpArrow = false;
 
     float fps = 60.f;
     float speedhack = 1.f;

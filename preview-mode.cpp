@@ -543,12 +543,7 @@ public:
 		}
 	}
 };
-
 MyEditorLayer* MyEditorLayer::s_instance = nullptr;
-
-void __fastcall LevelEditorLayer::updateHook(gd::LevelEditorLayer* self, void*, float dt) {
-	LevelEditorLayer::updateOrig(self, dt);
-}
 
 bool EditorPauseLayer_init(void* self, void* idc) {
 	is_editor_paused = true;
@@ -624,34 +619,6 @@ void EditorUI_ccTouchEnded(gd::EditorUI* self, void* idc, void* idc2) {
 	return matdash::orig<&EditorUI_ccTouchEnded>(self, idc, idc2);
 }
 
-void __fastcall EditorUI::moveForCommand_H(gd::EditorUI* self, CCPoint* pos, gd::EditCommand com) {
-	switch (com) {
-	case kEditCommandHalfRight:
-		*pos = CCPoint(15.f, 0);
-		return;
-	}
-
-	EditorUI::moveForCommand(self, pos, com);
-}
-
-//void addMoveButton(gd::EditorUI* self, const char* spr, const char* sizeTxt, gd::EditCommand command, const char* keybind = nullptr, float scale = 1.0f) {
-//	auto btn = self->getSpriteButton(spr, menu_selector(gd::EditorUI::moveObjectCall), nullptr, 0.9f);
-//	btn->setTag(command);
-//
-//	auto label = CCLabelBMFont::create(sizeTxt, "bigFont.fnt");
-//	label->setScale(.35f);
-//	label->setZOrder(50);
-//	label->setPosition(btn->getContentSize().width / 2, 11.0f);
-//	btn->addChild(label);
-//
-//	auto editButtonBar = from<gd::EditButtonBar*>(self, 0x160);
-//	auto ccComponentContainer = from<CCComponentContainer*>(editButtonBar, 0xe4);
-//	auto boomScrollLayer = from<CCNode*>(ccComponentContainer, 0x8);
-//	auto btnarray = from<CCArray*>(boomScrollLayer, 0xa8);
-//
-//	btnarray->addObject(btn);
-//}
-
 void EditorUI::Callback::onGoToBaseLayer(CCObject* sender) {
 	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = -1;
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString("All");
@@ -687,25 +654,11 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 	}
 	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = currentLayer;
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(currentLayer).c_str());
-
-	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
-	auto undo = gd::UndoObject::createWithArray(selectedObjects, gd::UndoCommand::Select);
-	auto undoList = from<CCArray*>(leveleditor, 0x170);
-	undoList->addObject(undo);
-}
-
-void EditorUI::Callback::onGoToGroup(CCObject* sender) {
-
 }
 
 void EditorUI::Callback::rotate45CW(CCObject* sender) {
 	CCArray* selectedObjects = editUI->getSelectedObjectsOfCCArray();
-	//editUI->getLevelEditorLayer()->addToUndoList(undo, false);
 	editUI->rotateObjects(selectedObjects, 45.f, { 0, 0 });
-	auto undoList = from<CCArray*>(editUI->getLevelEditorLayer(), 0x170);
-	auto undo = gd::UndoObject::createWithArray(selectedObjects, gd::UndoCommand::Transform);
-	//undoList->addObject(undo);
-	editUI->getLevelEditorLayer()->addToUndoList(undo, false);
 }
 
 void EditorUI::Callback::rotate45CCW(CCObject* sender) {
@@ -774,7 +727,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	moreObjInfoMenu->addChild(objrot);
 
 	auto objposx = CCLabelBMFont::create("", "chatFont.fnt");
-	objposx->setString(CCString::createWithFormat("Pos X: %.0f%")->getCString());
+	objposx->setString(CCString::createWithFormat("X: %.0f%")->getCString());
 	objposx->setVisible(0);
 	objposx->setTag(45013);
 	objposx->setScale(0.66f);
@@ -783,7 +736,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	moreObjInfoMenu->addChild(objposx);
 
 	auto objposy = CCLabelBMFont::create("", "chatFont.fnt");
-	objposy->setString(CCString::createWithFormat("Pos Y: %.0f%")->getCString());
+	objposy->setString(CCString::createWithFormat("Y: %.0f%")->getCString());
 	objposy->setVisible(0);
 	objposy->setTag(45014);
 	objposy->setScale(0.66f);
@@ -792,7 +745,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	moreObjInfoMenu->addChild(objposy);
 
 	auto objid = CCLabelBMFont::create("", "chatFont.fnt");
-	objid->setString(CCString::createWithFormat("ObjID: %d")->getCString());
+	objid->setString(CCString::createWithFormat("ID: %d")->getCString());
 	objid->setVisible(0);
 	objid->setTag(45016);
 	objid->setScale(0.66f);
@@ -802,7 +755,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 	gd::GameObject* selectedObject = from<gd::GameObject*>(self, 0x258);
 	auto objaddr = CCLabelBMFont::create("", "chatFont.fnt");
-	objaddr->setString(CCString::createWithFormat("Addr: 0x%p", selectedObject)->getCString());
+	objaddr->setString(CCString::createWithFormat("Address: 0x%p", selectedObject)->getCString());
 	objaddr->setVisible(0);
 	objaddr->setTag(45017);
 	objaddr->setAnchorPoint({ 0, 0.5f });
@@ -945,19 +898,6 @@ void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy
 	else {
 		EditorUI::scrollWheel(_self, dy, dx);
 	}
-}
-
-void __fastcall EditorUI::createMoveMenu_H(gd::EditorUI* self) {
-	EditorUI::createMoveMenu(self);
-
-	//auto bar_array = from<CCArray*>(self, 0xa8);
-
-	
-
-	//array->addObject(sprite);
-	//editButtonBar->addChild(sprite);
-	
-	//addMoveButton(self, "edit_rightBtn2_001.png", "1/2", kEditCommandHalfRight, nullptr);
 }
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
@@ -1192,15 +1132,6 @@ void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* ed
 	}
 }
 
-//bool __fastcall CustomSongLayer::init_H(CCLayer* self, gd::LevelSettingsObject* object) {
-//	bool result = CustomSongLayer::init(self, object);
-//
-//	auto menu = from<CCMenu*>(self, 0x194);
-//	menu->setVisible(0);
-//
-//	return result;
-//}
-
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	scheduler = self;
 	Scheduler::update(self, dt);
@@ -1283,7 +1214,6 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 
 		auto rightMenu = from<CCMenu*>(editUI->getDeselectBtn(), 0xac);
 		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45028));
-		//auto goToGroupBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45031));
 
 		if (lel) {
 			auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
@@ -1371,17 +1301,6 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				onBaseLayerBtn->setEnabled(true);
 			}
 		}
-
-		//if (goToGroupBtn) {
-		//	if (editUI->getSelectedObjectsOfCCArray()->count() == 0) {
-		//		goToGroupBtn->setVisible(0);
-		//		goToGroupBtn->setEnabled(false);
-		//	}
-		//	else {
-		//		goToGroupBtn->setVisible(1);
-		//		goToGroupBtn->setEnabled(true);
-		//	}
-		//}
 		
 		if (objcolorid) {
 			if (editUI->getSingleSelectedObj() == 0) objcolorid->setVisible(0);
@@ -1447,7 +1366,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objposx->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("Pos X: %.01f%", editUI->getSingleSelectedObj()->getPositionX())->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objposx)->setString(CCString::createWithFormat("X: %.01f%", editUI->getSingleSelectedObj()->getPositionX())->getCString());
 				objposx->setVisible(1);
 			}
 		}
@@ -1456,7 +1375,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			if (editUI->getSingleSelectedObj() == 0) objposy->setVisible(0);
 			else
 			{
-				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Pos Y: %.01f%", editUI->getSingleSelectedObj()->getPositionY())->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objposy)->setString(CCString::createWithFormat("Y: %.01f%", editUI->getSingleSelectedObj()->getPositionY())->getCString());
 				objposy->setVisible(1);
 			}
 		}
@@ -1464,7 +1383,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		if (objid) {
 			if (editUI->getSingleSelectedObj() == 0) objid->setVisible(0);
 			else {
-				reinterpret_cast<CCLabelBMFont*>(objid)->setString(CCString::createWithFormat("ObjID: %d", editUI->getSingleSelectedObj()->getObjectID())->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objid)->setString(CCString::createWithFormat("ID: %d", editUI->getSingleSelectedObj()->getObjectID())->getCString());
 				objid->setVisible(1);
 			}
 		}
@@ -1473,7 +1392,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		{
 			if (editUI->getSingleSelectedObj() == 0) objaddr->setVisible(0);
 			else {
-				reinterpret_cast<CCLabelBMFont*>(objaddr)->setString(CCString::createWithFormat("Addr: 0x%p", editUI->getSingleSelectedObj())->getCString());
+				reinterpret_cast<CCLabelBMFont*>(objaddr)->setString(CCString::createWithFormat("Address: 0x%p", editUI->getSingleSelectedObj())->getCString());
 				objaddr->setVisible(1);
 			}
 		}
@@ -1493,24 +1412,6 @@ void Scheduler::mem_init() {
 		reinterpret_cast<void*>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?update@CCScheduler@cocos2d@@UAEXM@Z")),
 		Scheduler::update_H,
 		reinterpret_cast<void**>(&Scheduler::update));
-	/*MH_CreateHook(
-		reinterpret_cast<void*>(cocosbase + 0xff970),
-		Scheduler::update_H,
-		reinterpret_cast<void**>(Scheduler::update));*/
-}
-
-//void CustomSongLayer::mem_init() {
-//	MH_CreateHook(
-//		reinterpret_cast<void*>(gd::base + 0x36540),
-//		CustomSongLayer::init_H,
-//		reinterpret_cast<void**>(&CustomSongLayer::init));
-//}
-
-void LevelEditorLayer::mem_init() {
-	MH_CreateHook(
-		reinterpret_cast<void*>(gd::base + 0x91620),
-		LevelEditorLayer::updateHook,
-		reinterpret_cast<void**>(&LevelEditorLayer::updateOrig));
 }
 
 void EditorUI::mem_init() {
@@ -1526,14 +1427,6 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x4ee90),
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
-	/*MH_CreateHook(
-		reinterpret_cast<void*>(gd::base + 0x411f0),
-		EditorUI::onPause_H,
-		reinterpret_cast<void**>(&EditorUI::onPause));*/
-	MH_CreateHook(
-		reinterpret_cast<void*>(gd::base + 0x49d20),
-		EditorUI::createMoveMenu_H,
-		reinterpret_cast<void**>(&EditorUI::createMoveMenu));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
 	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);
@@ -1556,22 +1449,11 @@ void EditorPauseLayer::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x3f420),
 		EditorPauseLayer::onExitNoSave_H,
 		reinterpret_cast<void**>(&EditorPauseLayer::onExitNoSave));
-	/*MH_CreateHook(
-		reinterpret_cast<void*>(gd::base + 0x3f380),
-		EditorPauseLayer::onExitEditor_H,
-		reinterpret_cast<void**>(&EditorPauseLayer::onExitEditor));*/
 	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0x3f570),
 		EditorPauseLayer::keyDown_H,
 		reinterpret_cast<void**>(&EditorPauseLayer::keyDown));
 }
-
-//void LevelSettingsLayer::mem_init() {
-//	MH_CreateHook(
-//		reinterpret_cast<void*>(gd::base + 0x97050),
-//		LevelSettingsLayer::init_H,
-//		reinterpret_cast<void**>(&LevelSettingsLayer::init));
-//}
 
 void preview_mode::init() {
 	matdash::add_hook<&MyEditorLayer::updateVisibility, matdash::Thiscall>(gd::base + 0x8ef20);
