@@ -79,7 +79,7 @@ void render_node_properties(CCNode* node) {
 
 	if (ImGui::BeginPopupModal("Add Child")) {
 		static int item = 0;
-		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0");
+		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0CCScale9Sprite\0");
 
 		static int tag = -1;
 		ImGui::InputInt("Tag", &tag);
@@ -99,6 +99,9 @@ void render_node_properties(CCNode* node) {
 		if (item == 3 || item == 4) {
 			ImGui::InputText("Texture", text, 256);
 			ImGui::Checkbox("Frame", &frame);
+		}
+		if (item == 5) {
+			ImGui::InputText("Texture", text, 256);
 		}
 
 		ImGui::Separator();
@@ -135,6 +138,10 @@ void render_node_properties(CCNode* node) {
 				else
 					sprite = CCSprite::create(text);
 				_child = gd::CCMenuItemSpriteExtra::create(sprite, sprite, nullptr, 0);
+				break;
+			}
+			case 5: {
+				_child = extension::CCScale9Sprite::create(text);
 				break;
 			}
 			}
