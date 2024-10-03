@@ -173,6 +173,14 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         }*/
         //0x8d770
 
+        int sectionForPos(float x)
+        {
+            int section = x / 100;
+            if (section < 0)
+                section = 0;
+            return section;
+        }
+
         int getCurrentLayer() { return m_nCurrentLayer; }
         void setCurrentLayer(int n) { m_nCurrentLayer = n; }
     };

@@ -1234,10 +1234,13 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			auto objectDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(125));
 			objectDrawNode->clear();
 			if (setting().onHitboxes) {
+				//if (arrcount != 0) {
+				auto layer = lel->gameLayer();
+				float xp = -layer->getPositionX() / layer->getScale();
 				if (setting().onSolidsHitbox) {
-					for (int i = 0; i < arrcount; i++) {
+					for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
 						if (i < 0) continue;
-						if (i > arrcount) break;
+						if (i >= arrcount) break;
 						auto objAtInd = secarr->objectAtIndex(i);
 						auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
@@ -1249,9 +1252,9 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				}
 
 				if (setting().onHazardsHitbox) {
-					for (int i = 0; i < arrcount; i++) {
+					for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
 						if (i < 0) continue;
-						if (i > arrcount) break;
+						if (i >= arrcount) break;
 						auto objAtInd = secarr->objectAtIndex(i);
 						auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
@@ -1263,9 +1266,9 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 				}
 
 				if (setting().onSpecialsHitbox) {
-					for (int i = 0; i < arrcount; i++) {
+					for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
 						if (i < 0) continue;
-						if (i > arrcount) break;
+						if (i >= arrcount) break;
 						auto objAtInd = secarr->objectAtIndex(i);
 						auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
@@ -1275,6 +1278,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 						}
 					}
 				}
+				//}
 			}
 		}
 

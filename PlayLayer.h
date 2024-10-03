@@ -82,5 +82,8 @@ namespace GameObject {
 	inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
 	void __fastcall setOpacity_H(gd::GameObject* self, void* edx, GLubyte opacity);
 
+	inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
+	void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
+
 	void mem_init();
 }
