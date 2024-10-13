@@ -6,6 +6,8 @@
 
 namespace gd {
 
+	class LevelSettingsObject;
+
 	class StartPosObject : public GameObject {
 	public:
 			
@@ -14,6 +16,9 @@ namespace gd {
 		}
 		static StartPosObject* create() {
 			return reinterpret_cast<StartPosObject * (__fastcall*)()>(base + 0x75bf0)();
+		}
+		LevelSettingsObject* levelSettingsObject() {
+			return from<LevelSettingsObject*>(this, 0x328);
 		}
 	};
 }

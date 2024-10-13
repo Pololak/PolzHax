@@ -180,6 +180,8 @@ DWORD WINAPI my_thread(void* hModule) {
     Scheduler::mem_init();
     MenuLayer::mem_init();
     PlayerObject::mem_init();
+    GameObject::mem_init();
+    CCCircleWave::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),

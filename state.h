@@ -27,6 +27,7 @@ struct SettingStruct {
     bool onAutoSave = false;
     bool onExplorer = false;
     cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;
+    char message[50] = "Your Text";
     
     // Bypass
     bool onCharFilter = false;
@@ -107,10 +108,7 @@ struct SettingStruct {
     bool onHazardsHitbox = false;
     bool onSpecialsHitbox = false;
 
-    float solidsColor[3] = { 0, 0, 1 };
-    float hazardsColor[3] = { 1, 0, 0 };
-    float specialsColor[3] = { 0, 1, 0 };
-    int hitboxOpacity = 255;
+
     //
     bool onIgnoreEsc = false;
     bool onInstantComplete = false;
@@ -186,22 +184,33 @@ struct SettingStruct {
     bool onHideLabels = false;
 
     bool onZeroDelay = false;
-    int hitboxFillOpacity = 255;
-    int labelsOpacity = 255;
-    float labelsScale = 1.f;
+
     bool isSafeMode;
     bool onSessionTime = false;
     bool onNoMiniIcon = false;
     bool onDontFade = false;
     bool extraFeatures = false;
     bool onSwitchToUpArrow = false;
+    bool onNoEffectCircle = false;
+    bool onShowLayout = false;
 
-    float fps = 60.f;
-    float speedhack = 1.f;
-    float UISize = 1.0f;
-    float Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 };
-    float BGcolor[4] = { 0, 0, 0, 0.902 };
-    char message[50] = "Your Text";
+    int hitboxFillOpacity = 255;
+    int labelsOpacity = 255;
+    int hitboxOpacity = 255;
+    float labelsScale = 1.f,
+        solidsColor[3] = { 0, 0, 1 },
+        hazardsColor[3] = { 1, 0, 0 },
+        specialsColor[3] = { 0, 1, 0 },
+        fps = 60.f,
+        speedhack = 1.f,
+        UISize = 1.0f,
+        wavePulseSize = 2.1f,
+        Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 },
+        BGcolor[4] = { 0, 0, 0, 0.902 };
+    
+
+
+    //float BackGroundColor[3] = { 0.156, 0.490, 1 }, GroundColor[3] = { 0, 0.400, 1 };
 };
 
 SettingStruct& setting();

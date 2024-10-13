@@ -476,8 +476,21 @@ public:
 			for (auto object : AwesomeArray<gd::GameObject>(objects)) {
 				if (!object || !object->getParent() || object->isSelected()) continue;
 
-				if (object->getIsTintObject())
+				if (object->getIsTintObject()) {
 					object->setObjectColor(obj_color);
+				}
+
+				//if (object->getType() == gd::GameObjectType::kGameObjectTypeSolid) {
+				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
+				//}
+
+				//if (object->getType() == gd::GameObjectType::kGameObjectTypeSlope) {
+				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
+				//}
+
+				//if (object->getType() == gd::GameObjectType::kGameObjectTypeHazard) {
+				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
+				//}
 
 				auto mode = object->getColorMode();
 				switch (mode) {

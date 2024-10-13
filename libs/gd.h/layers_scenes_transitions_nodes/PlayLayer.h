@@ -49,6 +49,10 @@ namespace gd {
 			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf3b80)(this); //f1fe0 1.91
 		}
 
+		void updateCustomColorBlend(int colorID, bool isBlend) {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xecf30)(this, colorID, isBlend);
+		}
+
 		auto layer() {
 			return from<cocos2d::CCLayer*>(this, 0x2D4);
 		}
@@ -135,6 +139,15 @@ namespace gd {
 		}
 		auto getAudioEffectsLayer() {
 			return from<gd::AudioEffectsLayer*>(this, 0x198);
+		}
+		auto getBackgroundSprite() {
+			return from<cocos2d::CCSprite*>(this, 0x164);
+		}
+		auto getGroundBottom() {
+			return from<cocos2d::CCLayer*>(this, 0x1a4);
+		}
+		auto getGroundTop() {
+			return from<cocos2d::CCLayer*>(this, 0x1a8);
 		}
 	};
 }

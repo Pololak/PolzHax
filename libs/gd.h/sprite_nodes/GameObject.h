@@ -306,11 +306,11 @@ namespace gd {
 		}
 
 		int getType() {
-			return from<int>(this, 0x249);
+			return from<int>(this, 0x268);
 			//return reinterpret_cast<int(__fastcall*)(GameObject*)>(base + 0x52240)(this);
 		}
 		void setType(int newType) {
-			from<int>(this, 0x249) = newType;
+			from<int>(this, 0x268) = newType;
 		}
 
 		float getObjectRadius() {
@@ -388,6 +388,10 @@ namespace gd {
 			if (getHasColor()) {
 				getChildSprite()->setColor(color);
 			}
+		}
+
+		auto getGlowSprite() {
+			return from<cocos2d::CCSprite*>(this, 0x1d8);
 		}
 
 		void setCustomColor(cocos2d::ccColor3B color) {

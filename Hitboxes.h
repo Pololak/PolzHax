@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 //#include "HitboxNode.h"
+#include <deque>
 
 namespace Hitboxes {
 	void drawRect(CCDrawNode* drawer, CCRect const& rect, ccColor4F col);

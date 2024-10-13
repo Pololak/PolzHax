@@ -1527,6 +1527,9 @@
     <ClInclude Include="SimplePlayer.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="Speedhack.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1580,9 +1583,6 @@
     <ClCompile Include="ObjectToolbox.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="Hitboxes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MenuLayer.cpp">
       <Filter>Header Files\Hooks</Filter>
     </ClCompile>
@@ -1597,6 +1597,12 @@
     </ClCompile>
     <ClCompile Include="SimplePlayer.cpp">
       <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Hitboxes.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Speedhack.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

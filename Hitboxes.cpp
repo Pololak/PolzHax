@@ -2,6 +2,9 @@
 #include "ObjectsIds.h"
 #include "state.h"
 
+//std::deque<cocos2d::CCRect> boo1;
+//std::deque<cocos2d::CCRect> boo2;
+
 void Hitboxes::drawRect(CCDrawNode* drawer, CCRect const& rect, ccColor4F col) {
     constexpr size_t N = 4;
     CCPoint vert[N];
@@ -121,9 +124,14 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
     rectRectangle.setRect(player->getPositionX() - distance1 / 2, player->getPositionY() - distance2 / 2, distance1, distance2);
     rectRectangleSmall.setRect(player->getPositionX() - distanceS1 / 2, player->getPositionY() - distanceS2 / 2, distanceS1, distanceS2);
 
-    Hitboxes::drawRect(drawNode, rectRectangleSmall, { 0, 0, 1, (setting().hitboxOpacity * 255.f) });
-    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0}, 0.5, {0.5, 0, 0, (setting().hitboxOpacity * 255.f)});
-    Hitboxes::drawRect(drawNode, rectRectangle, { 1, 0, 0, (setting().hitboxOpacity * 255.f) });
+    Hitboxes::drawRect(drawNode, rectRectangleSmall, { setting().solidsColor[0], setting().solidsColor[1], setting().solidsColor[2], (setting().hitboxOpacity * 255.f)});
+    drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0}, 0.5, { (setting().hazardsColor[0] / 2), (setting().hazardsColor[1] / 2), (setting().hazardsColor[2] / 2), (setting().hitboxOpacity * 255.f)});
+    Hitboxes::drawRect(drawNode, rectRectangle, { setting().hazardsColor[0], setting().hazardsColor[1], setting().hazardsColor[2], (setting().hitboxOpacity * 255.f) });
+
+    //while (boo1.size() > 0 && boo1.front().origin.x < rectRectangle.origin.x - 400)
+    //{
+    //    boo1.pop_front();
+    //}
 }
 
 //void Hitboxes::drawObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {

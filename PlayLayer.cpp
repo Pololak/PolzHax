@@ -7,6 +7,7 @@
 #include "CheckPoint.h"
 #include "Hitboxes.h"
 #include "imgui.h"
+//#include "ObjectsIds.h"
 
 CCArray* startPosArr;
 gd::PlayLayer* playLayer;
@@ -34,6 +35,31 @@ std::vector<time_t> m_clickFrames;
 int m_totalClicks = 0;
 bool m_isHolding = false;
 
+bool inPractice;
+bool inTestmode;
+int smoothOut;
+
+std::set<int>pulseObjects = {
+    50, 51, 52, 53, 54, 60, 148, 149, 405,
+    37 // that pulse things on sticks
+};
+
+std::set<int>portalObjects = {
+    10, 11,					//gravity portals
+    12, 13, 47, 111, 660,	//gamemode portals
+    45, 46,					//mirror portals
+    99, 101,				//mini/big portals
+    286, 287				//dual portals
+};
+
+std::set<int>cornerObjects = {
+    472, 473, 474
+};
+
+std::vector<gd::StartPosObject*> sp;
+std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniPortals, speedChanges, mirrorPortals;
+std::vector<bool> willFlip;
+
 void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player)
 {
     isPlayerDead = true;
@@ -56,6 +82,11 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     deathPos = 0.f;
     m_clickFrames.clear();
     m_totalClicks = 0;
+
+    //if (inTestmode || inPractice) {
+    //    smoothOut = 2; // Account for 1 extra frame respawn
+    //}
+
     PlayLayer::resetLevel(self);
 }
 
@@ -65,6 +96,10 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     isPlayerColorGot = false;
     fadedoutflag = 0;
     currentBest = 0;
+
+    //inPractice = false;
+    //inTestmode = from<bool>(self, 0x2b8);
+    //smoothOut = 0;
 
     if (!PlayLayer::init(self, level)) return false;
 
@@ -205,6 +240,18 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
             if (self->player2()) Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
         }
 
+    }
+
+    if (setting().onHideAttempts) {
+        self->attemptsLabel()->setVisible(false);
+    }
+    else {
+        self->attemptsLabel()->setVisible(true);
+    }
+
+    if (setting().onHidePlayer) {
+        self->player1()->setVisible(0);
+        self->player2()->setVisible(0);
     }
 
     auto labelsMenu = CCMenu::create();
@@ -432,6 +479,49 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         //speed->setPosition({ 2.f, 0 });
         //self->addChild(speed);
     }
+
+    //if (setting().onShowLayout) {
+    //    self->getBackgroundSprite()->setColor(ccc3(40, 125, 255)); // BG
+    //    from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
+    //    from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
+    //    from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
+    //    from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
+
+
+    //    for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+    //    {
+    //        if (i < 0) continue;
+    //        if (i >= arrcount) break;
+    //        auto objAtInd = secarr->objectAtIndex(i);
+    //        auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+    //        for (int j = 0; j < objarr->count(); j++)
+    //        {
+    //            auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+    //            if (obj->getIsTintObject()) {
+    //                obj->setObjectColor(ccc3(255, 255, 255));
+    //            } // Setting OBJ to white.
+    //            if (cornerObjects.contains(obj->getObjectID())) {
+    //                obj->getGlowSprite()->setVisible(0);
+    //            }
+    //            if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
+    //                obj->removeMeAndCleanup();
+    //                if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
+    //            } // Hiding deco objects.
+    //            if (pulseObjects.contains(obj->getObjectID())) {
+    //                obj->removeMeAndCleanup();
+    //            } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
+    //            if (obj->getHasColor()) {
+    //                auto node = obj->getChildSprite();
+    //                node->setColor(ccc3(255, 255, 255));
+    //                //node->setBlendFunc({ GL_ONE, GL_ONE });
+    //            } // Setting color to white and removing blending.
+
+    //        }
+    //    }
+    //}
+
+    //SmartStartPosSetup(self);
 }
 
 bool rKeyFlag = true;
@@ -443,10 +533,26 @@ inline bool playerTouchesObject(CCRect* playerRect, CCRect* hitboxRect)
 
 }
 
+void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void* edx, bool practice) {
+    inPractice = practice;
+    PlayLayer::togglePracticeMode(self, practice);
+}
+
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
-    isPlayerDead = false;
+
+    //if (!smoothOut) {
+    //    PlayLayer::update(self, dt);
+    //}
+
+    //float time = CCDirector::sharedDirector()->getAnimationInterval();
+    //if (smoothOut != 0 && dt - time < 1) {
+    //    smoothOut--;
+    //}
+
+    //PlayLayer::update(self, time);
     PlayLayer::update(self, dt);
+    isPlayerDead = false;
     if (!isPlayerDead) wasDead = false;
 
     //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
@@ -503,6 +609,12 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
                 self->setPlayerStartPosition({ 0, 105 });
                 self->setStartPosObject(nullptr);
             }
+            if (currentStartPos == 0) {
+                from<bool>(self, 0x2b8) = false;
+            }
+            else {
+                from<bool>(self, 0x2b8) = true;
+            }
             self->resetLevel();
             spswitcherlbl->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
             spswitcherlbl->stopAllActions();
@@ -523,6 +635,12 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
             else {
                 self->setPlayerStartPosition({ 0, 105 });
                 self->setStartPosObject(nullptr);
+            }
+            if (currentStartPos == 0) {
+                from<bool>(self, 0x2b8) = false;
+            }
+            else {
+                from<bool>(self, 0x2b8) = true;
             }
             self->resetLevel();
             spswitcherlbl->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
@@ -804,6 +922,54 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }), m_clickFrames.end());
 
     hasClicked = false;
+
+    //auto hardStreak_p1 = from<gd::HardStreak*>(self->player1(), 0x394);
+    //auto hardStreak_p2 = from<gd::HardStreak*>(self->player2(), 0x394);
+    //if (setting().onNoWavePulse) {
+    //    hardStreak_p1->pulseSize() = setting().wavePulseSize;
+    //    hardStreak_p2->pulseSize() = setting().wavePulseSize;
+    //}
+
+    //if (setting().onShowLayout) {
+    //    self->getBackgroundSprite()->setColor(ccc3(40, 125, 255)); // BG
+    //    from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
+    //    from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
+    //    from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
+    //    from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
+
+
+    //    for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+    //    {
+    //        if (i < 0) continue;
+    //        if (i >= arrcount) break;
+    //        auto objAtInd = secarr->objectAtIndex(i);
+    //        auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+    //        for (int j = 0; j < objarr->count(); j++)
+    //        {
+    //            auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+    //            if (obj->getIsTintObject()) {
+    //                obj->setObjectColor(ccc3(255, 255, 255));
+    //            } // Setting OBJ to white.
+    //            if (cornerObjects.contains(obj->getObjectID())) {
+    //                obj->getGlowSprite()->setVisible(0);
+    //            }
+    //            if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
+    //                obj->removeMeAndCleanup();
+    //                if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
+    //            } // Hiding deco objects.
+    //            if (pulseObjects.contains(obj->getObjectID())) {
+    //                obj->removeMeAndCleanup();
+    //            } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
+    //            if (obj->getHasColor()) {
+    //                auto node = obj->getChildSprite();
+    //                node->setColor(ccc3(255, 255, 255));
+    //                //node->setBlendFunc({ GL_ONE, GL_ONE });
+    //            } // Setting color to white and removing blending.
+
+    //        }
+    //    }
+    //}
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {
@@ -983,12 +1149,9 @@ void __fastcall PlayerObject::updatePlayerRollFrame_H(gd::PlayerObject* self, vo
     PlayerObject::updatePlayerRollFrame(self, frameID);
 }
 
-//void __fastcall GameObject::setOpacity_H(gd::GameObject* self, void* edx, GLubyte opacity) {
-//    if (setting().onDontFade) {
-//        return GameObject::setOpacity(self, 255.f);
-//    }
-//    GameObject::setOpacity((self->getObjectID() = 1), opacity);
-//}
+void __fastcall CCCircleWave::drawH(gd::CCCircleWave* self) {
+    if (!setting().onNoEffectCircle) CCCircleWave::draw(self);
+}
 
 void PauseLayer::mem_init() {
     MH_CreateHook(
@@ -1043,6 +1206,7 @@ void PlayLayer::mem_init() {
         PlayLayer::releaseButton_H,
         reinterpret_cast<void**>(&PlayLayer::releaseButton));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xec510), PlayLayer::applyEnterEffect_H, reinterpret_cast<void**>(&PlayLayer::applyEnterEffect));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
         // Hi.
 }
 
@@ -1061,4 +1225,8 @@ void PlayerObject::mem_init() {
 void GameObject::mem_init() {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setOpacity_H, reinterpret_cast<void**>(&GameObject::setOpacity));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColor_H, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
+}
+
+void CCCircleWave::mem_init() {
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xb4b0), CCCircleWave::drawH, reinterpret_cast<void**>(&CCCircleWave::draw));
 }

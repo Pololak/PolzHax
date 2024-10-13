@@ -6,6 +6,21 @@
 namespace gd {
     class ColorAction;
 
+    enum Gamemode {
+        kGamemodeCube = 0,
+        kGamemodeShip = 1,
+        kGamemodeBall = 2,
+        kGamemodeUfo = 3,
+        kGamemodeWave = 4
+    };
+
+    enum Speed {
+        kSpeedNormal = 0,
+        kSpeedSlow = 1,
+        kSpeedFast = 2,
+        kSpeedFaster = 3
+    };
+
     class LevelSettingsObject : public cocos2d::CCNode {
     public:
         ColorAction* m_background_color;

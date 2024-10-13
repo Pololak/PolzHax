@@ -35,9 +35,12 @@ namespace PlayLayer {
 	inline void(__thiscall* applyEnterEffect)(gd::PlayLayer*, gd::GameObject*);
 	void __fastcall applyEnterEffect_H(gd::PlayLayer* self, void* edx, gd::GameObject* obj);
 
+	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer*, bool);
+	void __fastcall togglePracticeModeH(gd::PlayLayer* self, void* edx, bool practice);
+
 	void mem_init();
 
-	extern bool inPractice;
+	//extern bool inPractice;
 }
 
 namespace PauseLayer {
@@ -84,6 +87,13 @@ namespace GameObject {
 
 	inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
 	void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
+
+	void mem_init();
+}
+
+namespace CCCircleWave {
+	inline void(__thiscall* draw)(gd::CCCircleWave*);
+	void __fastcall drawH(gd::CCCircleWave* self);
 
 	void mem_init();
 }

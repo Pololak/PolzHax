@@ -271,6 +271,15 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88da0), "\xc1", 1, NULL);
         }
 
+        if (setting().onNoBGFlash) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c92), "\x6a\x00", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6ca8), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c92), "\x6a\x01", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6ca8), "\xc7\x04\x24\x8f\xc2\xf5\x3d", 7, NULL);
+        }
+
         if (setting().onNoDeathEffect) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\xe9\xe7\x01\x00\x00\x90", 6, NULL);
         }
@@ -1115,16 +1124,16 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes game animations instant (e.g. buttons).");
 
-            /*if (ImGui::Checkbox("No Background Flash", &setting().onNoBGFlash)) {
+            if (ImGui::Checkbox("No Background Flash", &setting().onNoBGFlash)) {
                 if (setting().onNoBGFlash) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6cd1), "\xeb\x0e\x90\x90\x90\x90", 6, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c93), "\x00", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c92), "\x6a\x00", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6ca8), "\xc7\x04\x24\x00\x00\x00\x00", 7, NULL);
                 }
                 else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6cd1), "\x8b\x8f\x00\x02\x00\x00", 6, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c93), "\x01", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6c92), "\x6a\x01", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e6ca8), "\xc7\x04\x24\x8f\xc2\xf5\x3d", 7, NULL);
                 }
-            }*/
+            }
 
             /*if (ImGui::Checkbox("No Cube Rotation", &setting().onNoCubeRotation)) {
                 if (setting().onNoCubeRotation) {
@@ -1154,6 +1163,10 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x01", 1, NULL);
                 }
             }*/
+
+            ImGui::Checkbox("No Effect Circle", &setting().onNoEffectCircle);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Removes effect circles from orb, portal & pad activations.");
 
             if (ImGui::Checkbox("No Ghost Trail", &setting().onNoGhostTrail)) {
                 if (setting().onNoGhostTrail) {
@@ -1287,6 +1300,15 @@ void RenderMain() {
                 ImGui::SetTooltip("Disables the disappearing effect on invisible blocks and etc.");
 
             //ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
+            ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
+            ImGui::SameLine();
+            if (ImGui::TreeNode("")) {
+                ImGui::SetNextItemWidth(50.f);
+                ImGui::DragFloat("Trail Size", &setting().wavePulseSize, 0.1f, 0.1f, 10.f);
+                ImGui::TreePop();
+            }
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Disables wave trail pulsing.");
 
             if (ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail)) {
                 if (setting().onNoWaveTrail) {
@@ -1792,6 +1814,16 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Plays the level's song in-sync with your position.");
 
+            //ImGui::Checkbox("Show Layout", &setting().onShowLayout);
+            //if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+            //    ImGui::SetTooltip("Removes all decoration and colour from levels.");
+            //ImGui::SameLine();
+            //if (ImGui::TreeNode("")) {
+            //    ImGui::ColorEdit3("Background Color", setting().BackGroundColor, ImGuiColorEditFlags_NoInputs);
+            //    ImGui::ColorEdit3("Ground Color", setting().GroundColor, ImGuiColorEditFlags_NoInputs);
+            //    ImGui::TreePop();
+            //}
+
             ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you switch between multiple start positions in-level.");
@@ -2093,6 +2125,8 @@ void RenderMain() {
 
             //ImGui::Checkbox("Swap Wave Trail", &setting().onSwapWaveColors);
 
+
+
             //ImGui::ColorEdit3("##primarycolorpulse", setting().PrimaryPulse, ImGuiColorEditFlags_NoInputs);
             //ImGui::SameLine();
             //ImGui::Checkbox("P1-Col Pulse", &setting().onPrimaryPulse);
@@ -2125,6 +2159,10 @@ void RenderMain() {
             if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack))
             {
                 update_speed_hack();
+                cheatAdd();
+            }
+            else {
+                cheatDec();
             }
             ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
         }
@@ -2288,7 +2326,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.2");
+            ImGui::Text("v1.1.9-alpha.3");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

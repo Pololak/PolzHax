@@ -654,6 +654,7 @@
     <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="preview-mode.hpp" />
     <ClInclude Include="SimplePlayer.h" />
+    <ClInclude Include="Speedhack.hpp" />
     <ClInclude Include="state.h" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
@@ -680,6 +681,7 @@
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />
+    <ClCompile Include="Speedhack.cpp" />
     <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>
