@@ -2159,11 +2159,11 @@ void RenderMain() {
             if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack))
             {
                 update_speed_hack();
-                cheatAdd();
+                //cheatAdd();
             }
-            else {
-                cheatDec();
-            }
+            //else {
+            //    cheatDec();
+            //}
             ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
         }
 
@@ -2326,7 +2326,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.3");
+            ImGui::Text("v1.1.9-alpha.4");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
