@@ -7,36 +7,26 @@ struct LayersStruct {
     cocos2d::CCLayer* PauseLayerObject;
 };
 
-
 struct SettingStruct {
-
-    bool show = false;
-
-    int selected_dart = 1;
-
-    float waveSize;
-
     int cheatsCount = 0;
     int beforeRestartCheatsCount = 0;
 
     int NoclipByte;
     int CurrentNoclipByte;
 
-    // PolzHax
-    //int priority = 2;
+    int hitboxFillOpacity = 255;
+    int labelsOpacity = 255;
+    int hitboxOpacity = 255;
+
+    bool show = false;
     bool onAutoSave = false;
     bool onExplorer = false;
-    cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;
-    char message[50] = "Your Text";
-    
-    // Bypass
+
     bool onCharFilter = false;
     bool onIcons = false;
     bool onMainLevels = false;
     bool onSliderLimit = false;
     bool onTextLength = false;
-
-    // Cosmetic
     bool onSCoinUncoll = false;
     bool onCoinsPractice = false;
     bool onDontEnter = false;
@@ -73,8 +63,6 @@ struct SettingStruct {
     bool onTrailAlwaysOn = false;
     bool onTrailBugFix = false;
     bool onWaveTrailDeath = false;
-
-    // Creator
     bool onAbsolutePosition = false;
     bool onCopyHack = false;
     bool onDefSongBypass = false;
@@ -93,23 +81,16 @@ struct SettingStruct {
     bool onSmoothEditTrail = false;
     bool onVerifyHack = false;
     bool onZoomBypass = false;
-
-    // Level
     bool onBallRotationFix = false;
     bool onConfirmExit = false;
     bool onMusicSync = false;
     bool onHiFPSRotation = false;
-    // Hitboxes
     bool onHitboxes = false;
     bool onHitboxesOnDeath = false;
-
     bool onPlayerHitbox = false;
     bool onSolidsHitbox = false;
     bool onHazardsHitbox = false;
     bool onSpecialsHitbox = false;
-
-
-    //
     bool onIgnoreEsc = false;
     bool onInstantComplete = false;
     bool onInstantTriggers = false;
@@ -120,8 +101,6 @@ struct SettingStruct {
     bool onPracticeMusic = false;
     bool onSPSwitcher = false;
     bool onSuicide = false;
-    
-    // Universal
     bool onFPSBypass = false;
     bool onAllowLowVolume = false;
     bool onAutoSafe = false;
@@ -145,28 +124,14 @@ struct SettingStruct {
     bool onTransparentPause = false;
     bool onShouldHue = false;
     bool onAlwaysHue = false;
-
-    // Icons
     bool onSameDualColor = false;
     bool onSwapWaveColors = false;
-
-    float GlowPulse[3] = { 1.f, 1.f, 1.f };
-    float SecondaryPulse[3] = { 1.f, 1.f, 1.f };
-    float PrimaryPulse[3] = { 1.f, 1.f, 1.f };
-    float WaveTrailPulse[3] = { 1.f, 1.f, 1.f };
-
     bool onGlowPulse = false;
     bool onSecondaryPulse = false;
     bool onPrimaryPulse = false;
     bool onWaveTrailPulse = false;
-
-    // SpeedHack
-
     bool onSpeedhack = false;
     bool onSpeedhackMusic = false;
-
-    // Labels
-
     bool onCheatIndicator = false;
     bool onClock = false;
     bool onFPSLabel = false;
@@ -177,14 +142,10 @@ struct SettingStruct {
     bool onNoclipAccuracy = false;
     bool onNoclipDeaths = false;
     bool onMeta = false;
-
     bool onNoclipOutOfMe = false;
     bool onSpeedhackCounted = false;
-
     bool onHideLabels = false;
-
     bool onZeroDelay = false;
-
     bool isSafeMode;
     bool onSessionTime = false;
     bool onNoMiniIcon = false;
@@ -193,24 +154,31 @@ struct SettingStruct {
     bool onSwitchToUpArrow = false;
     bool onNoEffectCircle = false;
     bool onShowLayout = false;
+    bool onGridSize = false;
 
-    int hitboxFillOpacity = 255;
-    int labelsOpacity = 255;
-    int hitboxOpacity = 255;
-    float labelsScale = 1.f,
-        solidsColor[3] = { 0, 0, 1 },
-        hazardsColor[3] = { 1, 0, 0 },
-        specialsColor[3] = { 0, 1, 0 },
-        fps = 60.f,
-        speedhack = 1.f,
-        UISize = 1.0f,
-        wavePulseSize = 2.1f,
-        Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 },
-        BGcolor[4] = { 0, 0, 0, 0.902 };
-    
+    float labelsScale = 1.f;
+    float solidsColor[3] = { 0, 0, 1 };
+    float hazardsColor[3] = { 1, 0, 0 };
+    float specialsColor[3] = { 0, 1, 0 };
+    float fps = 60.f;
+    float speedhack = 1.f;
+    float UISize = 1.0f;
+    float wavePulseSize = 2.1f;
+    float Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 };
+    float BGcolor[4] = { 0, 0, 0, 0.902 };
+    float gridSize = 30.f;
 
+    cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;
+    char message[50] = "Your Text";
 
-    //float BackGroundColor[3] = { 0.156, 0.490, 1 }, GroundColor[3] = { 0, 0.400, 1 };
+    int selected_dart = 1;
+};
+
+enum LabelPosition {
+    TL,
+    TR,
+    BL,
+    BR,
 };
 
 SettingStruct& setting();

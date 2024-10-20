@@ -30,9 +30,9 @@ namespace gd {
 	};
 	class CCMenuItemSpriteExtra : public cocos2d::CCMenuItemSprite {
 	public:
-		static auto create(CCNode* sprite, CCNode* idk, CCObject* target, cocos2d::SEL_MenuHandler callback) {
+		static auto create(CCNode* activatedSprite, CCNode* deactivatedSprite, CCObject* target, cocos2d::SEL_MenuHandler callback) {
 			auto ret = reinterpret_cast<CCMenuItemSpriteExtra * (__fastcall*)(CCNode*, CCNode*, CCObject*, cocos2d::SEL_MenuHandler)>
-				(base + 0xd1e0)(sprite, idk, target, callback); //base + 0xd1e0 GHS 1.92
+				(base + 0xd1e0)(activatedSprite, deactivatedSprite, target, callback); //base + 0xd1e0 GHS 1.92
 			__asm add esp, 0x8;
 			return ret;
 		}

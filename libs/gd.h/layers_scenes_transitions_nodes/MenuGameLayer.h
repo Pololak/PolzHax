@@ -5,6 +5,8 @@
 
 namespace gd {
 
+	class PlayerObject;
+
 	class MenuGameLayer : public cocos2d::CCLayer {
 	public:
 		void tryJump(float param_1) {
@@ -29,6 +31,14 @@ namespace gd {
 				)(
 					this, idk
 				);
+		}
+
+		void destroyPlayer() {
+			return reinterpret_cast<void(__fastcall*)(MenuGameLayer*)>(base + 0xaec50)(this);
+		}
+
+		PlayerObject* getPlayerObject() {
+			return from<PlayerObject*>(this, 0x128);
 		}
 		/*gd::MenuGameLayer* create() {
 			return reinterpret_cast<void(__thiscall*)(MenuGameLayer*)(

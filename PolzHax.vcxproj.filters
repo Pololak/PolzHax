@@ -1530,6 +1530,15 @@
     <ClInclude Include="Speedhack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Labels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GJGarageLayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1603,6 +1612,12 @@
     </ClCompile>
     <ClCompile Include="Speedhack.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Labels.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GJGarageLayer.cpp">
+      <Filter>Header Files\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

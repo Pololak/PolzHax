@@ -28,7 +28,7 @@ namespace gd {
 		void setSizeMult(float mult) {
 			__asm movss xmm1, mult
 			return reinterpret_cast<void(__thiscall*)(CCMenuItemToggler*)>(
-				base + 0x19990
+				base + 0xd3b0
 				)(this);
 		}
 		//my own function

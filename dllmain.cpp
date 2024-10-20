@@ -23,6 +23,7 @@
 #include "PlayLayer.h"
 #include "CrashLogger.hpp"
 #include "SimplePlayer.h"
+#include "GJGarageLayer.h"
 gd::ColorSelectPopup* colorSelectPopup;
 
 void LevelInfoLayer_onClone(gd::LevelInfoLayer* self, CCObject* foo) {
@@ -130,10 +131,27 @@ matdash::cc::c_decl<cocos2d::extension::RGBA> cocos_hsv2rgb(cocos2d::extension::
     return matdash::orig<&cocos_hsv2rgb>(color);
 }
 
-bool(__thiscall* ObjectToolbox_gridNodeSizeForKey)(int id);
-void __stdcall ObjectToolbox_gridNodeSizeForKey_H(int id) {
+void(__thiscall* CCTransitionScene_initWithDuration)(CCTransitionScene*, float, CCScene*);
+void __fastcall CCTransitionScene_initWithDurationH(CCTransitionScene* self, void* edx, float duration, CCScene* scene) {
+    if (setting().onNoTransition) return CCTransitionScene_initWithDuration(self, 0.f, scene);
+    else CCTransitionScene_initWithDuration(self, duration, scene);
+}
 
-    ObjectToolbox_gridNodeSizeForKey(id);
+void(__thiscall* CCParticleSystemQuad_draw)(CCParticleSystemQuad*);
+void __fastcall CCParticleSystemQuad_drawH(CCParticleSystemQuad* self) {
+    if (!setting().onNoParticles) return CCParticleSystemQuad_draw(self);
+}
+
+bool(__thiscall* GameManager_isIconUnlocked)(gd::GameManager*, int, int);
+bool __fastcall GameManager_isIconUnlockedH(gd::GameManager* self, void* edx, int id, int type) {
+    switch (type)
+    {
+    case 0: if (id > 48) return true; break;
+    case 1: if (id > 18) return true; break;
+    case 2: if (id > 10) return true; break;
+    case 3: if (id > 10) return true; break;
+    }
+    return GameManager_isIconUnlocked(self, id, type);
 }
 
 void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
@@ -182,6 +200,9 @@ DWORD WINAPI my_thread(void* hModule) {
     PlayerObject::mem_init();
     GameObject::mem_init();
     CCCircleWave::mem_init();
+    MenuGameLayer::mem_init();
+    SimplePlayer::mem_init();
+    GJGarageLayer::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),
@@ -191,6 +212,14 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void*>(gd::base + 0x2dc70),
         reinterpret_cast<void**>(&CustomizeObjectLayer_init_H),
         reinterpret_cast<void**>(&CustomizeObjectLayer_init));
+
+    MH_CreateHook(
+        reinterpret_cast<void*>(gd::base + 0x66b10),
+        reinterpret_cast<void**>(&GameManager_isIconUnlockedH),
+        reinterpret_cast<void**>(&GameManager_isIconUnlocked));
+
+    MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?initWithDuration@CCTransitionScene@cocos2d@@UAE_NMPAVCCScene@2@@Z")), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
+    MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?draw@CCParticleSystemQuad@cocos2d@@UAEXXZ")), CCParticleSystemQuad_drawH, reinterpret_cast<void**>(&CCParticleSystemQuad_draw));
 
     matdash::add_hook<&ColorSelectPopup_init>(gd::base + 0x29db0);
     matdash::add_hook<&ColorSelectPopup_dtor>(gd::base + 0x2b050);

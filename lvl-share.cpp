@@ -13,8 +13,8 @@ using namespace cocos2d;
 
 template <class S>
 void dump_level(gd::GJGameLevel* level, S& stream) {
-	const auto song_key = level->m_songID ?
-		format("<k>k45</k><i>{}</i>", level->m_songID) :
+	const auto song_key = level->songID() ?
+		format("<k>k45</k><i>{}</i>", level->songID()) :
 		level->m_audioTrack ?
 		format("<k>k8</k><i>{}</i>", level->m_audioTrack) : "";
 	// encode it twice because gdshare does too
@@ -55,7 +55,7 @@ gd::GJGameLevel* import_level(S& stream) {
 		}
 		else if (key == "k45"sv) {
 			const auto text = value.value;
-			level->m_songID = std::stoi(text);
+			level->songID() = std::stoi(text);
 		}
 	}
 	return level;

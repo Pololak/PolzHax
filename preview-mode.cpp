@@ -888,6 +888,19 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 		}
 	}
 
+	//int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
+	//auto customObj = CCLabelBMFont::create("", "chatFont.fnt");
+	//customObj->setString(CCString::createWithFormat("%d")->getCString());
+	//customObj->setTag(45050);
+	//moreObjInfoMenu->addChild(customObj);
+
+	//uint32_t ind;
+
+	//auto edit_categories = from<CCArray*>(self, 0x1e0);
+	//auto button_bar = dynamic_cast<gd::EditButtonBar*>(edit_categories->objectAtIndex(ind));
+
+	//auto pages = from<CCArray*>(button_bar, 0xec);
+
 	return result;
 }
 
@@ -913,6 +926,71 @@ void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy
 	}
 }
 
+void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
+	//if (setting().onGridSize) {
+	//	auto actualMode = self->selectedMode();
+	//	self->selectedMode() == gd::EditorUI::Mode_Create;
+
+	//	EditorUI::updateGridNodeSize(self);
+
+	//	self->selectedMode() == actualMode;
+	//}
+	EditorUI::updateGridNodeSize(self);
+}
+
+void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
+	EditorUI::createMoveMenu(self);
+
+	//CCMenu* newPage = CCMenu::create();
+	//if (newPage) {
+	//	auto buttonArray = from<CCArray*>(self->editButtonBar(), 0xec);
+	//	buttonArray->addObject(newPage);
+	//}
+}
+
+void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void* edx, gd::GameObject* object) {
+	auto selectedCustomMode = gd::GameManager::sharedState()->getIntGameVariable("0005");
+	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
+	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
+	if (selectFilterObject != 0) {
+		if (object->getObjectID() == selectFilterObject) return EditorUI::selectObject(self, object);
+	}
+	else {
+		EditorUI::selectObject(self, object);
+	}
+}
+
+void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void* edx, CCArray* objects) {
+	auto selectedCustomMode = gd::GameManager::sharedState()->getIntGameVariable("0005");
+	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
+	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
+
+	//auto lel = self->getLevelEditorLayer();
+	//auto secarr = lel->getLevelSections();
+	//auto arrcount = secarr->count();
+	//for (int i = 0; i < (lel->getAllObjects()->count()); i++) {
+	//	auto objAtInd = secarr->objectAtIndex(i);
+	//	auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+	//	for (int j = 0; j < objarr->count(); j++) {
+	//		auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+	//		auto objectID = obj->getObjectID();
+	//		if (objectID == selectFilterObject) EditorUI::selectObjects(self, objects);
+	//	}
+	//}
+
+	EditorUI::selectObjects(self, objects);
+
+	//auto objCount = objects->count();
+
+	//CCArray* objs = lel->getAllObjects();
+	//for (int i = 0; i < (objs->count()); i++) {
+	//	auto object = reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i));
+	//	auto objectID = object->getObjectID();
+	//	if (objectID == selectFilterObject) EditorUI::selectObjects(self, objects);
+	//}
+}
+
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
 	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
@@ -932,6 +1010,15 @@ void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 	}
 	editorUI->selectObjects(objs2);
 	editorUI->updateButtons();
+}
+
+void __fastcall EditorUI::keyDown_H(gd::EditorUI* self, void* edx, enumKeyCodes key) {
+	if ((key == KEY_Alt) && (key == KEY_Shift) && (key == KEY_E)) {
+		reinterpret_cast<SEL_MenuHandler>(&EditorUI::Callback::rotate45CW);
+	}
+	else {
+		EditorUI::keyDown(self, key);
+	}
 }
 
 void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
@@ -1145,6 +1232,28 @@ void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* ed
 	}
 }
 
+//bool isEasedScrollLayer(gd::BoomScrollLayer* self) {
+//	if (!self->getParent()) return false;
+//
+//	if (vtable_cast(self->getParent(), 0x11c804)) return false;
+//
+//	if (vtable_cast(self->getParent(), 0x114b90)) return false;
+//
+//	return true;
+//}
+//
+//class BoomScrollLayer_CB : public gd::BoomScrollLayer {
+//public:
+//	void onGoToPage(CCObject* sender) {
+//		auto p = sender->getTag();
+//		if (isEasedScrollLayer(this)) this->moveToPage(p);
+//		else {
+//			this->instantMoveToPage(p - 1);
+//			this->instantMoveToPage(p);
+//		}
+//	}
+//};
+
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	scheduler = self;
 	Scheduler::update(self, dt);
@@ -1221,6 +1330,7 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		auto objid = moreObjInfoMenu->getChildByTag(45016);
 		auto objaddr = moreObjInfoMenu->getChildByTag(45017);
 		auto objcounter = moreObjInfoMenu->getChildByTag(45018);
+		//auto customObj = moreObjInfoMenu->getChildByTag(45050);
 
 		auto leftMenu = from<CCMenu*>(editUI->getRedoBtn(), 0xac);
 		auto deleteBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(45030));
@@ -1405,6 +1515,11 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			}
 		}
 
+		//if (customObj) {
+		//	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0005");
+		//	reinterpret_cast<CCLabelBMFont*>(customObj)->setString(CCString::createWithFormat("%d", selectFilterObject)->getCString());
+		//}
+
 		if (objaddr)
 		{
 			if (editUI->getSingleSelectedObj() == 0) objaddr->setVisible(0);
@@ -1444,6 +1559,11 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x4ee90),
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDown_H, reinterpret_cast<void**>(&EditorUI::keyDown));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
 	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);

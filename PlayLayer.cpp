@@ -60,6 +60,10 @@ std::vector<gd::StartPosObject*> sp;
 std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniPortals, speedChanges, mirrorPortals;
 std::vector<bool> willFlip;
 
+void PlayLayer::Callback::onNextStartPos(CCObject*) {
+
+}
+
 void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player)
 {
     isPlayerDead = true;
@@ -926,8 +930,12 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto hardStreak_p1 = from<gd::HardStreak*>(self->player1(), 0x394);
     auto hardStreak_p2 = from<gd::HardStreak*>(self->player2(), 0x394);
     if (setting().onNoWavePulse) {
-        hardStreak_p1->pulseSize() = setting().wavePulseSize;
-        hardStreak_p2->pulseSize() = setting().wavePulseSize;
+        if (self->player1()->isDart()) {
+            hardStreak_p1->pulseSize() = setting().wavePulseSize;
+        }
+        if (self->player2()->isDart()) {
+            hardStreak_p2->pulseSize() = setting().wavePulseSize;
+        }
     }
 
     //if (setting().onShowLayout) {
@@ -1013,7 +1021,6 @@ void __fastcall PlayLayer::releaseButton_H(gd::PlayLayer* self, void* edx, int i
 }
 
 void __fastcall PlayLayer::applyEnterEffect_H(gd::PlayLayer* self, void* edx, gd::GameObject* obj) {
-
     PlayLayer::applyEnterEffect(self, obj);
 }
 
@@ -1052,19 +1059,16 @@ bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
     auto director = CCDirector::sharedDirector();
     auto menu = CCMenu::create();
 
-    auto bg = (extension::CCScale9Sprite*)self->getChildren()->objectAtIndex(0);
-    if (setting().onTransparentPause) {
-        bg->setVisible(0);
-    }
-    else {
-        bg->setVisible(1);
-    }
+    auto child_count = self->getChildren()->count();
 
-    auto autoretry_lbl = (CCLabelBMFont*)self->getChildren()->objectAtIndex(9);
-    auto autocheck_lbl = (CCLabelBMFont*)self->getChildren()->objectAtIndex(10);
-    auto bar_lbl = (CCLabelBMFont*)self->getChildren()->objectAtIndex(11);
-    bar_lbl->setVisible(0);
-    auto toggler_menu = (CCMenu*)self->getChildren()->objectAtIndex(12);
+    auto menu_offset = from<bool>(CCApplication::sharedApplication(), 0x48) ? -3 : 0;
+
+    auto checkbox_menu = reinterpret_cast<CCMenu*>(self->getChildren()->objectAtIndex(child_count - 5 + menu_offset));
+    auto bar_text = reinterpret_cast<CCLabelBMFont*>(self->getChildren()->objectAtIndex(child_count - 6 + menu_offset));
+    bar_text->setString("Bar");
+    bar_text->setScale(0.42f);
+
+
 
     auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
     auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
@@ -1076,13 +1080,8 @@ bool __fastcall PauseLayer::customSetup_H(gd::CCBlockLayer* self) {
     PercentageLabel->setScale(0.4f);
     PercentageLabel->setPosition({ 455,25 });
     PercentageLabel->setAnchorPoint({ 0.f, 0.5f });
-    toggler_menu->addChild(PercentageButton);
+    checkbox_menu->addChild(PercentageButton);
     self->addChild(PercentageLabel);
-    
-    auto new_bar_lbl = CCLabelBMFont::create("Bar", "bigFont.fnt");
-    new_bar_lbl->setPosition({ 402, 25 });
-    new_bar_lbl->setScale(0.35f);
-    self->addChild(new_bar_lbl);
 
     menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 
@@ -1153,6 +1152,19 @@ void __fastcall CCCircleWave::drawH(gd::CCCircleWave* self) {
     if (!setting().onNoEffectCircle) CCCircleWave::draw(self);
 }
 
+void __fastcall GameObject::getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor3B& color) {
+    auto objectColor = self->getObjectColor();
+    switch (objectColor)
+    {
+    case 8:
+        GameObject::getEditorColor(self, { (255, 255, 0) });
+        break;
+    default:
+        GameObject::getEditorColor(self, color);
+        break;
+    }
+}
+
 void PauseLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xd5f50),
@@ -1205,8 +1217,8 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf0af0),
         PlayLayer::releaseButton_H,
         reinterpret_cast<void**>(&PlayLayer::releaseButton));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xec510), PlayLayer::applyEnterEffect_H, reinterpret_cast<void**>(&PlayLayer::applyEnterEffect));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xec510), PlayLayer::applyEnterEffect_H, reinterpret_cast<void**>(&PlayLayer::applyEnterEffect));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
         // Hi.
 }
 
@@ -1225,6 +1237,7 @@ void PlayerObject::mem_init() {
 void GameObject::mem_init() {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setOpacity_H, reinterpret_cast<void**>(&GameObject::setOpacity));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColor_H, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
 }
 
 void CCCircleWave::mem_init() {

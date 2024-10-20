@@ -56,7 +56,17 @@ class GameObject;
 
 class BoomScrollLayer : public cocos2d::CCLayer {
 public:
-    
+    void instantMoveToPage(int page) {
+        reinterpret_cast<void(__thiscall*)(BoomScrollLayer*, int)>(
+            base + 0x8430
+            )(this, page);
+    }
+
+    void moveToPage(int page) {
+        reinterpret_cast<void(__thiscall*)(BoomScrollLayer*, int)>(
+            base + 0x8500
+            )(this, page);
+    }
 };
 
 class EditorUI : public cocos2d::CCLayer {
@@ -159,7 +169,7 @@ public:
     }
 
     void selectObjects(cocos2d::CCArray* arr) {
-        return reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*)>(base + 0x47fa0)(this, arr); //0xf1f20 - GHS 1.92 // - Taswert: wtf is this??? Why did I put it here???
+        return reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*)>(base + 0x47fa0)(this, arr); //0xf1f20 - GHS 1.92 // - Taswert: wtf is this??? Why did I put it here??? // - Polz: maybe for select all?
     }
 
     EditButtonBar* editButtonBar() {
@@ -229,6 +239,14 @@ public:
     void getCreateBtn() {
         return reinterpret_cast<void(__fastcall*)()>(base + 0x47200)();
     }
+
+    int selectedMode() {
+        return from<int>(this, 0x228);
+    }
+
+    static constexpr const int Mode_Create = 2;
+    static constexpr const int Mode_Delete = 1;
+    static constexpr const int Mode_Edit = 3;
 
 };
 

@@ -325,6 +325,51 @@ struct time {
 	}
 };
 
+template <typename T, typename R>
+T as(R const v) { return reinterpret_cast<T>(v); }
+
+template<typename T, typename R = T>
+static constexpr R vtable_cast(T obj, uintptr_t vtable) {
+	if (obj && (*as<uintptr_t*>(obj) - gd::base == vtable))
+		return as<R>(obj);
+
+	return nullptr;
+}
+
+struct cocos {
+	template <class Type = cocos2d::CCNode>
+	static Type* getChildOfType(cocos2d::CCNode* node, int index) {
+		size_t indexCounter = 0;
+		if (node->getChildrenCount() == 0) return nullptr;
+		// start from end for negative index
+		if (index < 0) {
+			index = -index - 1;
+			for (size_t i = node->getChildrenCount() - 1; i >= 0; i--) {
+				if (auto obj = dynamic_cast<Type*>(node->getChildren()->objectAtIndex(i))) {
+					if (indexCounter == index) {
+						return obj;
+					}
+					++indexCounter;
+				}
+				if (i == 0) break;
+			}
+		}
+		else {
+			for (size_t i = 0; i < node->getChildrenCount(); i++) {
+				if (auto obj = dynamic_cast<Type*>(node->getChildren()->objectAtIndex(i))) {
+					if (indexCounter == index) {
+						return obj;
+					}
+					++indexCounter;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+};
+
+
 inline void safeModeON() {
 	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
 	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);

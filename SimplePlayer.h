@@ -3,7 +3,7 @@
 
 namespace SimplePlayer {
 	inline bool(__thiscall* init)(gd::SimplePlayer*, int);
-	bool __fastcall init_H(gd::SimplePlayer* self, int frameID);
+	bool __fastcall init_H(gd::SimplePlayer* self, void* edx, int frameID);
 
 	void newExtraFrame(char const* extra);
 

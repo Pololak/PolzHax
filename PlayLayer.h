@@ -38,6 +38,12 @@ namespace PlayLayer {
 	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer*, bool);
 	void __fastcall togglePracticeModeH(gd::PlayLayer* self, void* edx, bool practice);
 
+	class Callback {
+	public:
+		void onPreviousStartPos(CCObject*);
+		void onNextStartPos(CCObject*);
+	};
+
 	void mem_init();
 
 	//extern bool inPractice;
@@ -88,6 +94,9 @@ namespace GameObject {
 	inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
 	void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
 
+	inline void(__thiscall* getEditorColor)(gd::GameObject*, const cocos2d::ccColor3B&);
+	void __fastcall getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor3B& color);
+
 	void mem_init();
 }
 
@@ -96,4 +105,9 @@ namespace CCCircleWave {
 	void __fastcall drawH(gd::CCCircleWave* self);
 
 	void mem_init();
+}
+
+namespace RingObject {
+	inline void(__thiscall* spawnCircle)(CCObject*);
+	void __fastcall spawnCircleH(CCObject* effect);
 }

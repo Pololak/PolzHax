@@ -29,9 +29,8 @@ namespace gd {
 				base + 0x7ff50)(iconID);
 		}
 
-		void updatePlayerFrame(int iconID, IconType iconType) {
-			reinterpret_cast<void (__thiscall*)(SimplePlayer*, int, IconType)>(
-				base + 0x12c650)(this, iconID, iconType);
+		void updatePlayerFrame(int frameID, IconType iconType) {
+			reinterpret_cast<void(__thiscall*)(SimplePlayer*, int, IconType)>(base + 0x80c70)(this, frameID, iconType);
 		}
 
 		void updateColors() {

@@ -331,13 +331,6 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F6D40), "\x55", 1, NULL);
         }
 
-        if (setting().onNoParticles) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\xC3", 1, NULL);
-        }
-        else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\x56", 1, NULL);
-        }
-
         if (setting().onNoLightning) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\xeb", 1, NULL);
         }
@@ -750,13 +743,6 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\xf3\x0f\x11\x41\x1c\xf3\x0f\x11\x41\x18", 10, NULL);
         }
 
-        if (setting().onNoTransition) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\x31\xc0\x89", 3, NULL); // 31 C0 89
-        }
-        else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
-        }
-
         if (setting().onSafeMode) safeModeON();
         else safeModeOFF();
 
@@ -1152,7 +1138,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("No visual effects on death.");
 
             /*if (ImGui::Checkbox("No Force Player Glow", &setting().onNoForceGlow)) {
@@ -1178,7 +1164,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f338d), "\xff\x75\x08", 3, NULL);
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables player ghost trail triggers.");
 
             if (ImGui::Checkbox("No Glow", &setting().onNoGlowObject)) {
@@ -1189,7 +1175,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x46d8a3), "\x0f\x85\x8e\x01\x00\x00", 6, NULL);
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables objects glow.");
 
             if (ImGui::Checkbox("No Gravity Effect", &setting().onNoGravityEffect)) {
@@ -1200,7 +1186,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f4586), "\x75\x07", 2, NULL);
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables gravity effect.");
 
             ImGui::Checkbox("No Mini Icon", &setting().onNoMiniIcon);
@@ -1217,7 +1203,7 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables mirror portals.");
 
             if (ImGui::Checkbox("No New Best Popup", &setting().onNoNewBest)) {
@@ -1228,7 +1214,7 @@ void RenderMain() {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5ff0), "\x55", 1, NULL);
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the new best popup.");
 
             if (ImGui::Checkbox("No Orb Ring", &setting().onNoOrbRing)) {
@@ -1242,14 +1228,7 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables orb ring effect when touching it.");
 
-            if (ImGui::Checkbox("No Particles", &setting().onNoParticles)) {
-                if (setting().onNoParticles) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\xC3", 1, NULL);
-                }
-                else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xb77f0), "\x56", 1, NULL);
-                }
-            }
+            if (ImGui::Checkbox("No Particles", &setting().onNoParticles))
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the particle system.");
 
@@ -1407,7 +1386,10 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            
+            //ImGui::SetNextItemWidth(80.f);
+            //ImGui::DragFloat("##gridsize", &setting().gridSize, 0.1f, 1.f, 120.f);
+            //ImGui::SameLine();
+            //ImGui::Checkbox("Grid Size", &setting().onGridSize);
 
             if (ImGui::Checkbox("Absolute Rotation", &setting().onAbsolutePosition)) {
                 if (setting().onAbsolutePosition) {
@@ -1970,14 +1952,8 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Locks all rotation at 0 degrees.");
 
-            if (ImGui::Checkbox("No Transition", &setting().onNoTransition)) {
-                if (setting().onNoTransition) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\x31\xc0\x89", 3, NULL); // 31 C0 89
-                }
-                else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xa49a7), "\xf3\x0f\x11", 3, NULL); // 31 C0 89
-                }
-            }
+            ImGui::Checkbox("No Transition", &setting().onNoTransition);
+
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Shorterns scene transition time to 0s.");
 
@@ -2326,7 +2302,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.4");
+            ImGui::Text("v1.1.9-alpha.5");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

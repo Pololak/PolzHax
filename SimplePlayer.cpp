@@ -3,9 +3,9 @@
 
 gd::SimplePlayer* simplePlayer;
 
-bool __fastcall SimplePlayer::init_H(gd::SimplePlayer* self, int frameID) {
-	if (!SimplePlayer::init(self, frameID)) return false;
+bool __fastcall SimplePlayer::init_H(gd::SimplePlayer* self, void* edx, int frameID) {
 	simplePlayer = self;
+	if (!SimplePlayer::init(self, frameID)) return false;
 
 	int limit = Icons::getCount("player", "001");
 	if (frameID > limit) frameID = limit;

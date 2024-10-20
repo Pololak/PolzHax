@@ -11,6 +11,10 @@ namespace gd {
 	class PlayLayer;
 	class OBB2D;
 
+	enum class PlayerButton {
+		Jump = 1,
+	};
+
 	class PlayerObject : public GameObject {
 	public:
 
@@ -33,13 +37,28 @@ namespace gd {
 				base + 0xdaa60
 				)(this, fl, obj, rect);
 		}
-		void pushButton(int button) {
-			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde080)(this, button);
+		void pushButton(PlayerButton p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, PlayerButton)>(base + 0xde080)(this, p0);
 		}
-		void releaseButton(int button) {
-			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde150)(this, button);
+		void releaseButton(PlayerButton p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, PlayerButton)>(base + 0xde150)(this, p0);
 		}
 
+		bool isFly() {
+			return from<bool>(this, 0x468);
+		}
+
+		bool isBird() {
+			return from<bool>(this, 0x469);
+		}
+
+		bool isRoll() {
+			return from<bool>(this, 0x46a);
+		}
+
+		bool isDart() {
+			return from<bool>(this, 0x46b);
+		}
 		
 		//bool collidedWithObject(float fl, gd::GameObject* obj)
 		//{

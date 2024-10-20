@@ -17,5 +17,8 @@ namespace ObjectToolbox {
 	inline bool(__thiscall* triggerTab)();
 	void __fastcall triggerTab_H();
 
+	inline void(__thiscall* gridNodeSizeForKey)(int);
+	void __fastcall gridNodeSizeForKeyH(int objectID);
+
 	void mem_init();
 }

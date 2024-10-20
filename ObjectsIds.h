@@ -41,7 +41,8 @@ std::set<int>orbsnportals = {
 	99, 101,				//mini/big portals
 	286, 287,				//dual portals
 	200, 201, 202, 203,		//speed portals
-	142						//coin
+	142,
+	29, 30, 104, 105, 744, 221, 717, 718, 743	//coin
 };
 
 std::set<int>solids = {

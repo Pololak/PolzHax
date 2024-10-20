@@ -228,8 +228,11 @@ namespace gd {
 		}
 		int getIntGameVariable(const char* key) {
 			return reinterpret_cast<int(__thiscall*)(GameManager*, const char*)>(
-				base + 0xCA330
+				base + 0x6afb0
 				)(this, key);
+		}
+		void setIntGameVariable(const char* key, int value) {
+			reinterpret_cast<void(__thiscall*)(GameManager*, const char*, int)>(base + 0x6aed0)(this, key, value);
 		}
 		bool getUGV(const char* key) {
 			return reinterpret_cast<bool(__thiscall*)(GameManager*, const char*)>(
@@ -259,6 +262,10 @@ namespace gd {
 
 		int getPlayerFrame() {
 			return from<int>(this, 0x1b0);
+		}
+
+		void setPlayerType(IconType type) {
+			from<IconType>(this, 0x2b4) = type;
 		}
 	};
 }

@@ -540,9 +540,11 @@
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GJGarageLayer.h" />
     <ClInclude Include="Hitboxes.h" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="Icons.h" />
+    <ClInclude Include="Labels.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
@@ -562,6 +564,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\FLAlertLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJBaseGameLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJDropDownLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJSpecialColorSelect.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
@@ -662,7 +665,9 @@
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="explorer.cpp" />
+    <ClCompile Include="GJGarageLayer.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
+    <ClCompile Include="Labels.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp" />

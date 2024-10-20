@@ -1,5 +1,6 @@
 #include "ObjectToolbox.h"
 #include "pch.h"
+#include "state.h"
 
 void objectAdd(int id)
 {
@@ -55,6 +56,17 @@ void __fastcall ObjectToolbox::triggerTab_H() {
     ObjectToolbox::triggerTab();
 }
 
+void __fastcall ObjectToolbox::gridNodeSizeForKeyH(int objectID) {
+    //if (setting().onGridSize) {
+    //    float gridSize = setting().gridSize;
+    //    __asm {
+    //        movss xmm0, gridSize
+    //        add esp, 0x4
+    //    }
+    //}
+    ObjectToolbox::gridNodeSizeForKey(objectID);
+}
+
 void ObjectToolbox::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0x44964),
@@ -76,4 +88,5 @@ void ObjectToolbox::mem_init() {
         reinterpret_cast<void*>(gd::base + 0x46d37),
         reinterpret_cast<void*>(&ObjectToolbox::triggerTab_H),
         reinterpret_cast<void**>(&ObjectToolbox::triggerTab));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xcfc90), ObjectToolbox::gridNodeSizeForKeyH, reinterpret_cast<void**>(&ObjectToolbox::gridNodeSizeForKey));
 }
