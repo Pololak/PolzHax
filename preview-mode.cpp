@@ -965,6 +965,17 @@ void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void* edx, CCArray*
 	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
 	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
 
+	if (selectFilterObject != 0) {
+		auto filteredObjects = CCArray::create();
+		for (int i = 0; i < objects->count(); i++) {
+			if (reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i))->getObjectID() == selectFilterObject) {
+				filteredObjects->addObject(objects->objectAtIndex(i));
+			}
+		}
+		return EditorUI::selectObjects(self, filteredObjects);
+	}
+	else
+		return EditorUI::selectObjects(self, objects);
 	//auto lel = self->getLevelEditorLayer();
 	//auto secarr = lel->getLevelSections();
 	//auto arrcount = secarr->count();
@@ -1561,8 +1572,8 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDown_H, reinterpret_cast<void**>(&EditorUI::keyDown));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
