@@ -155,6 +155,7 @@ struct SettingStruct {
     bool onNoEffectCircle = false;
     bool onShowLayout = false;
     bool onGridSize = false;
+    bool onBetterLevelUpdate = false;
 
     float labelsScale = 1.f;
     float solidsColor[3] = { 0, 0, 1 };

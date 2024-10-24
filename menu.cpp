@@ -820,6 +820,15 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
         }
 
+        if (setting().onBetterLevelUpdate)
+        {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49ec4d), "\x90\x90", 2, NULL);
+        }
+        else
+        {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49ec4d), "\x74\x0e", 2, NULL);
+        }
+
         // fuck it.
 
         
@@ -1853,6 +1862,17 @@ void RenderMain() {
             }*/
 
             ImGui::Checkbox("Auto Safe Mode", &setting().onAutoSafe);
+
+            if (ImGui::Checkbox("Better Level Update", &setting().onBetterLevelUpdate)) {
+                if (setting().onBetterLevelUpdate)
+                {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49ec4d), "\x90\x90", 2, NULL);
+                }
+                else
+                {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49ec4d), "\x74\x0e", 2, NULL);
+                }
+            }
 
             if (ImGui::Checkbox("Fast Alt-Tab", &setting().onFastAlt)) {
                 if (setting().onFastAlt) {
