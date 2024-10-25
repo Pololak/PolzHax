@@ -128,19 +128,6 @@ namespace gd {
 		cocos2d::TextureQuality m_eQuality; //more after that i havent re'd
 
 	public:
-		//int getPlayerFrame() { return m_nPlayerFrame; }
-		int getPlayerShip() { return m_nPlayerShip; }
-		//int getPlayerBall() { return m_nPlayerBall; }
-		int getPlayerBird() { return m_nPlayerBird; }
-		int getPlayerDart() { return m_nPlayerDart; }
-		int getPlayerRobot() { return m_nPlayerRobot; }
-		int getPlayerSpider() { return m_nPlayerSpider; }
-		int getPlayerStreak() { return m_nPlayerStreak; }
-		int getPlayerDeathEffect() { return m_nPlayerDeathEffect; }
-		bool getPlayerGlow() { return m_bPlayerGlow; }
-		//int getPlayerColor() { return m_nPlayerColor; }
-		//int getPlayerColor2() { return m_nPlayerColor2; }
-		IconType getPlayerIconType() { return m_nPlayerIconType; }
 		std::string getPlayerUDID() {
 			return from<std::string>(this, 0x158);
 		}
@@ -205,6 +192,10 @@ namespace gd {
 			return from<int>(this, 0x1c4);
 		}
 
+		int getPlayerGlow() {
+			return from<int>(this, 0x1c8);
+		}
+
 		bool getShowProgressBar() {
 			return from<bool>(this, 0x1d4); //0x1d4 - ghs 1.92
 		}
@@ -218,7 +209,7 @@ namespace gd {
 		}
 		bool getGameVariable(const char* key) {
 			return reinterpret_cast<bool(__thiscall*)(GameManager*, const char*)>(
-				base + 0x6ade0
+				base + 0x6ace0
 				)(this, key);
 		}
 		void setGameVariable(const char* key, bool value) {
@@ -256,12 +247,20 @@ namespace gd {
 		//PlayLayer* getPlayLayer() { return m_pPlayLayer; }
 		LevelEditorLayer* getEditorLayer() { return m_pLevelEditorLayer; }
 
+		int getPlayerFrame() {
+			return from<int>(this, 0x1b0);
+		}
+
+		int getPlayerShip() {
+			return from<int>(this, 0x1b4);
+		}
+
 		int getPlayerBall() {
 			return from<int>(this, 0x1b8);
 		}
 
-		int getPlayerFrame() {
-			return from<int>(this, 0x1b0);
+		int getPlayerBird() {
+			return from<int>(this, 0x1bc);
 		}
 
 		void setPlayerType(IconType type) {

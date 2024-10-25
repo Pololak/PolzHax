@@ -40,6 +40,13 @@ namespace gd {
         kEditCommandScale = 25,
     };
 
+    class ButtonPage : public cocos2d::CCLayer {
+    public:
+        static ButtonPage* create(cocos2d::CCArray* array) {
+            return reinterpret_cast<ButtonPage * (__thiscall*)(cocos2d::CCArray*)>(base + 0x3b060)(array);
+        }
+    };
+
 class EditButtonBar : public cocos2d::CCNode {
 public:
     cocos2d::CCArray* m_buttonArray;

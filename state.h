@@ -168,7 +168,6 @@ struct SettingStruct {
     float BGcolor[4] = { 0, 0, 0, 0.902 };
     float gridSize = 30.f;
 
-    cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;
     char message[50] = "Your Text";
 
     int selected_dart = 1;
@@ -181,5 +180,11 @@ enum LabelPosition {
     BR,
 };
 
+struct FuckThis {
+    cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;
+    bool onValueEnter = false;
+};
+
 SettingStruct& setting();
 LayersStruct& layers();
+FuckThis& fuckThis();

@@ -107,7 +107,7 @@ bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int 
     constexpr auto handler = [](CCObject* _self, CCObject* button) {
         auto self = reinterpret_cast<gd::ColorSelectPopup*>(_self);
         auto picker = self->colorPicker();
-        setting().onColorPicker = picker;
+        fuckThis().onColorPicker = picker;
         };
     auto sprite = gd::ButtonSprite::create("Picker", 0x28, 0, 0.6f, true, "goldFont.fnt", "GJ_button_04.png", 30.0);
     
@@ -150,8 +150,34 @@ bool __fastcall GameManager_isIconUnlockedH(gd::GameManager* self, void* edx, in
     case 1: if (id > 18) return true; break;
     case 2: if (id > 10) return true; break;
     case 3: if (id > 10) return true; break;
+    case 99: if (id > 2) return true; break;
     }
     return GameManager_isIconUnlocked(self, id, type);
+}
+
+void(__thiscall* MenuGameLayer_create)(gd::MenuGameLayer*);
+void __fastcall MenuGameLayer_createH(gd::MenuGameLayer* self) {
+    gd::GJGameLevel* level = gd::GameLevelManager::sharedState()->getMainLevel(18, false);
+    gd::PlayLayer::create(level);
+}
+
+bool(__thiscall* SupportLayer_customSetup)(gd::GJDropDownLayer*);
+void __fastcall SupportLayer_customSetupH(gd::GJDropDownLayer* self) {
+    SupportLayer_customSetup(self);
+
+    auto winSize = CCDirector::sharedDirector()->getWinSize();
+
+    auto layerMain = (CCLayer*)self->getChildren()->objectAtIndex(0);
+
+    auto menu = CCMenu::create();
+    menu->setPosition(winSize.width / 2, winSize.height / 2);
+
+    auto reqSpr = gd::ButtonSprite::create("Req", 24, 0, 0.8f, true, "bigFont.fnt", "GJ_button_04.png", 25.f);
+    auto reqBtn = gd::CCMenuItemSpriteExtra::create(reqSpr, reqSpr, self, 0);
+    reqBtn->setPosition(70, -90);
+
+    layerMain->addChild(menu);
+    menu->addChild(reqBtn);
 }
 
 void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
@@ -217,6 +243,9 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void*>(gd::base + 0x66b10),
         reinterpret_cast<void**>(&GameManager_isIconUnlockedH),
         reinterpret_cast<void**>(&GameManager_isIconUnlocked));
+
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xad430), MenuGameLayer_createH, reinterpret_cast<void**>(&MenuGameLayer_create));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xfd420), SupportLayer_customSetupH, reinterpret_cast<void**>(&SupportLayer_customSetup));
 
     MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?initWithDuration@CCTransitionScene@cocos2d@@UAE_NMPAVCCScene@2@@Z")), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
     MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?draw@CCParticleSystemQuad@cocos2d@@UAEXXZ")), CCParticleSystemQuad_drawH, reinterpret_cast<void**>(&CCParticleSystemQuad_draw));

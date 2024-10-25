@@ -3,6 +3,7 @@
 #define GJGAMELEVEL_H
 
 #include <gd.h>
+#include <utility>
 
 namespace gd {
 

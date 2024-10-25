@@ -540,6 +540,7 @@
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GameVariables.hpp" />
     <ClInclude Include="GJGarageLayer.h" />
     <ClInclude Include="Hitboxes.h" />
     <ClInclude Include="hsv.hpp" />

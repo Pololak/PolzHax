@@ -24,7 +24,7 @@ namespace gd {
 				)();
 		}
 		void update(float idk) {
-			return reinterpret_cast<void(__thiscall*)(
+			return reinterpret_cast<void(__fastcall*)(
 				MenuGameLayer*, float
 				)>(
 					base + 0xAE210

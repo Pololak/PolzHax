@@ -33,6 +33,12 @@ class GameLevelManager : public cocos2d::CCNode {
         virtual void levelUpdate(GJGameLevel* level) {
             return reinterpret_cast<void(__fastcall*)(GJGameLevel*)>(gd::base + 0x5b530)(level); //1.91 5ae70
         }
+
+        GJGameLevel* getMainLevel(int id, bool unk) {
+            return reinterpret_cast<GJGameLevel * (__thiscall*)(
+                GameLevelManager*, int, bool
+                )>(base + 0x561f0)(this, id, unk);
+        }
 };
 
 }

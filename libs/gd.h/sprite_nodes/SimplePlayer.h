@@ -26,7 +26,7 @@ namespace gd {
 	public:
 		static auto create(int iconID) {
 			return reinterpret_cast<SimplePlayer* (__fastcall*)(int)>(
-				base + 0x7ff50)(iconID);
+				base + 0x80770)(iconID);
 		}
 
 		void updatePlayerFrame(int frameID, IconType iconType) {
@@ -75,6 +75,9 @@ namespace gd {
 		}
 		auto colorSpr() {
 			return from<cocos2d::CCSprite*>(this, 0x1bc);
+		}
+		auto glowSpr() {
+			return from<cocos2d::CCSprite*>(this, 0x1c4);
 		}
 	};
 }

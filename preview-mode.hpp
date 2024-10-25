@@ -82,6 +82,7 @@ namespace EditorPauseLayer {
 		void VanillaSelectAllButton(CCObject*);
 		void extraFeaturesToggler(CCObject*);
 		void extraInfoPopup(CCObject*);
+		void selectFilterToggle(CCObject*);
 	};
 
 	void mem_init();

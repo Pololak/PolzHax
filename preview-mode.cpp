@@ -26,6 +26,7 @@
 #include "Hitboxes.h"
 #include "moveForCommand.h"
 #include <array>
+#include "GameVariables.hpp"
 
 using namespace cocos2d;
 
@@ -846,40 +847,6 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	goToGroupBtn->setVisible(0);
 	goToGroupBtn->setEnabled(false);
 
-	auto rotateButtonsMenu = CCMenu::create();
-	rotateButtonsMenu->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
-	if (setting().extraFeatures) {
-		rotateButtonsMenu->setVisible(1);
-	}
-	else {
-		rotateButtonsMenu->setVisible(0);
-	}
-	self->addChild(rotateButtonsMenu);
-
-	auto rotate45CWspr = gd::ButtonSprite::create("45", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
-	rotate45CWspr->setScale(0.70f);
-	auto rotate45CWbtn = gd::CCMenuItemSpriteExtra::create(rotate45CWspr, rotate45CWspr, self, menu_selector(EditorUI::Callback::rotate45CW));
-	rotate45CWbtn->setPosition({ 105, 165 });
-	rotateButtonsMenu->addChild(rotate45CWbtn);
-
-	auto rotate45CCWspr = gd::ButtonSprite::create("-45", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
-	rotate45CCWspr->setScale(0.70f);
-	auto rotate45CCWbtn = gd::CCMenuItemSpriteExtra::create(rotate45CCWspr, rotate45CCWspr, self, menu_selector(EditorUI::Callback::rotate45CCW));
-	rotate45CCWbtn->setPosition({ 65, 165 });
-	rotateButtonsMenu->addChild(rotate45CCWbtn);
-
-	auto rotate265CWspr = gd::ButtonSprite::create("26.5", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
-	rotate265CWspr->setScale(0.70f);
-	auto rotate265CWbtn = gd::CCMenuItemSpriteExtra::create(rotate265CWspr, rotate265CWspr, self, menu_selector(EditorUI::Callback::rotate265CW));
-	rotate265CWbtn->setPosition({ 105, 135 });
-	rotateButtonsMenu->addChild(rotate265CWbtn);
-
-	auto rotate265CCWspr = gd::ButtonSprite::create("-26.5", 32.f, 0, 4.f, false, "bigFont.fnt", "GJ_button_01.png", 32.f);
-	rotate265CCWspr->setScale(0.70f);
-	auto rotate265CCWbtn = gd::CCMenuItemSpriteExtra::create(rotate265CCWspr, rotate265CCWspr, self, menu_selector(EditorUI::Callback::rotate265CCW));
-	rotate265CCWbtn->setPosition({ 65, 135 });
-	rotateButtonsMenu->addChild(rotate265CCWbtn);
-
 	if (setting().onPersClip)
 	{
 		if (!savedClipboard.empty()) {
@@ -941,23 +908,84 @@ void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
 void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	EditorUI::createMoveMenu(self);
 
-	//CCMenu* newPage = CCMenu::create();
-	//if (newPage) {
-	//	auto buttonArray = from<CCArray*>(self->editButtonBar(), 0xec);
-	//	buttonArray->addObject(newPage);
-	//}
+	auto boomScrollLayer = from<gd::BoomScrollLayer*>(self->editButtonBar(), 0xe8);
+	auto extendLayer = from<CCLayer*>(boomScrollLayer, 0x158);
+	auto buttonPage2 = reinterpret_cast<CCMenu*>(extendLayer->getChildren()->objectAtIndex(1));
+	auto array = from<CCArray*>(self->editButtonBar(), 0xec);
+	auto menu = reinterpret_cast<CCMenu*>(buttonPage2->getChildren()->objectAtIndex(0));
+
+	bool extraFeatures_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::EXTRA_FEATURES);
+
+	if (extraFeatures_enabled) {
+		auto rotate45CW_base = CCSprite::create("GJ_button_01.png");
+		auto rotate45CW_second = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
+		if (!rotate45CW_second->initWithFile("edit_rotate45rBtn_001.png")) {
+			rotate45CW_second->initWithSpriteFrameName("edit_cwBtn_001.png");
+		}
+		rotate45CW_base->addChild(rotate45CW_second);
+		rotate45CW_base->setScale(0.9f);
+		rotate45CW_second->setPosition(rotate45CW_base->getContentSize() / 2);
+		rotate45CW_second->setPositionY(rotate45CW_second->getPositionY() + 2);
+		auto rotate45CW_btn = gd::CCMenuItemSpriteExtra::create(rotate45CW_base, rotate45CW_base, self, menu_selector(EditorUI::Callback::rotate45CW));
+		rotate45CW_btn->setPosition({ -105, -132 });
+		menu->addChild(rotate45CW_btn);
+
+		auto rotate45CCW_base = CCSprite::create("GJ_button_01.png");
+		auto rotate45CCW_second = CCSprite::createWithSpriteFrameName("edit_ccwBtn_001.png");
+		if (!rotate45CCW_second->initWithFile("edit_rotate45lBtn_001.png")) {
+			rotate45CCW_second->initWithSpriteFrameName("edit_ccwBtn_001.png");
+		}
+		rotate45CCW_base->addChild(rotate45CCW_second);
+		rotate45CCW_base->setScale(0.9f);
+		rotate45CCW_second->setPosition(rotate45CCW_base->getContentSize() / 2);
+		rotate45CCW_second->setPositionY(rotate45CCW_second->getPositionY() + 2);
+		auto rotate45CCW_btn = gd::CCMenuItemSpriteExtra::create(rotate45CCW_base, rotate45CCW_base, self, menu_selector(EditorUI::Callback::rotate45CCW));
+		rotate45CCW_btn->setPosition({ -65, -132 });
+		menu->addChild(rotate45CCW_btn);
+
+		auto rotate265CW_base = CCSprite::create("GJ_button_01.png");
+		auto rotate265CW_second = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
+		if (!rotate265CW_second->initWithFile("edit_rotate265rBtn_001.png")) {
+			rotate265CW_second->initWithSpriteFrameName("edit_cwBtn_001.png");
+		}
+		rotate265CW_base->addChild(rotate265CW_second);
+		rotate265CW_base->setScale(0.9f);
+		rotate265CW_second->setPosition(rotate265CW_base->getContentSize() / 2);
+		rotate265CW_second->setPositionY(rotate265CW_second->getPositionY() + 2);
+		auto rotate265CW_btn = gd::CCMenuItemSpriteExtra::create(rotate265CW_base, rotate265CW_base, self, menu_selector(EditorUI::Callback::rotate265CW));
+		rotate265CW_btn->setPosition({ -25, -132 });
+		menu->addChild(rotate265CW_btn);
+
+		auto rotate265CCW_base = CCSprite::create("GJ_button_01.png");
+		auto rotate265CCW_second = CCSprite::createWithSpriteFrameName("edit_ccwBtn_001.png");
+		if (!rotate265CCW_second->initWithFile("edit_rotate265lBtn_001.png")) {
+			rotate265CCW_second->initWithSpriteFrameName("edit_ccwBtn_001.png");
+		}
+		rotate265CCW_base->addChild(rotate265CCW_second);
+		rotate265CCW_base->setScale(0.9f);
+		rotate265CCW_second->setPosition(rotate265CCW_base->getContentSize() / 2);
+		rotate265CCW_second->setPositionY(rotate265CCW_second->getPositionY() + 2);
+		auto rotate265CCW_btn = gd::CCMenuItemSpriteExtra::create(rotate265CCW_base, rotate265CCW_base, self, menu_selector(EditorUI::Callback::rotate265CCW));
+		rotate265CCW_btn->setPosition({ 15, -132 });
+		menu->addChild(rotate265CCW_btn);
+	}
 }
 
 void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void* edx, gd::GameObject* object) {
 	auto selectedCustomMode = gd::GameManager::sharedState()->getIntGameVariable("0005");
 	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
 	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
-	if (selectFilterObject != 0) {
+
+	bool selectFilter_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::SELECT_FILTER);
+
+
+	if ((selectFilterObject != 0) && selectFilter_enabled) {
 		if (object->getObjectID() == selectFilterObject) return EditorUI::selectObject(self, object);
 	}
 	else {
 		EditorUI::selectObject(self, object);
 	}
+	
 }
 
 void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void* edx, CCArray* objects) {
@@ -965,30 +993,21 @@ void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void* edx, CCArray*
 	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
 	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
 
-	//auto lel = self->getLevelEditorLayer();
-	//auto secarr = lel->getLevelSections();
-	//auto arrcount = secarr->count();
-	//for (int i = 0; i < (lel->getAllObjects()->count()); i++) {
-	//	auto objAtInd = secarr->objectAtIndex(i);
-	//	auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+	bool selectFilter_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::SELECT_FILTER);
 
-	//	for (int j = 0; j < objarr->count(); j++) {
-	//		auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-	//		auto objectID = obj->getObjectID();
-	//		if (objectID == selectFilterObject) EditorUI::selectObjects(self, objects);
-	//	}
-	//}
+
+	if ((selectFilterObject != 0) && selectFilter_enabled) {
+		auto filteredObjects = CCArray::create();
+		for (int i = 0; i < objects->count(); i++) {
+			if (reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i))->getObjectID() == selectFilterObject) {
+				filteredObjects->addObject(objects->objectAtIndex(i));
+			}
+		}
+		return EditorUI::selectObjects(self, filteredObjects);
+	}
+	else return EditorUI::selectObjects(self, objects);
 
 	EditorUI::selectObjects(self, objects);
-
-	//auto objCount = objects->count();
-
-	//CCArray* objs = lel->getAllObjects();
-	//for (int i = 0; i < (objs->count()); i++) {
-	//	auto object = reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i));
-	//	auto objectID = object->getObjectID();
-	//	if (objectID == selectFilterObject) EditorUI::selectObjects(self, objects);
-	//}
 }
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
@@ -1028,21 +1047,26 @@ void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
 bool SEP = false;
 
 void EditorPauseLayer::Callback::SmallEditorStepToggler(CCObject*) {
-	SEP = !SEP;
-		if (SEP) {
-			gd::GameManager::sharedState()->setGameVariable("0035", true);
-		}
-		else {
-			gd::GameManager::sharedState()->setGameVariable("0035", false);
-		}
+	gd::GameManager::sharedState()->toggleGameVariable("0035");
+	//SEP = !SEP;
+	//	if (SEP) {
+	//		gd::GameManager::sharedState()->setGameVariable("0035", true);
+	//	}
+	//	else {
+	//		gd::GameManager::sharedState()->setGameVariable("0035", false);
+	//	}
 }
 
 void EditorPauseLayer::Callback::extraFeaturesToggler(CCObject*) {
-	setting().extraFeatures = !setting().extraFeatures;
+	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::EXTRA_FEATURES);
 }
 
 void EditorPauseLayer::Callback::extraInfoPopup(CCObject*) {
 	gd::FLAlertLayer::create(nullptr, "Extra Features", "This toggler enables some extra features, like 45/26.5 rotate buttons. \nMight be <cr>unstable</c>, so use at <cr>your own risk</c>. \n<cr>Requires re-entering the editor.</c>", "Ok", nullptr, 320.f, false, 120.f)->show();
+}
+
+void EditorPauseLayer::Callback::selectFilterToggle(CCObject*) {
+	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::SELECT_FILTER);
 }
 
 auto EPMTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
@@ -1052,11 +1076,19 @@ auto EPMTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
 
 auto SEPTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff)
 {
-	return (SEP) ? toggleOn : toggleOff;
+	bool smallStep_enabled = gd::GameManager::sharedState()->getGameVariable("0035");
+	return (smallStep_enabled) ? toggleOn : toggleOff;
+	//return (SEP) ? toggleOn : toggleOff;
 }
 
 auto extraFeaturesTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff) {
-	return (setting().extraFeatures) ? toggleOn : toggleOff;
+	bool extraFeatures_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::EXTRA_FEATURES);
+	return (extraFeatures_enabled) ? toggleOn : toggleOff;
+}
+
+auto selectFilterTogglerSprite(CCSprite* toggleOn, CCSprite* toggleOff) {
+	bool selectFilter_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::SELECT_FILTER);
+	return (selectFilter_enabled) ? toggleOn : toggleOff;
 }
 
 void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
@@ -1075,12 +1107,22 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	auto EPMButton = gd::CCMenuItemToggler::create(EPMTogglerSprite(toggleOn, toggleOff), EPMTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::PreviewModeToggler));
 	auto EPMLabel = CCLabelBMFont::create("Preview Mode", "bigFont.fnt");
 	EPMButton->setScale(0.70f);
-	EPMButton->setPosition({ 30, 150 });
+	EPMButton->setPosition({ 30, 180 });
 	EPMLabel->setScale(0.35f);
-	EPMLabel->setPosition({ 50,150 });
+	EPMLabel->setPosition({ 50,180 });
 	EPMLabel->setAnchorPoint({ 0.f, 0.5f });
 	togglerMenu->addChild(EPMButton);
 	togglerMenu->addChild(EPMLabel);
+
+	auto SFButton = gd::CCMenuItemToggler::create(selectFilterTogglerSprite(toggleOn, toggleOff), selectFilterTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::selectFilterToggle));
+	auto SFLabel = CCLabelBMFont::create("Select Filter", "bigFont.fnt");
+	SFButton->setScale(0.70f);
+	SFButton->setPosition({ 30, 150 });
+	SFLabel->setScale(0.35f);
+	SFLabel->setPosition({ 50,150 });
+	SFLabel->setAnchorPoint({ 0.f, 0.5f });
+	togglerMenu->addChild(SFButton);
+	togglerMenu->addChild(SFLabel);
 
 	auto SEPButton = gd::CCMenuItemToggler::create(SEPTogglerSprite(toggleOn, toggleOff), SEPTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::SmallEditorStepToggler));
 	auto SEPLabel = CCLabelBMFont::create("Small Editor Step", "bigFont.fnt");
@@ -1093,15 +1135,15 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	togglerMenu->addChild(SEPLabel);
 
 	auto EFToggler = gd::CCMenuItemToggler::create(extraFeaturesTogglerSprite(toggleOn, toggleOff), extraFeaturesTogglerSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::extraFeaturesToggler));
-	EFToggler->setPosition({ 30, 180 });
+	EFToggler->setPosition({ 30, 210 });
 	EFToggler->setScale(0.70f);
 	auto EFInfoIcon = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 	EFInfoIcon->setScale(0.5f);
 	auto EFInfoBtn = gd::CCMenuItemSpriteExtra::create(EFInfoIcon, EFInfoIcon, self, menu_selector(EditorPauseLayer::Callback::extraInfoPopup));
-	EFInfoBtn->setPosition({ 12, 196 });
+	EFInfoBtn->setPosition({ 12, 226 });
 	auto EFLabel = CCLabelBMFont::create("Extra features", "bigFont.fnt");
 	EFLabel->setScale(0.35f);
-	EFLabel->setPosition({ 50, 180 });
+	EFLabel->setPosition({ 50, 210 });
 	EFLabel->setAnchorPoint({ 0.f, 0.5f });
 	togglerMenu->addChild(EFToggler);
 	togglerMenu->addChild(EFLabel);
@@ -1560,9 +1602,9 @@ void EditorUI::mem_init() {
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDown_H, reinterpret_cast<void**>(&EditorUI::keyDown));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);

@@ -3,6 +3,8 @@
 #include "utils.hpp"
 #include "state.h"
 
+#include "GameVariables.hpp"
+
 struct Icons {
 	static void patchCube(int amount) {
 		auto cubeAmount = patchUtils::intToBytes(amount);
@@ -41,10 +43,11 @@ struct Icons {
 	}
 
 	static void patchDart(int amount, int dartID) {
+		int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 		auto count = getCount("dart", "001");
 		if (dartID > amount) {
 			dartID = amount;
-			setting().selected_dart = amount;
+			selected_dart = amount;
 		}
 		auto dartAmount = patchUtils::intToBytes(amount);
 		//patch(gd::base + 0x7fef6, { 0xbe, dartAmount[0], dartAmount[1], dartAmount[2], dartAmount[3] }); //GaragePage::init

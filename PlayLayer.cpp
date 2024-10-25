@@ -86,11 +86,6 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     deathPos = 0.f;
     m_clickFrames.clear();
     m_totalClicks = 0;
-
-    //if (inTestmode || inPractice) {
-    //    smoothOut = 2; // Account for 1 extra frame respawn
-    //}
-
     PlayLayer::resetLevel(self);
 }
 
@@ -544,20 +539,9 @@ void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void* edx, b
 
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
-
-    //if (!smoothOut) {
-    //    PlayLayer::update(self, dt);
-    //}
-
-    //float time = CCDirector::sharedDirector()->getAnimationInterval();
-    //if (smoothOut != 0 && dt - time < 1) {
-    //    smoothOut--;
-    //}
-
-    //PlayLayer::update(self, time);
-    PlayLayer::update(self, dt);
     isPlayerDead = false;
     if (!isPlayerDead) wasDead = false;
+    PlayLayer::update(self, dt);
 
     //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
@@ -1152,17 +1136,42 @@ void __fastcall CCCircleWave::drawH(gd::CCCircleWave* self) {
     if (!setting().onNoEffectCircle) CCCircleWave::draw(self);
 }
 
-void __fastcall GameObject::getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor3B& color) {
-    auto objectColor = self->getObjectColor();
-    switch (objectColor)
+void __fastcall GameObject::getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor4B color) {
+    int* a = GameObject::getEditorColor(self, color);
+    switch (self->getActiveColor())
     {
+    case 0:
+        *a = 0x0AFFFFFF;
+        break;
+    case 1:
+        *a = 0x0AFF96AF;
+        break;
+    case 2:
+        *a = 0x0A9696FF;
+        break;
+    case 3:
+        *a = 0x0AFF96FF;
+        break;
+    case 4:
+        *a = 0x0A96FFFF;
+        break;
+    case 5:
+        *a = 0x0AFFAF4B;
+        break;
+    case 6:
+        *a = 0x0AFFFF96;
+        break;
+    case 7:
+        *a = 0x0A96FF96;
+        break;
     case 8:
-        GameObject::getEditorColor(self, { (255, 255, 0) });
+        *a = 0x0A00FFFF;
         break;
     default:
-        GameObject::getEditorColor(self, color);
+        *a = 0x0AFFFFFF;
         break;
     }
+    if (self->isInvisible()) *a = 0x0A007FFF;
 }
 
 void PauseLayer::mem_init() {
@@ -1237,7 +1246,7 @@ void PlayerObject::mem_init() {
 void GameObject::mem_init() {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setOpacity_H, reinterpret_cast<void**>(&GameObject::setOpacity));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColor_H, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
 }
 
 void CCCircleWave::mem_init() {

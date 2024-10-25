@@ -459,6 +459,14 @@ namespace gd {
 			return from<bool>(this, 0x2cb);
 		}*/
 
+		bool isInvisible() {
+			return from<bool>(this, 0x2e8);
+		}
+
+		int getActiveColor() {
+			return from<int>(this, 0x308);
+		}
+
 		virtual cocos2d::CCRect* const& getObjectRect(cocos2d::CCRect* rect) {
 			return reinterpret_cast<cocos2d::CCRect* (__thiscall*)(GameObject*, cocos2d::CCRect*)>(base + 0x71b90)(this, rect);
 		}

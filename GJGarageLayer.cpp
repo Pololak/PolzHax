@@ -3,14 +3,196 @@
 #include "Icons.h"
 #include "state.h"
 
+#include "GameVariables.hpp"
+
 Fields* fields = nullptr;
 gd::GJGarageLayer* garageLayer;
+CCLayer* iconKitPreview;
+
+class IconKitPreview : public CCLayer {
+public:
+	static IconKitPreview* create() {
+		IconKitPreview* obj = new IconKitPreview;
+		if (obj && obj->init()) {
+			obj->autorelease();
+			return obj;
+		}
+		CC_SAFE_DELETE(obj);
+		return nullptr;
+	}
+
+	bool init() {
+		if (!CCLayer::init()) return false;
+		const float width = 300, height = 85;
+		CCLayerColor* CCLayerCol = CCLayerColor::create(ccc4(0, 0, 0, 0));
+		CCLayerCol->setZOrder(1);
+		CCLayerCol->setScale(10.f);
+		this->addChild(CCLayerCol);
+		auto actionColor = CCFadeTo::create(0.1f, 75);
+		CCLayerCol->runAction(actionColor);
+
+		auto touchDispatcher = CCDirector::sharedDirector()->m_pTouchDispatcher;
+		touchDispatcher->incrementForcePrio();
+		this->registerWithTouchDispatcher();
+		setTouchEnabled(true);
+		setKeypadEnabled(true);
+		setMouseEnabled(true);
+
+
+		auto director = CCDirector::sharedDirector();
+
+		auto bgSprite = CCSprite::create("GJ_button_03.png");
+		bgSprite->setScale(100.f);
+		bgSprite->setOpacity(0);
+		auto bgButton = gd::CCMenuItemSpriteExtra::create(bgSprite, nullptr, this, nullptr);
+		auto bgMenu = CCMenu::create();
+		bgMenu->addChild(bgButton);
+		bgMenu->setZOrder(0);
+		bgMenu->setPosition((CCDirector::sharedDirector()->getScreenRight()) - 25, (CCDirector::sharedDirector()->getScreenTop()) - 25);
+		this->addChild(bgMenu); // DONT EVEN ASK WHAT IS THIS
+
+		auto bg = extension::CCScale9Sprite::create("GJ_square01.png");
+		bg->setContentSize({ width, height });
+		bg->setPosition(director->getWinSize().width / 2, director->getWinSize().height / 2);
+		bg->setZOrder(2);
+		this->addChild(bg);
+
+		auto bgbg = extension::CCScale9Sprite::create("square02_small.png");
+		bgbg->setContentSize({ 250, 50 });
+		bgbg->setPosition(director->getWinSize().width / 2, director->getWinSize().height / 2);
+		bgbg->setOpacity(75);
+		bgbg->setZOrder(2);
+		this->addChild(bgbg);
+
+		auto appearAction = CCEaseElasticOut::create(CCScaleTo::create(.5f, 1.f), .6f);
+
+		auto menu = CCMenu::create();
+		menu->setZOrder(3);
+		this->addChild(menu);
+
+		auto closeBtn = gd::CCMenuItemSpriteExtra::create(
+			(CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png")),
+			nullptr,
+			this,
+			menu_selector(IconKitPreview::onClose));
+		closeBtn->setPosition(-((width / 2) - 5), (height / 2) - 5);
+
+		menu->addChild(closeBtn);
+
+		auto gm = gd::GameManager::sharedState();
+		int selected_dart = gm->getIntGameVariable(GameVariable::SELECTED_DART);
+
+		auto playerIcon = gd::SimplePlayer::create(gd::GameManager::sharedState()->getPlayerFrame());
+		playerIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
+		playerIcon->colorSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		playerIcon->glowSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		if (gm->getPlayerGlow() == 2) playerIcon->glowSpr()->setVisible(1);
+		playerIcon->setPosition({ -100, 0 });
+		menu->addChild(playerIcon);
+
+		auto shipIcon = gd::SimplePlayer::create(gd::GameManager::sharedState()->getPlayerShip());
+		shipIcon->updatePlayerFrame(gd::GameManager::sharedState()->getPlayerShip(), gd::IconType::Ship);
+		shipIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
+		shipIcon->colorSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		shipIcon->glowSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		if (gm->getPlayerGlow() == 2) shipIcon->glowSpr()->setVisible(1);
+		shipIcon->setPosition({ -50, 0 });
+		menu->addChild(shipIcon);
+
+		auto rollIcon = gd::SimplePlayer::create(gd::GameManager::sharedState()->getPlayerBall());
+		rollIcon->updatePlayerFrame(gd::GameManager::sharedState()->getPlayerBall(), gd::IconType::Ball);
+		rollIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
+		rollIcon->colorSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		rollIcon->glowSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		if (gm->getPlayerGlow() == 2) rollIcon->glowSpr()->setVisible(1);
+		rollIcon->setPosition({ 0, 0 });
+		menu->addChild(rollIcon);
+
+		auto birdIcon = gd::SimplePlayer::create(gd::GameManager::sharedState()->getPlayerBird());
+		birdIcon->updatePlayerFrame(gd::GameManager::sharedState()->getPlayerBird(), gd::IconType::UFO);
+		birdIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
+		birdIcon->colorSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		birdIcon->glowSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		if (gm->getPlayerGlow() == 2) birdIcon->glowSpr()->setVisible(1);
+		birdIcon->setPosition({ 50, 0 });
+		menu->addChild(birdIcon);
+
+		auto waveIcon = gd::SimplePlayer::create(selected_dart);
+		waveIcon->updatePlayerFrame(selected_dart, gd::IconType::Wave);
+		waveIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
+		waveIcon->colorSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		waveIcon->glowSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
+		if (gm->getPlayerGlow() == 2) waveIcon->glowSpr()->setVisible(1);
+		waveIcon->setPosition({ 100, 0 });
+		menu->addChild(waveIcon);
+
+		auto userIDlabel = CCLabelBMFont::create("UserID:", "chatFont.fnt");
+		userIDlabel->setPosition({ -145, -31 });
+		userIDlabel->setScale(0.75f);
+		userIDlabel->setString(CCString::createWithFormat("UserID: %d", gm->getUserID())->getCString());
+		userIDlabel->setAnchorPoint({ 0.f, 0.5f });
+		userIDlabel->setOpacity(75);
+		menu->addChild(userIDlabel);
+
+		this->setScale(0.1f);
+		this->runAction(appearAction);
+
+		return true;
+	}
+
+	void keyBackClicked() override {
+		this->removeFromParentAndCleanup(true);
+		iconKitPreview = nullptr;
+	}
+
+	void onClose(CCObject*) {
+		this->removeFromParentAndCleanup(true);
+		iconKitPreview = nullptr;
+	}
+
+	void showCallback(CCObject* btn) {
+		auto director = CCDirector::sharedDirector();
+		auto myIconLayer = IconKitPreview::create();
+		myIconLayer->setZOrder(100);
+		auto myLayer2 = static_cast<CCLayer*>(static_cast<CCNode*>(btn)->getParent()->getParent());
+		myLayer2->addChild(myIconLayer);
+		iconKitPreview = myIconLayer;
+	}
+};
 
 bool __fastcall GJGarageLayer::init_H(gd::GJGarageLayer* self) {
 	garageLayer = self;
 	delete fields;
 	fields = new Fields;
 	if (!GJGarageLayer::init_(self)) return false;
+
+	//auto menugamelayer = gd::MenuGameLayer::create();
+	//menugamelayer->setTag(-5);
+	//self->addChild(menugamelayer);
+
+	auto director = CCDirector::sharedDirector();
+
+	auto iconKitSpr = CCSprite::createWithSpriteFrameName("GJ_rotationControlBtn01_001.png");
+	iconKitSpr->setScale(1.25);
+	auto iconKitSpr2 = CCSprite::createWithSpriteFrameName("player_04_001.png");
+	iconKitSpr2->setScale(0.5);
+	iconKitSpr2->setPosition({ 14.5f, 15.5f });
+	auto iconKitSpr3 = CCSprite::createWithSpriteFrameName("player_04_2_001.png");
+	iconKitSpr3->setPosition({ 15, 15 });
+	iconKitSpr3->setZOrder(-1);
+	iconKitSpr->addChild(iconKitSpr2);
+	iconKitSpr2->addChild(iconKitSpr3);
+
+	auto iconKitBtn = gd::CCMenuItemSpriteExtra::create(iconKitSpr, iconKitSpr, self, menu_selector(IconKitPreview::showCallback));
+	iconKitBtn->setPosition({ 350, 235 });
+
+	auto menu = CCMenu::create();
+
+	menu->addChild(iconKitBtn);
+	menu->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
+	
+	self->addChild(menu);
+
 	return true;
 }
 
@@ -20,6 +202,7 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
 	auto GM = gd::GameManager::sharedState();
+	int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 
 	auto itemMenu = cocos::getChildOfType<CCMenu>(self, 0);
 
@@ -77,7 +260,7 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 			auto btn = gd::CCMenuItemSpriteExtra::create(base, nullptr, self, menu_selector(GJGarageLayer::Callback::onDartIcon));
 			totalWaves++;
 			btn->setPosition({ -165 + (posLimit * 30), -6 - (rows * 30) }); //guh
-			if (i + 1 == setting().selected_dart) fields->m_dartSelector->setPosition(btn->getPosition());
+			if (i + 1 == selected_dart) fields->m_dartSelector->setPosition(btn->getPosition());
 
 			btn->setTag(totalWaves);
 			dartMenu->addChild(btn);
@@ -121,12 +304,13 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 	//auto dartMenu = gd::GaragePage::create(gd::IconType::Ball, this, menu_selector(GJGarageLayer::onDartIcon));
 
 	GJGarageLayer::selectPage(self, 0);
-	GJGarageLayer::switchToPage((ceilf(setting().selected_dart / 36)));
+	GJGarageLayer::switchToPage((ceilf(selected_dart / 36)));
 }
 
 void GJGarageLayer::Callback::onDartIcon(CCObject* sender) {
 	auto newSender = static_cast<CCNode*>(sender);
-	setting().selected_dart = newSender->getTag();
+	gd::GameManager::sharedState()->setIntGameVariable(GameVariable::SELECTED_DART, newSender->getTag());
+	//selected_dart = newSender->getTag();
 	Icons::patchDart(Icons::getCount("dart", "001"), newSender->getTag());
 	auto playerIcon = garageLayer->getPlayerIcon();
 	playerIcon->updatePlayerFrame(newSender->getTag(), gd::IconType::Wave);
@@ -149,13 +333,14 @@ void GJGarageLayer::Callback::onPrev(CCObject* sender) {
 }
 
 void GJGarageLayer::switchToPage(int page) {
+	int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 	std::cout << page << " " << fields->m_totalWavePages - 1 << std::endl;
 	for (int i = 0; i < fields->m_totalWavePages; i++) {
 		auto node = static_cast<CCNode*>(fields->m_dartPage->getChildren()->objectAtIndex(i));
 		if (i == page) node->setVisible(true);
 		else node->setVisible(false);
 	}
-	float selectedWavePage = (ceilf(setting().selected_dart / 36));
+	float selectedWavePage = (ceilf(selected_dart / 36));
 	if (selectedWavePage == page) fields->m_dartSelector->setVisible(true);
 	else fields->m_dartSelector->setVisible(false);
 }

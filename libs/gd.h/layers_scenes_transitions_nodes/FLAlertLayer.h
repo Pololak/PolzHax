@@ -27,6 +27,9 @@ namespace gd {
 		bool m_bBorder; //?
 		bool m_bNoAction; //?
 
+		cocos2d::CCLayer* m_internalLayer;
+		cocos2d::CCMenu* internalMenu;
+
 	public:
 		CCNode vtable;
 		auto getMenu()

@@ -13,10 +13,6 @@
 
 DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 
-
-
-
-
 ImVec4 color1;
 ImVec4 color2;
 ImVec4 color3;
@@ -2302,7 +2298,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.5");
+            ImGui::Text("v1.1.9-alpha.6");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2322,13 +2318,13 @@ void RenderMain() {
     }
     ImGui::End();
 
-    if (setting().onColorPicker) {
+    if (fuckThis().onColorPicker) {
         static bool just_opened = true;
         static Color3F color;
         if (just_opened) {
             ImGui::OpenPopup("Color picker");
             just_opened = false;
-            color = Color3F::from(setting().onColorPicker->getColorValue());
+            color = Color3F::from(fuckThis().onColorPicker->getColorValue());
         }
         bool unused_open = true;
         if (ImGui::BeginPopupModal("Color picker", &unused_open,
@@ -2339,8 +2335,8 @@ void RenderMain() {
             ImGui::EndPopup();
         }
         else {
-            setting().onColorPicker->setColorValue(color);
-            setting().onColorPicker = nullptr;
+            fuckThis().onColorPicker->setColorValue(color);
+            fuckThis().onColorPicker = nullptr;
             just_opened = true;
         }
     }

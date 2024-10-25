@@ -65,6 +65,7 @@ namespace PauseLayer {
 	class Callback {
 	public:
 		void PercentageToggler(CCObject*);
+		void onCopyLevel(CCObject*);
 	};
 
 	void mem_init();
@@ -94,8 +95,8 @@ namespace GameObject {
 	inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
 	void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
 
-	inline void(__thiscall* getEditorColor)(gd::GameObject*, const cocos2d::ccColor3B&);
-	void __fastcall getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor3B& color);
+	inline int*(__thiscall* getEditorColor)(gd::GameObject*, cocos2d::ccColor4B);
+	void __fastcall getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor4B color);
 
 	void mem_init();
 }

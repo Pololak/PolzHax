@@ -1539,6 +1539,9 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="GameVariables.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
