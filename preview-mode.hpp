@@ -42,6 +42,9 @@ namespace EditorUI {
 	//inline bool(__thiscall* keyUp)(gd::EditorUI*, cocos2d::enumKeyCodes);
 	//void __fastcall keyUp_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
 
+	inline CCPoint*(__thiscall* moveForCommand)(gd::EditorUI*, CCPoint*, gd::EditCommand);
+	CCPoint* __fastcall moveForCommandH(gd::EditorUI* self, void* edx, CCPoint* pos, gd::EditCommand com);
+
 	class Callback {
 	public:
 		void onGoToBaseLayer(CCObject*);
@@ -51,6 +54,31 @@ namespace EditorUI {
 		void rotate45CCW(CCObject*);
 		void rotate265CW(CCObject*);
 		void rotate265CCW(CCObject*);
+
+		void moveObjectHalfLeft(CCObject*);
+		void moveObjectHalfRight(CCObject*);
+		void moveObjectHalfUp(CCObject*);
+		void moveObjectHalfDown(CCObject*);
+
+		void moveObjectQuarterLeft(CCObject*);
+		void moveObjectQuarterRight(CCObject*);
+		void moveObjectQuarterUp(CCObject*);
+		void moveObjectQuarterDown(CCObject*);
+
+		void moveObjectEightLeft(CCObject*);
+		void moveObjectEightRight(CCObject*);
+		void moveObjectEightUp(CCObject*);
+		void moveObjectEightDown(CCObject*);
+
+		void moveObjectSmallerLeft(CCObject*);
+		void moveObjectSmallerRight(CCObject*);
+		void moveObjectSmallerUp(CCObject*);
+		void moveObjectSmallerDown(CCObject*);
+
+		void moveObjectQUnitLeft(CCObject*);
+		void moveObjectQUnitRight(CCObject*);
+		void moveObjectQUnitUp(CCObject*);
+		void moveObjectQUnitDown(CCObject*);
 	};
 
 	void mem_init();

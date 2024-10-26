@@ -43,11 +43,10 @@ struct Icons {
 	}
 
 	static void patchDart(int amount, int dartID) {
-		int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 		auto count = getCount("dart", "001");
 		if (dartID > amount) {
 			dartID = amount;
-			selected_dart = amount;
+			setting().selected_dart = amount;
 		}
 		auto dartAmount = patchUtils::intToBytes(amount);
 		//patch(gd::base + 0x7fef6, { 0xbe, dartAmount[0], dartAmount[1], dartAmount[2], dartAmount[3] }); //GaragePage::init

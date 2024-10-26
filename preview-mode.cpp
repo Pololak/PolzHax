@@ -905,6 +905,174 @@ void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
 	EditorUI::updateGridNodeSize(self);
 }
 
+CCPoint* __fastcall EditorUI::moveForCommandH(gd::EditorUI* self, void* edx, CCPoint* pos, gd::EditCommand com) {
+	switch (com) // Taken from HJFod https://github.com/HJfod/BetterEdit/blob/v4/tools/EditTab/moveForCommand.cpp
+	{
+	case moveForCommand::kEditCommandHalfLeft:
+		*pos = CCPoint(-15.f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandHalfRight:
+		*pos = CCPoint(15.0f, 0.0f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandHalfUp:
+		*pos = CCPoint(0.f, 15.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandHalfDown:
+		*pos = CCPoint(0.f, -15.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQuarterLeft:
+		*pos = CCPoint(-7.5f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQuarterRight:
+		*pos = CCPoint(7.5f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQuarterUp:
+		*pos = CCPoint(0.f, 7.5f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQuarterDown:
+		*pos = CCPoint(0.f, -7.5f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandEightLeft:
+		*pos = CCPoint(-3.75f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandEightRight:
+		*pos = CCPoint(3.75f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandEightUp:
+		*pos = CCPoint(0.f, 3.75f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandEightDown:
+		*pos = CCPoint(0.f, -3.75f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandSmallerLeft:
+		*pos = CCPoint(-0.5f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandSmallerRight:
+		*pos = CCPoint(0.5f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandSmallerUp:
+		*pos = CCPoint(0.f, 0.5f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandSmallerDown:
+		*pos = CCPoint(0.f, -0.5f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQUnitLeft:
+		*pos = CCPoint(-.25f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQUnitRight:
+		*pos = CCPoint(.25f, 0.f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQUnitUp:
+		*pos = CCPoint(0.f, .25f);
+		return pos;
+		break;
+	case moveForCommand::kEditCommandQUnitDown:
+		*pos = CCPoint(0.f, -.25f);
+		return pos;
+		break;
+	}
+
+	EditorUI::moveForCommand(self, pos, com);
+}
+
+void EditorUI::Callback::moveObjectHalfUp(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandHalfUp);
+}
+
+void EditorUI::Callback::moveObjectHalfDown(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandHalfDown);
+}
+
+void EditorUI::Callback::moveObjectHalfLeft(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandHalfLeft);
+}
+
+void EditorUI::Callback::moveObjectHalfRight(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandHalfRight);
+}
+
+void EditorUI::Callback::moveObjectQuarterUp(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterUp);
+}
+
+void EditorUI::Callback::moveObjectQuarterDown(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterDown);
+}
+
+void EditorUI::Callback::moveObjectQuarterLeft(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterLeft);
+}
+
+void EditorUI::Callback::moveObjectQuarterRight(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterRight);
+}
+
+void EditorUI::Callback::moveObjectEightUp(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandEightUp);
+}
+
+void EditorUI::Callback::moveObjectEightDown(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandEightDown);
+}
+
+void EditorUI::Callback::moveObjectEightLeft(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandEightLeft);
+}
+
+void EditorUI::Callback::moveObjectEightRight(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandEightRight);
+}
+
+void EditorUI::Callback::moveObjectSmallerUp(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerUp);
+}
+
+void EditorUI::Callback::moveObjectSmallerDown(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerDown);
+}
+
+void EditorUI::Callback::moveObjectSmallerLeft(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerLeft);
+}
+
+void EditorUI::Callback::moveObjectSmallerRight(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerRight);
+}
+
+void EditorUI::Callback::moveObjectQUnitUp(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitUp);
+}
+
+void EditorUI::Callback::moveObjectQUnitDown(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitDown);
+}
+
+void EditorUI::Callback::moveObjectQUnitLeft(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitLeft);
+}
+
+void EditorUI::Callback::moveObjectQUnitRight(CCObject*) {
+	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitRight);
+}
+
 void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	EditorUI::createMoveMenu(self);
 
@@ -969,6 +1137,298 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 		rotate265CCW_btn->setPosition({ 15, -132 });
 		menu->addChild(rotate265CCW_btn);
 	}
+
+	auto dotsNode = reinterpret_cast<CCLayer*>(boomScrollLayer->getChildren()->objectAtIndex(1));
+	CCArray* dotsArray = from<CCArray*>(boomScrollLayer, 0x118);
+	CCArray* pagesArray = from<CCArray*>(boomScrollLayer, 0x144);
+
+	CCArray* movePageCCArray = CCArray::create();
+	auto moveButtonPage = gd::ButtonPage::create(movePageCCArray);
+	moveButtonPage->setPositionX(buttonPage2->getPositionX() + CCDirector::sharedDirector()->getWinSize().width / 2);
+	auto movePageMenu = reinterpret_cast<CCMenu*>(moveButtonPage->getChildren()->objectAtIndex(0));
+	auto pageDot = CCSprite::create("smallDot.png");
+
+	extendLayer->addChild(moveButtonPage);
+	pagesArray->insertObject(moveButtonPage, 2);
+	dotsArray->addObject(pageDot);
+	dotsNode->addChild(pageDot);
+
+	auto moveHalfUp_spr = CCSprite::create("GJ_button_01.png");
+	moveHalfUp_spr->setScale(0.9f);
+	auto moveHalfUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn2_001.png");
+	moveHalfUp_spr2->setPosition({ moveHalfUp_spr->getContentSize().width / 2, (moveHalfUp_spr->getContentSize().height / 2) + 2 });
+	auto moveHalfUp_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
+	moveHalfUp_lbl->setScale(0.5f);
+	moveHalfUp_lbl->setPosition({ moveHalfUp_spr->getContentSize().width / 2, (moveHalfUp_spr->getContentSize().height / 2) - 9 });
+	moveHalfUp_spr->addChild(moveHalfUp_spr2);
+	moveHalfUp_spr->addChild(moveHalfUp_lbl);
+	auto moveHalfUp_btn = gd::CCMenuItemSpriteExtra::create(moveHalfUp_spr, moveHalfUp_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfUp));
+	moveHalfUp_btn->setPosition({ -105, -92 });
+
+	auto moveHalfDown_spr = CCSprite::create("GJ_button_01.png");
+	moveHalfDown_spr->setScale(0.9f);
+	auto moveHalfDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn2_001.png");
+	moveHalfDown_spr2->setPosition({ moveHalfDown_spr->getContentSize().width / 2, (moveHalfDown_spr->getContentSize().height / 2) + 2 });
+	auto moveHalfDown_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
+	moveHalfDown_lbl->setScale(0.5f);
+	moveHalfDown_lbl->setPosition({ moveHalfDown_spr->getContentSize().width / 2, (moveHalfDown_spr->getContentSize().height / 2) - 9 });
+	moveHalfDown_spr->addChild(moveHalfDown_spr2);
+	moveHalfDown_spr->addChild(moveHalfDown_lbl);
+	auto moveHalfDown_btn = gd::CCMenuItemSpriteExtra::create(moveHalfDown_spr, moveHalfDown_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfDown));
+	moveHalfDown_btn->setPosition({ -65, -92 });
+
+	auto moveHalfLeft_spr = CCSprite::create("GJ_button_01.png");
+	moveHalfLeft_spr->setScale(0.9f);
+	auto moveHalfLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
+	moveHalfLeft_spr2->setPosition({ moveHalfLeft_spr->getContentSize().width / 2, (moveHalfLeft_spr->getContentSize().height / 2) + 2 });
+	auto moveHalfLeft_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
+	moveHalfLeft_lbl->setScale(0.5f);
+	moveHalfLeft_lbl->setPosition({ moveHalfLeft_spr->getContentSize().width / 2, (moveHalfLeft_spr->getContentSize().height / 2) - 9 });
+	moveHalfLeft_spr->addChild(moveHalfLeft_spr2);
+	moveHalfLeft_spr->addChild(moveHalfLeft_lbl);
+	auto moveHalfLeft_btn = gd::CCMenuItemSpriteExtra::create(moveHalfLeft_spr, moveHalfLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfLeft));
+	moveHalfLeft_btn->setPosition({ -25, -92 });
+
+	auto moveHalfRight_spr = CCSprite::create("GJ_button_01.png");
+	moveHalfRight_spr->setScale(0.9f);
+	auto moveHalfRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
+	moveHalfRight_spr2->setPosition({ moveHalfRight_spr->getContentSize().width / 2, (moveHalfRight_spr->getContentSize().height / 2) + 2 });
+	auto moveHalfRight_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
+	moveHalfRight_lbl->setScale(0.5f);
+	moveHalfRight_lbl->setPosition({ moveHalfRight_spr->getContentSize().width / 2, (moveHalfRight_spr->getContentSize().height / 2) - 9 });
+	moveHalfRight_spr->addChild(moveHalfRight_spr2);
+	moveHalfRight_spr->addChild(moveHalfRight_lbl);
+	auto moveHalfRight_btn = gd::CCMenuItemSpriteExtra::create(moveHalfRight_spr, moveHalfRight_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfRight));
+	moveHalfRight_btn->setPosition({ 15, -92 });
+
+	auto moveQuarterUp_spr = CCSprite::create("GJ_button_01.png");
+	moveQuarterUp_spr->setScale(0.9f);
+	auto moveQuarterUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn2_001.png");
+	moveQuarterUp_spr2->setPosition({ moveQuarterUp_spr->getContentSize().width / 2, (moveQuarterUp_spr->getContentSize().height / 2) + 2 });
+	auto moveQuarterUp_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
+	moveQuarterUp_lbl->setScale(0.5f);
+	moveQuarterUp_lbl->setPosition({ moveQuarterUp_spr->getContentSize().width / 2, (moveQuarterUp_spr->getContentSize().height / 2) - 9 });
+	moveQuarterUp_spr->addChild(moveQuarterUp_spr2);
+	moveQuarterUp_spr->addChild(moveQuarterUp_lbl);
+	auto moveQuarterUp_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterUp_spr, moveQuarterUp_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterUp));
+	moveQuarterUp_btn->setPosition({ 55, -92 });
+
+	auto moveQuarterDown_spr = CCSprite::create("GJ_button_01.png");
+	moveQuarterDown_spr->setScale(0.9f);
+	auto moveQuarterDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn2_001.png");
+	moveQuarterDown_spr2->setPosition({ moveQuarterDown_spr->getContentSize().width / 2, (moveQuarterDown_spr->getContentSize().height / 2) + 2 });
+	auto moveQuarterDown_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
+	moveQuarterDown_lbl->setScale(0.5f);
+	moveQuarterDown_lbl->setPosition({ moveQuarterDown_spr->getContentSize().width / 2, (moveQuarterDown_spr->getContentSize().height / 2) - 9 });
+	moveQuarterDown_spr->addChild(moveQuarterDown_spr2);
+	moveQuarterDown_spr->addChild(moveQuarterDown_lbl);
+	auto moveQuarterDown_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterDown_spr, moveQuarterDown_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterDown));
+	moveQuarterDown_btn->setPosition({ 95, -92 });
+
+	auto moveQuarterLeft_spr = CCSprite::create("GJ_button_01.png");
+	moveQuarterLeft_spr->setScale(0.9f);
+	auto moveQuarterLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
+	moveQuarterLeft_spr2->setPosition({ moveQuarterLeft_spr->getContentSize().width / 2, (moveQuarterLeft_spr->getContentSize().height / 2) + 2 });
+	auto moveQuarterLeft_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
+	moveQuarterLeft_lbl->setScale(0.5f);
+	moveQuarterLeft_lbl->setPosition({ moveQuarterLeft_spr->getContentSize().width / 2, (moveQuarterLeft_spr->getContentSize().height / 2) - 9 });
+	moveQuarterLeft_spr->addChild(moveQuarterLeft_spr2);
+	moveQuarterLeft_spr->addChild(moveQuarterLeft_lbl);
+	auto moveQuarterLeft_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterLeft_spr, moveQuarterLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterLeft));
+	moveQuarterLeft_btn->setPosition({ -105, -132 });
+
+	auto moveQuarterRight_spr = CCSprite::create("GJ_button_01.png");
+	moveQuarterRight_spr->setScale(0.9f);
+	auto moveQuarterRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
+	moveQuarterRight_spr2->setPosition({ moveQuarterRight_spr->getContentSize().width / 2, (moveQuarterRight_spr->getContentSize().height / 2) + 2 });
+	auto moveQuarterRight_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
+	moveQuarterRight_lbl->setScale(0.5f);
+	moveQuarterRight_lbl->setPosition({ moveQuarterRight_spr->getContentSize().width / 2, (moveQuarterRight_spr->getContentSize().height / 2) - 9 });
+	moveQuarterRight_spr->addChild(moveQuarterRight_spr2);
+	moveQuarterRight_spr->addChild(moveQuarterRight_lbl);
+	auto moveQuarterRight_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterRight_spr, moveQuarterRight_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterRight));
+	moveQuarterRight_btn->setPosition({ -65, -132 });
+
+	auto moveEightUp_spr = CCSprite::create("GJ_button_01.png");
+	moveEightUp_spr->setScale(0.9f);
+	auto moveEightUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn2_001.png");
+	moveEightUp_spr2->setPosition({ moveEightUp_spr->getContentSize().width / 2, (moveEightUp_spr->getContentSize().height / 2) + 2 });
+	auto moveEightUp_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
+	moveEightUp_lbl->setScale(0.5f);
+	moveEightUp_lbl->setPosition({ moveEightUp_spr->getContentSize().width / 2, (moveEightUp_spr->getContentSize().height / 2) - 9 });
+	moveEightUp_spr->addChild(moveEightUp_spr2);
+	moveEightUp_spr->addChild(moveEightUp_lbl);
+	auto moveEightUp_btn = gd::CCMenuItemSpriteExtra::create(moveEightUp_spr, moveEightUp_spr, self, menu_selector(EditorUI::Callback::moveObjectEightUp));
+	moveEightUp_btn->setPosition({ -25, -132 });
+
+	auto moveEightDown_spr = CCSprite::create("GJ_button_01.png");
+	moveEightDown_spr->setScale(0.9f);
+	auto moveEightDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn2_001.png");
+	moveEightDown_spr2->setPosition({ moveEightDown_spr->getContentSize().width / 2, (moveEightDown_spr->getContentSize().height / 2) + 2 });
+	auto moveEightDown_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
+	moveEightDown_lbl->setScale(0.5f);
+	moveEightDown_lbl->setPosition({ moveEightDown_spr->getContentSize().width / 2, (moveEightDown_spr->getContentSize().height / 2) - 9 });
+	moveEightDown_spr->addChild(moveEightDown_spr2);
+	moveEightDown_spr->addChild(moveEightDown_lbl);
+	auto moveEightDown_btn = gd::CCMenuItemSpriteExtra::create(moveEightDown_spr, moveEightDown_spr, self, menu_selector(EditorUI::Callback::moveObjectEightDown));
+	moveEightDown_btn->setPosition({ 15, -132 });
+
+	auto moveEightLeft_spr = CCSprite::create("GJ_button_01.png");
+	moveEightLeft_spr->setScale(0.9f);
+	auto moveEightLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
+	moveEightLeft_spr2->setPosition({ moveEightLeft_spr->getContentSize().width / 2, (moveEightLeft_spr->getContentSize().height / 2) + 2 });
+	auto moveEightLeft_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
+	moveEightLeft_lbl->setScale(0.5f);
+	moveEightLeft_lbl->setPosition({ moveEightLeft_spr->getContentSize().width / 2, (moveEightLeft_spr->getContentSize().height / 2) - 9 });
+	moveEightLeft_spr->addChild(moveEightLeft_spr2);
+	moveEightLeft_spr->addChild(moveEightLeft_lbl);
+	auto moveEightLeft_btn = gd::CCMenuItemSpriteExtra::create(moveEightLeft_spr, moveEightLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectEightLeft));
+	moveEightLeft_btn->setPosition({ 55, -132 });
+
+	auto moveEightRight_spr = CCSprite::create("GJ_button_01.png");
+	moveEightRight_spr->setScale(0.9f);
+	auto moveEightRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
+	moveEightRight_spr2->setPosition({ moveEightRight_spr->getContentSize().width / 2, (moveEightRight_spr->getContentSize().height / 2) + 2 });
+	auto moveEightRight_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
+	moveEightRight_lbl->setScale(0.5f);
+	moveEightRight_lbl->setPosition({ moveEightRight_spr->getContentSize().width / 2, (moveEightRight_spr->getContentSize().height / 2) - 9 });
+	moveEightRight_spr->addChild(moveEightRight_spr2);
+	moveEightRight_spr->addChild(moveEightRight_lbl);
+	auto moveEightRight_btn = gd::CCMenuItemSpriteExtra::create(moveEightRight_spr, moveEightRight_spr, self, menu_selector(EditorUI::Callback::moveObjectEightRight));
+	moveEightRight_btn->setPosition({ 95, -132 });
+
+	movePageMenu->addChild(moveHalfUp_btn);
+	movePageMenu->addChild(moveHalfDown_btn);
+	movePageMenu->addChild(moveHalfLeft_btn);
+	movePageMenu->addChild(moveHalfRight_btn);
+
+	movePageMenu->addChild(moveQuarterUp_btn);
+	movePageMenu->addChild(moveQuarterDown_btn);
+	movePageMenu->addChild(moveQuarterLeft_btn);
+	movePageMenu->addChild(moveQuarterRight_btn);
+
+	movePageMenu->addChild(moveEightUp_btn);
+	movePageMenu->addChild(moveEightDown_btn);
+	movePageMenu->addChild(moveEightLeft_btn);
+	movePageMenu->addChild(moveEightRight_btn);
+
+	CCArray* movePage2CCArray = CCArray::create();
+	auto moveButtonPage2 = gd::ButtonPage::create(movePage2CCArray);
+	moveButtonPage2->setPositionX(moveButtonPage->getPositionX() + CCDirector::sharedDirector()->getWinSize().width / 2);
+	auto movePageMenu2 = reinterpret_cast<CCMenu*>(moveButtonPage2->getChildren()->objectAtIndex(0));
+	auto pageDot2 = CCSprite::create("smallDot.png");
+
+	extendLayer->addChild(moveButtonPage2);
+	pagesArray->insertObject(moveButtonPage2, 3);
+	dotsArray->addObject(pageDot2);
+	dotsNode->addChild(pageDot2);
+
+	auto moveSmallerUp_spr = CCSprite::create("GJ_button_01.png");
+	moveSmallerUp_spr->setScale(0.9f);
+	auto moveSmallerUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+	moveSmallerUp_spr2->setPosition({ moveSmallerUp_spr->getContentSize().width / 2, (moveSmallerUp_spr->getContentSize().height / 2) + 2 });
+	auto moveSmallerUp_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
+	moveSmallerUp_lbl->setScale(0.5f);
+	moveSmallerUp_lbl->setPosition({ moveSmallerUp_spr->getContentSize().width / 2, (moveSmallerUp_spr->getContentSize().height / 2) - 9 });
+	moveSmallerUp_spr->addChild(moveSmallerUp_spr2);
+	moveSmallerUp_spr->addChild(moveSmallerUp_lbl);
+	auto moveSmallerUp_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerUp_spr, moveSmallerUp_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerUp));
+	moveSmallerUp_btn->setPosition({ -105, -92 });
+
+	auto moveSmallerDown_spr = CCSprite::create("GJ_button_01.png");
+	moveSmallerDown_spr->setScale(0.9f);
+	auto moveSmallerDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+	moveSmallerDown_spr2->setPosition({ moveSmallerDown_spr->getContentSize().width / 2, (moveSmallerDown_spr->getContentSize().height / 2) + 2 });
+	auto moveSmallerDown_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
+	moveSmallerDown_lbl->setScale(0.5f);
+	moveSmallerDown_lbl->setPosition({ moveSmallerDown_spr->getContentSize().width / 2, (moveSmallerDown_spr->getContentSize().height / 2) - 9 });
+	moveSmallerDown_spr->addChild(moveSmallerDown_spr2);
+	moveSmallerDown_spr->addChild(moveSmallerDown_lbl);
+	auto moveSmallerDown_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerDown_spr, moveSmallerDown_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerDown));
+	moveSmallerDown_btn->setPosition({ -65, -92 });
+
+	auto moveSmallerLeft_spr = CCSprite::create("GJ_button_01.png");
+	moveSmallerLeft_spr->setScale(0.9f);
+	auto moveSmallerLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
+	moveSmallerLeft_spr2->setPosition({ moveSmallerLeft_spr->getContentSize().width / 2, (moveSmallerLeft_spr->getContentSize().height / 2) + 2 });
+	auto moveSmallerLeft_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
+	moveSmallerLeft_lbl->setScale(0.5f);
+	moveSmallerLeft_lbl->setPosition({ moveSmallerLeft_spr->getContentSize().width / 2, (moveSmallerLeft_spr->getContentSize().height / 2) - 9 });
+	moveSmallerLeft_spr->addChild(moveSmallerLeft_spr2);
+	moveSmallerLeft_spr->addChild(moveSmallerLeft_lbl);
+	auto moveSmallerLeft_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerLeft_spr, moveSmallerLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerLeft));
+	moveSmallerLeft_btn->setPosition({ -25, -92 });
+
+	auto moveSmallerRight_spr = CCSprite::create("GJ_button_01.png");
+	moveSmallerRight_spr->setScale(0.9f);
+	auto moveSmallerRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
+	moveSmallerRight_spr2->setPosition({ moveSmallerRight_spr->getContentSize().width / 2, (moveSmallerRight_spr->getContentSize().height / 2) + 2 });
+	auto moveSmallerRight_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
+	moveSmallerRight_lbl->setScale(0.5f);
+	moveSmallerRight_lbl->setPosition({ moveSmallerRight_spr->getContentSize().width / 2, (moveSmallerRight_spr->getContentSize().height / 2) - 9 });
+	moveSmallerRight_spr->addChild(moveSmallerRight_spr2);
+	moveSmallerRight_spr->addChild(moveSmallerRight_lbl);
+	auto moveSmallerRight_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerRight_spr, moveSmallerRight_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerRight));
+	moveSmallerRight_btn->setPosition({ 15, -92 });
+
+	auto moveQUnitUp_spr = CCSprite::create("GJ_button_01.png");
+	moveQUnitUp_spr->setScale(0.9f);
+	auto moveQUnitUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+	moveQUnitUp_spr2->setPosition({ moveQUnitUp_spr->getContentSize().width / 2, (moveQUnitUp_spr->getContentSize().height / 2) + 2 });
+	auto moveQUnitUp_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
+	moveQUnitUp_lbl->setScale(0.5f);
+	moveQUnitUp_lbl->setPosition({ moveQUnitUp_spr->getContentSize().width / 2, (moveQUnitUp_spr->getContentSize().height / 2) - 9 });
+	moveQUnitUp_spr->addChild(moveQUnitUp_spr2);
+	moveQUnitUp_spr->addChild(moveQUnitUp_lbl);
+	auto moveQUnitUp_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitUp_spr, moveQUnitUp_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitUp));
+	moveQUnitUp_btn->setPosition({ 55, -92 });
+
+	auto moveQUnitDown_spr = CCSprite::create("GJ_button_01.png");
+	moveQUnitDown_spr->setScale(0.9f);
+	auto moveQUnitDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+	moveQUnitDown_spr2->setPosition({ moveQUnitDown_spr->getContentSize().width / 2, (moveQUnitDown_spr->getContentSize().height / 2) + 2 });
+	auto moveQUnitDown_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
+	moveQUnitDown_lbl->setScale(0.5f);
+	moveQUnitDown_lbl->setPosition({ moveQUnitDown_spr->getContentSize().width / 2, (moveQUnitDown_spr->getContentSize().height / 2) - 9 });
+	moveQUnitDown_spr->addChild(moveQUnitDown_spr2);
+	moveQUnitDown_spr->addChild(moveQUnitDown_lbl);
+	auto moveQUnitDown_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitDown_spr, moveQUnitDown_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitDown));
+	moveQUnitDown_btn->setPosition({ 95, -92 });
+
+	auto moveQUnitLeft_spr = CCSprite::create("GJ_button_01.png");
+	moveQUnitLeft_spr->setScale(0.9f);
+	auto moveQUnitLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
+	moveQUnitLeft_spr2->setPosition({ moveQUnitLeft_spr->getContentSize().width / 2, (moveQUnitLeft_spr->getContentSize().height / 2) + 2 });
+	auto moveQUnitLeft_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
+	moveQUnitLeft_lbl->setScale(0.5f);
+	moveQUnitLeft_lbl->setPosition({ moveQUnitLeft_spr->getContentSize().width / 2, (moveQUnitLeft_spr->getContentSize().height / 2) - 9 });
+	moveQUnitLeft_spr->addChild(moveQUnitLeft_spr2);
+	moveQUnitLeft_spr->addChild(moveQUnitLeft_lbl);
+	auto moveQUnitLeft_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitLeft_spr, moveQUnitLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitLeft));
+	moveQUnitLeft_btn->setPosition({ -105, -132 });
+
+	auto moveQUnitRight_spr = CCSprite::create("GJ_button_01.png");
+	moveQUnitRight_spr->setScale(0.9f);
+	auto moveQUnitRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
+	moveQUnitRight_spr2->setPosition({ moveQUnitRight_spr->getContentSize().width / 2, (moveQUnitRight_spr->getContentSize().height / 2) + 2 });
+	auto moveQUnitRight_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
+	moveQUnitRight_lbl->setScale(0.5f);
+	moveQUnitRight_lbl->setPosition({ moveQUnitRight_spr->getContentSize().width / 2, (moveQUnitRight_spr->getContentSize().height / 2) - 9 });
+	moveQUnitRight_spr->addChild(moveQUnitRight_spr2);
+	moveQUnitRight_spr->addChild(moveQUnitRight_lbl);
+	auto moveQUnitRight_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitRight_spr, moveQUnitRight_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitRight));
+	moveQUnitRight_btn->setPosition({ -65, -132 });
+
+	movePageMenu2->addChild(moveSmallerUp_btn);
+	movePageMenu2->addChild(moveSmallerDown_btn);
+	movePageMenu2->addChild(moveSmallerLeft_btn);
+	movePageMenu2->addChild(moveSmallerRight_btn);
+
+	movePageMenu2->addChild(moveQUnitUp_btn);
+	movePageMenu2->addChild(moveQUnitDown_btn);
+	movePageMenu2->addChild(moveQUnitLeft_btn);
+	movePageMenu2->addChild(moveQUnitRight_btn);
+
 }
 
 void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void* edx, gd::GameObject* object) {
@@ -1605,6 +2065,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b040), EditorUI::moveForCommandH, reinterpret_cast<void**>(&EditorUI::moveForCommand));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDown_H, reinterpret_cast<void**>(&EditorUI::keyDown));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);

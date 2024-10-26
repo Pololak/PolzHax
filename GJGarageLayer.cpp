@@ -80,7 +80,6 @@ public:
 		menu->addChild(closeBtn);
 
 		auto gm = gd::GameManager::sharedState();
-		int selected_dart = gm->getIntGameVariable(GameVariable::SELECTED_DART);
 
 		auto playerIcon = gd::SimplePlayer::create(gd::GameManager::sharedState()->getPlayerFrame());
 		playerIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
@@ -117,8 +116,8 @@ public:
 		birdIcon->setPosition({ 50, 0 });
 		menu->addChild(birdIcon);
 
-		auto waveIcon = gd::SimplePlayer::create(selected_dart);
-		waveIcon->updatePlayerFrame(selected_dart, gd::IconType::Wave);
+		auto waveIcon = gd::SimplePlayer::create(setting().selected_dart);
+		waveIcon->updatePlayerFrame(setting().selected_dart, gd::IconType::Wave);
 		waveIcon->baseSpr()->setColor(gm->colorForIdx(gm->getPlayerColor()));
 		waveIcon->colorSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
 		waveIcon->glowSpr()->setColor(gm->colorForIdx(gm->getPlayerColor2()));
@@ -202,7 +201,6 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
 	auto GM = gd::GameManager::sharedState();
-	int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 
 	auto itemMenu = cocos::getChildOfType<CCMenu>(self, 0);
 
@@ -260,7 +258,7 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 			auto btn = gd::CCMenuItemSpriteExtra::create(base, nullptr, self, menu_selector(GJGarageLayer::Callback::onDartIcon));
 			totalWaves++;
 			btn->setPosition({ -165 + (posLimit * 30), -6 - (rows * 30) }); //guh
-			if (i + 1 == selected_dart) fields->m_dartSelector->setPosition(btn->getPosition());
+			if (i + 1 == setting().selected_dart) fields->m_dartSelector->setPosition(btn->getPosition());
 
 			btn->setTag(totalWaves);
 			dartMenu->addChild(btn);
@@ -304,13 +302,12 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 	//auto dartMenu = gd::GaragePage::create(gd::IconType::Ball, this, menu_selector(GJGarageLayer::onDartIcon));
 
 	GJGarageLayer::selectPage(self, 0);
-	GJGarageLayer::switchToPage((ceilf(selected_dart / 36)));
+	GJGarageLayer::switchToPage((ceilf(setting().selected_dart / 36)));
 }
 
 void GJGarageLayer::Callback::onDartIcon(CCObject* sender) {
 	auto newSender = static_cast<CCNode*>(sender);
-	gd::GameManager::sharedState()->setIntGameVariable(GameVariable::SELECTED_DART, newSender->getTag());
-	//selected_dart = newSender->getTag();
+	setting().selected_dart = newSender->getTag();
 	Icons::patchDart(Icons::getCount("dart", "001"), newSender->getTag());
 	auto playerIcon = garageLayer->getPlayerIcon();
 	playerIcon->updatePlayerFrame(newSender->getTag(), gd::IconType::Wave);
@@ -333,14 +330,13 @@ void GJGarageLayer::Callback::onPrev(CCObject* sender) {
 }
 
 void GJGarageLayer::switchToPage(int page) {
-	int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 	std::cout << page << " " << fields->m_totalWavePages - 1 << std::endl;
 	for (int i = 0; i < fields->m_totalWavePages; i++) {
 		auto node = static_cast<CCNode*>(fields->m_dartPage->getChildren()->objectAtIndex(i));
 		if (i == page) node->setVisible(true);
 		else node->setVisible(false);
 	}
-	float selectedWavePage = (ceilf(selected_dart / 36));
+	float selectedWavePage = (ceilf(setting().selected_dart / 36));
 	if (selectedWavePage == page) fields->m_dartSelector->setVisible(true);
 	else fields->m_dartSelector->setVisible(false);
 }

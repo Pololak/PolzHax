@@ -150,7 +150,7 @@ struct SettingStruct {
     bool onSessionTime = false;
     bool onNoMiniIcon = false;
     bool onDontFade = false;
-    bool extraFeatures = false;
+    bool onMenuGameplay = false;
     bool onSwitchToUpArrow = false;
     bool onNoEffectCircle = false;
     bool onShowLayout = false;

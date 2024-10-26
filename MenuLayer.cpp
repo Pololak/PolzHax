@@ -49,12 +49,11 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	menu->addChild(reloadBtn);
 	self->addChild(menu);
 
-	int selected_dart = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::SELECTED_DART);
 	Icons::patchCube(Icons::getCount("player", "001"));
 	Icons::patchShip(Icons::getCount("ship", "001"));
 	Icons::patchBall(Icons::getCount("player_ball", "001"));
 	Icons::patchBird(Icons::getCount("bird", "001"));
-	Icons::patchDart(Icons::getCount("dart", "001"), selected_dart);
+	Icons::patchDart(Icons::getCount("dart", "001"), setting().selected_dart);
 	//Icons::patchTrail(Icons::getCount("player_special", "001"));
 
 	return true;

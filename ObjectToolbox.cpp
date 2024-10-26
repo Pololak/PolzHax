@@ -56,15 +56,12 @@ void __fastcall ObjectToolbox::triggerTab_H() {
     ObjectToolbox::triggerTab();
 }
 
-void __fastcall ObjectToolbox::gridNodeSizeForKeyH(int objectID) {
-    //if (setting().onGridSize) {
-    //    float gridSize = setting().gridSize;
-    //    __asm {
-    //        movss xmm0, gridSize
-    //        add esp, 0x4
-    //    }
-    //}
-    ObjectToolbox::gridNodeSizeForKey(objectID);
+void __stdcall ObjectToolbox::gridNodeSizeForKeyH(int objectID) {
+	//float gridSize = setting().gridSize;
+	//__asm {
+	//	movss xmm0, gridSize
+	//	add esp, 0x4
+	//}
 }
 
 void ObjectToolbox::mem_init() {
