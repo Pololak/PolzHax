@@ -91,6 +91,8 @@ public:
         reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCPoint*, EditCommand*)>(base + 0x4b040)(this, pos, command);
     }
 
+
+
     //CCMenuItemSpriteExtra* getSpriteButton(
     //    const char* sprite,
     //    cocos2d::SEL_MenuHandler callback,
@@ -149,6 +151,10 @@ public:
         reinterpret_cast<void(__thiscall*)(EditorUI*, EditCommand)>(
             base + 0x4b2c0
             )(this, command);
+    }
+
+    void transformObjectCall(EditCommand command) {
+        reinterpret_cast<void(__thiscall*)(EditorUI*, EditCommand)>(base + 0x4b5a0)(this, command);
     }
 
     auto& clipboard() {
@@ -251,6 +257,10 @@ public:
         return from<int>(this, 0x228);
     }
 
+    float getGridSize() {
+        return from<float>(this, 0x128);
+    }
+
     static constexpr const int Mode_Create = 2;
     static constexpr const int Mode_Delete = 1;
     static constexpr const int Mode_Edit = 3;
@@ -259,10 +269,10 @@ public:
 
 class EditorPauseLayer : public gd::CCBlockLayer {
 public:
-    PAD(0x8)
-        gd::CCMenuItemSpriteExtra* m_pButton0;  // 0x1a4
-    gd::CCMenuItemSpriteExtra* m_pButton1;  // 0x1a8
-    gd::LevelEditorLayer* m_pEditorLayer;   // 0x1ac
+    PAD(0x4)
+        CCMenuItemSpriteExtra* m_pButton0;
+        CCMenuItemSpriteExtra* m_pButton1;
+        LevelEditorLayer* m_pEditorLayer;
 
     void onResume(cocos2d::CCObject* pSender) {
         reinterpret_cast<void(__thiscall*)(EditorPauseLayer*, cocos2d::CCObject*)>(
@@ -270,10 +280,10 @@ public:
             )(this, pSender);
     }
 
-    void saveLevel(cocos2d::CCObject* pSender) {
-        reinterpret_cast<void(__thiscall*)(EditorPauseLayer*, cocos2d::CCObject*)>(
+    void saveLevel() {
+        reinterpret_cast<void(__thiscall*)(EditorPauseLayer*)>(
             base + 0x3eec0
-            )(this, pSender);
+            )(this);
     }
 
     CCMenuItemSpriteExtra* bpmButton() {

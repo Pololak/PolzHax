@@ -14,10 +14,14 @@ namespace gd {
 			const char* desc, const char* icon/*, bool quest*/) {
 			auto pRet = reinterpret_cast<AchievementBar * (__fastcall*)(const char*,
 				const char*, const char*/*, bool*/)>(
-					base + 0x271f0 //0x3B120
+					base + 0x273d0 //0x3B120
 					)(title, desc, icon/*, quest */);
 			__asm add esp, 0x8
 			return pRet;
+		}
+
+		void show() {
+			return reinterpret_cast<void(__fastcall*)()>(base + 0x27d80)();
 		}
 	};
 	#pragma runtime_checks("s", restore)

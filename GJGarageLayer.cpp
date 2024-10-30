@@ -183,7 +183,8 @@ bool __fastcall GJGarageLayer::init_H(gd::GJGarageLayer* self) {
 	iconKitSpr2->addChild(iconKitSpr3);
 
 	auto iconKitBtn = gd::CCMenuItemSpriteExtra::create(iconKitSpr, iconKitSpr, self, menu_selector(IconKitPreview::showCallback));
-	iconKitBtn->setPosition({ 350, 235 });
+	auto simplePlayer = from<gd::SimplePlayer*>(self, 0x12c);
+	iconKitBtn->setPosition({ simplePlayer->getPositionX() + 80, simplePlayer->getPositionY()});
 
 	auto menu = CCMenu::create();
 

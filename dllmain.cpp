@@ -229,6 +229,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MenuGameLayer::mem_init();
     SimplePlayer::mem_init();
     GJGarageLayer::mem_init();
+    LevelEditorLayer::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),

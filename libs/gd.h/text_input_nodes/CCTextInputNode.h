@@ -39,7 +39,7 @@ namespace gd {
 		//	return pRet;
 		//}
 
-		/*static CCTextInputNode* create(const char* caption, cocos2d::CCObject* target, 
+		static CCTextInputNode* create(const char* caption, cocos2d::CCObject* target, 
 			const char* fntFile, float width, float height) {
 			__asm {
 				movss xmm0, width
@@ -51,14 +51,6 @@ namespace gd {
 			)(caption, target, fntFile);
 			__asm add esp, 0x8
 			return pRet;
-		}*/
-		static CCTextInputNode* create(float width, float height, char const* label, char const* labelFont, int fontSize, char const* fieldFont) {
-			auto pRet = reinterpret_cast<CCTextInputNode * (__thiscall*)(float, float, char const*, char const*, int, char const*)>(base + 0x13a90)(width, height, label, labelFont, fontSize, fieldFont);
-			return pRet;
-		}
-
-		static CCTextInputNode* create(char const* label, int idk, char const* font) {
-			return reinterpret_cast<CCTextInputNode * (__thiscall*)(char const*, int, char const*)>(base + 0x13a90)(label, idk, font);
 		}
 
 		void setLabelPlaceholderColor(cocos2d::ccColor3B color) {
@@ -75,7 +67,7 @@ namespace gd {
 		}
 		void setMaxLabelLength(int length) { m_nMaxLabelLength = length; }
 		void setAllowedChars(std::string filter) {
-			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*, std::string)>(base + 0x5770)(this, filter);
+			return reinterpret_cast<void(__fastcall*)(CCTextInputNode*, std::string)>(base + 0x5770)(this, filter);
 		}
 		void refreshLabel() {
 			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*)>(

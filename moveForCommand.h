@@ -28,4 +28,11 @@ namespace moveForCommand {
 	static constexpr const gd::EditCommand kEditCommandQUnitDown = static_cast<gd::EditCommand>(0x413);
 }
 
+namespace rotationForCommand {
+	static constexpr const gd::EditCommand kEditCommandRotate45CW = static_cast<gd::EditCommand>(0x414);
+	static constexpr const gd::EditCommand kEditCommandRotate45CCW = static_cast<gd::EditCommand>(0x415);
+	static constexpr const gd::EditCommand kEditCommandRotate265CW = static_cast<gd::EditCommand>(0x416);
+	static constexpr const gd::EditCommand kEditCommandRotate265CCW = static_cast<gd::EditCommand>(0x417);
+}
+
 

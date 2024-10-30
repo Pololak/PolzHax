@@ -39,6 +39,10 @@ class GameLevelManager : public cocos2d::CCNode {
                 GameLevelManager*, int, bool
                 )>(base + 0x561f0)(this, id, unk);
         }
+
+        void resetTimerForKey(char const* key) {
+            return reinterpret_cast<void(__fastcall*)(char const*)>(gd::base + 0x5440)(key);
+        }
 };
 
 }

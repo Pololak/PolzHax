@@ -85,14 +85,27 @@ bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 		btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
 	}
 	auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
+	button->setPosition({ -30, -210 });
 
 	menu->setZOrder(1);
-	menu->setPosition({ director->getScreenRight() - 29.5f, director->getScreenBottom() + 109 });
+	menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 	menu->addChild(button);
 	self->addChild(menu);
 
 	return true;
 }
+
+class Callback {
+public:
+	void onRefresh(gd::LevelBrowserLayer* lbl, CCObject* sender) {
+		auto gameLevelManager = gd::GameLevelManager::sharedState();
+		//auto chars = (char const*)sender;
+		//gameLevelManager->resetTimerForKey(chars);
+
+		auto searchObject = from<gd::GJSearchObject*>(lbl, 0x134);
+		lbl->loadPage(searchObject);
+	}
+};
 
 bool LevelBrowserLayer_init(gd::LevelBrowserLayer* self, gd::GJSearchObject* obj) {
 	if (!matdash::orig<&LevelBrowserLayer_init>(self, obj)) return false;
@@ -138,6 +151,7 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&LevelInfoLayer_init>(self, level)) return false;
 
 	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
 
 	auto menu = from<CCMenu*>(self, 0x138);
 
@@ -160,7 +174,7 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 
 
 	//menu->setZOrder(1);
-	button->setPosition({ -254, 24 });
+	button->setPosition({ -(winSize.width / 2) + 30, 24});
 	menu->addChild(button);
 	//self->addChild(menu);
 

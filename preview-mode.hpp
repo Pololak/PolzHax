@@ -4,10 +4,19 @@
 namespace preview_mode {
 	void init();
 
+	void showZoomText(gd::EditorUI* ui);
+
 	class Callback {
 	public:
 		void hideUI_btn(CCObject*);
 	};
+}
+
+namespace LevelEditorLayer {
+	inline void(__thiscall* onPlaytest)(gd::LevelEditorLayer*);
+	void __fastcall onPlaytestH(gd::LevelEditorLayer* self);
+
+	void mem_init();
 }
 
 namespace EditorUI {
@@ -44,6 +53,9 @@ namespace EditorUI {
 
 	inline CCPoint*(__thiscall* moveForCommand)(gd::EditorUI*, CCPoint*, gd::EditCommand);
 	CCPoint* __fastcall moveForCommandH(gd::EditorUI* self, void* edx, CCPoint* pos, gd::EditCommand com);
+
+	inline void(__thiscall* transformObject)(gd::EditorUI*, gd::GameObject*, gd::EditCommand, bool);
+	void __fastcall transformObjectH(gd::EditorUI* self, void* edx, gd::GameObject* obj, gd::EditCommand com, bool idk);
 
 	class Callback {
 	public:
@@ -111,6 +123,8 @@ namespace EditorPauseLayer {
 		void extraFeaturesToggler(CCObject*);
 		void extraInfoPopup(CCObject*);
 		void selectFilterToggle(CCObject*);
+
+		void onSaveLevel(CCObject*);
 	};
 
 	void mem_init();

@@ -43,6 +43,10 @@ class LevelEditorLayer : public cocos2d::CCLayer {
         EditorUI* m_pEditorUI;
 
     public:
+        static LevelEditorLayer* create(GJGameLevel* level) {
+            return reinterpret_cast<LevelEditorLayer * (__fastcall*)(GJGameLevel*)>(gd::base + 0x8c220)(level);
+        }
+
         EditorUI* getEditorUI() {
             return from<EditorUI*>(this, 0x15C);
         }
@@ -172,6 +176,10 @@ class LevelEditorLayer : public cocos2d::CCLayer {
             return from<cocos2d::CCSprite*>(this, 0x160);
         }*/
         //0x8d770
+
+        GameObject* createObject(int id, cocos2d::CCPoint const& position) {
+            return reinterpret_cast<GameObject * (__thiscall*)(LevelEditorLayer*, int, cocos2d::CCPoint)>(base + 0x8d150)(this, id, position);
+        }
 
         int sectionForPos(float x)
         {

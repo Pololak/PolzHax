@@ -8,6 +8,28 @@ namespace gd {
 	class GJBaseGameLayer;
 	class GJGameLevel;
 
+	class GJGroundLayer : public cocos2d::CCLayer {
+	public:
+		static GJGroundLayer* create(int p0) {
+			return reinterpret_cast<GJGroundLayer * (__fastcall*)(int)>(base + 0x81140)(p0);
+		}
+
+		void hideShadows(bool hide) {
+			if (hide) {
+				reinterpret_cast<cocos2d::CCSprite*>(this->getChildren()->objectAtIndex(2))->setVisible(0);
+				reinterpret_cast<cocos2d::CCSprite*>(this->getChildren()->objectAtIndex(3))->setVisible(0);
+			}
+		}
+
+		auto groundSprite() {
+			return from<cocos2d::CCSprite*>(this, 0x118);
+		}
+
+		auto lineSprite() {
+			return from<cocos2d::CCSprite*>(this, 0x120);
+		}
+	};
+
 	class UILayer : public cocos2d::CCLayerColor {
 	public:
 		PAD(8)
