@@ -27,6 +27,7 @@
 #include "moveForCommand.h"
 #include <array>
 #include "GameVariables.hpp"
+#include "nodes.hpp"
 
 using namespace cocos2d;
 
@@ -704,6 +705,13 @@ bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
 	EditorUI::dtor(self);
 }
 
+void EditorUI::Callback::onGoToGroup(CCObject* sender) {
+	int objectGroup = from<int>(editUI->getSingleSelectedObj(), 0x324);
+
+	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = objectGroup;
+	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(objectGroup).c_str());
+}
+
 bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer* editor) {
 	editUI = self;
 
@@ -843,13 +851,11 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	if (!goToGroupSpr->initWithFile("GJ_goToGroupBtn_001.png")) {
 		goToGroupSpr->create("GJ_button_04.png");
 	}
-	auto goToGroupBtn = gd::CCMenuItemSpriteExtra::create(goToGroupSpr, nullptr, self, 0);
+	auto goToGroupBtn = gd::CCMenuItemSpriteExtra::create(goToGroupSpr, nullptr, self, menu_selector(EditorUI::Callback::onGoToGroup));
 	goToGroupBtn->setTag(45031);
 	goToGroupSpr->setScale(0.75f);
 	goToGroupBtn->setPosition({self->getDeselectBtn()->getPositionX() - 84, self->getDeselectBtn()->getPositionY() - 1});
 	rightMenu->addChild(goToGroupBtn);
-	goToGroupBtn->setVisible(0);
-	goToGroupBtn->setEnabled(false);
 
 	if (setting().onPersClip)
 	{
@@ -1769,27 +1775,37 @@ void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* ed
 	}
 }
 
-//bool isEasedScrollLayer(gd::BoomScrollLayer* self) {
-//	if (!self->getParent()) return false;
-//
-//	if (vtable_cast(self->getParent(), 0x11c804)) return false;
-//
-//	if (vtable_cast(self->getParent(), 0x114b90)) return false;
-//
-//	return true;
-//}
-//
-//class BoomScrollLayer_CB : public gd::BoomScrollLayer {
-//public:
-//	void onGoToPage(CCObject* sender) {
-//		auto p = sender->getTag();
-//		if (isEasedScrollLayer(this)) this->moveToPage(p);
-//		else {
-//			this->instantMoveToPage(p - 1);
-//			this->instantMoveToPage(p);
-//		}
-//	}
-//};
+void SetGroupIDLayer::Callback::onCurrentGroup(CCObject*) {
+	CCArray* objs = editUI->getSelectedObjectsOfCCArray();
+	int currentEditorGroup = editUI->getLevelEditorLayer()->getLayerGroup();
+
+	auto setGroupIDLayer = CCDirector::sharedDirector()->getRunningScene()->getChildren()->objectAtIndex(1);
+
+	for (int i = 0; i < (objs->count()); i++)
+	{
+		auto obj = reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i));
+		from<int>(obj, 0x324) = currentEditorGroup;
+		from<CCLabelBMFont*>(setGroupIDLayer, 0x1c4)->setString(std::to_string(currentEditorGroup).c_str());
+		from<int>(setGroupIDLayer, 0x1c8) = currentEditorGroup;
+	}
+
+}
+
+bool __fastcall SetGroupIDLayer::initH(gd::SetGroupIDLayer* self, void* edx, gd::GameObject* obj, CCArray* arr) {
+	if (!SetGroupIDLayer::init(self, obj, arr)) return false;
+
+	auto menu = self->getMenu();
+	auto onDown_btn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildren()->objectAtIndex(1));
+	auto onUp_btn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildren()->objectAtIndex(2));
+	onDown_btn->setSizeMult(1.f);
+	onUp_btn->setSizeMult(1.f);
+
+	auto setCurrentGroup_spr = gd::ButtonSprite::create("Current Group", 0x56, 0, 0.5f, true, "bigFont.fnt", "GJ_button_04.png", 25.f);
+	auto setCurrentGroup_btn = gd::CCMenuItemSpriteExtra::create(setCurrentGroup_spr, setCurrentGroup_spr, self, menu_selector(SetGroupIDLayer::Callback::onCurrentGroup));
+	setCurrentGroup_btn->setPosition({ -120.f, 0.f });
+	
+	menu->addChild(setCurrentGroup_btn);
+}
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	scheduler = self;
@@ -1868,12 +1884,14 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 		auto objaddr = moreObjInfoMenu->getChildByTag(45017);
 		auto objcounter = moreObjInfoMenu->getChildByTag(45018);
 		//auto customObj = moreObjInfoMenu->getChildByTag(45050);
+		
 
 		auto leftMenu = from<CCMenu*>(editUI->getRedoBtn(), 0xac);
 		auto deleteBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(45030));
 
 		auto rightMenu = from<CCMenu*>(editUI->getDeselectBtn(), 0xac);
 		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45028));
+		auto onGoToGroup = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(45031));
 
 		if (lel) {
 			auto playerDrawNode = reinterpret_cast<CCDrawNode*>(lel->gameLayer()->getChildByTag(124));
@@ -1963,6 +1981,15 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			else {
 				onBaseLayerBtn->setVisible(1);
 				onBaseLayerBtn->setEnabled(true);
+			}
+		}
+
+		if (onGoToGroup) {
+			if (editUI->getSelectedObjectsOfCCArray()->count() == 1) {
+				onGoToGroup->setVisible(1);
+			}
+			else {
+				onGoToGroup->setVisible(0);
 			}
 		}
 		
@@ -2151,4 +2178,8 @@ void preview_mode::init() {
 	matdash::add_hook<&EditorPauseLayer_dtor>(gd::base + 0x3e280);
 
 	matdash::add_hook<&GameObject_shouldBlendColor>(gd::base + 0x6ece0);
+}
+
+void SetGroupIDLayer::mem_init() {
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf78d0), SetGroupIDLayer::initH, reinterpret_cast<void**>(&SetGroupIDLayer::init));
 }

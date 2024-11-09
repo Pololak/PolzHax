@@ -61,9 +61,31 @@ gd::GJGameLevel* import_level(S& stream) {
 	return level;
 }
 
+cocos2d::CCObject* levelObject;
+cocos2d::CCArray* localLevelArray;
+
+class MoveToTopProtocol : public gd::FLAlertLayerProtocol {
+public:
+	void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override {
+		if (btn2) {
+			localLevelArray->removeObject(levelObject, true);
+			localLevelArray->insertObject(levelObject, 0);
+			gd::LocalLevelManager::sharedState()->updateLevelOrder();
+		}
+	}
+};
+
+MoveToTopProtocol moveToTopProtocol;
+
+void EditLevelLayer::Callback::onMoveToTop(CCObject*) {
+	gd::FLAlertLayer::create(&moveToTopProtocol, "Move To Top", "Move this level to the top of the created levels list?", "NO", "YES", 300.f, false, 140.f)->show();
+}
+
 bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&EditLevelLayer_init>(self, level)) return false;
 
+	localLevelArray = gd::LocalLevelManager::sharedState()->getLocalLevels();
+	levelObject = (cocos2d::CCObject*)level;
 
 	auto director = CCDirector::sharedDirector();
 
@@ -85,27 +107,25 @@ bool EditLevelLayer_init(gd::EditLevelLayer* self, gd::GJGameLevel* level) {
 		btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
 	}
 	auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, to_handler<SEL_MenuHandler, handler>);
-	button->setPosition({ -30, -210 });
+	button->setPosition({ -30, -270 });
 
 	menu->setZOrder(1);
 	menu->setPosition({ director->getScreenRight(), director->getScreenTop() });
 	menu->addChild(button);
 	self->addChild(menu);
 
+	auto onMoveToTop_spr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+	if (!onMoveToTop_spr->initWithFile("GJ_orderUpBtn_001.png")) {
+		onMoveToTop_spr->createWithSpriteFrameName("edit_upBtn_001.png");
+	}
+	onMoveToTop_spr->setScale(0.925f);
+	auto onMoveToTop_btn = gd::CCMenuItemSpriteExtra::create(onMoveToTop_spr, onMoveToTop_spr, self, menu_selector(EditLevelLayer::Callback::onMoveToTop));
+	onMoveToTop_btn->setPosition({ -30, -210 });
+
+	menu->addChild(onMoveToTop_btn);
+
 	return true;
 }
-
-class Callback {
-public:
-	void onRefresh(gd::LevelBrowserLayer* lbl, CCObject* sender) {
-		auto gameLevelManager = gd::GameLevelManager::sharedState();
-		//auto chars = (char const*)sender;
-		//gameLevelManager->resetTimerForKey(chars);
-
-		auto searchObject = from<gd::GJSearchObject*>(lbl, 0x134);
-		lbl->loadPage(searchObject);
-	}
-};
 
 bool LevelBrowserLayer_init(gd::LevelBrowserLayer* self, gd::GJSearchObject* obj) {
 	if (!matdash::orig<&LevelBrowserLayer_init>(self, obj)) return false;

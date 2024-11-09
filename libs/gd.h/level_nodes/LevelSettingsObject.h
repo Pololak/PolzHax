@@ -5,6 +5,12 @@
 
 namespace gd {
     class ColorAction;
+    class SettingsColorObject : public cocos2d::CCNode {
+    public:
+        const cocos2d::ccColor3B getColor()  {
+            return from<cocos2d::ccColor3B>(this, 0xe8);
+        }
+    };
 
     enum Gamemode {
         kGamemodeCube = 0,
@@ -98,6 +104,10 @@ namespace gd {
         }
         auto getIsFlipped(bool isFlipped) {
             from<bool>(this, 0x129) = isFlipped;
+        }
+
+        SettingsColorObject* getColorObjectBG() {
+            return from<SettingsColorObject*>(this, 0xe8);
         }
 
         /*auto getGJGameLevel() {

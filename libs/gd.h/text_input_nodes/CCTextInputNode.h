@@ -19,7 +19,7 @@ namespace gd {
 		cocos2d::ccColor3B m_cPlaceholderColor;
 		cocos2d::ccColor3B m_cNormalColor;
 		cocos2d::CCLabelBMFont* m_pCursor;
-		cocos2d::CCTextFieldTTF* m_pTextField;
+		cocos2d::CCTextFieldTTF* m_textField;
 		TextInputDelegate* m_delegate;
 		int m_nMaxLabelLength;
 		cocos2d::CCLabelBMFont* m_pPlaceholderLabel;
@@ -74,9 +74,15 @@ namespace gd {
 				base + 0x5770
 				)(this);
 		}
-		cocos2d::CCTextFieldTTF* getTextField() { return m_pTextField; }
-		void setString(const char* text) { m_pTextField->setString(text); }
-		const char* getString() { return m_pTextField->getString(); }
+		void setString(std::string text) {
+			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*, std::string)>(base + 0x13d70)(this, text);
+		}
+		const char* getString() {
+			return m_textField->getString();
+		}
+		cocos2d::CCTextFieldTTF* getTextField() {
+			return from<cocos2d::CCTextFieldTTF*>(this, 0x170);
+		}
 		void setDelegate(TextInputDelegate* delegate) { m_delegate = delegate; }
 	};
 	#pragma runtime_checks("s", restore)

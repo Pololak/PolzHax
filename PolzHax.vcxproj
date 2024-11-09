@@ -558,6 +558,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCBlockLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCNodeContainer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CreatorLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditLevelLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorUI.h" />
@@ -652,6 +653,7 @@
     <ClInclude Include="menu.h" />
     <ClInclude Include="MenuLayer.h" />
     <ClInclude Include="moveForCommand.h" />
+    <ClInclude Include="nodes.hpp" />
     <ClInclude Include="ObjectsIds.h" />
     <ClInclude Include="ObjectToolbox.h" />
     <ClInclude Include="pch.h" />
@@ -682,6 +684,7 @@
     <ClCompile Include="lvl-share.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
+    <ClCompile Include="nodes.cpp" />
     <ClCompile Include="ObjectToolbox.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />

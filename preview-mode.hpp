@@ -139,6 +139,18 @@ namespace BoomScrollLayer {
 	void mem_init();
 }
 
+namespace SetGroupIDLayer {
+	inline bool(__thiscall* init)(gd::SetGroupIDLayer*, gd::GameObject*, CCArray*);
+	bool __fastcall initH(gd::SetGroupIDLayer* self, void* edx, gd::GameObject* obj, CCArray* arr);
+
+	class Callback {
+	public:
+		void onCurrentGroup(CCObject*);
+	};
+
+	void mem_init();
+}
+
 namespace Scheduler {
 	inline bool(__thiscall* update)(CCScheduler* self, float dt);
 	void __fastcall update_H(CCScheduler* self, void* edx, float dt);

@@ -48,21 +48,6 @@ namespace gd {
 			return ret;
 		}
 
-		static auto create(cocos2d::CCNode* topSprite, int buttonWidth, int widthLimit, float idk, float idk2, bool limitWidth, const char* bgSprite) {
-			auto ret = reinterpret_cast<ButtonSprite * (__vectorcall*)(
-				float, float, float, float, float, float,
-				cocos2d::CCNode*, int, int, float, float, bool, const char*
-				)>(base + 0x9510)(0.f, 0.f, 0.f, idk, 0.f, 0.f, topSprite, buttonWidth, widthLimit, idk, idk2, limitWidth, bgSprite); //0x9800 - GD 1.92
-			// TODO: fix vectorcall version to work with clang
-			// __asm movss xmm3, scale
-			// auto ret = reinterpret_cast<ButtonSprite*(__fastcall*)(
-			// 	const char*, int, // ecx and edx
-			// 	int, bool, const char*, const char*, float // stack
-			// )>(base + 0x9800)(label, width, idk, absolute, font, sprite, height);
-			__asm add esp, 20;
-			return ret;
-		}
-
 		auto getLabel()
 		{
 			return from<cocos2d::CCLabelBMFont*>(this, 0x1d0);

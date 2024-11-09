@@ -2,6 +2,7 @@
 #include "Icons.h"
 
 #include "GameVariables.hpp"
+#include "nodes.hpp"
 
 bool isReload = false;
 
@@ -58,6 +59,19 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 
 	//auto inputNode = gd::CCTextInputNode::create("X", self, "bigFont.fnt", 30.f, 20.f);
 	//self->addChild(inputNode);
+
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+
+	switch (tm.tm_mon)
+	{
+	case 0:
+	case 1:
+	case 11:
+		CCParticleSnow * snow = CCParticleSnow::createWithTotalParticles(700);
+		self->addChild(snow);
+		break;
+	}
 
 	return true;
 }

@@ -8,8 +8,10 @@ namespace gd {
     class LocalLevelManager : GManager {
     public:
 
-        static auto sharedState() {
-            return reinterpret_cast<LocalLevelManager * (__stdcall*)()>(base + 0xac180)();
+        static LocalLevelManager* sharedState() {
+            return reinterpret_cast<LocalLevelManager * (__stdcall*)()>(
+                base + 0xac180
+                )();
         }
         //static GameManager* sharedState() {
         //    return reinterpret_cast<GameManager * (__stdcall*)()>(

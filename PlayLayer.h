@@ -38,6 +38,15 @@ namespace PlayLayer {
 	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer*, bool);
 	void __fastcall togglePracticeModeH(gd::PlayLayer* self, void* edx, bool practice);
 
+	inline void(__thiscall* createCheckpoint)(gd::PlayLayer*);
+	void __fastcall createCheckpointH(gd::PlayLayer* self);
+
+	inline void(__thiscall* removeLastCheckpoint)(gd::PlayLayer*);
+	void __fastcall removeLastCheckpointH(gd::PlayLayer* self);
+
+	inline void(__thiscall* levelComplete)(gd::PlayLayer*);
+	void __fastcall levelCompleteH(gd::PlayLayer* self);
+
 	class Callback {
 	public:
 		void onPreviousStartPos(CCObject*);
@@ -84,6 +93,9 @@ namespace PlayerObject {
 
 	inline void(__thiscall* updatePlayerRollFrame)(gd::PlayerObject*, int);
 	void __fastcall updatePlayerRollFrame_H(gd::PlayerObject* self, void* edx, int frameID);
+
+	inline void(__thiscall* runBallRotation2)(gd::PlayerObject*);
+	void __fastcall runBallRotation2H(gd::PlayerObject* self);
 
 	void mem_init();
 }

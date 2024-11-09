@@ -36,7 +36,15 @@ namespace gd {
 			__asm add esp, 0x8;
 			return ret;
 		}
+
+		void setSizeMult(float mult) {
+			__asm movss xmm1, mult
+			return reinterpret_cast<void(__thiscall*)(CCMenuItemSpriteExtra*)>(
+				base + 0xd3b0
+				)(this);
+		}
 	};
+
 	#pragma runtime_checks("s", restore)
 }
 

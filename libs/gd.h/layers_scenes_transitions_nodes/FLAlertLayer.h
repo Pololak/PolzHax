@@ -12,29 +12,23 @@ namespace gd {
 	#pragma runtime_checks("s", off)
 	class FLAlertLayer : public cocos2d::CCLayerColor {
 	protected:
-		cocos2d::CCMenu* m_pButtonMenu;
-		int m_nControlConnected; //?
-		cocos2d::CCObject* m_pTarget;
-		PAD(12);
-		cocos2d::CCLayer* m_pLayer; //not working bruh
-		int m_nZOrder2;
-		bool m_bNoElasticity;
-		cocos2d::ccColor3B m_cColor2; //?
-		ButtonSprite* m_pButton1;
-		ButtonSprite* m_pButton2;
-		ScrollingLayer* m_pScrollingLayer;
-		int m_nJoystickConnected;
-		bool m_bBorder; //?
-		bool m_bNoAction; //?
-
-		cocos2d::CCLayer* m_internalLayer;
-		cocos2d::CCMenu* internalMenu;
+		cocos2d::CCMenu* m_buttonMenu;
+		int m_controlConnected;
+		int m_ZOrder;
+		FLAlertLayerProtocol* m_alertProtocol; // m_pParent
+		cocos2d::CCNode* m_scene; // m_targetScene
+		bool m_reverseKeyBack;
+		CCLayer* m_mainLayer; // m_internalLayer
+		ScrollingLayer* m_scrollingLayer;
+		int m_scrollAction;
+		bool m_containsBorder;
+		bool m_noAction;
 
 	public:
 		CCNode vtable;
 		auto getMenu()
 		{
-			return m_pButtonMenu;
+			return m_buttonMenu;
 		}
 
 		auto menu()

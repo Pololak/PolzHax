@@ -102,6 +102,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/MoreOptionsLayer.h"
 #include "layers_scenes_transitions_nodes/LevelSearchLayer.h"
 #include "layers_scenes_transitions_nodes/GJGarageLayer.h"
+#include "layers_scenes_transitions_nodes/CustomSongLayer.h"
 //#include "layers_scenes_transitions_nodes/EditorPauseLayer.h"
 
 #include "layers_scenes_transitions_nodes/EditLevelLayer.h"

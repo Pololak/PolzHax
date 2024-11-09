@@ -35,7 +35,6 @@ std::vector<time_t> m_clickFrames;
 int m_totalClicks = 0;
 bool m_isHolding = false;
 
-bool inPractice;
 bool inTestmode;
 int smoothOut;
 
@@ -59,6 +58,9 @@ std::set<int>cornerObjects = {
 std::vector<gd::StartPosObject*> sp;
 std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniPortals, speedChanges, mirrorPortals;
 std::vector<bool> willFlip;
+
+std::vector<CheckPoint> checkpoints;
+bool inPractice = false;
 
 void PlayLayer::Callback::onNextStartPos(CCObject*) {
 
@@ -86,6 +88,9 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     deathPos = 0.f;
     m_clickFrames.clear();
     m_totalClicks = 0;
+    if (inPractice && checkpoints.size() > 0) {
+        checkpoints.back().restore(self);
+    }
     PlayLayer::resetLevel(self);
 }
 
@@ -95,6 +100,9 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     isPlayerColorGot = false;
     fadedoutflag = 0;
     currentBest = 0;
+
+    checkpoints.clear();
+    inPractice = false;
 
     //inPractice = false;
     //inTestmode = from<bool>(self, 0x2b8);
@@ -425,7 +433,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         xPos->setAnchorPoint({ 0.f, 0.f });
         xPos->setOpacity(100);
         xPos->setTag(69060);
-        xPos->setPosition({ 2.f, 30 });
+        xPos->setPosition({ 2.f, 40 });
         self->addChild(xPos);
 
         auto yPos = CCLabelBMFont::create("Y: 0", "bigFont.fnt");
@@ -435,18 +443,18 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         yPos->setAnchorPoint({ 0.f, 0.f });
         yPos->setOpacity(100);
         yPos->setTag(69061);
-        yPos->setPosition({ 2.f, 20 });
+        yPos->setPosition({ 2.f, 30 });
         self->addChild(yPos);
 
-        //auto vel = CCLabelBMFont::create("Vel: 0", "bigFont.fnt");
-        //vel->setString(CCString::createWithFormat("Vel: %.d")->getCString());
-        //vel->setScale(0.35f);
-        //vel->setZOrder(5);
-        //vel->setAnchorPoint({ 0.f, 0.f });
-        //vel->setOpacity(100);
-        //vel->setTag(69062);
-        //vel->setPosition({ 2.f, 30 });
-        //self->addChild(vel);
+		auto vel = CCLabelBMFont::create("yVel: 0", "bigFont.fnt");
+		vel->setString(CCString::createWithFormat("yVel: %.f")->getCString());
+		vel->setScale(0.35f);
+		vel->setZOrder(5);
+		vel->setAnchorPoint({ 0.f, 0.f });
+		vel->setOpacity(100);
+		vel->setTag(69062);
+		vel->setPosition({ 2.f, 20 });
+		self->addChild(vel);
 
         auto rot = CCLabelBMFont::create("Rot: 0", "bigFont.fnt");
         rot->setString(CCString::createWithFormat("Rot: %.f")->getCString());
@@ -533,8 +541,25 @@ inline bool playerTouchesObject(CCRect* playerRect, CCRect* hitboxRect)
 }
 
 void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void* edx, bool practice) {
+    checkpoints.clear();
     inPractice = practice;
     PlayLayer::togglePracticeMode(self, practice);
+}
+
+void __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
+    if (from<gd::PlayerObject*>(self, 0x2a4) != nullptr) {
+        checkpoints.push_back({
+            CheckPoint::from(self)
+            });
+    }
+    PlayLayer::createCheckpoint(self);
+}
+
+void __fastcall PlayLayer::removeLastCheckpointH(gd::PlayLayer* self) {
+    if (checkpoints.size() > 0) {
+        checkpoints.pop_back();
+    }
+    PlayLayer::removeLastCheckpoint(self);
 }
 
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
@@ -739,12 +764,19 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    //if (vel) {
-    //    vel->setString(CCString::createWithFormat("Vel: %.06d%", self->player1()->m_yVelocity)->getCString());
-    //}
+    if (vel) {
+        auto yVelocity = from<double>(self->player1(), 0x458);
+        vel->setString(CCString::createWithFormat("Vel: %.06f%", yVelocity)->getCString());
+        if (setting().onHideLabels) {
+            vel->setVisible(0);
+        }
+        else {
+            vel->setVisible(1);
+        }
+    }
 
     if (rot) {
-        rot->setString(CCString::createWithFormat("Rot: %.06f%", self->player1()->getRotation())->getCString());
+        rot->setString(CCString::createWithFormat("Rot: %.06f%", self->player1()->getRealRotation())->getCString());
         if (setting().onHideLabels) {
             rot->setVisible(0);
         }
@@ -780,15 +812,17 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
 
     auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
     playerDrawNode->clear();
-    if ((setting().onPlayerHitbox && setting().onHitboxes) || (self->player1()->getIsDead() && setting().onHitboxesOnDeath))
+    if (setting().onHitboxes || (self->player1()->getIsDead() && setting().onHitboxesOnDeath))
     {
-        if (self->player1())
-        {
-            Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
-        }
-        if (self->player2())
-        {
-            Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+        if (setting().onPlayerHitbox) {
+            if (self->player1())
+            {
+                Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
+            }
+            if (self->player2())
+            {
+                Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+            }
         }
     }
 
@@ -913,14 +947,10 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
 
     auto hardStreak_p1 = from<gd::HardStreak*>(self->player1(), 0x394);
     auto hardStreak_p2 = from<gd::HardStreak*>(self->player2(), 0x394);
-    if (setting().onNoWavePulse) {
-        if (self->player1()->isDart()) {
-            hardStreak_p1->pulseSize() = setting().wavePulseSize;
-        }
-        if (self->player2()->isDart()) {
-            hardStreak_p2->pulseSize() = setting().wavePulseSize;
-        }
-    }
+	if (setting().onNoWavePulse) {
+		hardStreak_p1->pulseSize() = setting().wavePulseSize;
+		hardStreak_p2->pulseSize() = setting().wavePulseSize;
+	}
 
     //if (setting().onShowLayout) {
     //    self->getBackgroundSprite()->setColor(ccc3(40, 125, 255)); // BG
@@ -986,6 +1016,8 @@ void __fastcall PlayLayer::onQuit_H(gd::PlayLayer* self, void* edx) {
     objDrawNode->clear();
 
     playLayer = nullptr;
+
+    checkpoints.clear();
     PlayLayer::onQuit(self);
 }
 
@@ -1010,7 +1042,6 @@ void __fastcall PlayLayer::applyEnterEffect_H(gd::PlayLayer* self, void* edx, gd
 
 class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
 protected:
-
     void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override
     {
         if (btn2)
@@ -1101,6 +1132,12 @@ void __fastcall PauseLayer::onQuit_H(CCObject* btn)
     PauseLayer::onQuit(btn);
 }
 
+void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
+    checkpoints.clear();
+    inPractice = false;
+    PlayLayer::levelComplete(self);
+}
+
 void __fastcall EndLevelLayer::customSetup_H(gd::GJDropDownLayer* self) {
     EndLevelLayer::customSetup(self);
 
@@ -1174,6 +1211,13 @@ void __fastcall GameObject::getEditorColorH(gd::GameObject* self, void* edx, coc
     if (self->isInvisible()) *a = 0x0A007FFF;
 }
 
+void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
+    if (setting().onBallRotationFix) {
+        self->stopActionByTag(1);
+    }
+    PlayerObject::runBallRotation2(self);
+}
+
 void PauseLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xd5f50),
@@ -1227,7 +1271,10 @@ void PlayLayer::mem_init() {
         PlayLayer::releaseButton_H,
         reinterpret_cast<void**>(&PlayLayer::releaseButton));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xec510), PlayLayer::applyEnterEffect_H, reinterpret_cast<void**>(&PlayLayer::applyEnterEffect));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1010), PlayLayer::createCheckpointH, reinterpret_cast<void**>(&PlayLayer::createCheckpoint));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1d70), PlayLayer::removeLastCheckpointH, reinterpret_cast<void**>(&PlayLayer::removeLastCheckpoint));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe52e0), PlayLayer::levelCompleteH, reinterpret_cast<void**>(&PlayLayer::levelComplete));
         // Hi.
 }
 
@@ -1241,6 +1288,7 @@ void EndLevelLayer::mem_init() {
 void PlayerObject::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdad10), PlayerObject::runBallRotation2H, reinterpret_cast<void**>(&PlayerObject::runBallRotation2));
 }
 
 void GameObject::mem_init() {

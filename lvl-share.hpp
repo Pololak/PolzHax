@@ -5,3 +5,10 @@
 namespace lvl_share {
 	void init();
 }
+
+namespace EditLevelLayer {
+	class Callback {
+	public:
+		void onMoveToTop(CCObject*);
+	};
+}

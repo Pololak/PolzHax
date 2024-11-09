@@ -1642,6 +1642,11 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
+            ImGui::Checkbox("Ball Rotation Bug Fix", &setting().onBallRotationFix);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Fixes that ball rotation bug when entering a portal mid ball animation.");
+
+
             if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
                 if (setting().onConfirmExit) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\x90\x90\x90\x90\x90", 5, NULL);
@@ -2298,7 +2303,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.8");
+            ImGui::Text("v1.1.9-alpha.9");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

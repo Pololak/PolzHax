@@ -37,6 +37,15 @@
     <Filter Include="Header Files\Hooks">
       <UniqueIdentifier>{7b00abb7-50d2-4b7b-8ed7-ac0ef4d1e946}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Hooks">
+      <UniqueIdentifier>{65c9a9f5-c64e-4b43-bf20-e3c88ce8254e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Polz2">
+      <UniqueIdentifier>{21eb153b-c7ff-42ae-8aa3-c40c3ba1e519}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Polz2">
+      <UniqueIdentifier>{6050e373-f925-4aff-b4b3-acf06a485fb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1455,9 +1464,6 @@
     <ClInclude Include="libs\matplist.hpp">
       <Filter>libs</Filter>
     </ClInclude>
-    <ClInclude Include="hsv.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\sprite_nodes\HardStreak.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1476,9 +1482,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectsIds.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\level_nodes\SettingsColorObject.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1494,19 +1497,10 @@
     <ClInclude Include="ObjectToolbox.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="CheckPoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MoreOptionsLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="Hitboxes.h">
-      <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
     <ClInclude Include="MenuLayer.h">
-      <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="moveForCommand.h">
       <Filter>Header Files\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h">
@@ -1520,9 +1514,6 @@
     </ClInclude>
     <ClInclude Include="lvl-share.hpp">
       <Filter>Header Files\Hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="Icons.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SimplePlayer.h">
       <Filter>Header Files\Hooks</Filter>
@@ -1539,8 +1530,32 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="CheckPoint.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
     <ClInclude Include="GameVariables.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="Hitboxes.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsIds.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="Icons.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="hsv.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="moveForCommand.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes.hpp">
+      <Filter>Header Files\Polz2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1574,53 +1589,56 @@
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp">
       <Filter>libs\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="menu.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="state.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="explorer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="libs\nfd\src\nfd_common.c">
       <Filter>libs\nfd</Filter>
     </ClCompile>
     <ClCompile Include="libs\nfd\src\nfd_win.cpp">
       <Filter>libs\nfd</Filter>
     </ClCompile>
-    <ClCompile Include="PlayLayer.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectToolbox.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuLayer.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="CrashLogger.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="preview-mode.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
     <ClCompile Include="lvl-share.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="SimplePlayer.cpp">
-      <Filter>Header Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="Hitboxes.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Speedhack.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Labels.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="GJGarageLayer.cpp">
-      <Filter>Header Files\Hooks</Filter>
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuLayer.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectToolbox.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayLayer.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="preview-mode.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SimplePlayer.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Speedhack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Labels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="explorer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hitboxes.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes.cpp">
+      <Filter>Source Files\Polz2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

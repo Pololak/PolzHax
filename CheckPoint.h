@@ -1,3 +1,63 @@
+#pragma once
+
+#include "pch.h"
+
+struct CheckPointStorage {
+
+    float rotation;
+    double velocity;
+
+    static CheckPointStorage from(gd::PlayerObject* player) {
+        return (CheckPointStorage({
+            player->getRealRotation(),
+            player->getYVelocity(),
+            }));
+    }
+
+    void restore(gd::PlayerObject* player) {
+        player->setRealRotation(rotation);
+        player->setYVelocity(velocity);
+        //*(float*)((size_t)location + 0x18) = rotation;
+        //*(float*)((size_t)location + 0x1c) = rotation_2;
+
+        //*(float*)((size_t)location + 0x25c) = size;
+        //*(float*)((size_t)location + 0x260) = size_2;
+
+        //*(double*)((size_t)location + 0x458) = velocity;
+
+        //*(float*)((size_t)location + 0x470) = size_3;
+    }
+};
+
+struct CheckPoint {
+    CheckPointStorage p1;
+    CheckPointStorage p2;
+
+    static CheckPoint from(gd::PlayLayer* playLayer) {
+        gd::PlayerObject* player1 = playLayer->player1();
+        gd::PlayerObject* player2 = playLayer->player2();
+
+        return (
+            CheckPoint({
+                CheckPointStorage::from(player1),
+                CheckPointStorage::from(player2)
+                })
+            );
+    }
+
+    void restore(gd::PlayLayer* playLayer) {
+        p1.restore(playLayer->player1());
+        p2.restore(playLayer->player2());
+    }
+};
+
+struct ObjectBlending {
+    ccBlendFunc col1;
+    ccBlendFunc col2;
+    ccBlendFunc col3;
+    ccBlendFunc col4;
+    ccBlendFunc dline;
+};
 //#pragma once
 //
 //struct CheckPointStorage {
@@ -36,7 +96,7 @@
 //	CheckPointStorage p1;
 //	CheckPointStorage p2;
 //
-//	static CheckPoint from(gd::PlayLayer* playLayer) {
+//	static CheckPoint from(void* playLayer) {
 //		void* Player1 = *(void**)((char*)playLayer + 0x2a4);
 //		void* Player2 = *(void**)((char*)playLayer + 0x2a8);
 //

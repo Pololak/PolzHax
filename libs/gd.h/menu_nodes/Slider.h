@@ -22,13 +22,7 @@ namespace gd {
             }
 
             float getValue() {
-                float pos = this->m_bVertical ?
-                    this->getPositionY() : 
-                    this->getPositionX();
-                
-                float scale = this->getScale();
-                
-                return (scale * this->m_fLength * .5f + pos) / (scale * this->m_fLength);
+                return (this->getPosition().x + this->getScale() * 200.0 * 0.5) / (this->getScale() * 200.0);
             }
     };
 
@@ -43,7 +37,9 @@ namespace gd {
             bool m_bVertical;
 
         public:
-            SliderThumb* getThumb() const { return m_pThumb; }
+            SliderThumb* getThumb() {
+                return from<SliderThumb*>(this, 0x130);
+            }
     };
 
     class Slider : public cocos2d::CCLayer {
@@ -55,12 +51,16 @@ namespace gd {
             float m_fHeight;
 
         public:
+            SliderTouchLogic* getTouchLogic() {
+                return from<SliderTouchLogic*>(this, 0x118);
+            }
+
             void setValue(float val) {
                 this->m_pTouchLogic->getThumb()->setValue(val);
             }
 
             float getValue() {
-                return this->m_pTouchLogic->getThumb()->getValue();
+                return this->getTouchLogic()->getThumb()->getValue();
             }
 
             void setBarVisibility(bool v) {

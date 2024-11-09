@@ -87,10 +87,10 @@ struct SettingStruct {
     bool onHiFPSRotation = false;
     bool onHitboxes = false;
     bool onHitboxesOnDeath = false;
-    bool onPlayerHitbox = false;
-    bool onSolidsHitbox = false;
-    bool onHazardsHitbox = false;
-    bool onSpecialsHitbox = false;
+    bool onPlayerHitbox = true;
+    bool onSolidsHitbox = true;
+    bool onHazardsHitbox = true;
+    bool onSpecialsHitbox = true;
     bool onIgnoreEsc = false;
     bool onInstantComplete = false;
     bool onInstantTriggers = false;
