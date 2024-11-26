@@ -28,6 +28,7 @@
 #include <array>
 #include "GameVariables.hpp"
 #include "nodes.hpp"
+#include "RotatingSaws.hpp"
 
 using namespace cocos2d;
 
@@ -64,6 +65,267 @@ void preview_mode::showZoomText(gd::EditorUI* ui) {
 		zoomLabel->runAction(CCSequence::create(CCDelayTime::create(0.5f), CCFadeOut::create(.5f), nullptr));
 	}
 }
+
+CCLabelBMFont* m_gridSizeLabel = nullptr;
+
+static std::array<float, 9> SNAP_GRID_SIZES {
+	1.f, 2.f, 3.75f, 7.5f, 15.f, 30.f, 60.f, 90.f, 120.f
+};
+
+void updateGridSizeLabel() {
+	m_gridSizeLabel->setString(CCString::createWithFormat("%.02f%", setting().gridSize)->getCString());
+}
+
+class GridSizeCB {
+public:
+	void onIncrement(CCObject*) {
+		auto next = std::upper_bound(SNAP_GRID_SIZES.begin(), SNAP_GRID_SIZES.end(), setting().gridSize);
+		if (next == SNAP_GRID_SIZES.end()) next--;
+		setting().gridSize = *next;
+		updateGridSizeLabel();
+	}
+	void onDecrement(CCObject*) {
+		auto next = std::lower_bound(SNAP_GRID_SIZES.begin(), SNAP_GRID_SIZES.end(), setting().gridSize);
+		if (next != SNAP_GRID_SIZES.begin()) next--;
+		setting().gridSize = *next;
+		updateGridSizeLabel();
+	}
+};
+
+gd::GameObject* g_lastObject = nullptr;
+int g_bDontUpdateSlider = 0;
+
+void updateLastObjectX(gd::LevelEditorLayer* lel, gd::GameObject* obj = nullptr);
+
+float getLevelLength() {
+	float screenEnd = CCDirector::sharedDirector()->getScreenRight() + 300.f;
+	auto res = screenEnd;
+
+	if (g_lastObject) {
+		if (g_lastObject->retainCount() == 1u) {
+			g_lastObject->release();
+			g_lastObject = nullptr;
+			updateLastObjectX(levelEditorLayer);
+		}
+		else {
+			res = g_lastObject->getPositionX() + 340.f;
+		}
+	}
+
+	if (res < screenEnd)
+		res = screenEnd;
+
+	return res;
+}
+
+void updateLastObjectX(gd::LevelEditorLayer* lel, gd::GameObject* obj) {
+	if (obj == nullptr) {
+		CCARRAY_FOREACH_B_TYPE(lel->getAllObjects(), pObj, gd::GameObject) {
+			if (!g_lastObject) {
+				g_lastObject = pObj;
+				continue;
+			}
+
+			if (pObj->getPositionX() < g_lastObject->getPositionX())
+				g_lastObject = pObj;
+		}
+	}
+	else {
+		if (!g_lastObject)
+			g_lastObject = obj;
+
+		if (obj->getPositionX() > g_lastObject->getPositionX())
+			g_lastObject = obj;
+	}
+
+	if (g_lastObject)
+		g_lastObject->retain();
+}
+
+void handleObjectAddForSlider(gd::LevelEditorLayer* self, gd::GameObject* obj) {
+	if (obj) updateLastObjectX(self, obj);
+}
+
+cocos2d::CCLayer* circleToolPopup;
+
+static float m_angle;
+static float m_step;
+static float m_fat;
+CCLabelBMFont* m_circleToolLabel = nullptr;
+FloatInputNode* angle_input = nullptr;
+FloatInputNode* step_input = nullptr;
+
+class CircleToolPopup : public CCLayer { // FINALLY
+public:
+	static CircleToolPopup* create() {
+		CircleToolPopup* obj = new CircleToolPopup;
+		if (obj && obj->init()) {
+			obj->autorelease();
+			return obj;
+		}
+		CC_SAFE_DELETE(obj);
+		return nullptr;
+	}
+
+	bool init() {
+		if (!CCLayer::init()) return false;
+		const float width = 300, height = 220;
+		CCLayerColor* CCLayerCol = CCLayerColor::create(ccc4(0, 0, 0, 0));
+		CCLayerCol->setZOrder(1);
+		CCLayerCol->setScale(10.f);
+		this->addChild(CCLayerCol);
+		auto actionColor = CCFadeTo::create(0.1f, 75);
+		CCLayerCol->runAction(actionColor);
+
+		auto touchDispatcher = CCDirector::sharedDirector()->m_pTouchDispatcher;
+		touchDispatcher->incrementForcePrio();
+		this->registerWithTouchDispatcher();
+		setTouchEnabled(true);
+		setKeypadEnabled(true);
+		setMouseEnabled(true);
+
+		auto director = CCDirector::sharedDirector();
+
+		auto bgSprite = CCSprite::create("GJ_button_03.png");
+		bgSprite->setScale(100.f);
+		bgSprite->setOpacity(0);
+		auto bgButton = gd::CCMenuItemSpriteExtra::create(bgSprite, nullptr, this, nullptr);
+		auto bgMenu = CCMenu::create();
+		bgMenu->addChild(bgButton);
+		bgMenu->setZOrder(0);
+		bgMenu->setPosition((CCDirector::sharedDirector()->getScreenRight()) - 25, (CCDirector::sharedDirector()->getScreenTop()) - 25);
+		this->addChild(bgMenu); // DONT EVEN ASK WHAT IS THIS
+
+		auto bg = extension::CCScale9Sprite::create("GJ_square01.png");
+		bg->setContentSize({ width, height });
+		bg->setPosition(director->getWinSize().width / 2, director->getWinSize().height / 2);
+		bg->setZOrder(2);
+		this->addChild(bg);
+
+		const CCPoint offset = director->getWinSize() / 2.f;
+
+		auto appearAction = CCEaseElasticOut::create(CCScaleTo::create(.5f, 1.f), .6f);
+
+		auto menu = CCMenu::create();
+		menu->setZOrder(3);
+		this->addChild(menu);
+
+		auto closeBtn = gd::CCMenuItemSpriteExtra::create(
+			(CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png")),
+			nullptr,
+			this,
+			menu_selector(CircleToolPopup::onClose));
+		closeBtn->setPosition(-((width / 2) - 5), (height / 2) - 5);
+
+		menu->addChild(closeBtn);
+
+		auto mainLabel = CCLabelBMFont::create("Circle Tool", "bigFont.fnt");
+		mainLabel->setPosition(ccp(0.f, 95.f) + offset);
+		mainLabel->setScale(0.75f);
+		mainLabel->setZOrder(5);
+		this->addChild(mainLabel);
+
+		auto arcLabel = CCLabelBMFont::create("Arc:", "goldFont.fnt");
+		arcLabel->setPosition(ccp(-60, 64) + offset);
+		arcLabel->setScale(0.75f);
+		arcLabel->setZOrder(5);
+		this->addChild(arcLabel);
+		angle_input = FloatInputNode::create(CCSize(60, 30), 2.f, "bigFont.fnt");
+		angle_input->set_value(m_angle);
+		angle_input->setPosition(ccp(-60, 38) + offset);
+		angle_input->setZOrder(5);
+		this->addChild(angle_input);
+
+		auto stepLabel = CCLabelBMFont::create("Step:", "goldFont.fnt");
+		stepLabel->setPosition(ccp(60, 64) + offset);
+		stepLabel->setScale(0.75f);
+		stepLabel->setZOrder(5);
+		this->addChild(stepLabel);
+		step_input = FloatInputNode::create(CCSize(60, 30), 2.f, "bigFont.fnt");
+		step_input->set_value(m_step);
+		step_input->setPosition(ccp(60, 38) + offset);
+		step_input->setZOrder(5);
+		this->addChild(step_input);
+
+		m_circleToolLabel = CCLabelBMFont::create("copies: 69\nobjects: 69420", "chatFont.fnt", 0.f, kCCTextAlignmentLeft);
+		m_circleToolLabel->setPosition(ccp(-83, -41) + offset);
+		m_circleToolLabel->setZOrder(5);
+		this->addChild(m_circleToolLabel);
+		this->update_labels();
+
+		auto originalAuthorLbl = CCLabelBMFont::create("Original by Mat", "goldFont.fnt");
+		originalAuthorLbl->setScale(0.5f);
+		auto originalAuthor = gd::CCMenuItemSpriteExtra::create(originalAuthorLbl, nullptr, this, menu_selector(CircleToolPopup::originalAuthor));
+		originalAuthor->setPosition(ccp(-92, -96));
+		menu->addChild(originalAuthor);
+
+		auto apply_btn = gd::CCMenuItemSpriteExtra::create(
+			gd::ButtonSprite::create("Apply", 0, 0, 0.75f, false, "goldFont.fnt", "GJ_button_01.png", 25.f),
+			nullptr,
+			this, menu_selector(CircleToolPopup::onApply)
+		);
+		apply_btn->setPosition({ 0, -85 });
+		menu->addChild(apply_btn);
+
+		this->setScale(0.1f);
+		this->runAction(appearAction);
+
+		return true;
+	}
+
+	void keyBackClicked() override {
+		this->removeFromParentAndCleanup(true);
+		circleToolPopup = nullptr;
+	}
+
+	void onClose(CCObject*) {
+		this->removeFromParentAndCleanup(true);
+		circleToolPopup = nullptr;
+	}
+
+	void update_labels() {
+		m_angle = angle_input->get_value().value_or(m_angle);
+		m_step = step_input->get_value().value_or(m_step);
+		auto objs = editUI->getSelectedObjectsOfCCArray();
+		const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
+		const auto obj_count = amt * objs->count();
+		m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
+	}
+
+	void onApply(CCObject*) {
+		perform();
+	}
+
+	void perform() {
+		CCArray* objs = CCArray::create();
+		for (float i = 1; i * m_step < m_angle; i++) {
+			editUI->onDuplicate(nullptr);
+			auto selected = editUI->getSelectedObjectsOfCCArray();
+			editUI->rotateObjects(selected, m_step, { 0.f, 0.f });
+
+			const float angle = i * m_step;
+
+			from<CCArray*>(levelEditorLayer, 0x170)->removeLastObject();
+			objs->addObjectsFromArray(selected);
+		}
+		from<CCArray*>(levelEditorLayer, 0x170)->addObject(gd::UndoObject::createWithArray(objs, gd::UndoCommand::Paste));
+		editUI->selectObjects(objs);
+		this->keyBackClicked();
+	}
+
+	void originalAuthor(CCObject*) {
+		CCApplication::sharedApplication()->openURL("https://github.com/matcool/small-gd-mods/blob/main/src/circle-tool.cpp");
+	}
+
+	void showCallback(CCObject* btn) {
+		auto director = CCDirector::sharedDirector();
+		auto myCircleTool = CircleToolPopup::create();
+		myCircleTool->setZOrder(9999);
+		auto myLayer2 = CCDirector::sharedDirector()->getRunningScene();
+		myLayer2->addChild(myCircleTool);
+		circleToolPopup = myCircleTool;
+	}
+};
 
 struct CompareTriggers {
 	bool operator()(gd::GameObject* a, gd::GameObject* b) const {
@@ -329,7 +591,6 @@ public:
 	void move_trigger(gd::GameObject* object) {
 		if (is_color_trigger(object)) {
 			
-			
 			this->insert_trigger(object);
 			this->remove_trigger(object);
 
@@ -372,6 +633,10 @@ public:
 		if (is_color_trigger(object)) {
 			this->insert_trigger(object);
 		}
+		handleObjectAddForSlider(this, object);
+		bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
+		if (prevAnims_enabled && RotateSaws::objectIsSaw(object))
+			RotateSaws::beginRotateSaw(object);
 	}
 
 	void removeSpecial(gd::GameObject* object) {
@@ -387,6 +652,11 @@ public:
 		if (object->getHasColor())
 			node = object->getChildSprite();
 		auto batch = this->*m_blending_batch_node;
+		bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
+		if (prevAnims_enabled && RotateSaws::objectIsSaw(object)) { // todo: make this shit work normally.
+			RotateSaws::stopRotateSaw(object);
+			RotateSaws::beginRotateSaw(object);
+		}
 		
 		if (color.blending) {
 			if (node->getParent() != batch) {
@@ -504,17 +774,29 @@ public:
 					object->setObjectColor(obj_color);
 				}
 
-				//if (object->getType() == gd::GameObjectType::kGameObjectTypeSolid) {
-				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
+				bool fixedLayering_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING);
+				//if (fixedLayering_enabled) {
+					if (object->getType() == gd::GameObjectType::kGameObjectTypeSolid) {
+						auto sprite = from<CCSpriteBatchNode*>(object, 0xac);
+						if (object->m_customColorBlend)
+							from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(sprite->getZOrder() - 1);
+					}
+
+					if (object->getType() == gd::GameObjectType::kGameObjectTypeSlope) {
+						from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
+					}
+
+					if (object->getType() == gd::GameObjectType::kGameObjectTypeHazard) {
+						from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
+					}
+
+					if (!object->getHasColor()) from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(99);
 				//}
 
-				//if (object->getType() == gd::GameObjectType::kGameObjectTypeSlope) {
-				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
-				//}
-
-				//if (object->getType() == gd::GameObjectType::kGameObjectTypeHazard) {
-				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
-				//}
+				if (!color1.blending) {
+					object->setZOrder(-1); 
+					from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(-1);
+				}
 
 				auto mode = object->getColorMode();
 				switch (mode) {
@@ -542,9 +824,9 @@ public:
 				case gd::CustomColorMode::PlayerCol2:
 					this->update_object_color(object, p2_color);
 					break;
-				case gd::CustomColorMode::White:
+				case gd::CustomColorMode::White: // bro
 					this->update_object_color(object, white);
-					break; // bro
+					break;
 				default:;
 				}
 			}
@@ -582,6 +864,16 @@ public:
 };
 MyEditorLayer* MyEditorLayer::s_instance = nullptr;
 
+void __fastcall LevelEditorLayer::removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* obj, bool idk) {
+	LevelEditorLayer::removeObject(self, obj, idk);
+	handleObjectAddForSlider(self, obj);
+	bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
+	if (prevAnims_enabled && RotateSaws::objectIsSaw(obj))
+		RotateSaws::stopRotateSaw(obj);
+	
+	std::cout << "LevelEditorLayer::removeObject called." << std::endl;
+}
+
 bool EditorPauseLayer_init(void* self, void* idc) {
 	is_editor_paused = true;
 	return matdash::orig<&EditorPauseLayer_init>(self, idc);
@@ -613,8 +905,13 @@ bool GameObject_shouldBlendColor(gd::GameObject* self) {
 }
 
 void EditorUI_moveObject(gd::EditorUI* self, gd::GameObject* object, CCPoint to) {
+	if (object == nullptr)
+		return;
+
 	matdash::orig<&EditorUI_moveObject>(self, object, to);
 	reinterpret_cast<MyEditorLayer*>(self->getParent())->move_trigger(object);
+
+	updateLastObjectX(self->getLevelEditorLayer(), object);
 }
 
 void EditorUI_deselectAll(gd::EditorUI* self) {
@@ -702,6 +999,7 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
 	editUI = nullptr;
 	if (setting().onPersClip) savedClipboard = self->clipboard();
+	g_lastObject = nullptr;
 	EditorUI::dtor(self);
 }
 
@@ -870,6 +1168,47 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	Slider->setPosition({ director->getScreenLeft() + 280, director->getScreenTop() - 19.5f});
 	Slider->setScale(0.8f);
 
+	setting().gridSize = 30.f;
+
+	auto offset = ccp((size.width / 2.f) + 140.f, (size.height) - 19.5f);
+	if ((size.width / size.height) < 1.6f) offset = ccp((size.width) - 55.f, +130.f);
+
+	auto gridSizeMenu = CCMenu::create();
+	gridSizeMenu->setPosition(offset);
+	self->addChild(gridSizeMenu);
+
+	auto gridMenuBG = extension::CCScale9Sprite::create("square02_small.png", { 0.f, 0.f, 0.f, 0.f });
+	gridMenuBG->setZOrder(-1);
+	gridMenuBG->setOpacity(75);
+	gridMenuBG->setContentSize({ 96.f, 28.f });
+
+	gridSizeMenu->addChild(gridMenuBG);
+
+	auto incrementSpr = CCSprite::createWithSpriteFrameName("GJ_zoomInBtn_001.png");
+	incrementSpr->setScale(0.5f);
+	auto incrementBtn = gd::CCMenuItemSpriteExtra::create(incrementSpr, incrementSpr, self, menu_selector(GridSizeCB::onIncrement));
+	incrementBtn->setPositionX(-35.f);
+
+	auto decrementSpr = CCSprite::createWithSpriteFrameName("GJ_zoomOutBtn_001.png");
+	decrementSpr->setScale(0.5f);
+	auto decrementBtn = gd::CCMenuItemSpriteExtra::create(decrementSpr, decrementSpr, self, menu_selector(GridSizeCB::onDecrement));
+	decrementBtn->setPositionX(35.f);
+
+	gridSizeMenu->addChild(incrementBtn);
+	gridSizeMenu->addChild(decrementBtn);
+
+	m_gridSizeLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_gridSizeLabel->setString(CCString::createWithFormat("%.02f%", setting().gridSize)->getCString());
+	m_gridSizeLabel->setScale(0.4f);
+	
+	gridSizeMenu->addChild(m_gridSizeLabel);
+
+	bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
+	if (prevAnims_enabled)
+		RotateSaws::beginRotations(self->getLevelEditorLayer());
+
+	updateLastObjectX(self->getLevelEditorLayer());
+
 	return result;
 }
 
@@ -896,15 +1235,15 @@ void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy
 }
 
 void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
-	//if (setting().onGridSize) {
-	//	auto actualMode = self->selectedMode();
-	//	self->selectedMode() == gd::EditorUI::Mode_Create;
+	auto size = setting().gridSize;
+	if (roundf(size) == 30.f) {
+		return EditorUI::updateGridNodeSize(self);
+	}
 
-	//	EditorUI::updateGridNodeSize(self);
-
-	//	self->selectedMode() == actualMode;
-	//}
+	auto actualMode = self->selectedMode();
+	self->selectedMode() == gd::EditorUI::Mode_Create;
 	EditorUI::updateGridNodeSize(self);
+	self->selectedMode() == actualMode;
 }
 
 CCPoint* __fastcall EditorUI::moveForCommandH(gd::EditorUI* self, void* edx, CCPoint* pos, gd::EditCommand com) {
@@ -1122,6 +1461,7 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	auto boomScrollLayer = from<gd::BoomScrollLayer*>(self->editButtonBar(), 0xe8);
 	auto extendLayer = from<CCLayer*>(boomScrollLayer, 0x158);
 	auto buttonPage2 = reinterpret_cast<CCMenu*>(extendLayer->getChildren()->objectAtIndex(1));
+	auto buttonPage2Menu = reinterpret_cast<CCMenu*>(buttonPage2->getChildren()->objectAtIndex(0));
 
 	auto dotsNode = reinterpret_cast<CCLayer*>(boomScrollLayer->getChildren()->objectAtIndex(1));
 	CCArray* dotsArray = from<CCArray*>(boomScrollLayer, 0x118);
@@ -1452,6 +1792,19 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	auto rotate265CCW_btn = gd::CCMenuItemSpriteExtra::create(rotate265CCW_base, rotate265CCW_base, self, menu_selector(EditorUI::Callback::rotate265CCW));
 	rotate265CCW_btn->setPosition({ 95, -(winSize.height / 2) + 28 });
 
+	auto circleToolBase_spr = CCSprite::create("GJ_button_01.png");
+	auto circleToolSecond_spr = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
+	auto circleToolLabel = CCLabelBMFont::create("Circle\ntool", "bigFont.fnt", 0.f, CCTextAlignment::kCCTextAlignmentCenter);
+	circleToolBase_spr->addChild(circleToolSecond_spr);
+	circleToolSecond_spr->setPosition({ (circleToolBase_spr->getContentSize().width) / 2, ((circleToolBase_spr->getContentSize().height) / 2) + 2 });
+	circleToolBase_spr->setScale(0.9f);
+	circleToolBase_spr->addChild(circleToolLabel);
+	//circleToolLabel->setAlignment(kCCTextAlignmentCenter);
+	circleToolLabel->setScale(0.35f);
+	circleToolLabel->setPosition({ (circleToolBase_spr->getContentSize().width) / 2, ((circleToolBase_spr->getContentSize().height) / 2) + 2 });
+	auto circleToolBtn = gd::CCMenuItemSpriteExtra::create(circleToolBase_spr, circleToolBase_spr, self, menu_selector(CircleToolPopup::showCallback));
+	circleToolBtn->setPosition({ -105, -(winSize.height / 2) + 28 });
+
 	movePageMenu2->addChild(moveSmallerUp_btn);
 	movePageMenu2->addChild(moveSmallerDown_btn);
 	movePageMenu2->addChild(moveSmallerLeft_btn);
@@ -1466,6 +1819,8 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	movePageMenu2->addChild(rotate45CCW_btn);
 	movePageMenu2->addChild(rotate265CW_btn);
 	movePageMenu2->addChild(rotate265CCW_btn);
+
+	buttonPage2Menu->addChild(circleToolBtn);
 }
 
 void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void* edx, gd::GameObject* object) {
@@ -1505,6 +1860,17 @@ void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void* edx, CCArray*
 	else return EditorUI::selectObjects(self, objects);
 
 	EditorUI::selectObjects(self, objects);
+}
+
+void __fastcall EditorUI::onCopyH(gd::EditorUI* self, void*, CCObject* sender) {
+	EditorUI::onCopy(self, sender);
+	auto string = from<std::string>(self, 0x264);
+	clipboard::write(string);
+}
+
+void __fastcall EditorUI::sliderChangedH(gd::EditorUI* self, void*, CCObject* object) {
+	std::cout << getLevelLength() << std::endl;
+	EditorUI::sliderChanged(self, object);
 }
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
@@ -1581,6 +1947,37 @@ void EditorPauseLayer::Callback::onSaveLevel(CCObject* obj) {
 	gd::FLAlertLayer::create(&saveLevelProtocol, "Save", "<cy>Save</c> the level?", "NO", "YES", 300.f, false, 140.f)->show();
 }
 
+void EditorPauseLayer::Callback::onExperimentLayering(CCObject*) {
+	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::EXPERIMENTAL_LAYERING);
+}
+
+auto experimentLayeringSprite(CCSprite* toggleOn, CCSprite* toggleOff) {
+	bool fixedLayering_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING);
+	return (fixedLayering_enabled) ? toggleOn : toggleOff;
+}
+
+void EditorPauseLayer::Callback::onPreviewAnims(CCObject*) {
+	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::PREV_ANIMS);
+	bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
+	if (prevAnims_enabled) {
+		RotateSaws::beginRotations(levelEditorLayer);
+	}
+	else {
+		RotateSaws::stopRotations(levelEditorLayer);
+	}
+}
+
+auto prevAnimsTogglerSpr(CCSprite* toggleOn, CCSprite* toggleOff) {
+	bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
+	return (prevAnims_enabled) ? toggleOn : toggleOff;
+}
+
+
+float timeXPos(gd::LevelEditorLayer* self, float time) {
+	auto l = self->getDrawGrid();
+	return (l->timeForXPos(time));
+}
+
 void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	editorPauseLayer = self;
 	EditorPauseLayer::customSetup(self);
@@ -1624,6 +2021,16 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	togglerMenu->addChild(SEPButton);
 	togglerMenu->addChild(SEPLabel);
 
+	auto PAToggler = gd::CCMenuItemToggler::create(prevAnimsTogglerSpr(toggleOn, toggleOff), prevAnimsTogglerSpr(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::onPreviewAnims));
+	auto PALabel = CCLabelBMFont::create("Preview Animations", "bigFont.fnt");
+	PAToggler->setScale(0.7f);
+	PAToggler->setPosition({ 30, 210 });
+	PALabel->setScale(0.35f);
+	PALabel->setPosition({ 50, 210 });
+	PALabel->setAnchorPoint({ 0.f, 0.5f });
+	togglerMenu->addChild(PAToggler);
+	togglerMenu->addChild(PALabel);
+
 	constexpr auto pshandler = [](CCObject* self, CCObject*) {
 		auto text = clipboard::read();
 		auto editor = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent());
@@ -1650,7 +2057,7 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	levellength->setString(CCString::createWithFormat("", 0)->getCString());
 	levellength->setTag(49001);
 	levellength->setAnchorPoint({ 0, 0.5f });
-	levellength->setPosition({ director->getScreenLeft() + 10, director->getScreenTop() - 30 });
+	levellength->setPosition({ director->getScreenLeft() + 10, director->getScreenTop() - 50 });
 	levellength->setScale(0.5f);
 	self->addChild(levellength);
 
@@ -1714,7 +2121,41 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	bpmButton_on->setPositionY(bpmButton_on->getPositionY() - 12);
 	helpButton->setPositionY(helpButton->getPositionY() - 12);
 
+	//auto fixLayerLbl = CCLabelBMFont::create("Fix\nLayering", "goldFont.fnt");
+	//fixLayerLbl->setAlignment(kCCTextAlignmentCenter);
+	//fixLayerLbl->setScale(0.6f);
+	//fixLayerLbl->setPosition({ keysButton->getPositionX(), 180 });
+
+	//auto fixLayering = gd::CCMenuItemToggler::create(experimentLayeringSprite(toggleOn, toggleOff), experimentLayeringSprite(toggleOff, toggleOn), self, menu_selector(EditorPauseLayer::Callback::onExperimentLayering));
+	//fixLayering->setScale(0.8f);
+	//bottommenu->addChild(fixLayering);
+	//fixLayering->setPosition({ keysButton->getPositionX(), 145 });
+
 	mainMenu->addChild(saveLevel_btn);
+
+	auto lengthLabel = CCLabelBMFont::create("Length:", "goldFont.fnt");
+	lengthLabel->setPosition({ director->getScreenLeft() + 10, director->getScreenTop() - 30 });
+	lengthLabel->setScale(0.5f);
+	lengthLabel->setAnchorPoint({ 0, 0.5f });
+
+	// time logic
+	float time = floorf(timeXPos(levelEditorLayer, getLevelLength())); // fVar5
+	int minutes = time / 60.f; // fVar10 = fvar5 / 60.0;
+	float seconds = time - (minutes * 60); // iVar11 = fVar5 - (iVar1 * 60);
+	std::string mins = CCString::createWithFormat("%i", minutes)->getCString();
+	std::string secs = CCString::createWithFormat("%.00f%", seconds)->getCString();
+
+	if (minutes < 1) {
+		lengthLabel->setString(std::string("Length: " + secs + " seconds").c_str());
+	}
+	else {
+		lengthLabel->setString(std::string("Length: " + mins + "min " + secs + "s").c_str());
+	}
+	//}
+	//else {
+		//lengthLabel->setString(CCString::createWithFormat("Length: %imin %is", minute, idk)->getCString());
+	//}
+	self->addChild(lengthLabel);
 }
 
 void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender) {
@@ -1725,6 +2166,7 @@ void __fastcall EditorPauseLayer::onSaveAndPlay_H(gd::EditorPauseLayer* self, vo
 		playerDrawNode->clear();
 		objDrawNode->clear();
 	}
+	RotateSaws::stopRotations(self->getEditorLayer());
 	editUI = nullptr;
 	EditorPauseLayer::onSaveAndPlay(self, sender);
 }
@@ -1737,6 +2179,7 @@ void __fastcall EditorPauseLayer::onSaveAndExit_H(gd::EditorPauseLayer* self, vo
 		playerDrawNode->clear();
 		objDrawNode->clear();
 	}
+	RotateSaws::stopRotations(self->getEditorLayer());
 	editUI = nullptr;
 	EditorPauseLayer::onSaveAndExit(self, sender);
 }
@@ -1749,6 +2192,7 @@ void __fastcall EditorPauseLayer::onExitNoSave_H(gd::EditorPauseLayer* self, voi
 		playerDrawNode->clear();
 		objDrawNode->clear();
 	}
+	RotateSaws::stopRotations(self->getEditorLayer());
 	editUI = nullptr;
 	EditorPauseLayer::onExitNoSave(self, sender);
 }
@@ -1761,6 +2205,7 @@ void __fastcall EditorPauseLayer::onExitEditor_H(gd::EditorPauseLayer* self, voi
 		playerDrawNode->clear();
 		objDrawNode->clear();
 	}
+	RotateSaws::stopRotations(self->getEditorLayer());
 	editUI = nullptr;
 	EditorPauseLayer::onExitEditor(self, sender);
 }
@@ -2100,6 +2545,14 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 			else objcounter->setVisible(1);
 		}
 	}
+	if (circleToolPopup) {
+		m_angle = angle_input->get_value().value_or(m_angle);
+		m_step = step_input->get_value().value_or(m_step);
+		auto objs = editUI->getSelectedObjectsOfCCArray();
+		const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
+		const auto obj_count = amt * objs->count();
+		m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
+	}
 }
 
 void Scheduler::mem_init() {
@@ -2112,6 +2565,7 @@ void Scheduler::mem_init() {
 
 void LevelEditorLayer::mem_init() {
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x909f0), LevelEditorLayer::onPlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onPlaytest));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8e180), LevelEditorLayer::removeObjectH, reinterpret_cast<void**>(&LevelEditorLayer::removeObject));
 }
 
 void EditorUI::mem_init() {
@@ -2127,13 +2581,16 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x4ee90),
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b040), EditorUI::moveForCommandH, reinterpret_cast<void**>(&EditorUI::moveForCommand));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b7e0), EditorUI::transformObjectH, reinterpret_cast<void**>(&EditorUI::transformObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x490c0), EditorUI::onCopyH, reinterpret_cast<void**>(&EditorUI::onCopy));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDown_H, reinterpret_cast<void**>(&EditorUI::keyDown));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41850), EditorUI::sliderChangedH, reinterpret_cast<void**>(&EditorUI::sliderChanged));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b410), EditorUI::moveObjectH, reinterpret_cast<void**>(&EditorUI::moveObject));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
 	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);

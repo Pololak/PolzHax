@@ -48,14 +48,16 @@ void __fastcall CCKeyboardDispatcher_dispatchKeyboardMSG_H(CCKeyboardDispatcher*
         if ((key == 'R') && setting().onRetryBind) {
             auto pl = gd::GameManager::sharedState()->getPlayLayer();
             if (pl) {
-                pl->resetLevel();
-                if (layers().PauseLayerObject)
-                {
-                    layers().PauseLayerObject->removeMeAndCleanup();
-                    layers().PauseLayerObject = nullptr;
+                if (!pl->hasCompletedLevel()) {
+                    pl->resetLevel();
+                    if (layers().PauseLayerObject)
+                    {
+                        layers().PauseLayerObject->removeMeAndCleanup();
+                        layers().PauseLayerObject = nullptr;
+                    }
+                    pl->resume();
+                    return;
                 }
-                pl->resume();
-                return;
             }
         }
     }
@@ -106,6 +108,14 @@ gd::LevelSettingsObject* lso;
 
 FloatInputNode* m_fadeTime_input = nullptr;
 float m_fadeTime;
+gd::CCMenuItemSpriteExtra* defaultButton = nullptr;
+
+class DefaultCallback {
+public:
+    void onDefault(CCObject* sender) {
+
+    }
+};
 
 bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int color_id, int idk, int idk2) {
     csp = self;
@@ -128,7 +138,7 @@ bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int 
 
     auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-    if (from<CCLabelBMFont*>(self, 0x1c8) != nullptr) {
+    if (from<CCLabelBMFont*>(self, 0x1c8) != nullptr) { // use this if you want to use on color triggers
         from<CCLabelBMFont*>(self, 0x1c8)->setVisible(0);
 
         auto fadeTimeLabel = CCLabelBMFont::create("FadeTime:", "goldFont.fnt");
@@ -143,7 +153,12 @@ bool ColorSelectPopup_init(gd::ColorSelectPopup* self, gd::GameObject* obj, int 
             };
         self->getLayer()->addChild(m_fadeTime_input);
         m_fadeTime_input->setPosition({ (winSize.width / 2) + 61, (winSize.height / 2) - 70}); // 16:9: 346, 90
+
+
     }
+    
+    std::cout << button->getUserObject() << std::endl;
+
     return true;
 }
 
@@ -320,6 +335,7 @@ DWORD WINAPI my_thread(void* hModule) {
     GJGarageLayer::mem_init();
     LevelEditorLayer::mem_init();
     SetGroupIDLayer::mem_init();
+    UILayer::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),

@@ -16,6 +16,12 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* onPlaytest)(gd::LevelEditorLayer*);
 	void __fastcall onPlaytestH(gd::LevelEditorLayer* self);
 
+	inline void(__thiscall* updateVisibility)(gd::LevelEditorLayer*, float);
+	void __fastcall updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt);
+
+	inline void(__thiscall* removeObject)(gd::LevelEditorLayer*, gd::GameObject*, bool);
+	void __fastcall removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* obj, bool idk);
+
 	void mem_init();
 }
 
@@ -91,7 +97,15 @@ namespace EditorUI {
 		void moveObjectQUnitRight(CCObject*);
 		void moveObjectQUnitUp(CCObject*);
 		void moveObjectQUnitDown(CCObject*);
+
+		void circleToolTest(CCObject*);
 	};
+
+	inline void(__thiscall* onCopy)(gd::EditorUI*, CCObject*);
+	void __fastcall onCopyH(gd::EditorUI* self, void*, CCObject* sender);
+
+	inline void(__thiscall* sliderChanged)(gd::EditorUI*, CCObject*);
+	void __fastcall sliderChangedH(gd::EditorUI* self, void*, CCObject* sender);
 
 	void mem_init();
 }
@@ -123,8 +137,11 @@ namespace EditorPauseLayer {
 		void extraFeaturesToggler(CCObject*);
 		void extraInfoPopup(CCObject*);
 		void selectFilterToggle(CCObject*);
+		void onPreviewAnims(CCObject*);
 
 		void onSaveLevel(CCObject*);
+		void onExperimentLayering(CCObject*);
+		void onExperimentLayeringInfo(CCObject*);
 	};
 
 	void mem_init();

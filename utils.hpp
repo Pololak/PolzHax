@@ -11,6 +11,15 @@
 #include <vector>
 #include <gd.h>
 #include <../support/base64.h>
+#include <tuple>
+
+#define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
+    if (__array__ && __array__->count())                                                                                                   \
+        for (auto [__index__, __obj__] = std::tuple<unsigned int, __type__> {0u, nullptr};                                                 \
+             (__index__ < __array__->count() && (__obj__ = reinterpret_cast<__type__>(__array__->objectAtIndex(__index__)))); __index__++)
+
+#define CCARRAY_FOREACH_B_TYPE(__array__, __obj__, __type__) CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__*, ix)
+
 
 using u8 = uint8_t;
 using i8 = int8_t;
@@ -287,35 +296,35 @@ public:
 	}
 };
 
-//struct ColorUtility { //taken from thesillydoggo
-//public:
-//	static ccColor3B hsvToRgb(const ccHSVValue& hsv) {
-//		float hue = hsv.h;
-//		float saturation = hsv.s;
-//		float value = hsv.v;
-//
-//		int hi = static_cast<int>(std::floor(hue / 60.0f)) % 6;
-//		float f = hue / 60.0f - std::floor(hue / 60.0f);
-//
-//		float p = value * (1 - saturation);
-//		float q = value * (1 - f * saturation);
-//		float t = value * (1 - (1 - f) * saturation);
-//
-//		float r, g, b;
-//
-//		switch (hi) {
-//		case 0: r = value; g = t; b = p; break;
-//		case 1: r = q; g = value; b = p; break;
-//		case 2: r = p; g = value; b = t; break;
-//		case 3: r = p; g = q; b = value; break;
-//		case 4: r = t; g = p; b = value; break;
-//		case 5: r = value; g = p; b = q; break;
-//		default: r = g = b = 0; break;
-//		}
-//
-//		return ccc3(static_cast<uint8_t>(r * 255), static_cast<uint8_t>(g * 255), static_cast<uint8_t>(b * 255));
-//	}
-//};
+struct ColorUtility { //taken from thesillydoggo
+public:
+	static cocos2d::ccColor3B hsvToRgb(const cocos2d::ccHSVValue& hsv) {
+		float hue = hsv.h;
+		float saturation = hsv.s;
+		float value = hsv.v;
+
+		int hi = static_cast<int>(std::floor(hue / 60.0f)) % 6;
+		float f = hue / 60.0f - std::floor(hue / 60.0f);
+
+		float p = value * (1 - saturation);
+		float q = value * (1 - f * saturation);
+		float t = value * (1 - (1 - f) * saturation);
+
+		float r, g, b;
+
+		switch (hi) {
+		case 0: r = value; g = t; b = p; break;
+		case 1: r = q; g = value; b = p; break;
+		case 2: r = p; g = value; b = t; break;
+		case 3: r = p; g = q; b = value; break;
+		case 4: r = t; g = p; b = value; break;
+		case 5: r = value; g = p; b = q; break;
+		default: r = g = b = 0; break;
+		}
+
+		return cocos2d::ccc3(static_cast<uint8_t>(r * 255), static_cast<uint8_t>(g * 255), static_cast<uint8_t>(b * 255));
+	}
+};
 
 struct time {
 	static inline time_t getTime() {
@@ -390,5 +399,12 @@ struct patchUtils {
 		result.push_back((value & 0x00ff0000) >> 16);
 		result.push_back((value & 0xff000000) >> 24);
 		return result;
+	}
+
+	typedef size_t size_tType;
+	std::string toHex(const size_tType& number) {
+		std::stringstream stream;
+		stream << std::hex << number;
+		return stream.str();
 	}
 };

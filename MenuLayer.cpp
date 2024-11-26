@@ -39,6 +39,7 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 
 	auto manager = gd::GameManager::sharedState();
 	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
 	auto menu = CCMenu::create();
 	menu->setPosition(0, 0);
 
@@ -56,9 +57,6 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	Icons::patchBird(Icons::getCount("bird", "001"));
 	Icons::patchDart(Icons::getCount("dart", "001"), setting().selected_dart);
 	//Icons::patchTrail(Icons::getCount("player_special", "001"));
-
-	//auto inputNode = gd::CCTextInputNode::create("X", self, "bigFont.fnt", 30.f, 20.f);
-	//self->addChild(inputNode);
 
 	auto t = std::time(nullptr);
 	auto tm = *std::localtime(&t);

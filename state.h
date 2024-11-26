@@ -8,16 +8,6 @@ struct LayersStruct {
 };
 
 struct SettingStruct {
-    int cheatsCount = 0;
-    int beforeRestartCheatsCount = 0;
-
-    int NoclipByte;
-    int CurrentNoclipByte;
-
-    int hitboxFillOpacity = 255;
-    int labelsOpacity = 255;
-    int hitboxOpacity = 255;
-
     bool show = false;
     bool onAutoSave = false;
     bool onExplorer = false;
@@ -40,9 +30,9 @@ struct SettingStruct {
     bool onMiniCube = false;
     bool onNoAnimations = false;
     bool onNoBGFlash = false;
-    bool onNoCubeRotation = false;
+    bool onNoCubeRotation = false; //
     bool onNoDeathEffect = false;
-    bool onNoForceGlow = false;
+    bool onNoForceGlow = false; //
     bool onNoGhostTrail = false;
     bool onNoGlowObject = false;
     bool onNoGravityEffect = false;
@@ -97,7 +87,7 @@ struct SettingStruct {
     bool onJumpHack = false;
     bool onNoclip = false;
     bool onPauseDurComp = false;
-    bool onPracticeFix = false;
+    bool onPracticeFix = false; // maybe
     bool onPracticeMusic = false;
     bool onSPSwitcher = false;
     bool onSuicide = false;
@@ -121,15 +111,15 @@ struct SettingStruct {
     bool onTransparentBG = false;
     bool onTransparentLists = false;
     bool onTransparentTextLabels = false;
-    bool onTransparentPause = false;
+    bool onTransparentPause = false; //
     bool onShouldHue = false;
     bool onAlwaysHue = false;
     bool onSameDualColor = false;
-    bool onSwapWaveColors = false;
-    bool onGlowPulse = false;
-    bool onSecondaryPulse = false;
-    bool onPrimaryPulse = false;
-    bool onWaveTrailPulse = false;
+    bool onSwapWaveColors = false; //
+    bool onRespawnTime = false;
+    bool onSecondaryPulse = false; //
+    bool onPrimaryPulse = false; //
+    bool onWaveTrailPulse = false; //
     bool onSpeedhack = false;
     bool onSpeedhackMusic = false;
     bool onCheatIndicator = false;
@@ -145,7 +135,7 @@ struct SettingStruct {
     bool onNoclipOutOfMe = false;
     bool onSpeedhackCounted = false;
     bool onHideLabels = false;
-    bool onZeroDelay = false;
+    bool onZeroDelay = false; //
     bool isSafeMode;
     bool onSessionTime = false;
     bool onNoMiniIcon = false;
@@ -154,7 +144,18 @@ struct SettingStruct {
     bool onSwitchToUpArrow = false;
     bool onNoEffectCircle = false;
     bool onShowLayout = false;
-    bool onGridSize = false;
+    bool onGridSize = false; //
+
+    int cheatsCount = 0;
+    int beforeRestartCheatsCount = 0;
+
+    int NoclipByte;
+    int CurrentNoclipByte;
+
+    int hitboxFillOpacity = 255;
+    int labelsOpacity = 255;
+    int hitboxOpacity = 255;
+    int selected_dart = 1;
 
     float labelsScale = 1.f;
     float solidsColor[3] = { 0, 0, 1 };
@@ -168,9 +169,10 @@ struct SettingStruct {
     float BGcolor[4] = { 0, 0, 0, 0.902 };
     float gridSize = 30.f;
 
-    char message[50] = "Your Text";
+    float rgbSpeed = 1.f;
+    bool onRainbowIcon = false;
 
-    int selected_dart = 1;
+    char message[50] = "Your Text";
 };
 
 enum LabelPosition {

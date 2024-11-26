@@ -1557,6 +1557,9 @@
     <ClInclude Include="nodes.hpp">
       <Filter>Header Files\Polz2</Filter>
     </ClInclude>
+    <ClInclude Include="RotatingSaws.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1638,6 +1641,9 @@
       <Filter>Source Files\Polz2</Filter>
     </ClCompile>
     <ClCompile Include="nodes.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="RotatingSaws.cpp">
       <Filter>Source Files\Polz2</Filter>
     </ClCompile>
   </ItemGroup>
