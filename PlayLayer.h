@@ -47,6 +47,12 @@ namespace PlayLayer {
 	inline void(__thiscall* levelComplete)(gd::PlayLayer*);
 	void __fastcall levelCompleteH(gd::PlayLayer* self);
 
+	class Callback {
+	public:
+		void onPreviousStartPos(CCObject*);
+		void onNextStartPos(CCObject*);
+	};
+
 	void mem_init();
 
 	//extern bool inPractice;
@@ -91,9 +97,6 @@ namespace PlayerObject {
 	inline void(__thiscall* runBallRotation2)(gd::PlayerObject*);
 	void __fastcall runBallRotation2H(gd::PlayerObject* self);
 
-	inline void(__thiscall* collidedWithObject)(gd::PlayerObject*, float, gd::GameObject*, CCRect);
-	void __fastcall collidedWithObjectH(gd::PlayerObject* self, void*, float idk, gd::GameObject* obj, CCRect rect);
-
 	void mem_init();
 }
 
@@ -120,14 +123,4 @@ namespace CCCircleWave {
 namespace RingObject {
 	inline void(__thiscall* spawnCircle)(CCObject*);
 	void __fastcall spawnCircleH(CCObject* effect);
-}
-
-namespace UILayer {
-	inline void(__thiscall* keyDown)(gd::UILayer*, enumKeyCodes);
-	void __fastcall keyDownH(gd::UILayer* self, void*, enumKeyCodes key);
-
-	inline void(__thiscall* keyUp)(gd::UILayer*, enumKeyCodes);
-	void __fastcall keyUpH(gd::UILayer* self, void*, enumKeyCodes key);
-
-	void mem_init();
 }

@@ -659,7 +659,6 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="preview-mode.hpp" />
-    <ClInclude Include="RotatingSaws.hpp" />
     <ClInclude Include="SimplePlayer.h" />
     <ClInclude Include="Speedhack.hpp" />
     <ClInclude Include="state.h" />
@@ -690,7 +689,6 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
-    <ClCompile Include="RotatingSaws.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />
     <ClCompile Include="Speedhack.cpp" />
     <ClCompile Include="state.cpp" />

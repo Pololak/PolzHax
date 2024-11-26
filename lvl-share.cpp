@@ -167,22 +167,6 @@ bool LevelBrowserLayer_init(gd::LevelBrowserLayer* self, gd::GJSearchObject* obj
 	return true;
 }
 
-class GarageRopeCallback {
-public:
-	void onGarage(CCObject*) {
-		auto garageScene = gd::GJGarageLayer::scene();
-		CCScene* scene = CCTransitionMoveInT::create(0.5f, garageScene);
-		CCDirector::sharedDirector()->pushScene(scene);
-	}
-};
-
-class IDK {
-public:
-	void onBack(CCObject* sender) {
-		reinterpret_cast<void(__thiscall*)(IDK*, CCObject*)>(gd::base + 0x2d970)(this, sender);
-	}
-};
-
 bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&LevelInfoLayer_init>(self, level)) return false;
 
@@ -213,12 +197,6 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	button->setPosition({ -(winSize.width / 2) + 30, 24});
 	menu->addChild(button);
 	//self->addChild(menu);
-
-	auto garageRope_spr = CCSprite::createWithSpriteFrameName("GJ_garageBtn_001.png");
-	garageRope_spr->setScale(0.6f);
-	auto garageRope = gd::CCMenuItemSpriteExtra::create(garageRope_spr, garageRope_spr, self, menu_selector(IDK::onBack));
-	garageRope->setPosition(menu->convertToNodeSpace({ (winSize.width / 2) + 145.f, director->getScreenTop() - 30.f }));
-	menu->addChild(garageRope);
 
 	return true;
 }

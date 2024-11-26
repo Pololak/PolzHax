@@ -259,16 +259,8 @@ namespace gd {
 			return from<int>(this, 0x228);
 		}
 
-		void setSelectedMode(int mode) {
-			from<int>(this, 0x228) = mode;
-		}
-
 		float getGridSize() {
 			return from<float>(this, 0x128);
-		}
-
-		void onDuplicate(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x48e70)(this, sender);
 		}
 
 		static constexpr const int Mode_Create = 2;

@@ -294,12 +294,12 @@ namespace gd {
 			return active;
 		}
 
-		cocos2d::CCRepeatForever* createRotateAction(float f) {
+		cocos2d::CCRepeatForever* createRotateAction(float f, int n) {
 			__asm movss xmm1, f
 
-			auto pRet = reinterpret_cast<cocos2d::CCRepeatForever * (__thiscall*)(GameObject*)>(
+			auto pRet = reinterpret_cast<cocos2d::CCRepeatForever * (__thiscall*)(GameObject*, int)>(
 				base + 0x72230
-				)(this);
+				)(this, n);
 
 			return pRet;
 		}
@@ -482,13 +482,6 @@ namespace gd {
 
 		cocos2d::CCRect* getObjectRect(cocos2d::CCRect* rect, float fl1, float fl2) {
 			return reinterpret_cast<cocos2d::CCRect * (__thiscall*)(GameObject*, cocos2d::CCRect*, float, float)>(base + 0x71bd0)(this, rect, fl1, fl2);
-		}
-
-		auto hasBeenActivated() {
-			return from<bool>(this, 0x246);
-		}
-		auto hasBeenActivatedP2() {
-			return from<bool>(this, 0x247);
 		}
 	};
 	#pragma runtime_checks("s", restore)

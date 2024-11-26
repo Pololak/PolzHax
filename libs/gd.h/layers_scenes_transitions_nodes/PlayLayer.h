@@ -32,9 +32,8 @@ namespace gd {
 
 	class UILayer : public cocos2d::CCLayerColor {
 	public:
-		PAD(0x8)
-			cocos2d::CCMenu* m_checkpointMenu;
-			CCMenuItemSpriteExtra* m_pauseBtn;
+		PAD(8)
+			cocos2d::CCMenu* m_pCheckPointMenu;		// 0x1a0
 
 		void onCheck(CCObject* pSender) {
 			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
@@ -182,12 +181,6 @@ namespace gd {
 		}
 		GJGameLevel* getGameLevel() {
 			return from<GJGameLevel*>(this, 0x2ac);
-		}
-		UILayer* getUILayer() {
-			return from<UILayer*>(this, 0x2a0);
-		}
-		auto playerGlowNode() {
-			return from<cocos2d::CCSpriteBatchNode*>(this, 0x2d0);
 		}
 	};
 }

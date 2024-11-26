@@ -508,11 +508,9 @@ void RenderMain() {
 
         if (setting().onLevelEdit) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x90\x90\x90\x90\x90\x90", 6, NULL);
         }
         else {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x0f\x85\xcc\x00\x00\x00", 6, NULL);
         }
 
         if (setting().onNoCMark) {
@@ -1519,11 +1517,9 @@ void RenderMain() {
             if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
                 if (setting().onLevelEdit) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x90\x90\x90\x90\x90\x90", 6, NULL);
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x0f\x85\xcc\x00\x00\x00", 6, NULL);
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1800,9 +1796,6 @@ void RenderMain() {
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Plays the level's song in-sync with your position.");
-
-            //ImGui::Checkbox("Respawn Time", &setting().onRespawnTime);
-            //ImGui::BeginCombo("")
 
             //ImGui::Checkbox("Show Layout", &setting().onShowLayout);
             //if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
@@ -2107,14 +2100,6 @@ void RenderMain() {
 
             ImGui::Checkbox("Same Dual Color", &setting().onSameDualColor);
 
-            ImGui::Checkbox("RGB Icon", &setting().onRainbowIcon);
-            ImGui::SameLine();
-            if (ImGui::TreeNode("")) {
-                ImGui::SetNextItemWidth(50.f);
-                ImGui::InputFloat("Speed", &setting().rgbSpeed);
-                ImGui::TreePop();
-            }
-
             //ImGui::Checkbox("Swap Wave Trail", &setting().onSwapWaveColors);
 
 
@@ -2318,7 +2303,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.10");
+            ImGui::Text("v1.1.9-alpha.9");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();

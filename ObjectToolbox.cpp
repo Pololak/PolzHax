@@ -56,8 +56,12 @@ void __fastcall ObjectToolbox::triggerTab_H() {
     ObjectToolbox::triggerTab();
 }
 
-void __fastcall ObjectToolbox::gridNodeSizeForKeyH(gd::ObjectToolbox* self, void*, int objectID) {
-    if (roundf(setting().gridSize) == 30.f) return ObjectToolbox::gridNodeSizeForKey(self, objectID);
+void __stdcall ObjectToolbox::gridNodeSizeForKeyH(int objectID) {
+	//float gridSize = setting().gridSize;
+	//__asm {
+	//	movss xmm0, gridSize
+	//	add esp, 0x4
+	//}
 }
 
 void ObjectToolbox::mem_init() {
@@ -81,5 +85,5 @@ void ObjectToolbox::mem_init() {
         reinterpret_cast<void*>(gd::base + 0x46d37),
         reinterpret_cast<void*>(&ObjectToolbox::triggerTab_H),
         reinterpret_cast<void**>(&ObjectToolbox::triggerTab));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xcfc90), reinterpret_cast<void*>(&ObjectToolbox::gridNodeSizeForKeyH), reinterpret_cast<void**>(&ObjectToolbox::gridNodeSizeForKey));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xcfc90), ObjectToolbox::gridNodeSizeForKeyH, reinterpret_cast<void**>(&ObjectToolbox::gridNodeSizeForKey));
 }
