@@ -8,7 +8,6 @@ namespace gd {
 
 	class CCSpritePlus;
 
-	// jesus fucking christ
 	enum GameObjectType {
 		kGameObjectTypeSolid = 0,
 		kGameObjectTypeHazard = 2,
@@ -17,37 +16,26 @@ namespace gd {
 		kGameObjectTypeShipPortal = 5,
 		kGameObjectTypeCubePortal = 6,
 		kGameObjectTypeDecoration = 7,
-		kGameObjectTypeYellowJumpPad = 8,
-		kGameObjectTypePinkJumpPad = 9,
-		kGameObjectTypeGravityPad = 10,
-		kGameObjectTypeYellowJumpRing = 11,
-		kGameObjectTypePinkJumpRing = 12,
-		kGameObjectTypeGravityRing = 13,
-		kGameObjectTypeInverseMirrorPortal = 14,
-		kGameObjectTypeNormalMirrorPortal = 15,
-		kGameObjectTypeBallPortal = 16,
-		kGameObjectTypeRegularSizePortal = 17,
-		kGameObjectTypeMiniSizePortal = 18,
-		kGameObjectTypeUfoPortal = 19,
-		kGameObjectTypeModifier = 20,
-		kGameObjectTypeSecretCoin = 22,
-		kGameObjectTypeDualPortal = 23,
-		kGameObjectTypeSoloPortal = 24,
-		kGameObjectTypeSlope = 25,
-		kGameObjectTypeWavePortal = 26,
-		kGameObjectTypeRobotPortal = 27,
-		kGameObjectTypeTeleportPortal = 28,
-		kGameObjectTypeCollectible = 30,
-		kGameObjectTypeUserCoin = 31,
-		kGameObjectTypeDropRing = 32,
-		kGameObjectTypeSpiderPortal = 33,
-		kGameObjectTypeRedJumpPad = 34,
-		kGameObjectTypeRedJumpRing = 35,
-		kGameObjectTypeCustomRing = 36,
-		kGameObjectTypeDashRing = 37,
-		kGameObjectTypeGravityDashRing = 38,
-		kGameObjectTypeCollisionObject = 39,
-		kGameObjectTypeSpecial = 40,
+		kGameObjectTypePulseObjects = 8, // Used for old pulse objects (wtf)
+		kGameObjectTypeYellowJumpPad = 9,
+		kGameObjectTypePinkJumpPad = 10,
+		kGameObjectTypeGravityPad = 11,
+		kGameObjectTypeYellowJumpRing = 12,
+		kGameObjectTypePinkJumpRing = 13,
+		kGameObjectTypeGravityRing = 14,
+		kGameObjectTypeInverseMirrorPortal = 15,
+		kGameObjectTypeNormalMirrorPortal = 16,
+		kGameObjectTypeBallPortal = 17,
+		kGameObjectTypeRegularSizePortal = 18,
+		kGameObjectTypeMiniSizePortal = 19,
+		kGameObjectTypeUfoPortal = 20,
+		kGameObjectTypeModifier = 21,
+		kGameObjectTypeBreakable = 22,
+		kGameObjectTypeSecretCoin = 23,
+		kGameObjectTypeDualPortal = 24,
+		kGameObjectTypeSoloPortal = 25,
+		kGameObjectTypeSlope = 26,
+		kGameObjectTypeWavePortal = 27,
 	};
 
 	/*class SettingsColorObject : public CCNode {
@@ -234,7 +222,7 @@ namespace gd {
 		//CCRGBAProtocol vtable
 		virtual void setOpacity(GLubyte opacity) {
 			return reinterpret_cast<void(__thiscall*)(GameObject*, GLubyte)>(
-				base + 0x72350
+				base + 0x72a60
 				)(this, opacity);
 		}
 
@@ -294,12 +282,12 @@ namespace gd {
 			return active;
 		}
 
-		cocos2d::CCRepeatForever* createRotateAction(float f, int n) {
+		cocos2d::CCRepeatForever* createRotateAction(float f) {
 			__asm movss xmm1, f
 
-			auto pRet = reinterpret_cast<cocos2d::CCRepeatForever * (__thiscall*)(GameObject*, int)>(
+			auto pRet = reinterpret_cast<cocos2d::CCRepeatForever * (__thiscall*)(GameObject*)>(
 				base + 0x72230
-				)(this, n);
+				)(this);
 
 			return pRet;
 		}

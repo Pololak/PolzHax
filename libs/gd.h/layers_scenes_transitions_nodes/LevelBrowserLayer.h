@@ -10,8 +10,14 @@ namespace gd
 
 	class LevelBrowserLayer : public cocos2d::CCLayer {
 	public:
-		static auto create(GJSearchObject* obj) {
-			return reinterpret_cast<LevelBrowserLayer * (__fastcall*)(GJSearchObject*)>(base + 0x894f0)(obj);
+		static LevelBrowserLayer* create(gd::GJSearchObject* pSearch) {
+			return reinterpret_cast<LevelBrowserLayer * (__fastcall*)(
+				gd::GJSearchObject*
+				)>(
+					gd::base + 0x894f0
+					)(
+						pSearch
+						);
 		}
 
 		virtual bool init(gd::GJSearchObject* search) {
@@ -26,13 +32,14 @@ namespace gd
 			return reinterpret_cast<void(__thiscall*)(LevelBrowserLayer*, gd::GJSearchObject*)>(base + 0x8a000)(this, search);
 		}
 		
+		static void scene(gd::GJSearchObject* pSearch) {
+			auto pScene = cocos2d::CCScene::create();
 
-		static cocos2d::CCScene* scene(gd::GJSearchObject* obj) {
-			auto scene = cocos2d::CCScene::create();
-			auto lvlbrowser = LevelBrowserLayer::create(obj);
-			scene->addChild(lvlbrowser);
-			// AppDelegate::get()->m_runningScene = scene;
-			return scene;
+			pScene->addChild(gd::LevelBrowserLayer::create(pSearch));
+
+			cocos2d::CCDirector::sharedDirector()->replaceScene(
+				cocos2d::CCTransitionFade::create(.5f, pScene)
+			);
 		}
 	};
 }

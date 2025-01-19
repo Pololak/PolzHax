@@ -100,19 +100,27 @@ public:
         return reinterpret_cast<GJSearchObject * (__fastcall*)(SearchType, gd::string, gd::string,
             gd::string, int, bool, bool,
             bool, int, bool, bool,
-            bool, bool, bool)>(base + 0x652a0)( //0x652a0 - GD 1.92
+            bool, bool, bool)>(base + 0x652a0)(
                 type, query, difficultyStr, lengthStr, page, isStar,
                 isCompleted, isFeatured, song, isOriginal, isTwoP,
                 isCustomSong, isSongFilter, isNoStar
                 );
     }
-    static auto create(SearchType type) {
-        return reinterpret_cast<GJSearchObject * (__fastcall*)(SearchType)>(base + 0x650d0)(type); //0x650d0 - GD 1.92
-        // return create(type, "", "-", "-", 0, false, false, false, 0, false, false, false, false, false);
+
+    static GJSearchObject* create(SearchType nID, std::string str) {
+        auto pRet = reinterpret_cast<GJSearchObject * (__fastcall*)(SearchType, std::string)>(
+            gd::base + 0x651b0
+            )(nID, str);
+        __asm add esp, 0x18
+        return pRet;
     }
-    static auto create(int type) {
-        return reinterpret_cast<GJSearchObject * (__fastcall*)(int)>(base + 0x650d0)(type); //0x650d0 - GD 1.92
-        // return create(type, "", "-", "-", 0, false, false, false, 0, false, false, false, false, false);
+
+    static GJSearchObject* create(SearchType type) {
+        return GJSearchObject::create(type, "");
+    }
+
+    const char* getKey() {
+        return reinterpret_cast<const char*(__fastcall*)(GJSearchObject*)>(base + 0x65570)(this);
     }
 
     SearchType m_type;

@@ -32,8 +32,9 @@ namespace gd {
 
 	class UILayer : public cocos2d::CCLayerColor {
 	public:
-		PAD(8)
-			cocos2d::CCMenu* m_pCheckPointMenu;		// 0x1a0
+		PAD(0x8)
+			cocos2d::CCMenu* m_checkpointMenu;
+			CCMenuItemSpriteExtra* m_pauseBtn;
 
 		void onCheck(CCObject* pSender) {
 			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
@@ -68,7 +69,7 @@ namespace gd {
 		void resetLevel() {
 			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f20)(this); //0xf1f20 - GHS 1.92
 		}
-		void destroyPlayer(PlayerObject* selfig) {
+		void destroyPlayer(PlayerObject* selfig) { // self ig, nice job
 			return reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*)>(base + 0xf04a0)(this, selfig); //ee990 1.91
 		}
 		void resume() {
@@ -181,6 +182,28 @@ namespace gd {
 		}
 		GJGameLevel* getGameLevel() {
 			return from<GJGameLevel*>(this, 0x2ac);
+		}
+
+		UILayer* getUILayer() {
+			return from<UILayer*>(this, 0x2a0);
+		}
+		auto playerGlowNode() {
+			return from<cocos2d::CCSpriteBatchNode*>(this, 0x2d0);
+		}
+		void pushButton(int p0, bool push) {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0a00)(this, p0, push);
+		}
+		void releaseButton(int p0, bool push) {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0af0)(this, p0, push);
+		}
+		void showEndLayer() {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xe6a80)(this);
+		}
+		void pickupItem(GameObject* p0) {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*, GameObject*)>(base + 0xee080)(this, p0);
+		}
+		void togglePracticeMode(bool p0) {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*, bool)>(base + 0xf3610)(this, p0);
 		}
 	};
 }

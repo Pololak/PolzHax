@@ -3,6 +3,7 @@
 
 #include "GameVariables.hpp"
 #include "nodes.hpp"
+#include <filesystem>
 
 bool isReload = false;
 
@@ -65,8 +66,6 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 
 	switch (tm.tm_mon)
 	{
-	case 0:
-	case 1:
 	case 11:
 		CCParticleSnow * snow = CCParticleSnow::createWithTotalParticles(700);
 		self->addChild(snow);
@@ -76,31 +75,9 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	return true;
 }
 
-void __fastcall MenuGameLayer::tryJumpH(gd::MenuGameLayer* self, void* edx, float idk) {
-
-}
-
-void __fastcall MenuGameLayer::updateH(gd::MenuGameLayer* self, void* edx, float dt) {
-	if (self->getPlayerObject()->isRoll() && GetAsyncKeyState(KEY_W)) self->destroyPlayer(); // Destroys player if it's ball gamemode.
-
-	if ((GetAsyncKeyState(KEY_W))) {
-		self->getPlayerObject()->pushButton(gd::PlayerButton::Jump);
-	}
-	else {
-		self->getPlayerObject()->releaseButton(gd::PlayerButton::Jump);
-	}
-
-	MenuGameLayer::update(self, dt);
-}
-
 void MenuLayer::mem_init() {
 	MH_CreateHook(
 		reinterpret_cast<void*>(gd::base + 0xaf210),
 		MenuLayer::init_H,
 		reinterpret_cast<void**>(&MenuLayer::init));
-}
-
-void MenuGameLayer::mem_init() {
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xadff0), MenuGameLayer::tryJumpH, reinterpret_cast<void**>(&MenuGameLayer::tryJump));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xae210), MenuGameLayer::updateH, reinterpret_cast<void**>(&MenuGameLayer::update));
 }

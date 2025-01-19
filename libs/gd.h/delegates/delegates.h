@@ -107,6 +107,13 @@ namespace gd {
     class AppDelegate : public cocos2d::CCApplication {
 
     };
+
+    class LeaderboardManagerDelegate {
+        virtual void updateUserScoreFinished() {}
+        virtual void updateUserScoreFailed() {}
+        virtual void loadLeaderboardFinished(cocos2d::CCArray*, const char*) {}
+        virtual void loadLeaderboardFailed(const char*) {}
+    };
 }
 
 #endif

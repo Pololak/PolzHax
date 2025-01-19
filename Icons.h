@@ -73,7 +73,7 @@ struct Icons {
 				break;
 			}
 		}
-		std::cout << startLabel << ": " << count - 1 << "\n";
+		//std::cout << startLabel << ": " << count - 1 << "\n";
 		return count - 1;
 	}
 };

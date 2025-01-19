@@ -41,6 +41,14 @@ namespace gd {
 			return from<cocos2d::CCLayer*>(this, 0x1AC);
 		}
 
+		void setMenu(cocos2d::CCMenu* menu) {
+			from<cocos2d::CCMenu*>(this, 0x194) = menu;
+		}
+
+		void setLayer(cocos2d::CCLayer* layer) {
+			from<cocos2d::CCLayer*>(this, 0x1ac) = layer;
+		}
+
 		virtual void onEnter() {
 			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
 				base + 0x23750

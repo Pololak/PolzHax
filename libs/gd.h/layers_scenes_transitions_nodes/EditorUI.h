@@ -63,6 +63,8 @@ namespace gd {
 	class Slider;
 	class GameObject;
 
+	class LevelSettingsObject;
+
 	class BoomScrollLayer : public cocos2d::CCLayer {
 	public:
 		void instantMoveToPage(int page) {
@@ -267,6 +269,10 @@ namespace gd {
 		static constexpr const int Mode_Delete = 1;
 		static constexpr const int Mode_Edit = 3;
 
+		void onPause(CCObject* sender) {
+			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x411f0)(this, sender);
+		}
+
 	};
 
 	class EditorPauseLayer : public gd::CCBlockLayer {
@@ -314,6 +320,13 @@ namespace gd {
 	public:
 		void onGravityFlipped(CCObject* sender) {
 			return reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, CCObject*)>(base + 0x99b10)(this, sender);
+		}
+		LevelSettingsObject* getLevelSettings() {
+			return from<LevelSettingsObject*>(this, 0x200);
+		}
+		static CCMenuItemToggler* createToggleButton(cocos2d::SEL_MenuHandler callback, bool toggled, cocos2d::CCMenu* menu, cocos2d::CCPoint point) {
+			auto pRet = reinterpret_cast<CCMenuItemToggler * (__fastcall*)(cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, cocos2d::CCPoint)>(base + 0x99830)(callback, toggled, menu, point);
+			return pRet;
 		}
 	};
 }

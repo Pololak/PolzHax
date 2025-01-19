@@ -63,26 +63,64 @@ namespace gd {
             // bool isCurrentUser();
             // void mergeWithScore(GJUserScore*);
 
-            inline IconType getIconType() const { return this->iconType_; };
+            std::string userName() {
+                return from<std::string>(this, 0xe8);
+            }
 
-            inline int getPlayerCube() const { return this->playerCube_; };
-            inline int getPlayerShip() const { return this->playerShip_; };
-            inline int getPlayerBall() const { return this->playerBall_; };
-            inline int getPlayerUfo() const { return this->playerUfo_; };
-            inline int getPlayerWave() const { return this->playerWave_; };
-            inline int getPlayerRobot() const { return this->playerRobot_; };
-            inline int getPlayerSpider() const { return this->playerSpider_; };
-            inline int getPlayerStreak() const { return this->playerStreak_; };
-            inline bool getGlowEnabled() const { return this->glowEnabled_; };
-            inline int getPlayerExplosion() const { return this->playerExplosion_; };
+            auto stars() {
+                return from<int>(this, 0x124);
+            }
 
-            inline int getPlayerColor1() const { return this->color1_; };
-            inline int getPlayerColor2() const { return this->color2_; };
+            auto demons() {
+                return from<int>(this, 0x128);
+            }
 
-            inline int getCompletedDemons() const { return this->demons_; };
+            auto secretCoins() {
+                return from<int>(this, 0x134);
+            }
 
-            inline std::string getPlayerName() const { return this->userName_; };
-            inline std::string getUserUDID() const { return this->userUDID_; };
+            auto creatorPoints() {
+                return from<int>(this, 0x130);
+            }
+
+            auto globalRank() {
+                return from<int>(this, 0x12c);
+            }
+
+            auto userID() {
+                return from<int>(this, 0x11c);
+            }
+
+            auto icon() {
+                return from<int>(this, 0x138);
+            }
+
+            IconType iconType() {
+                return from<IconType>(this, 0x148);
+            }
+
+            auto color1() {
+                return from<int>(this, 0x13c);
+            }
+
+            auto color2() {
+                return from<int>(this, 0x140);
+            }
+
+            auto special() {
+                return from<int>(this, 0x144);
+            }
+
+            auto accountID() {
+                return from<int>(this, 0x100);
+            }
+
+            // Types:
+            // Top 100 = 0,
+            // Creator = 1,
+            auto scoreType() {
+                return from<int>(this, 0x118); // 0 - Top 100, 1 - Creator
+            }
     };
 }
 

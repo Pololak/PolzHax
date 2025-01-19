@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include <cocos2d.h>
 #include "imgui-hook.hpp"
-#include <gd.h>
 
 using namespace cocos2d;
 
@@ -120,7 +119,7 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
                 case WM_SYSKEYUP:
                     blockInput = true;
             }
-        } else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F11 || msg.wParam == VK_F1 || msg.wParam == VK_OEM_3)) {
+        } else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F1 || msg.wParam == VK_OEM_3 ||msg.wParam == VK_TAB)) {
             // std::cout << "key is " << std::hex << static_cast<unsigned>(msg.wParam) << std::endl;
             g_toggleCallback();
         }
@@ -134,6 +133,10 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
     CCEGLView_pollEvents(self);
 }
 
+void ImGuiHook::poll(CCEGLView* self) {
+    CCEGLView_pollEvents_H(self);
+}
+
 void (__thiscall* CCEGLView_toggleFullScreen)(cocos2d::CCEGLView*, bool);
 void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bool toggle) {
     ImGui_ImplOpenGL3_Shutdown();
@@ -144,7 +147,7 @@ void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bo
 
     g_inited = false;
     // ImGui::CreateContext();
-    // ImGui::GetIO();
+    ImGui::GetIO();
     // auto hwnd = windowToHWND(self->getWindow());
     // ImGui_ImplWin32_Init(hwnd);
     // ImGui_ImplOpenGL3_Init();
@@ -174,7 +177,7 @@ void ImGuiHook::setupHooks(std::function<void(void*, void*, void**)> hookFunc) {
         reinterpret_cast<void**>(&CCEGLView_toggleFullScreen)
     );
     hookFunc(
-        reinterpret_cast<void*>(gd::base + 0x28f00),
+        reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandleA(0)) + 0x28f00),
         reinterpret_cast<void*>(&AppDelegate_applicationWillEnterForeground_H),
         reinterpret_cast<void**>(&AppDelegate_applicationWillEnterForeground)
     );

@@ -326,6 +326,10 @@ namespace gd {
 		void setRealRotation(float rot) {
 			from<float>(this, 0x18) = rot;
 		}
+
+		cocos2d::CCMotionStreak* motionStreak() {
+			return from<cocos2d::CCMotionStreak*>(this, 0x390);
+		}
 	};
 }
 

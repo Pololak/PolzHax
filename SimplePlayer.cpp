@@ -23,7 +23,7 @@ bool __fastcall SimplePlayer::init_H(gd::SimplePlayer* self, void* edx, int fram
 }
 
 void SimplePlayer::newExtraFrame(char const* extra) {
-	std::cout << extra << std::endl;
+	//std::cout << extra << std::endl;
 	auto extraSpr = static_cast<CCSprite*>(simplePlayer->baseSpr()->getChildByTag(69));
 	auto SFC = CCSpriteFrameCache::sharedSpriteFrameCache();
 	if (!extraSpr) return;
@@ -33,11 +33,11 @@ void SimplePlayer::newExtraFrame(char const* extra) {
 		extraSpr->setPosition(simplePlayer->colorSpr()->getPosition());
 		extraSpr->setDisplayFrame(SFC->spriteFrameByName(extra));
 		extraSpr->setVisible(true);
-		std::cout << "isExtra" << std::endl;
+		/*std::cout << "isExtra" << std::endl;*/
 	}
 	else {
 		extraSpr->setVisible(false);
-		std::cout << "noExtra" << std::endl;
+		/*std::cout << "noExtra" << std::endl;*/
 	}
 }
 
@@ -52,7 +52,7 @@ void __fastcall SimplePlayer::updatePlayerFrame_H(gd::SimplePlayer* self, void* 
 	default: break;
 	}
 	int limit = Icons::getCount(prefix, "001");
-	std::cout << prefix << " " << limit << std::endl;
+	//std::cout << prefix << " " << limit << std::endl;
 	if (frameID > limit) frameID = limit;
 	SimplePlayer::newExtraFrame(CCString::createWithFormat("player_%02d_extra_001.png", frameID)->getCString());
 }

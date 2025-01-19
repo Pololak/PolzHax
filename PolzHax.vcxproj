@@ -37,7 +37,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -109,7 +109,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\MinHook;$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)cappuccino-sdk\incl\cocos2dx;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\kazmath\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES\GL;$(SolutionDir)cappuccino-sdk\incl\extensions;$(SolutionDir)cappuccino-sdk\incl\extensions\AssetsManager;$(SolutionDir)cappuccino-sdk\incl\extensions\CCBReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Action;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\animation;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\datas;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\display;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\external_tool;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\physics;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\utils;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Components;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\BaseClasses;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\Layouts;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\System;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets\Compatible;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json\rapidjson;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json\rapidjson\internal;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ButtonReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\CheckBoxReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ImageViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelAtlasReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelBMFontReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LayoutReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ListViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LoadingBarReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\PageViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ScrollViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\SliderReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\TextFieldReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Trigger;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCControlExtension;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCEditBox;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCScrollView;$(SolutionDir)cappuccino-sdk\incl\extensions\LocalStorage;$(SolutionDir)cappuccino-sdk\incl\extensions\network;$(SolutionDir)cappuccino-sdk\incl\extensions\physics_nodes;$(SolutionDir)cappuccino-sdk\incl\extensions\spine;$(SolutionDir)libs\imgui-hook;$(SolutionDir)libs\imgui-hook\imgui;$(SolutionDir)libs\imgui-hook\imgui\backends;$(SolutionDir)libs\imgui-hook\imgui\misc;$(SolutionDir)libs\mat-dash;$(SolutionDir)libs\mat-dash\include;$(SolutionDir)libs\mat-dash\include\matdash;$(SolutionDir)libs\mat-dash\include\matdash\detail;$(SolutionDir)libs\nfd;$(SolutionDir)libs\nfd\src;$(SolutionDir)libs\nfd\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\MinHook;$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)cappuccino-sdk\incl\cocos2dx;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\kazmath\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES\GL;$(SolutionDir)cappuccino-sdk\incl\extensions;$(SolutionDir)cappuccino-sdk\incl\extensions\AssetsManager;$(SolutionDir)cappuccino-sdk\incl\extensions\CCBReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Action;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\animation;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\datas;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\display;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\external_tool;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\physics;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\utils;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Components;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\BaseClasses;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\Layouts;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\System;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets\Compatible;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json\rapidjson;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json\rapidjson\internal;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ButtonReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\CheckBoxReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ImageViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelAtlasReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelBMFontReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LayoutReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ListViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LoadingBarReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\PageViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ScrollViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\SliderReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\TextFieldReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Trigger;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCControlExtension;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCEditBox;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCScrollView;$(SolutionDir)cappuccino-sdk\incl\extensions\LocalStorage;$(SolutionDir)cappuccino-sdk\incl\extensions\network;$(SolutionDir)cappuccino-sdk\incl\extensions\physics_nodes;$(SolutionDir)cappuccino-sdk\incl\extensions\spine;$(SolutionDir)libs\imgui-hook;$(SolutionDir)libs\imgui-hook\imgui;$(SolutionDir)libs\imgui-hook\imgui\backends;$(SolutionDir)libs\imgui-hook\imgui\misc;$(SolutionDir)libs\mat-dash;$(SolutionDir)libs\mat-dash\include;$(SolutionDir)libs\mat-dash\include\matdash;$(SolutionDir)libs\mat-dash\include\matdash\detail;$(SolutionDir)libs\imgui-hook\imgui\misc\cpp;$(SolutionDir)libs\detours;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalOptions>-D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -119,7 +119,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(SolutionDir)cappuccino-sdk\lib\cappuccino.lib;$(SolutionDir)cappuccino-sdk\incl\extensions\libExtensions.lib;$(SolutionDir)libs\MinHook\libMinHook-x86-v141-mtd.lib;$(SolutionDir)libs\glew32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)cappuccino-sdk\lib\cappuccino.lib;$(SolutionDir)cappuccino-sdk\incl\extensions\libExtensions.lib;$(SolutionDir)libs\glew32.lib;$(SolutionDir)libs\MinHook\libMinHook-x86-v141-mtd.lib;$(SolutionDir)libs\detours\libdetours.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -538,14 +538,20 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
     <ClInclude Include="CheckPoint.h" />
     <ClInclude Include="CrashLogger.hpp" />
+    <ClInclude Include="EditorSettingsLayer.hpp" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameVariables.hpp" />
     <ClInclude Include="GJGarageLayer.h" />
+    <ClInclude Include="GJScoreCell.h" />
     <ClInclude Include="Hitboxes.h" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="Icons.h" />
+    <ClInclude Include="InfoLayer.hpp" />
     <ClInclude Include="Labels.h" />
+    <ClInclude Include="LevelBrowserLayer.h" />
+    <ClInclude Include="libs\detours\detours.h" />
+    <ClInclude Include="libs\detours\detver.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
@@ -557,6 +563,7 @@
     <ClInclude Include="libs\gd.h\include\GDProtocols.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCBlockLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCNodeContainer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CommentCell.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CreatorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h" />
@@ -568,7 +575,10 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJDropDownLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJScoreCell.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJSpecialColorSelect.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LeaderboardsLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
@@ -586,6 +596,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\TextAlertPopup.h" />
     <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h" />
     <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h" />
+    <ClInclude Include="libs\gd.h\level_nodes\GJComment.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h" />
     <ClInclude Include="libs\gd.h\level_nodes\LevelSettingsObject.h" />
     <ClInclude Include="libs\gd.h\level_nodes\SettingsColorObject.h" />
@@ -636,6 +647,7 @@
     <ClInclude Include="libs\imgui-hook\imgui\imstb_rectpack.h" />
     <ClInclude Include="libs\imgui-hook\imgui\imstb_textedit.h" />
     <ClInclude Include="libs\imgui-hook\imgui\imstb_truetype.h" />
+    <ClInclude Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="libs\mat-dash\include\matdash.hpp" />
     <ClInclude Include="libs\mat-dash\include\matdash\boilerplate.hpp" />
     <ClInclude Include="libs\mat-dash\include\matdash\cocos.hpp" />
@@ -645,9 +657,6 @@
     <ClInclude Include="libs\mat-dash\include\matdash\minhook.hpp" />
     <ClInclude Include="libs\matplist.hpp" />
     <ClInclude Include="libs\MinHook\MinHook.h" />
-    <ClInclude Include="libs\nfd\src\common.h" />
-    <ClInclude Include="libs\nfd\src\include\nfd.h" />
-    <ClInclude Include="libs\nfd\src\nfd_common.h" />
     <ClInclude Include="lvl-share.hpp" />
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="menu.h" />
@@ -658,19 +667,31 @@
     <ClInclude Include="ObjectToolbox.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayLayer.h" />
+    <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="preview-mode.hpp" />
+    <ClInclude Include="RGBColorInputWidget.hpp" />
+    <ClInclude Include="RotatingSaws.hpp" />
+    <ClInclude Include="schema.hpp" />
     <ClInclude Include="SimplePlayer.h" />
+    <ClInclude Include="SonicWaveFirstWave.hpp" />
+    <ClInclude Include="SpeedHack.h" />
     <ClInclude Include="Speedhack.hpp" />
     <ClInclude Include="state.h" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommentCell.cpp" />
+    <ClCompile Include="CommentCell.h" />
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EditorSettingsLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
     <ClCompile Include="GJGarageLayer.cpp" />
+    <ClCompile Include="GJScoreCell.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
+    <ClCompile Include="InfoLayer.cpp" />
     <ClCompile Include="Labels.cpp" />
+    <ClCompile Include="LevelBrowserLayer.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp" />
@@ -679,9 +700,10 @@
     <ClCompile Include="libs\imgui-hook\imgui\imgui_draw.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="libs\nfd\src\nfd_common.c" />
-    <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
+    <ClCompile Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="lvl-share.cpp" />
+    <ClCompile Include="managerViewer.cpp" />
+    <ClCompile Include="managerViewer.h" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="nodes.cpp" />
@@ -689,11 +711,15 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
+    <ClCompile Include="RGBColorInputWidget.cpp" />
+    <ClCompile Include="RotatingSaws.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />
-    <ClCompile Include="Speedhack.cpp" />
+    <ClCompile Include="SonicWaveFirstWave.cpp" />
+    <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="libs\detours\libdetours.lib" />
     <Library Include="libs\glew32.lib" />
     <Library Include="libs\MinHook\libMinHook-x86-v141-mtd.lib" />
   </ItemGroup>

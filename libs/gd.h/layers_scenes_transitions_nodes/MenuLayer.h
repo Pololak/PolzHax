@@ -42,6 +42,13 @@ namespace gd {
 	public:
 		cocos2d::CCArray* getMoreGamesList();
 	};
+
+	class OptionsLayer : public GJDropDownLayer {
+	public:
+		static OptionsLayer* create() {
+			return reinterpret_cast<OptionsLayer*(__fastcall*)()>(base + 0xd0360)();
+		}
+	};
 }
 
 #endif

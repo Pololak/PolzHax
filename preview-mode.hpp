@@ -16,6 +16,14 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* onPlaytest)(gd::LevelEditorLayer*);
 	void __fastcall onPlaytestH(gd::LevelEditorLayer* self);
 
+	inline void(__thiscall* removeObject)(gd::LevelEditorLayer*, gd::GameObject*, bool);
+	void __fastcall removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* obj, bool idk);
+
+	inline void(__thiscall* update)(gd::LevelEditorLayer*, float);
+	void __fastcall updateH(gd::LevelEditorLayer* self, void*, float dt);
+
+	void groupStickyObjects(gd::LevelEditorLayer* levelEditor, CCArray* objects);
+
 	void mem_init();
 }
 
@@ -43,7 +51,7 @@ namespace EditorUI {
 	void __fastcall selectObjectsH(gd::EditorUI* self, void* edx, CCArray* objects);
 
 	inline bool(__thiscall* keyDown)(gd::EditorUI*, cocos2d::enumKeyCodes);
-	void __fastcall keyDown_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
+	void __fastcall keyDownH(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
 
 	//inline bool(__thiscall* keyDown)(gd::EditorUI*, cocos2d::enumKeyCodes);
 	//void __fastcall keyDown_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
@@ -91,7 +99,29 @@ namespace EditorUI {
 		void moveObjectQUnitRight(CCObject*);
 		void moveObjectQUnitUp(CCObject*);
 		void moveObjectQUnitDown(CCObject*);
+
+		void onGroupSticky(CCObject*);
 	};
+
+	inline void(__thiscall* onCopy)(gd::EditorUI*, CCObject*);
+	void __fastcall onCopyH(gd::EditorUI* self, void*, CCObject* sender);
+
+	inline void(__thiscall* sliderChanged)(gd::EditorUI*, CCObject*);
+	void __fastcall sliderChangedH(gd::EditorUI* self, void*, CCObject* sender);
+
+	inline void(__thiscall* setupDeleteMenu)(gd::EditorUI*);
+	void __fastcall setupDeleteMenuH(gd::EditorUI* self);
+
+	inline void(__thiscall* updateButtons)(gd::EditorUI*);
+	void __fastcall updateButtonsH(gd::EditorUI* self);
+
+	inline void(__thiscall* onGroupDown)(gd::EditorUI*, CCObject*);
+	void __fastcall onGroupDownH(gd::EditorUI*, void*, CCObject*);
+
+	inline void(__thiscall* onGroupUp)(gd::EditorUI*, CCObject*);
+	void __fastcall onGroupUpH(gd::EditorUI*, void*, CCObject*);
+
+	void updateObjectInfo();
 
 	void mem_init();
 }
@@ -101,7 +131,7 @@ namespace EditorPauseLayer {
 	void __fastcall customSetup_H(gd::EditorPauseLayer* self);
 
 	inline void(__thiscall* onSaveAndPlay)(gd::EditorPauseLayer*, CCObject*);
-	void __fastcall onSaveAndPlay_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
+	void __fastcall onSaveAndPlayH(gd::EditorPauseLayer* self, void*, CCObject* sender);
 
 	inline void(__thiscall* onSaveAndExit)(gd::EditorPauseLayer*, CCObject*);
 	void __fastcall onSaveAndExit_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
@@ -110,10 +140,13 @@ namespace EditorPauseLayer {
 	void __fastcall onExitNoSave_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
 
 	inline void(__thiscall* onExitEditor)(gd::EditorPauseLayer*, CCObject*);
-	void __fastcall onExitEditor_H(gd::EditorPauseLayer* self, void*, CCObject* sender);
+	void __fastcall onExitEditorH(gd::EditorPauseLayer* self, void*, CCObject* sender);
 
 	inline bool(__thiscall* keyDown)(gd::EditorPauseLayer*, cocos2d::enumKeyCodes);
 	void __fastcall keyDown_H(gd::EditorPauseLayer* self, void* edx, cocos2d::enumKeyCodes key);
+
+	inline void(__thiscall* saveLevel)(gd::EditorPauseLayer*);
+	void __fastcall saveLevelH(gd::EditorPauseLayer* self);
 
 	class Callback {
 	public:
@@ -149,6 +182,30 @@ namespace SetGroupIDLayer {
 	};
 
 	void mem_init();
+}
+
+namespace ColorSelectPopup {
+	inline bool(__thiscall* init)(gd::ColorSelectPopup*, gd::GameObject*, int, int, int);
+	bool __fastcall initH(gd::ColorSelectPopup* self, void*, gd::GameObject* obj, int color_id, int idk, int idk2);
+
+	inline bool(__thiscall* dtor)(gd::ColorSelectPopup*);
+	void __fastcall dtorH(gd::ColorSelectPopup* self);
+
+	inline void(__thiscall* closeColorSelect)(gd::ColorSelectPopup*, CCObject*);
+	void __fastcall closeColorSelectH(gd::ColorSelectPopup* self, void*, CCObject* sender);
+
+	inline void(__thiscall* sliderChanged)(gd::ColorSelectPopup*, CCObject*);
+	void __fastcall sliderChangedH(gd::ColorSelectPopup* self, void*, CCObject* sender);
+
+	inline void(__thiscall* colorValueChanged)(gd::ColorSelectPopup*, ccColor3B);
+	void __fastcall colorValueChangedH(gd::ColorSelectPopup* self, void*, ccColor3B color);
+
+	void mem_init();
+}
+
+namespace LevelSettingsLayer {
+	inline bool(__thiscall* init)(gd::LevelSettingsLayer*, gd::LevelSettingsObject*);
+	bool __fastcall initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject);
 }
 
 namespace Scheduler {

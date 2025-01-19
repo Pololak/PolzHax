@@ -47,10 +47,19 @@ namespace PlayLayer {
 	inline void(__thiscall* levelComplete)(gd::PlayLayer*);
 	void __fastcall levelCompleteH(gd::PlayLayer* self);
 
+	inline void(__thiscall* removePlayer2)(gd::PlayLayer* self);
+	void __fastcall removePlayer2H(gd::PlayLayer* self);
+
+	inline void(__thiscall* markCheckpoint)(gd::PlayLayer*);
+	void __fastcall markCheckpointH(gd::PlayLayer* self);
+
+	void onNextStartPos();
+	void onPrevStartPos();
+
 	class Callback {
 	public:
-		void onPreviousStartPos(CCObject*);
-		void onNextStartPos(CCObject*);
+		void onNextPos(CCObject*);
+		void onPrevPos(CCObject*);
 	};
 
 	void mem_init();
@@ -59,8 +68,8 @@ namespace PlayLayer {
 }
 
 namespace PauseLayer {
-	inline bool(__thiscall* customSetup)(gd::CCBlockLayer* self);
-	bool __fastcall customSetup_H(gd::CCBlockLayer* self);
+	inline void(__thiscall* customSetup)(gd::PauseLayer* self);
+	void __fastcall customSetupH(gd::PauseLayer* self);
 
 	inline bool(__thiscall* onEdit)(CCLayer* self);
 	void __fastcall onEdit_H(CCLayer* self);
@@ -70,6 +79,12 @@ namespace PauseLayer {
 
 	inline bool(__thiscall* onQuit)(CCObject* btn);
 	void __fastcall onQuit_H(CCObject* btn);
+
+	inline void(__thiscall* togglerMenu)();
+	void __fastcall togglerMenuH(); // This thing is funny af
+
+	inline bool(__thiscall* onProgressBar)(gd::PauseLayer*, CCObject*);
+	void __fastcall onProgressBarH(gd::PauseLayer* self, void*, CCObject* obj);
 
 	class Callback {
 	public:
@@ -81,8 +96,15 @@ namespace PauseLayer {
 }
 
 namespace EndLevelLayer {
-	inline void(__thiscall* customSetup)(gd::GJDropDownLayer*);
-	void __fastcall customSetup_H(gd::GJDropDownLayer* self);
+	inline void(__thiscall* customSetup)(gd::EndLevelLayer*);
+	void __fastcall customSetup_H(gd::EndLevelLayer* self);
+
+	class Callback {
+	public:
+		void onReset(CCObject*);
+		void onHideLayer(CCObject*);
+		void onShowLayer(CCObject*);
+	};
 
 	void mem_init();
 }
@@ -97,18 +119,24 @@ namespace PlayerObject {
 	inline void(__thiscall* runBallRotation2)(gd::PlayerObject*);
 	void __fastcall runBallRotation2H(gd::PlayerObject* self);
 
+	inline void(__thiscall* ringJump)(gd::PlayerObject*, gd::GameObject*);
+	void __fastcall ringJumpH(gd::PlayerObject* self, void*, gd::GameObject* object);
+
 	void mem_init();
 }
 
 namespace GameObject {
 	inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
-	void __fastcall setOpacity_H(gd::GameObject* self, void* edx, GLubyte opacity);
+	void __fastcall setOpacityH(gd::GameObject* self, void* edx, GLubyte opacity);
 
 	inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
 	void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
 
 	inline int*(__thiscall* getEditorColor)(gd::GameObject*, cocos2d::ccColor4B);
 	void __fastcall getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor4B color);
+
+	inline void(__thiscall* activateObject)(gd::GameObject*);
+	void __fastcall activateObjectH(gd::GameObject* self);
 
 	void mem_init();
 }

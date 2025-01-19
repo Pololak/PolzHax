@@ -50,6 +50,9 @@ public:
     auto getLevelString() {
         return from<gd::string>(this, 0x120);
     }
+    auto getLevelType() {
+        return from<GJLevelType>(this, 0x26c);
+    }
 
     cocos2d::CCDictionary* m_lastBuildSave;
     int m_levelID;

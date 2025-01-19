@@ -4,12 +4,18 @@
 #include <imgui-hook.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <cpp/imgui_stdlib.h>
 #include <filesystem>
 #include <fstream>
 #include <chrono>
 #include "state.h"
 #include "explorer.h"
 #include "utils.hpp"
+#include "managerViewer.h"
+#include "SpeedHack.h"
+#include <shellapi.h>
+#include "PlayLayer.h"
+#include "portable-file-dialogs.h"
 
 DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 
@@ -26,7 +32,14 @@ void update_speed_hack() {
         if (auto sound = fme->currentSound())
             if (setting().onSpeedhackMusic) sound->setPitch(value);
             else sound->setPitch(1.f);
-    CCDirector::sharedDirector()->m_pScheduler->setTimeScale(value);
+    if (!setting().onClassicMode) {
+        CCDirector::sharedDirector()->m_pScheduler->setTimeScale(value);
+        SpeedHack::SetSpeed(1.f);
+    }
+    else {
+        CCDirector::sharedDirector()->m_pScheduler->setTimeScale(1.f);
+        SpeedHack::SetSpeed(value);
+    }
 }
 
 // Pitch Shifter is currently unused.
@@ -36,14 +49,6 @@ void update_fps_bypass() {
     static const auto addr = cocos_symbol<&CCApplication::setAnimationInterval>("?setAnimationInterval@CCApplication@cocos2d@@UAEXN@Z");
     addr(CCApplication::sharedApplication(), 1.0 / value);
     CCDirector::sharedDirector()->setAnimationInterval(1.0 / value);
-}
-
-void save() {
-    auto file = fopen("Resources/polzsave.dat", "wb");
-    if (file) {
-        fwrite(&setting(), sizeof(setting()), 1, file);
-        fclose(file);
-    }
 }
 
 void cheatDec()
@@ -57,26 +62,43 @@ void cheatAdd()
     setting().beforeRestartCheatsCount++;
 }
 
+void updatePriority(int priority) {
+    switch (priority)
+    {
+    case 4:
+        SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
+        break;
+    case 3:
+        SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+        break;
+    case 2:
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+        break;
+    case 1:
+        SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+        break;
+    case 0:
+        SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+        break;
+    }
+}
+
+static std::string getSongFolder() {
+    return CCFileUtils::sharedFileUtils()->getWritablePath();
+}
+
+static std::string getResourcesFolder() {
+    return CCFileUtils::sharedFileUtils()->getWritablePath2() + "/Resources";
+}
+
+std::vector<std::string> dllNames;
+
 bool oneX = true;
 
 void RenderMain() {
-	unsigned long long pointervalue;
-
     if (oneX) {
-        auto file = fopen("Resources/polzsave.dat", "rb");
-        if (file) {
-            fseek(file, 0, SEEK_END);
-            auto size = ftell(file);
-
-            if (size == sizeof(setting())) {
-                fseek(file, 0, SEEK_SET);
-                fread(&setting(), sizeof(setting()), 1, file);
-                fclose(file);
-            }
-        }
-
         float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6;
-        float addingInterfaceY, addingSpeedhackY, addingIconsY;
+        float addingInterfaceY, addingSpeedhackY, addingIconsY, addingShortcutsY;
         if (ImGui::Begin("PolzHax", nullptr)) {
             ImGui::SetWindowPos({ 5 , 5 });
             addingX1 = ImGui::GetWindowWidth() + 10;
@@ -103,25 +125,27 @@ void RenderMain() {
         if (ImGui::Begin("Creator", nullptr)) {
             ImGui::SetWindowPos({ addingX3, 5 });
             addingX4 = addingX3 + ImGui::GetWindowWidth() + 5;
-            addingSpeedhackY = ImGui::GetWindowHeight() + 10;
         }
-
-        if (ImGui::Begin("Speedhack", nullptr)) {
-            ImGui::SetWindowPos({ addingX3, addingSpeedhackY });
-        }
-
 
         if (ImGui::Begin("Level", nullptr)) {
             ImGui::SetWindowPos({ addingX4 , 5 });
             addingX5 = addingX4 + ImGui::GetWindowWidth() + 5;
+            addingShortcutsY = ImGui::GetWindowHeight() + 10;
         }
 
+        if (ImGui::Begin("Shortcuts", nullptr)) {
+            ImGui::SetWindowPos({ addingX4, addingShortcutsY });
+        }
 
         if (ImGui::Begin("Universal", nullptr)) {
             ImGui::SetWindowPos({ addingX5, 5 });
             addingX6 = addingX5 + ImGui::GetWindowWidth() + 5;
+            addingSpeedhackY = ImGui::GetWindowHeight() + 10;
         }
 
+        if (ImGui::Begin("Speedhack", nullptr)) {
+            ImGui::SetWindowPos({ addingX5, addingSpeedhackY });
+        }
 
         if (ImGui::Begin("Status", nullptr)) {
             ImGui::SetWindowPos({ addingX6, 5 });
@@ -131,13 +155,6 @@ void RenderMain() {
         if (ImGui::Begin("Icons", nullptr)) {
             ImGui::SetWindowPos({ addingX6, addingIconsY });
         }
-
-        
-
-        // Fuck this stupid save function i have no fucking words
-        // Ima need to copypaste 80+ patches for fucking saves
-
-        //WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x518e29), "\x32", 1, NULL);
 
         // Bypass
 
@@ -198,6 +215,13 @@ void RenderMain() {
 
         // Cosmetic
 
+        if (setting().onAlwaysNewBest) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xf077e), "\x90\x90", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xf077e), "\x74\x14", 2, NULL);
+        }
+
         if (setting().onSCoinUncoll) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x443368), "\x8B\xC2\x90", 3, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4735CE), "\x8B\xD9\x90", 3, NULL);
@@ -221,6 +245,30 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x8B\xD9", 2, NULL);
         }
 
+        if (setting().onFastAnimComp) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5F99), "\x00\x00\x00\x00", 4, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5F99), "\x99\x99\xF9\x3F", 4, NULL);
+        }
+
+        if (setting().onFastShowComp) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5CA4), "\x00\x00\x00\x00", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57F6), "\x00\x00\x00\x00", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57CE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57DE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5814), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5824), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5CA4), "\x00\x00\xc0\x3f", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57F6), "\xaf\x47\x61\x3f", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57CE), "\xC7\x04\x24\xC3\xF5\x28\x3F", 7, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57DE), "\xC7\x04\x24\x9A\x99\x19\x3F", 7, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5814), "\xC7\x04\x24\xAF\x47\x61\x3E", 7, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5824), "\xC7\x04\x24\x00\x00\x00\x40", 7, NULL);
+        }
+
         if (setting().onFObjectInvisible) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebece), "\x90\x90\x90\x90\x90\x90", 6, NULL);
         }
@@ -242,6 +290,13 @@ void RenderMain() {
         }
         else {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x3F", 7, NULL); // 0F 84 9A 01 00 00
+        }
+
+        if (setting().onInversedTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x85\x55\x02\x00\x00", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
         }
 
         if (setting().onMaxParticles) {
@@ -386,17 +441,17 @@ void RenderMain() {
         }
 
         if (setting().onTrailAlwaysOff) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\xC3", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\xe9\x56\x02\x00\x00\x90", 6, NULL);
         }
         else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\x56", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
         }
 
         if (setting().onTrailAlwaysOn) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x01", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x90\x90\x90\x90\x90\x90", 6, NULL);
         }
         else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x00", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
         }
 
         if (setting().onTrailBugFix) {
@@ -508,9 +563,11 @@ void RenderMain() {
 
         if (setting().onLevelEdit) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x90\x90\x90\x90\x90\x90", 6, NULL);
         }
         else {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x0f\x85\xcc\x00\x00\x00", 6, NULL);
         }
 
         if (setting().onNoCMark) {
@@ -646,6 +703,15 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\x0f\x85\xef\x02\x00\x00", 6, NULL);
         }
 
+        if (setting().onNoclipUnstuck) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdae16), "\xE9\x00\x02\x00\x00\x90", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdb02d), "\xE9\x10\x01\x00\x00\x90", 6, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdae16), "\x0F\x84\xFF\x01\x00\x00", 6, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdb02d), "\x0F\x8B\x0F\x01\x00\x00", 6, NULL);
+        }
+
         if (setting().onPauseDurComp) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E531B), "\x00", 1, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4E2906), "\x90\x90\x90\x90\x90\x90", 6, NULL);
@@ -670,6 +736,8 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F3691), "\xe8\xaa\x42\xf2\xff", 5, NULL); // e8 aa 42 f2 ff
         }
 
+        WriteRef(gd::base + 0xf04ff, setting().respawnTime);
+
         if (setting().onSuicide) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea268), "\xe9\xc9\x01\x00\x00\x90", 6, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ea453), "\xe9\x59\x02\x00\x00\x90", 6, NULL);
@@ -680,6 +748,15 @@ void RenderMain() {
         }
 
         // Universal
+
+        if (setting().onAllowLowVolume) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd0cb0), "\xeb", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd772e), "\xeb", 1, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd0cb0), "\x76", 1, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd772e), "\x76", 1, NULL);
+        }
 
         if (setting().onFastAlt) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
@@ -884,17 +961,15 @@ void RenderMain() {
     //ImGui::PushFont(font);
 
     if (setting().show) {
-        
-
-        
-
-        
-
         if (setting().onExplorer) {
             render_explorer_window(setting().onExplorer);
         }
 
-        if (ImGui::Begin("Bypass", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+        if (setting().managerView) {
+            showManagerView(setting().managerView);
+        }
+
+        if (ImGui::Begin("Bypass", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
@@ -975,10 +1050,21 @@ void RenderMain() {
         }
 
         if (ImGui::Begin("Cosmetic", nullptr,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(140 * setting().UISize);
+
+            if (ImGui::Checkbox("Always New Best", &setting().onAlwaysNewBest)) {
+                if (setting().onAlwaysNewBest) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xf077e), "\x90\x90", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xf077e), "\x74\x14", 2, NULL);
+                }
+            }
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Always shows new best on death.");
 
             if (ImGui::Checkbox("Coins Show Uncollected", &setting().onSCoinUncoll)) {
                 if (setting().onSCoinUncoll) {
@@ -1014,6 +1100,42 @@ void RenderMain() {
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables transition trigger effects.");
+
+            ImGui::Checkbox("Don't Fade", &setting().onDontFade);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Disables fading when objects leave the viewable play area.");
+
+            if (ImGui::Checkbox("Fast Animation Complete", &setting().onFastAnimComp)) {
+                if (setting().onFastAnimComp) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5F99), "\x00\x00\x00\x00", 4, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5F99), "\x99\x99\xF9\x3F", 4, NULL);
+                }
+            }
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Makes the level ending animation instant.");
+
+            if (ImGui::Checkbox("Fast Show Complete", &setting().onFastShowComp)) {
+                if (setting().onFastShowComp) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5CA4), "\x00\x00\x00\x00", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57F6), "\x00\x00\x00\x00", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57CE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57DE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5814), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5824), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5CA4), "\x00\x00\xc0\x3f", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57F6), "\xaf\x47\x61\x3f", 4, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57CE), "\xC7\x04\x24\xC3\xF5\x28\x3F", 7, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE57DE), "\xC7\x04\x24\x9A\x99\x19\x3F", 7, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5814), "\xC7\x04\x24\xAF\x47\x61\x3E", 7, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xE5824), "\xC7\x04\x24\x00\x00\x00\x40", 7, NULL);
+                }
+            }
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Makes the show complete at the end of the level instant.");
 
             if (ImGui::Checkbox("Force Objects Invisible", &setting().onFObjectInvisible)) {
                 if (setting().onFObjectInvisible) {
@@ -1070,6 +1192,15 @@ void RenderMain() {
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the mirror portal animation.");
+
+            if (ImGui::Checkbox("Inversed Trail", &setting().onInversedTrail)) {
+                if (setting().onInversedTrail) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x85\x55\x02\x00\x00", 6, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
+                }
+            }
 
             if (ImGui::Checkbox("Max Particles", &setting().onMaxParticles)) {
                 if (setting().onMaxParticles) {
@@ -1277,7 +1408,7 @@ void RenderMain() {
             //ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
             ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
             ImGui::SameLine();
-            if (ImGui::TreeNode("")) {
+            if (ImGui::TreeNode("##trailSize")) {
                 ImGui::SetNextItemWidth(50.f);
                 ImGui::DragFloat("Trail Size", &setting().wavePulseSize, 0.1f, 0.1f, 10.f);
                 ImGui::TreePop();
@@ -1333,10 +1464,10 @@ void RenderMain() {
 
             if (ImGui::Checkbox("Trail Always Off", &setting().onTrailAlwaysOff)) {
                 if (setting().onTrailAlwaysOff) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\xC3", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\xe9\x56\x02\x00\x00\x90", 6, NULL);
                 }
                 else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac080), "\x56", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1344,10 +1475,10 @@ void RenderMain() {
 
             if (ImGui::Checkbox("Trail Always On", &setting().onTrailAlwaysOn)) {
                 if (setting().onTrailAlwaysOn) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x01", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x90\x90\x90\x90\x90\x90", 6, NULL);
                 }
                 else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xAC476), "\x00", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1377,7 +1508,7 @@ void RenderMain() {
         }
 
         if (ImGui::Begin("Creator", nullptr,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
@@ -1486,10 +1617,6 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows you to scroll out the editor.");
 
-            ImGui::Checkbox("Global Clipboard", &setting().onPersClip);
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
-                ImGui::SetTooltip("Allows you to copy objects between levels.");
-
             if (ImGui::Checkbox("Hide Grid", &setting().onHideGrid)) {
                 if (setting().onHideGrid) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
@@ -1517,9 +1644,11 @@ void RenderMain() {
             if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
                 if (setting().onLevelEdit) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x90\x90\x90\x90\x90\x90", 6, NULL);
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x75\x62", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x450ec2), "\x0f\x85\xcc\x00\x00\x00", 6, NULL);
                 }
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1587,6 +1716,10 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you place the same object over itself in editor.");
 
+            ImGui::Checkbox("Reset Percentage", &setting().onResetEditPercentage);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Resets normal percentage while saving level.");
+
             if (ImGui::Checkbox("Smooth Trail", &setting().onSmoothEditTrail)) {
                 if (setting().onSmoothEditTrail) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x90\x90", 2, NULL);
@@ -1634,18 +1767,31 @@ void RenderMain() {
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you zoom fully in & out.");
+
+            ImGui::SetNextWindowSize({ 200 * setting().UISize, 0});
         }
 
         if (ImGui::Begin("Level", nullptr,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
+            ImGui::Checkbox("0% Practice Complete", &setting().onZeroPracticeComplete);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Completes a level if you beat it in 1 practice attempt.");
+
+            ImGui::Checkbox("Auto Practice Mode", &setting().onAutoPractice);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Auto-enables practice mode.");
+
+            ImGui::Checkbox("Auto Song Download", &setting().onAutoDownloadSong);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Automatically starts downloading songs when you open the level page.");
+
             ImGui::Checkbox("Ball Rotation Bug Fix", &setting().onBallRotationFix);
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Fixes that ball rotation bug when entering a portal mid ball animation.");
-
 
             if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
                 if (setting().onConfirmExit) {
@@ -1758,8 +1904,24 @@ void RenderMain() {
                     cheatDec();
                 }
             }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the player invincible.");
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##noclipsettings")) {
+                if (ImGui::Checkbox("Experimental (buggy)", &setting().onNoclipUnstuck)) {
+                    if (setting().onNoclipUnstuck) {
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdae16), "\xE9\x00\x02\x00\x00\x90", 6, NULL);
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdb02d), "\xE9\x10\x01\x00\x00\x90", 6, NULL);
+                    }
+                    else {
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdae16), "\x0F\x84\xFF\x01\x00\x00", 6, NULL);
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xdb02d), "\x0F\x8B\x0F\x01\x00\x00", 6, NULL);
+                    }
+                }
+                if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                    ImGui::SetTooltip("Prevents the player from getting stuck.");
+                ImGui::TreePop();
+            }
 
             if (ImGui::Checkbox("Pause During Completion", &setting().onPauseDurComp)) {
                 if (setting().onPauseDurComp) {
@@ -1776,7 +1938,9 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you pause during the level complete animation.");
 
-            //ImGui::Checkbox("Practice Bug Fix", &setting().onPracticeFix);
+            ImGui::Checkbox("Practice Bug Fix", &setting().onPracticeFix);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Saves & restores player velocity in practice mode.");
 
             if (ImGui::Checkbox("Practice Music", &setting().onPracticeMusic)) {
                 if (setting().onPracticeMusic) {
@@ -1797,6 +1961,10 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Plays the level's song in-sync with your position.");
 
+            ImGui::Checkbox("Replay Last Checkpoint", &setting().onLastCheckpoint);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Respawn from your last practice mode checkpoint after completing a level.");
+
             //ImGui::Checkbox("Show Layout", &setting().onShowLayout);
             //if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
             //    ImGui::SetTooltip("Removes all decoration and colour from levels.");
@@ -1806,6 +1974,14 @@ void RenderMain() {
             //    ImGui::ColorEdit3("Ground Color", setting().GroundColor, ImGuiColorEditFlags_NoInputs);
             //    ImGui::TreePop();
             //}
+
+            ImGui::SetNextItemWidth(60.f);
+            if (ImGui::DragFloat("Respawn Time", &setting().respawnTime, 0.1f, 0.1f, 10.f))
+				WriteRef(gd::base + 0xf04ff, setting().respawnTime);
+            
+            ImGui::Checkbox("Show Layout", &setting().onShowLayout);
+
+            ImGui::Checkbox("Smart StartPos", &setting().onSmartStartPos);
 
             ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1826,10 +2002,10 @@ void RenderMain() {
         }
 
         if (ImGui::Begin("Universal", nullptr,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
-            ImGui::SetNextItemWidth(120 * setting().UISize);
+            ImGui::SetNextItemWidth(80 * setting().UISize);
             if (ImGui::DragFloat("##fpsbypass", &setting().fps, 1.f, 1.f, 360.f))
                 update_fps_bypass();
             ImGui::SameLine();
@@ -1844,14 +2020,16 @@ void RenderMain() {
                 update_pitch_shifter();
             ImGui::EndTabItem();*/
 
-            /*if (ImGui::Checkbox("Allow Low Volume", &setting().onAllowLowVolume)) {
+            if (ImGui::Checkbox("Allow Low Volume", &setting().onAllowLowVolume)) {
                 if (setting().onAllowLowVolume) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd0cb0), "\xeb", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd772e), "\xeb", 1, NULL);
                 }
                 else {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd0cb0), "\x76", 1, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd772e), "\x76", 1, NULL);
                 }
-            }*/
+            }
 
             ImGui::Checkbox("Auto Safe Mode", &setting().onAutoSafe);
 
@@ -1953,8 +2131,9 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Locks all rotation at 0 degrees.");
 
-            ImGui::Checkbox("No Transition", &setting().onNoTransition);
+            ImGui::Checkbox("Menu Gameplay", &setting().onMenuGameplay);
 
+            ImGui::Checkbox("No Transition", &setting().onNoTransition);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Shorterns scene transition time to 0s.");
 
@@ -2063,12 +2242,19 @@ void RenderMain() {
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Makes the text input areas transparent.");
 
-            //ImGui::Checkbox("Zero Delay", &setting().onZeroDelay);
+            if (ImGui::Checkbox("Zero Delay", &setting().onZeroDelay)) {
+                auto cocos = GetModuleHandleA("libcocos2d.dll");
+                if (!setting().onZeroDelay)
+                    MH_DisableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(cocos) + 0xfc240));
+                else
+                    MH_EnableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(cocos) + 0xfc240));
+            }
 
             //ImGui::Checkbox("Transparent Pause", &setting().onTransparentPause);
         }
 
-        if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+        if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+            auto pl = gd::GameManager::sharedState()->getPlayLayer();
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
@@ -2085,7 +2271,7 @@ void RenderMain() {
             ImGui::Checkbox("FPS Counter", &setting().onFPSLabel);
             ImGui::Checkbox("Message", &setting().onMessageLabel);
             ImGui::SetNextItemWidth(150 * setting().UISize);
-            ImGui::InputText("##message", setting().message, IM_ARRAYSIZE(setting().message));
+            ImGui::InputText("##message", &setting().message);
             ImGui::Checkbox("Noclip Accuracy", &setting().onNoclipAccuracy);
             ImGui::Checkbox("Noclip Deaths", &setting().onNoclipDeaths);
             ImGui::Checkbox("Session Time", &setting().onSessionTime);
@@ -2093,38 +2279,41 @@ void RenderMain() {
         }
 
         if (ImGui::Begin("Icons", nullptr,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
             ImGui::Checkbox("Same Dual Color", &setting().onSameDualColor);
 
-            //ImGui::Checkbox("Swap Wave Trail", &setting().onSwapWaveColors);
+            //ImGui::Checkbox("Swap Wave Trail Color", &setting().onSwapWaveTrailColors);
 
+            ImGui::Checkbox("RGB Icon", &setting().onRainbowIcon);
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##rgbSettings")) {
+                ImGui::SetNextItemWidth(50.f);
+                ImGui::InputFloat("Speed", &setting().rgbSpeed);
+                ImGui::TreePop();
+            }
 
+            ImGui::Checkbox("P1 Effects", &setting().onEnableP1);
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##p1effects")) {
+                ImGui::TreePop();
+            }
 
-            //ImGui::ColorEdit3("##primarycolorpulse", setting().PrimaryPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("P1-Col Pulse", &setting().onPrimaryPulse);
-
-            //ImGui::ColorEdit3("##secondarycolorpulse", setting().SecondaryPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("P2-Col Pulse", &setting().onSecondaryPulse);
-
-            //ImGui::ColorEdit3("##GlowColorPulse", setting().GlowPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("Glow Color Pulse", &setting().onGlowPulse);
-
-            //ImGui::ColorEdit3("##WaveTrailColorPulse", setting().WaveTrailPulse, ImGuiColorEditFlags_NoInputs);
-            //ImGui::SameLine();
-            //ImGui::Checkbox("Wave Trail Color Pulse", &setting().onWaveTrailPulse);
+            ImGui::Checkbox("P2 Effects", &setting().onEnableP2);
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##p2effects")) {
+                ImGui::TreePop();
+            }
+            ImGui::SetNextWindowSize({ 200 * setting().UISize, 0});
         }
 
-        if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
-            ImGui::SetNextItemWidth(120 * setting().UISize);
+            ImGui::SetNextItemWidth(80 * setting().UISize);
 
             if (ImGui::DragFloat("##speedhack", &setting().speedhack, 0.05f, 0.f, 10.f))
             {
@@ -2133,37 +2322,97 @@ void RenderMain() {
             }
 
             ImGui::SameLine();
-            if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack))
-            {
+            if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack)) {
                 update_speed_hack();
-                //cheatAdd();
             }
-            //else {
-            //    cheatDec();
-            //}
+            if (ImGui::Checkbox("Classic Mode", &setting().onClassicMode)) {
+                update_speed_hack();
+            }
             ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
+
+            ImGui::SetNextWindowSize({ 200 * setting().UISize, 0});
         }
 
-        /*if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+        if (ImGui::Begin("Shortcuts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Checkbox("Cheat Indicator", &setting().onCheatIndicator);
+            float winWidth = ImGui::GetWindowSize().x;
 
-            if (ImGui::TreeNode("FPS Label")) {
-                ImGui::Checkbox("Enable##fps", &setting().onFPSLabel);
-                ImGui::Checkbox("Prefix##fps", &setting().fps_prefix);
-                ImGui::TreePop();
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Options", { 180 * setting().UISize, 0 })) {
+                auto optionsLayer = gd::OptionsLayer::create();
+                optionsLayer->showLayer(true);
+                CCDirector::sharedDirector()->getRunningScene()->addChild(optionsLayer);
             }
-            if (ImGui::TreeNode("CPS Label")) {
-                ImGui::Checkbox("Enable##cps", &setting().onCPSLabel);
-                ImGui::Checkbox("Prefix##cps", &setting().cps_prefix);
-                ImGui::Checkbox("Total clicks", &setting().cps_total);
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Restart Level", { 180 * setting().UISize, 0 })) {
+                if (gd::GameManager::sharedState()->getPlayLayer()) {
+                    PlayLayer::resetLevel_H(gd::GameManager::sharedState()->getPlayLayer());
+                }
             }
-        }*/
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Practice Mode", { 180 * setting().UISize, 0 })) {
+                if (gd::GameManager::sharedState()->getPlayLayer()) {
+                    PlayLayer::togglePracticeModeH(gd::GameManager::sharedState()->getPlayLayer(), 0, !gd::GameManager::sharedState()->getPlayLayer()->getPracticeMode());
+                }
+            }
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Uncomplete Level", {180 * setting().UISize, 0} )) {
+                if (gd::GameManager::sharedState()->getPlayLayer()) {
+                    auto gsm = gd::GameStatsManager::sharedState();
+                    auto glm = gd::GameLevelManager::sharedState();
+                    gd::GJGameLevel* level = nullptr;
+                    level = gd::GameManager::sharedState()->getPlayLayer()->getGameLevel();
+                    std::cout << CCString::createWithFormat("c_{}", level->m_levelID)->getCString() << std::endl;
+
+                    if (from<int>(level, 0x1d8) >= 100 && gsm->hasCompletedLevel(level)) {
+                        int levelID = level->m_levelID;
+
+                        gsm->setStat("4", gsm->getStat("4") - 1);
+                        gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("ñ_%i", levelID)->getCString());
+                        if (from<int>(level, 0x1f4) > 0) {
+                            gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("star_%i", levelID)->getCString());
+                            gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("demon_%i", levelID)->getCString());
+                            gsm->setStat("6", gsm->getStat("6") - from<int>(level, 0x1f4));
+                            if (from<int>(level, 0x1f4) >= 10) {
+                                gsm->setStat("5", gsm->getStat("5") - 1);
+                            }
+                        }
+                    }
+
+                    from<int>(level, 0x1d8) = 0;
+                    from<int>(level, 0x1dc) = 0;
+
+                    gd::FLAlertLayer::create(nullptr, "Success", "Save & Load your data to apply the changes.", "OK", nullptr, 300.f, false, 120.f)->show();
+                }
+            }
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Inject DLL", { 180 * setting().UISize, 0 } )) {
+                auto selection = pfd::open_file("Select a file", CCFileUtils::sharedFileUtils()->getWritablePath2(), { "DLL File", "*.dll" }, pfd::opt::multiselect).result();
+                for (auto const& filename : selection) {
+                    LoadLibrary(filename.c_str());
+                    std::filesystem::path path = filename;
+                    dllNames.push_back(path.filename().string());
+                }
+            }
+
+            ImGui::SetCursorPosX((((winWidth - 188 * setting().UISize) + (ImGui::GetStyle().ItemSpacing.x * setting().UISize)) / 2));
+            if (ImGui::Button("Resources", { 86 * setting().UISize, 0})) {
+                ShellExecute(0, NULL, getResourcesFolder().c_str(), NULL, NULL, SW_SHOW);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("AppData", { 86 * setting().UISize, 0 })) {
+                ShellExecute(0, NULL, getSongFolder().c_str(), NULL, NULL, SW_SHOW);
+            }
+        }
 
         if (ImGui::Begin("Interface", nullptr,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
             if (ImGui::ColorEdit4("Color Style", setting().Overlaycolor, ImGuiColorEditFlags_NoInputs)) {
@@ -2240,7 +2489,7 @@ void RenderMain() {
 
             if (ImGui::Button("Sort Tabs")) {
                 float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6;
-                float addingInterfaceY, addingSpeedhackY, addingIconsY;
+                float addingInterfaceY, addingSpeedhackY, addingIconsY, addingShortcutsY;
                 if (ImGui::Begin("PolzHax", nullptr)) {
                     ImGui::SetWindowPos({ 5 , 5 });
                     addingX1 = ImGui::GetWindowWidth() + 10;
@@ -2267,25 +2516,27 @@ void RenderMain() {
                 if (ImGui::Begin("Creator", nullptr)) {
                     ImGui::SetWindowPos({ addingX3, 5 });
                     addingX4 = addingX3 + ImGui::GetWindowWidth() + 5;
-                    addingSpeedhackY = ImGui::GetWindowHeight() + 10;
                 }
-
-                if (ImGui::Begin("Speedhack", nullptr)) {
-                    ImGui::SetWindowPos({ addingX3, addingSpeedhackY });
-                }
-
 
                 if (ImGui::Begin("Level", nullptr)) {
                     ImGui::SetWindowPos({ addingX4 , 5 });
                     addingX5 = addingX4 + ImGui::GetWindowWidth() + 5;
+                    addingShortcutsY = ImGui::GetWindowHeight() + 10;
                 }
 
+                if (ImGui::Begin("Shortcuts", nullptr)) {
+                    ImGui::SetWindowPos({ addingX4, addingShortcutsY });
+                }
 
                 if (ImGui::Begin("Universal", nullptr)) {
                     ImGui::SetWindowPos({ addingX5, 5 });
                     addingX6 = addingX5 + ImGui::GetWindowWidth() + 5;
+                    addingSpeedhackY = ImGui::GetWindowHeight() + 10;
                 }
 
+                if (ImGui::Begin("Speedhack", nullptr)) {
+                    ImGui::SetWindowPos({ addingX5, addingSpeedhackY });
+                }
 
                 if (ImGui::Begin("Status", nullptr)) {
                     ImGui::SetWindowPos({ addingX6, 5 });
@@ -2296,64 +2547,53 @@ void RenderMain() {
                     ImGui::SetWindowPos({ addingX6, addingIconsY });
                 }
             }
-
         }
 
-        if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+        if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.1.9-alpha.9");
+            ImGui::Text("v1.2.0-alpha.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
             if (ImGui::Button("Save"))
             {
-                save();
+                setting().saveState();
                 gd::FLAlertLayer::create(nullptr, "Saved!", "Your hack state is saved!", "Ok", nullptr, 240.f, false, 0)->show();
             }
             ImGui::EndTabItem();
 
-            //ImGui::Combo("Thread Priority", setting().priority, setting().priority, 5);
+            const char* const priorities[] = { "Highest", "High", "Normal", "Low", "Lowest" };
+            ImGui::SetNextItemWidth(22 * setting().UISize);
+            ImGui::Combo("Thread Priority", &setting().priority, priorities, 5);
+            if (ImGui::IsItemDeactivatedAfterEdit()) {
+                updatePriority(setting().priority);
+            }
+
+            //if (ImGui::Button("AppData")) {
+            //    ShellExecute(0, NULL, getSongFolder().c_str(), NULL, NULL, SW_SHOW);
+            //}
+
             if (ImGui::Button("Cocos Explorer")) {
                 setting().onExplorer = !setting().onExplorer;
             }
+
+			if (ImGui::Button("Manager Viewer")) {
+				setting().managerView = !setting().managerView;
+			}
         }
 
     }
     ImGui::End();
 
-    if (fuckThis().onColorPicker) {
-        static bool just_opened = true;
-        static Color3F color;
-        if (just_opened) {
-            ImGui::OpenPopup("Color picker");
-            just_opened = false;
-            color = Color3F::from(fuckThis().onColorPicker->getColorValue());
-        }
-        bool unused_open = true;
-        if (ImGui::BeginPopupModal("Color picker", &unused_open,
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)) {
-
-            ImGui::ColorPicker3("##color_picker.color", &color.r);
-
-            ImGui::EndPopup();
-        }
-        else {
-            fuckThis().onColorPicker->setColorValue(color);
-            fuckThis().onColorPicker = nullptr;
-            just_opened = true;
-        }
-    }
-
     update_fps_bypass();
     update_speed_hack();
+    updatePriority(setting().priority);
 
     if (setting().onFPSBypass) {
         update_fps_bypass();
     }
-
-    //ImGui::PopFont();
 }
 
 void imgui_init() {
@@ -2361,9 +2601,43 @@ void imgui_init() {
     io.Fonts->Clear();
     io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
     io.Fonts->Build();
+
+    if (!std::filesystem::is_directory("PolzHax") || !std::filesystem::exists("PolzHax"))
+    {
+        std::filesystem::create_directory("PolzHax");
+    }
+    if (!std::filesystem::is_directory("PolzHax/extensions") || !std::filesystem::exists("PolzHax/extensions"))
+    {
+        std::filesystem::create_directory("PolzHax/extensions");
+    }
+
+    auto path = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/extensions";
+
+    for (const auto& file : std::filesystem::directory_iterator(path))
+    {
+        if (file.path().extension() == ".dll")
+        {
+            auto dllname = file.path().filename().string();
+            dllNames.push_back(dllname);
+            LoadLibrary(file.path().string().c_str());
+        }
+    }
+
+    auto cocos = GetModuleHandleA("libcocos2d.dll");
+    if (!setting().onZeroDelay)
+        MH_DisableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(cocos) + 0xfc240));
+    else
+        MH_EnableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(cocos) + 0xfc240));
+
+    std::cout << "Extensions Loaded: " << dllNames.size() << std::endl;
+    for (const auto& name : dllNames) {
+        std::cout << name << std::endl;
+    }
 }
 
 void setup_imgui_menu() {
+    SpeedHack::Setup();
+    updatePriority(setting().priority);
     ImGuiHook::setToggleCallback([]() {setting().show = !setting().show; });
     ImGuiHook::setRenderFunction(RenderMain);
     ImGuiHook::setInitFunction(imgui_init);

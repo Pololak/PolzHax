@@ -6,8 +6,12 @@
 
 namespace gd {
 
+	class GJGameLevel;
+
 	class GameStatsManager : public GManager {
 	public:
+		PAD(0x8)
+		cocos2d::CCDictionary* m_completedLevels;
 
 		static GameStatsManager* sharedState() {
 			return reinterpret_cast<GameStatsManager * (__stdcall*)()>(
@@ -17,8 +21,19 @@ namespace gd {
 
 		int getStat(const char* index) {
 			return reinterpret_cast<int(__thiscall*)(GameStatsManager*, const char*)>(
-				base + 0x4f40 //4ED0
+				base + 0x770c0 //4ED0
 				)(this, index);
+		}
+		void setStat(const char* index, int amount) {
+			return reinterpret_cast<void(__thiscall*)(GameStatsManager*, const char*, int)>(base + 0x77180)(this, index, amount);
+		}
+
+		bool hasCompletedLevel(GJGameLevel* gameLevel) {
+			return reinterpret_cast<bool(__thiscall*)(GameStatsManager*, GJGameLevel*)>(base + 0x78220)(this, gameLevel);
+		}
+
+		cocos2d::CCDictionary* completedLevels() {
+			return from<cocos2d::CCDictionary*>(this, 0xf8);
 		}
 		/*
 		1 - Jumps

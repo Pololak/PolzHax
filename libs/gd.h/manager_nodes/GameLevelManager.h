@@ -9,8 +9,19 @@ class GJGameLevel;
 
 class GameLevelManager : public cocos2d::CCNode {
     protected:
-
     public:
+        cocos2d::CCDictionary* m_mainLevels;
+        cocos2d::CCDictionary* m_valueDict;
+        cocos2d::CCDictionary* m_savedLevelsDict;
+        cocos2d::CCDictionary* m_timerDict;
+        cocos2d::CCDictionary* m_userValues;
+        cocos2d::CCDictionary* m_storedLevels;
+        cocos2d::CCDictionary* m_pageInfo;
+        cocos2d::CCDictionary* m_unknownDict;
+        cocos2d::CCDictionary* m_savedPacks;
+        cocos2d::CCDictionary* m_activeDownloads;
+        cocos2d::CCDictionary* m_activeUploads;
+
         static auto sharedState() {
             return reinterpret_cast<GameLevelManager * (__stdcall*)()>(base + 0x55850)();
         }
@@ -41,7 +52,31 @@ class GameLevelManager : public cocos2d::CCNode {
         }
 
         void resetTimerForKey(char const* key) {
-            return reinterpret_cast<void(__fastcall*)(char const*)>(gd::base + 0x5440)(key);
+            return reinterpret_cast<void(__thiscall*)(GameLevelManager*, char const*)>(gd::base + 0x5440)(this, key);
+        }
+
+        int getTimeLeft(char const* key/*, float delay*/) {
+            return reinterpret_cast<int(__thiscall*)(GameLevelManager*, char const*/*, float*/)>(gd::base + 0x585d0)(this, key/*, delay*/);
+        }
+
+        const char* getPostCommentKey(int level) {
+            return cocos2d::CCString::createWithFormat("comment_%i", level)->getCString();
+        }
+
+        void makeTimeStamp(char const* key) {
+            return reinterpret_cast<void(__thiscall*)(GameLevelManager*, char const*)>(gd::base + 0x58350)(this, key);
+        }
+
+        void updateUserScore() {
+            return reinterpret_cast<void(__thiscall*)(GameLevelManager*)>(base + 0x5c950)(this);
+        }
+
+        int accountIDforID(int userID) {
+            return reinterpret_cast<int(__thiscall*)(GameLevelManager*, int)>(base + 0x56e10)(this, userID);
+        }
+
+        std::string getLengthStr(bool ti, bool sh, bool me, bool lo) {
+            return reinterpret_cast<std::string(__thiscall*)(GameLevelManager*, bool, bool, bool, bool)>(base + 0x599b0)(this, ti, sh, me, lo);
         }
 };
 

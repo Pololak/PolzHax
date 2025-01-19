@@ -54,36 +54,43 @@ namespace gd {
 		}
 
 		void setLabelPlaceholderColor(cocos2d::ccColor3B color) {
-			m_cPlaceholderColor = color;
+			from<cocos2d::ccColor3B>(this, 0x164) = color;
 			this->refreshLabel();
 		}
 		void setLabelPlaceholerScale(float scale) {
-			m_fPlaceholderScale = scale;
+			from<float>(this, 0x160) = scale;
 			this->refreshLabel();
 		}
 		void setMaxLabelScale(float scale) {
-			m_fMaxLabelScale = scale;
+			from<float>(this, 0x15c) = scale;
 			this->refreshLabel();
 		}
-		void setMaxLabelLength(int length) { m_nMaxLabelLength = length; }
+		void setMaxLabelWidth(float width) {
+			from<float>(this, 0x158) = width;
+		}
+		void setMaxLabelLength(int length) { 
+			from<int>(this, 0x178) = length;
+		}
 		void setAllowedChars(std::string filter) {
-			return reinterpret_cast<void(__fastcall*)(CCTextInputNode*, std::string)>(base + 0x5770)(this, filter);
+			from<std::string>(this, 0x140) = filter;
 		}
 		void refreshLabel() {
 			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*)>(
-				base + 0x5770
+				base + 0x14030
 				)(this);
 		}
 		void setString(std::string text) {
 			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*, std::string)>(base + 0x13d70)(this, text);
 		}
-		const char* getString() {
-			return m_textField->getString();
-		}
 		cocos2d::CCTextFieldTTF* getTextField() {
 			return from<cocos2d::CCTextFieldTTF*>(this, 0x170);
 		}
-		void setDelegate(TextInputDelegate* delegate) { m_delegate = delegate; }
+		const char* getString() {
+			return getTextField()->getString();
+		}
+		void setDelegate(TextInputDelegate* delegate) { 
+			from<TextInputDelegate*>(this, 0x174) = delegate;
+		}
 	};
 	#pragma runtime_checks("s", restore)
 }

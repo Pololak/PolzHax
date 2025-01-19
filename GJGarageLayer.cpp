@@ -192,6 +192,29 @@ bool __fastcall GJGarageLayer::init_H(gd::GJGarageLayer* self) {
 	menu->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
 	
 	self->addChild(menu);
+	
+	auto demonIcon = CCSprite::createWithSpriteFrameName("GJ_demonIcon_001.png");
+	auto hammerIcon = CCSprite::createWithSpriteFrameName("GJ_hammerIcon_001.png");
+
+	demonIcon->setPosition({ director->getScreenRight() - 40.f, director->getScreenTop() - 96.f });
+	hammerIcon->setPosition({ director->getScreenRight() - 40.f, director->getScreenTop() - 124.f });
+
+	self->addChild(demonIcon);
+	//self->addChild(hammerIcon);
+
+	auto demonCount = CCLabelBMFont::create("", "bigFont.fnt");
+	demonCount->setString(CCString::createWithFormat("%i", gd::GameStatsManager::sharedState()->getStat("5"))->getCString());
+	demonCount->setScale(0.5f);
+	demonCount->setAnchorPoint({ 1.f, 0.5f });
+	demonCount->setPosition({ director->getScreenRight() - 58.f, director->getScreenTop() - 96.f });
+	self->addChild(demonCount);
+
+	//auto hammerCount = CCLabelBMFont::create("", "bigFont.fnt");
+	//hammerCount->setString(CCString::createWithFormat("%i", gd::GameStatsManager::sharedState()->getStat("5"))->getCString());
+	//hammerCount->setScale(0.5f);
+	//hammerCount->setAnchorPoint({ 1.f, 0.5f });
+	//hammerCount->setPosition({ director->getScreenRight() - 58.f, director->getScreenTop() - 124.f });
+	//self->addChild(hammerCount);
 
 	return true;
 }
@@ -238,7 +261,7 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 			//if (i > 35) break;
 			if (totalWaves > count - 1) break;
 
-			std::cout << totalWaves << " " << i << " " << count << " " << a << std::endl;
+			//std::cout << totalWaves << " " << i << " " << count << " " << a << std::endl;
 
 			auto base = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("dart_%02d_001.png", i + 1)->getCString());
 			auto extra = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("dart_%02d_2_001.png", i + 1)->getCString());
@@ -264,7 +287,7 @@ void __fastcall GJGarageLayer::setupIconSelectH(gd::GJGarageLayer* self) {
 			btn->setTag(totalWaves);
 			dartMenu->addChild(btn);
 		}
-		std::cout << "page: " << a << std::endl;
+		//std::cout << "page: " << a << std::endl;
 		//dartMenu->setPositionX(dartMenu->getContentSize().width * (a));
 		fields->m_dartPage->addChild(dartMenu);
 		dartMenu->setPosition({ 0, 0 });
@@ -331,7 +354,7 @@ void GJGarageLayer::Callback::onPrev(CCObject* sender) {
 }
 
 void GJGarageLayer::switchToPage(int page) {
-	std::cout << page << " " << fields->m_totalWavePages - 1 << std::endl;
+	//std::cout << page << " " << fields->m_totalWavePages - 1 << std::endl;
 	for (int i = 0; i < fields->m_totalWavePages; i++) {
 		auto node = static_cast<CCNode*>(fields->m_dartPage->getChildren()->objectAtIndex(i));
 		if (i == page) node->setVisible(true);

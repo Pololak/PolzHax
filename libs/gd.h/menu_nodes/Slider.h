@@ -63,8 +63,22 @@ namespace gd {
                 return this->getTouchLogic()->getThumb()->getValue();
             }
 
+            auto getBarSprite() {
+                return from<cocos2d::CCSprite*>(this, 0x11c);
+            }
+
+            auto getGrooveSprite() {
+                return from<cocos2d::CCSprite*>(getBarSprite(), 0xAC);
+            }
+
             void setBarVisibility(bool v) {
-                this->m_pSliderBar->setVisible(v);
+                this->getBarSprite()->setVisible(v);
+            }
+
+            void updateBar() {
+                reinterpret_cast<void(__fastcall*)(Slider*)>(
+                    base + 0x1d310
+                    )(this);
             }
 
             static Slider* create(

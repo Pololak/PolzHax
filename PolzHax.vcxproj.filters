@@ -31,9 +31,6 @@
     <Filter Include="libs\mat-dash">
       <UniqueIdentifier>{4dc07176-4d93-47a5-be33-d64361a4e454}</UniqueIdentifier>
     </Filter>
-    <Filter Include="libs\nfd">
-      <UniqueIdentifier>{568e2e71-9f12-49ce-9b93-a10c4b70e01c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Hooks">
       <UniqueIdentifier>{7b00abb7-50d2-4b7b-8ed7-ac0ef4d1e946}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,9 @@
     </Filter>
     <Filter Include="Source Files\Polz2">
       <UniqueIdentifier>{6050e373-f925-4aff-b4b3-acf06a485fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\detours">
+      <UniqueIdentifier>{86e30898-bbc5-432a-bdd0-9fdfc479bf40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1470,15 +1470,6 @@
     <ClInclude Include="matplist.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libs\nfd\src\common.h">
-      <Filter>libs\nfd</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\nfd\src\include\nfd.h">
-      <Filter>libs\nfd</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\nfd\src\nfd_common.h">
-      <Filter>libs\nfd</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1557,6 +1548,60 @@
     <ClInclude Include="nodes.hpp">
       <Filter>Header Files\Polz2</Filter>
     </ClInclude>
+    <ClInclude Include="EditorSettingsLayer.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="RotatingSaws.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBColorInputWidget.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="schema.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelBrowserLayer.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LeaderboardsLayer.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="SonicWaveFirstWave.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJScoreCell.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="GJScoreCell.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.h">
+      <Filter>libs\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoLayer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\GJComment.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CommentCell.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="SpeedHack.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\detours\detours.h">
+      <Filter>libs\detours</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\detours\detver.h">
+      <Filter>libs\detours</Filter>
+    </ClInclude>
+    <ClInclude Include="portable-file-dialogs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1589,12 +1634,6 @@
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp">
       <Filter>libs\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="libs\nfd\src\nfd_common.c">
-      <Filter>libs\nfd</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\nfd\src\nfd_win.cpp">
-      <Filter>libs\nfd</Filter>
-    </ClCompile>
     <ClCompile Include="lvl-share.cpp">
       <Filter>Source Files\Hooks</Filter>
     </ClCompile>
@@ -1615,9 +1654,6 @@
     </ClCompile>
     <ClCompile Include="SimplePlayer.cpp">
       <Filter>Source Files\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="Speedhack.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="state.cpp">
       <Filter>Source Files</Filter>
@@ -1640,6 +1676,45 @@
     <ClCompile Include="nodes.cpp">
       <Filter>Source Files\Polz2</Filter>
     </ClCompile>
+    <ClCompile Include="EditorSettingsLayer.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="RotatingSaws.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="RGBColorInputWidget.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelBrowserLayer.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SonicWaveFirstWave.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="GJScoreCell.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>libs\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="managerViewer.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="managerViewer.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoLayer.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="CommentCell.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="CommentCell.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SpeedHack.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\MinHook\libMinHook-x86-v141-mtd.lib">
@@ -1647,6 +1722,9 @@
     </Library>
     <Library Include="libs\glew32.lib">
       <Filter>libs</Filter>
+    </Library>
+    <Library Include="libs\detours\libdetours.lib">
+      <Filter>libs\detours</Filter>
     </Library>
   </ItemGroup>
 </Project>

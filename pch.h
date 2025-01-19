@@ -15,12 +15,16 @@
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4018)
 #pragma warning (disable : 4390)
+#pragma warning (disable : 5260)
+#pragma warning (disable : 4305)
 //#include <Windows.h>
 #include "framework.h"
-#include "MinHook.h"
+#include <MinHook.h>
 #include <gd.h>
 #include <cocos2d.h>
 #include <GUI/CCControlExtension/CCScale9Sprite.h>
 #include <GUI/CCControlExtension/CCControlUtils.h>
+#include <detours.h>
+#pragma comment (lib, "libdetours.lib")
 using namespace cocos2d;
 #endif //PCH_H

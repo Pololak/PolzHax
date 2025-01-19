@@ -65,6 +65,7 @@ namespace gd {
 
 
 #include "GDProtocols.h"
+//#include "GameToolbox.h"
 
 #include "delegates/delegates.h"
 
@@ -103,6 +104,10 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/LevelSearchLayer.h"
 #include "layers_scenes_transitions_nodes/GJGarageLayer.h"
 #include "layers_scenes_transitions_nodes/CustomSongLayer.h"
+#include "layers_scenes_transitions_nodes/Infolayer.h"
+#include "layers_scenes_transitions_nodes/LeaderboardsLayer.h"
+#include "layers_scenes_transitions_nodes/GJScoreCell.h"
+#include "layers_scenes_transitions_nodes/CommentCell.h"
 //#include "layers_scenes_transitions_nodes/EditorPauseLayer.h"
 
 #include "layers_scenes_transitions_nodes/EditLevelLayer.h"
@@ -139,6 +144,7 @@ namespace gd {
 #include "level_nodes/GJGameLevel.h"
 #include "level_nodes/LevelSettingsObject.h"
 #include "level_nodes/ColorAction.h"
+#include "level_nodes/GJComment.h"
 //#include "level_nodes/SettingsColorObject.h"
 //#include "level_nodes/CustomColorMode.h"
 

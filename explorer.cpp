@@ -255,16 +255,16 @@ void render_node_properties(CCNode* node) {
 			}
 		}
 
-		//auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
-		//auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
-		//const auto rect = sprite_node->getTextureRect();
-		//CCDICT_FOREACH(cached_frames, el) {
-		//	auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
-		//	if (frame->getTexture() == texture && frame->getRect() == rect) {
-		//		ImGui::Text("Frame name: %s", el->getStrKey());
-		//		break;
-		//	}
-		//}
+		/*auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+		auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
+		const CCRect rect = sprite_node->getTextureRect();
+		CCDICT_FOREACH(cached_frames, el) {
+			auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
+			if ((frame->getTexture() == texture) && (frame->getRectInPixels() == rect) {
+				ImGui::Text("Frame name: %s", el->getStrKey());
+				break;
+			}
+		}*/
 	}
 }
 

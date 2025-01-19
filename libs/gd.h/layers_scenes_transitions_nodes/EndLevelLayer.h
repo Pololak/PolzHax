@@ -4,8 +4,9 @@
 #include <gd.h>
 
 namespace gd {
+	class GJDropDownLayer;
 
-	class EndLevelLayer : public cocos2d::CCLayer {
+	class EndLevelLayer : public GJDropDownLayer {
 	public:
 		static EndLevelLayer* create() {
 			return reinterpret_cast<EndLevelLayer * (__stdcall*)()>(

@@ -191,6 +191,10 @@ class LevelEditorLayer : public cocos2d::CCLayer {
 
         int getCurrentLayer() { return m_nCurrentLayer; }
         void setCurrentLayer(int n) { m_nCurrentLayer = n; }
+
+        //static cocos2d::CCScene* scene(GJGameLevel* level) {
+        //    return cocos2d::CCScene::create()->addChild(LevelEditorLayer::create(level));
+        //}
     };
 
 }

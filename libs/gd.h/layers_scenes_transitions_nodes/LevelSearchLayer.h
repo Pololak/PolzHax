@@ -13,6 +13,10 @@ namespace gd {
                     base + 0x17d9c0
                 )();
             }
+
+            bool checkTime(int time) {
+                return reinterpret_cast<bool(__thiscall*)(LevelSearchLayer*, int)>(base + 0xa2d30)(this, time);
+            }
     };
     
     class SearchButton : public cocos2d::CCSprite {

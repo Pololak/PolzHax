@@ -3,29 +3,35 @@
 #include "pch.h"
 
 struct CheckPointStorage {
+    float rot;
+    float rot_2;
 
-    float rotation;
+    float size;
+    float size_2;
+
     double velocity;
 
     static CheckPointStorage from(gd::PlayerObject* player) {
         return (CheckPointStorage({
-            player->getRealRotation(),
-            player->getYVelocity(),
+            *(float*)((size_t)player + 0x18), // rot
+            *(float*)((size_t)player + 0x1C), // rot
+
+            *(float*)((size_t)player + 0x25C), // size
+            *(float*)((size_t)player + 0x260), // size
+
+            *(double*)((size_t)player + 0x458),
+
             }));
     }
 
     void restore(gd::PlayerObject* player) {
-        player->setRealRotation(rotation);
-        player->setYVelocity(velocity);
-        //*(float*)((size_t)location + 0x18) = rotation;
-        //*(float*)((size_t)location + 0x1c) = rotation_2;
+        *(double*)((size_t)player + 0x458) = velocity;
 
-        //*(float*)((size_t)location + 0x25c) = size;
-        //*(float*)((size_t)location + 0x260) = size_2;
+        *(float*)((size_t)player + 0x018) = rot;
+        *(float*)((size_t)player + 0x01c) = rot_2;
 
-        //*(double*)((size_t)location + 0x458) = velocity;
-
-        //*(float*)((size_t)location + 0x470) = size_3;
+        *(float*)((size_t)player + 0x25C) = size;
+        *(float*)((size_t)player + 0x260) = size_2;
     }
 };
 
