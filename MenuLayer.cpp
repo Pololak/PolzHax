@@ -38,7 +38,6 @@ static CCScene* scene(bool p0) {
 bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	if (!MenuLayer::init(self)) return false;
 
-	auto manager = gd::GameManager::sharedState();
 	auto director = CCDirector::sharedDirector();
 	auto menu = CCMenu::create();
 	menu->setPosition(0, 0);

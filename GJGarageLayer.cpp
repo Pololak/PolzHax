@@ -129,6 +129,7 @@ public:
 		userIDlabel->setPosition({ -145, -31 });
 		userIDlabel->setScale(0.75f);
 		userIDlabel->setString(CCString::createWithFormat("UserID: %d", gm->getUserID())->getCString());
+		userIDlabel->setColor({ 0,0,0 });
 		userIDlabel->setAnchorPoint({ 0.f, 0.5f });
 		userIDlabel->setOpacity(75);
 		menu->addChild(userIDlabel);

@@ -15,6 +15,7 @@ namespace gd {
 
 	};
 	class CheckpointObject;
+	class PlayerCheckpoint : public cocos2d::CCNode {};
 	class GameplayDelegate;
 
 	enum class PlayerButton {
@@ -183,7 +184,7 @@ namespace gd {
 
 		static auto create(int idk1, int idk2, cocos2d::CCLayer* layer) {
 			return reinterpret_cast<PlayerObject * (__fastcall*)(int, int, cocos2d::CCLayer*)>(
-				base + 0xd71b0)(idk1, idk2, layer);
+				base + 0xd8bf0)(idk1, idk2, layer);
 		}
 
 		auto getOBB2D() {

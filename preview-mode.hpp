@@ -208,6 +208,11 @@ namespace LevelSettingsLayer {
 	bool __fastcall initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject);
 }
 
+namespace DrawGridLayer {
+	inline void(__thiscall* addToSpeedObjects)(gd::DrawGridLayer*, gd::GameObject*);
+	void __fastcall addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject);
+}
+
 namespace Scheduler {
 	inline bool(__thiscall* update)(CCScheduler* self, float dt);
 	void __fastcall update_H(CCScheduler* self, void* edx, float dt);

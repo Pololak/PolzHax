@@ -677,6 +677,7 @@
     <ClInclude Include="SpeedHack.h" />
     <ClInclude Include="Speedhack.hpp" />
     <ClInclude Include="state.h" />
+    <ClInclude Include="TrajectorySimulation.h" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -717,6 +718,7 @@
     <ClCompile Include="SonicWaveFirstWave.cpp" />
     <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="state.cpp" />
+    <ClCompile Include="TrajectorySimulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\detours\libdetours.lib" />

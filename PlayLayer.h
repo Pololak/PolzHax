@@ -56,6 +56,10 @@ namespace PlayLayer {
 	void onNextStartPos();
 	void onPrevStartPos();
 
+	typedef void* (__thiscall* fCCApplication_toggleVerticalSync)(void* instance, bool on);
+
+	extern fCCApplication_toggleVerticalSync CCApplication_toggleVerticalSync;
+
 	class Callback {
 	public:
 		void onNextPos(CCObject*);

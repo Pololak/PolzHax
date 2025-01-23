@@ -147,7 +147,7 @@ void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bo
 
     g_inited = false;
     // ImGui::CreateContext();
-    ImGui::GetIO();
+    //ImGui::GetIO();
     // auto hwnd = windowToHWND(self->getWindow());
     // ImGui_ImplWin32_Init(hwnd);
     // ImGui_ImplOpenGL3_Init();

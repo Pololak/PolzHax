@@ -157,7 +157,7 @@ void preview_mode::showZoomText(gd::EditorUI* ui) {
 }
 
 CCLayer* colorFilterPopup;
-gd::ButtonSprite* colorFilterSpr = nullptr;
+CCLabelBMFont* colorFilterLabel = nullptr;
 
 class ColorFilterPopup : public CCLayer {
 public:
@@ -323,43 +323,43 @@ public:
 		{
 		case 0:
 			colorSelected->setString("D");
-			colorFilterSpr->getLabel()->setString("D");
+			colorFilterLabel->setString("D");
 			break;
 		case 1:
 			colorSelected->setString("P1");
-			colorFilterSpr->getLabel()->setString("P1");
+			colorFilterLabel->setString("P1");
 			break;
 		case 2:
 			colorSelected->setString("P2");
-			colorFilterSpr->getLabel()->setString("P2");
+			colorFilterLabel->setString("P2");
 			break;
 		case 3:
 			colorSelected->setString("C1");
-			colorFilterSpr->getLabel()->setString("C1");
+			colorFilterLabel->setString("C1");
 			break;
 		case 4:
 			colorSelected->setString("C2");
-			colorFilterSpr->getLabel()->setString("C2");
+			colorFilterLabel->setString("C2");
 			break;
 		case 5:
 			colorSelected->setString("LBG");
-			colorFilterSpr->getLabel()->setString("LBG");
+			colorFilterLabel->setString("LBG");
 			break;
 		case 6:
 			colorSelected->setString("C3");
-			colorFilterSpr->getLabel()->setString("C3");
+			colorFilterLabel->setString("C3");
 			break;
 		case 7:
 			colorSelected->setString("C4");
-			colorFilterSpr->getLabel()->setString("C4");
+			colorFilterLabel->setString("C4");
 			break;
 		case 8:
 			colorSelected->setString("DL");
-			colorFilterSpr->getLabel()->setString("DL");
+			colorFilterLabel->setString("DL");
 			break;
 		case 9:
 			colorSelected->setString("W");
-			colorFilterSpr->getLabel()->setString("W");
+			colorFilterLabel->setString("W");
 			break;
 		}
 	}
@@ -1165,6 +1165,12 @@ void EditorUI::Callback::onGoToGroup(CCObject* sender) {
 
 	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = objectGroup;
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(objectGroup).c_str());
+
+	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(from<gd::EditorUI*>(sender, 0xFC)->getDeselectBtn(), 0xac)->getChildByTag(45028));
+	if (onBaseLayerBtn) {
+		onBaseLayerBtn->setVisible(1);
+		onBaseLayerBtn->setEnabled(true);
+	}
 }
 
 void EditorUI::Callback::onGroupSticky(CCObject*) {
@@ -1183,7 +1189,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	auto size = director->getWinSize();
 
 	gd::GameManager::sharedState()->setIntGameVariable(GameVariable::COLOR_FILTER, 0);
-	colorFilterSpr->getLabel()->setString("D");
+	colorFilterLabel->setString("D");
 
 	auto leftInfoSide = director->getScreenLeft() + 50.f;
 
@@ -1275,6 +1281,10 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	onBaseLayerSpr->setScale(0.5f);
 	onBaseLayerSpr->setOpacity(175);
 	rightMenu->addChild(onBaseLayerBtn);
+	if (from<int>(self->getLevelEditorLayer(), 0x12c) == -1) {
+		onBaseLayerBtn->setVisible(0);
+		onBaseLayerBtn->setEnabled(false);
+	}
 
 	auto onFreeLayerSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
 	auto onFreeLayerBtn = gd::CCMenuItemSpriteExtra::create(onFreeLayerSpr, nullptr, self, menu_selector(EditorUI::Callback::onGoToNextFreeLayer));
@@ -2028,11 +2038,14 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 	auto deleteMenu = from<CCMenu*>(self, 0x190);
 	int colorFilter = gd::GameManager::sharedState()->getIntGameVariable(GameVariable::COLOR_FILTER);
 
-	colorFilterSpr = gd::ButtonSprite::create("", 0x18, 0, 0.7f, true, "bigFont.fnt", "GJ_button_04.png", 40.f);
+	auto colorFilterSpr = CCSprite::create("GJ_button_04.png");
 	colorFilterSpr->setScale(0.9f);
-	colorFilterSpr->getLabel()->setString(CCString::createWithFormat("%i", colorFilter)->getCString());
 	auto onColorFilter = gd::CCMenuItemSpriteExtra::create(colorFilterSpr, nullptr, self, menu_selector(ColorFilterPopup::showCallback));
 	onColorFilter->setPosition({ 33, -18 });
+	colorFilterLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	colorFilterLabel->limitLabelWidth(16.f, .75f, .45f);
+	colorFilterLabel->setPosition({ colorFilterSpr->getContentSize() / 2.f });
+	colorFilterSpr->addChild(colorFilterLabel);
 
 	deleteMenu->addChild(onColorFilter);
 }
@@ -2308,13 +2321,6 @@ bool SEP = false;
 
 void EditorPauseLayer::Callback::SmallEditorStepToggler(CCObject*) {
 	gd::GameManager::sharedState()->toggleGameVariable("0035");
-	//SEP = !SEP;
-	//	if (SEP) {
-	//		gd::GameManager::sharedState()->setGameVariable("0035", true);
-	//	}
-	//	else {
-	//		gd::GameManager::sharedState()->setGameVariable("0035", false);
-	//	}
 }
 
 void EditorPauseLayer::Callback::selectFilterToggle(CCObject*) {
@@ -2687,6 +2693,15 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 	}
 
 	return true;
+}
+
+void __fastcall DrawGridLayer::addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject) {
+	cocos2d::CCArray* speedObjects = from<CCArray*>(self, 0x150);
+	bool bVar1 = speedObjects->containsObject(gameObject);
+	if (!bVar1) {
+		speedObjects->addObject(gameObject);
+		from<int>(self, 0x17c) = 1;
+	}
 }
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {

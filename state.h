@@ -212,7 +212,7 @@ struct SettingStruct {
     float f_blank17[3];
     float f_blank18[3];
     float LevelGColor[3] = { 1, 1, 1 };
-    float LevelBGColor[3] = { 1, 1, 1 };
+    float LevelBGColor[3] = { 0.156, 0.490, 1 };
     float labelsScale = 1.f;
     float solidsColor[3] = { 0, 0, 1 };
     float hazardsColor[3] = { 1, 0, 0 };
@@ -264,6 +264,17 @@ struct SettingStruct {
     bool onZeroPracticeComplete;
     bool onInversedTrail;
     bool onSwapWaveTrailColors;
+    bool onFastMenu;
+
+    bool onAutoKill;
+    int killPercent = 50;
+
+    bool onVSync;
+    bool onHidePauseButton;
+
+    bool onAutoDeafen;
+    int deafenPercent = 50;
+    int deafenKey;
 
     // Icons thing
 
@@ -299,8 +310,8 @@ DEF_SCHEMA(
 
     onCharFilter,
     onIcons,
-    onMainLevels, 
-    onSliderLimit, 
+    onMainLevels,
+    onSliderLimit,
     onTextLength,
 
     onAlwaysNewBest,
@@ -312,19 +323,20 @@ DEF_SCHEMA(
     onFastShowComp,
     onFObjectInvisible,
     onHideAttempts,
+    onHidePauseButton,
     onHidePauseMenu,
     onHidePlayer,
     onHidePracticeBtn,
-    onInstantMirror, 
-    onInversedTrail, 
-    onMaxParticles, 
+    onInstantMirror,
+    onInversedTrail,
+    onMaxParticles,
     onMiniCube,
     onNoAnimations,
     onNoBGFlash,
     onNoDeathEffect,
     onNoEffectCircle,
     onNoGhostTrail,
-    onNoGlowObject, 
+    onNoGlowObject,
     onNoGravityEffect,
     onNoMiniIcon,
     onNoMirror,
@@ -351,7 +363,7 @@ DEF_SCHEMA(
     onAbsolutePosition,
     onCopyHack,
     onDefSongBypass,
-    onEditorExtension, 
+    onEditorExtension,
     onEditorPreview,
     onFreeScroll,
     onHideGrid,
@@ -365,10 +377,15 @@ DEF_SCHEMA(
     onResetEditPercentage,
     onSmoothEditTrail,
     onSwitchToUpArrow,
-    onVerifyHack, 
+    onVerifyHack,
     onZoomBypass,
 
     onZeroPracticeComplete,
+    onAutoDeafen,
+    deafenPercent,
+    deafenKey,
+    onAutoKill,
+    killPercent,
     onAutoPractice,
     onAutoDownloadSong,
     onBallRotationFix,
@@ -399,8 +416,6 @@ DEF_SCHEMA(
     onSuicide,
 
 	onAllowLowVolume,
-	fps,
-	onFPSBypass,
 	onAutoSafe,
 	onFastAlt,
 	onForceVis,
@@ -414,6 +429,7 @@ DEF_SCHEMA(
 	onMenuGameplay,
 	onNoRotation,
 	onNoTransition,
+    onFastMenu,
 	onRetryBind,
 	onSafeMode,
 	onRestartButton,
@@ -446,5 +462,9 @@ DEF_SCHEMA(
 	onSameDualColor,
     onSwapWaveTrailColors,
 	onRainbowIcon,
-	rgbSpeed
+	rgbSpeed,
+
+    fps,
+    onFPSBypass,
+    onVSync
 )

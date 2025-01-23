@@ -32,6 +32,8 @@ void update_speed_hack() {
         if (auto sound = fme->currentSound())
             if (setting().onSpeedhackMusic) sound->setPitch(value);
             else sound->setPitch(1.f);
+    if (setting().speedhack == 0)
+        return;
     if (!setting().onClassicMode) {
         CCDirector::sharedDirector()->m_pScheduler->setTimeScale(value);
         SpeedHack::SetSpeed(1.f);
@@ -97,7 +99,9 @@ bool oneX = true;
 
 void RenderMain() {
     if (oneX) {
-        float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6;
+        setting().loadState();
+
+        float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6, addingX7;
         float addingInterfaceY, addingSpeedhackY, addingIconsY, addingShortcutsY;
         if (ImGui::Begin("PolzHax", nullptr)) {
             ImGui::SetWindowPos({ 5 , 5 });
@@ -109,18 +113,15 @@ void RenderMain() {
             ImGui::SetWindowPos({ 5, addingInterfaceY });
         }
 
-
         if (ImGui::Begin("Bypass", nullptr)) {
             ImGui::SetWindowPos({ addingX1 , 5 });
             addingX2 = addingX1 + ImGui::GetWindowWidth() + 5;
         }
 
-
         if (ImGui::Begin("Cosmetic", nullptr)) {
             ImGui::SetWindowPos({ addingX2, 5 });
             addingX3 = addingX2 + ImGui::GetWindowWidth() + 5;
         }
-
 
         if (ImGui::Begin("Creator", nullptr)) {
             ImGui::SetWindowPos({ addingX3, 5 });
@@ -140,20 +141,25 @@ void RenderMain() {
         if (ImGui::Begin("Universal", nullptr)) {
             ImGui::SetWindowPos({ addingX5, 5 });
             addingX6 = addingX5 + ImGui::GetWindowWidth() + 5;
-            addingSpeedhackY = ImGui::GetWindowHeight() + 10;
-        }
-
-        if (ImGui::Begin("Speedhack", nullptr)) {
-            ImGui::SetWindowPos({ addingX5, addingSpeedhackY });
         }
 
         if (ImGui::Begin("Status", nullptr)) {
             ImGui::SetWindowPos({ addingX6, 5 });
+            addingX7 = addingX6 + ImGui::GetWindowWidth() + 5;
             addingIconsY = ImGui::GetWindowHeight() + 10;
         }
 
         if (ImGui::Begin("Icons", nullptr)) {
             ImGui::SetWindowPos({ addingX6, addingIconsY });
+        }
+
+        if (ImGui::Begin("Display", nullptr)) {
+            ImGui::SetWindowPos({ addingX7, 5 });
+            addingSpeedhackY = ImGui::GetWindowHeight() + 10;
+        }
+
+        if (ImGui::Begin("Speedhack", nullptr)) {
+            ImGui::SetWindowPos({ addingX7, addingSpeedhackY });
         }
 
         // Bypass
@@ -816,6 +822,15 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x60578), "\xf3\x0f\x11\x41\x1c\xf3\x0f\x11\x41\x18", 10, NULL);
         }
 
+        if (setting().onFastMenu) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x160da), "\x00\x00\x00\x00", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x1618b), "\x00\x00\x00\x00", 4, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x160da), "\x00\x00\x00\x3f", 4, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x1618b), "\x29\x5c\x0f\x3e", 4, NULL);
+        }
+
         if (setting().onSafeMode) safeModeON();
         else safeModeOFF();
 
@@ -1151,6 +1166,10 @@ void RenderMain() {
             ImGui::Checkbox("Hide Attempts", &setting().onHideAttempts);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides the attemps counter in-game.");
+
+            ImGui::Checkbox("Hide Pause Button", &setting().onHidePauseButton);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Hides the pause button when the in-game cursor is enabled.");
 
             if (ImGui::Checkbox("Hide Pause Menu", &setting().onHidePauseMenu)) {
                 if (layers().PauseLayerObject)
@@ -1781,6 +1800,25 @@ void RenderMain() {
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Completes a level if you beat it in 1 practice attempt.");
 
+            ImGui::Checkbox("Auto Deafen", &setting().onAutoDeafen);
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##autodeafen")) {
+                ImGui::SetNextItemWidth(60.f * setting().UISize);
+                ImGui::DragInt("Deafen At", &setting().deafenPercent, 1, 0, 100);
+                ImGui::InputInt("Deafen Key", &setting().deafenKey, 1);
+                ImGui::TreePop();
+            }
+
+            ImGui::Checkbox("Auto Kill", &setting().onAutoKill);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Kills the player.");
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##autoKill")) {
+                ImGui::SetNextItemWidth(60.f * setting().UISize);
+                ImGui::DragInt("Kill At", &setting().killPercent, 1, 0, 100);
+                ImGui::TreePop();
+            }
+
             ImGui::Checkbox("Auto Practice Mode", &setting().onAutoPractice);
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Auto-enables practice mode.");
@@ -1999,19 +2037,92 @@ void RenderMain() {
             }
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Ouch.");
+
+            ImGui::SetNextWindowSize({ ImGui::GetWindowWidth() * setting().UISize, 0 });
+        }
+
+        if (ImGui::Begin("Shortcuts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(120 * setting().UISize);
+
+            float winWidth = ImGui::GetWindowSize().x;
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Options", { 180 * setting().UISize, 0 })) {
+                auto optionsLayer = gd::OptionsLayer::create();
+                optionsLayer->showLayer(false);
+                CCDirector::sharedDirector()->getRunningScene()->addChild(optionsLayer);
+            }
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Restart Level", { 180 * setting().UISize, 0 })) {
+                if (gd::GameManager::sharedState()->getPlayLayer()) {
+                    PlayLayer::resetLevel_H(gd::GameManager::sharedState()->getPlayLayer());
+                }
+            }
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Practice Mode", { 180 * setting().UISize, 0 })) {
+                if (gd::GameManager::sharedState()->getPlayLayer()) {
+                    PlayLayer::togglePracticeModeH(gd::GameManager::sharedState()->getPlayLayer(), 0, !gd::GameManager::sharedState()->getPlayLayer()->getPracticeMode());
+                }
+            }
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Uncomplete Level", { 180 * setting().UISize, 0 })) {
+                if (gd::GameManager::sharedState()->getPlayLayer()) {
+                    auto gsm = gd::GameStatsManager::sharedState();
+                    auto glm = gd::GameLevelManager::sharedState();
+                    gd::GJGameLevel* level = nullptr;
+                    level = gd::GameManager::sharedState()->getPlayLayer()->getGameLevel();
+                    std::cout << CCString::createWithFormat("c_{}", level->m_levelID)->getCString() << std::endl;
+
+                    if (from<int>(level, 0x1d8) >= 100 && gsm->hasCompletedLevel(level)) {
+                        int levelID = level->m_levelID;
+
+                        gsm->setStat("4", gsm->getStat("4") - 1);
+                        gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("ñ_%i", levelID)->getCString());
+                        if (from<int>(level, 0x1f4) > 0) {
+                            gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("star_%i", levelID)->getCString());
+                            gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("demon_%i", levelID)->getCString());
+                            gsm->setStat("6", gsm->getStat("6") - from<int>(level, 0x1f4));
+                            if (from<int>(level, 0x1f4) >= 10) {
+                                gsm->setStat("5", gsm->getStat("5") - 1);
+                            }
+                        }
+                    }
+
+                    from<int>(level, 0x1d8) = 0;
+                    from<int>(level, 0x1dc) = 0;
+
+                    gd::FLAlertLayer::create(nullptr, "Success", "Save & Load your data to apply the changes.", "OK", nullptr, 300.f, false, 120.f)->show();
+                }
+            }
+
+            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
+            if (ImGui::Button("Inject DLL", { 180 * setting().UISize, 0 })) {
+                auto selection = pfd::open_file("Select a file", CCFileUtils::sharedFileUtils()->getWritablePath2(), { "DLL File", "*.dll" }, pfd::opt::multiselect).result();
+                for (auto const& filename : selection) {
+                    LoadLibrary(filename.c_str());
+                    std::filesystem::path path = filename;
+                    dllNames.push_back(path.filename().string());
+                }
+            }
+
+            ImGui::SetCursorPosX((((winWidth - 188 * setting().UISize) + (ImGui::GetStyle().ItemSpacing.x * setting().UISize)) / 2));
+            if (ImGui::Button("Resources", { 86 * setting().UISize, 0 })) {
+                ShellExecute(0, NULL, getResourcesFolder().c_str(), NULL, NULL, SW_SHOW);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("AppData", { 86 * setting().UISize, 0 })) {
+                ShellExecute(0, NULL, getSongFolder().c_str(), NULL, NULL, SW_SHOW);
+            }
         }
 
         if (ImGui::Begin("Universal", nullptr,
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
-            ImGui::SetNextItemWidth(80 * setting().UISize);
-            if (ImGui::DragFloat("##fpsbypass", &setting().fps, 1.f, 1.f, 360.f))
-                update_fps_bypass();
-            ImGui::SameLine();
-            if (ImGui::Checkbox("FPS bypass", &setting().onFPSBypass))
-                update_fps_bypass();
-            ImGui::EndTabItem();
 
             /*if (ImGui::DragFloat("##pitchshifter", &setting().pitchshift, 1.f, 1.f, 10.f))
                 update_pitch_shifter();
@@ -2136,6 +2247,22 @@ void RenderMain() {
             ImGui::Checkbox("No Transition", &setting().onNoTransition);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Shorterns scene transition time to 0s.");
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##noTransition")) {
+                if (ImGui::Checkbox("Fast Menu", &setting().onFastMenu)) {
+                    if (setting().onFastMenu) {
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x160da), "\x00\x00\x00\x00", 4, NULL);
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x1618b), "\x00\x00\x00\x00", 4, NULL);
+                    }
+                    else {
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x160da), "\x00\x00\x00\x3f", 4, NULL);
+                        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x1618b), "\x29\x5c\x0f\x3e", 4, NULL);
+                    }
+                }
+                if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                    ImGui::SetTooltip("Same as in 2.2, affects popups and dropdowns.");
+                ImGui::TreePop();
+            }
 
             ImGui::Checkbox("Retry Keybind", &setting().onRetryBind);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -2249,12 +2376,11 @@ void RenderMain() {
                 else
                     MH_EnableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(cocos) + 0xfc240));
             }
-
-            //ImGui::Checkbox("Transparent Pause", &setting().onTransparentPause);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Reduces input delay.");
         }
 
         if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
-            auto pl = gd::GameManager::sharedState()->getPlayLayer();
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
@@ -2276,6 +2402,8 @@ void RenderMain() {
             ImGui::Checkbox("Noclip Deaths", &setting().onNoclipDeaths);
             ImGui::Checkbox("Session Time", &setting().onSessionTime);
             ImGui::Checkbox("Meta", &setting().onMeta);
+
+            ImGui::SetNextWindowSize({ ImGui::GetWindowWidth(), 0 });
         }
 
         if (ImGui::Begin("Icons", nullptr,
@@ -2306,108 +2434,6 @@ void RenderMain() {
             ImGui::SameLine();
             if (ImGui::TreeNode("##p2effects")) {
                 ImGui::TreePop();
-            }
-            ImGui::SetNextWindowSize({ 200 * setting().UISize, 0});
-        }
-
-        if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
-        {
-            ImGui::SetWindowFontScale(setting().UISize);
-            ImGui::SetNextItemWidth(80 * setting().UISize);
-
-            if (ImGui::DragFloat("##speedhack", &setting().speedhack, 0.05f, 0.f, 10.f))
-            {
-                update_speed_hack();
-                if (setting().speedhack < 0.f) setting().speedhack = 0;
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack)) {
-                update_speed_hack();
-            }
-            if (ImGui::Checkbox("Classic Mode", &setting().onClassicMode)) {
-                update_speed_hack();
-            }
-            ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
-
-            ImGui::SetNextWindowSize({ 200 * setting().UISize, 0});
-        }
-
-        if (ImGui::Begin("Shortcuts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
-            ImGui::SetWindowFontScale(setting().UISize);
-            ImGui::SetNextItemWidth(120 * setting().UISize);
-
-            float winWidth = ImGui::GetWindowSize().x;
-
-            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
-            if (ImGui::Button("Options", { 180 * setting().UISize, 0 })) {
-                auto optionsLayer = gd::OptionsLayer::create();
-                optionsLayer->showLayer(true);
-                CCDirector::sharedDirector()->getRunningScene()->addChild(optionsLayer);
-            }
-
-            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
-            if (ImGui::Button("Restart Level", { 180 * setting().UISize, 0 })) {
-                if (gd::GameManager::sharedState()->getPlayLayer()) {
-                    PlayLayer::resetLevel_H(gd::GameManager::sharedState()->getPlayLayer());
-                }
-            }
-
-            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
-            if (ImGui::Button("Practice Mode", { 180 * setting().UISize, 0 })) {
-                if (gd::GameManager::sharedState()->getPlayLayer()) {
-                    PlayLayer::togglePracticeModeH(gd::GameManager::sharedState()->getPlayLayer(), 0, !gd::GameManager::sharedState()->getPlayLayer()->getPracticeMode());
-                }
-            }
-
-            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
-            if (ImGui::Button("Uncomplete Level", {180 * setting().UISize, 0} )) {
-                if (gd::GameManager::sharedState()->getPlayLayer()) {
-                    auto gsm = gd::GameStatsManager::sharedState();
-                    auto glm = gd::GameLevelManager::sharedState();
-                    gd::GJGameLevel* level = nullptr;
-                    level = gd::GameManager::sharedState()->getPlayLayer()->getGameLevel();
-                    std::cout << CCString::createWithFormat("c_{}", level->m_levelID)->getCString() << std::endl;
-
-                    if (from<int>(level, 0x1d8) >= 100 && gsm->hasCompletedLevel(level)) {
-                        int levelID = level->m_levelID;
-
-                        gsm->setStat("4", gsm->getStat("4") - 1);
-                        gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("ñ_%i", levelID)->getCString());
-                        if (from<int>(level, 0x1f4) > 0) {
-                            gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("star_%i", levelID)->getCString());
-                            gsm->completedLevels()->removeObjectForKey(CCString::createWithFormat("demon_%i", levelID)->getCString());
-                            gsm->setStat("6", gsm->getStat("6") - from<int>(level, 0x1f4));
-                            if (from<int>(level, 0x1f4) >= 10) {
-                                gsm->setStat("5", gsm->getStat("5") - 1);
-                            }
-                        }
-                    }
-
-                    from<int>(level, 0x1d8) = 0;
-                    from<int>(level, 0x1dc) = 0;
-
-                    gd::FLAlertLayer::create(nullptr, "Success", "Save & Load your data to apply the changes.", "OK", nullptr, 300.f, false, 120.f)->show();
-                }
-            }
-
-            ImGui::SetCursorPosX((winWidth - 180 * setting().UISize) / 2);
-            if (ImGui::Button("Inject DLL", { 180 * setting().UISize, 0 } )) {
-                auto selection = pfd::open_file("Select a file", CCFileUtils::sharedFileUtils()->getWritablePath2(), { "DLL File", "*.dll" }, pfd::opt::multiselect).result();
-                for (auto const& filename : selection) {
-                    LoadLibrary(filename.c_str());
-                    std::filesystem::path path = filename;
-                    dllNames.push_back(path.filename().string());
-                }
-            }
-
-            ImGui::SetCursorPosX((((winWidth - 188 * setting().UISize) + (ImGui::GetStyle().ItemSpacing.x * setting().UISize)) / 2));
-            if (ImGui::Button("Resources", { 86 * setting().UISize, 0})) {
-                ShellExecute(0, NULL, getResourcesFolder().c_str(), NULL, NULL, SW_SHOW);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("AppData", { 86 * setting().UISize, 0 })) {
-                ShellExecute(0, NULL, getSongFolder().c_str(), NULL, NULL, SW_SHOW);
             }
         }
 
@@ -2488,7 +2514,7 @@ void RenderMain() {
             if (setting().UISize > 3.25f) setting().UISize = 3.25f;
 
             if (ImGui::Button("Sort Tabs")) {
-                float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6;
+                float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6, addingX7;
                 float addingInterfaceY, addingSpeedhackY, addingIconsY, addingShortcutsY;
                 if (ImGui::Begin("PolzHax", nullptr)) {
                     ImGui::SetWindowPos({ 5 , 5 });
@@ -2500,18 +2526,15 @@ void RenderMain() {
                     ImGui::SetWindowPos({ 5, addingInterfaceY });
                 }
 
-
                 if (ImGui::Begin("Bypass", nullptr)) {
                     ImGui::SetWindowPos({ addingX1 , 5 });
                     addingX2 = addingX1 + ImGui::GetWindowWidth() + 5;
                 }
 
-
                 if (ImGui::Begin("Cosmetic", nullptr)) {
                     ImGui::SetWindowPos({ addingX2, 5 });
                     addingX3 = addingX2 + ImGui::GetWindowWidth() + 5;
                 }
-
 
                 if (ImGui::Begin("Creator", nullptr)) {
                     ImGui::SetWindowPos({ addingX3, 5 });
@@ -2531,20 +2554,25 @@ void RenderMain() {
                 if (ImGui::Begin("Universal", nullptr)) {
                     ImGui::SetWindowPos({ addingX5, 5 });
                     addingX6 = addingX5 + ImGui::GetWindowWidth() + 5;
-                    addingSpeedhackY = ImGui::GetWindowHeight() + 10;
-                }
-
-                if (ImGui::Begin("Speedhack", nullptr)) {
-                    ImGui::SetWindowPos({ addingX5, addingSpeedhackY });
                 }
 
                 if (ImGui::Begin("Status", nullptr)) {
                     ImGui::SetWindowPos({ addingX6, 5 });
+                    addingX7 = addingX6 + ImGui::GetWindowWidth() + 5;
                     addingIconsY = ImGui::GetWindowHeight() + 10;
                 }
 
                 if (ImGui::Begin("Icons", nullptr)) {
                     ImGui::SetWindowPos({ addingX6, addingIconsY });
+                }
+
+                if (ImGui::Begin("Display", nullptr)) {
+                    ImGui::SetWindowPos({ addingX7, 5 });
+                    addingSpeedhackY = ImGui::GetWindowHeight() + 10;
+                }
+
+                if (ImGui::Begin("Speedhack", nullptr)) {
+                    ImGui::SetWindowPos({ addingX7, addingSpeedhackY });
                 }
             }
         }
@@ -2571,9 +2599,17 @@ void RenderMain() {
                 updatePriority(setting().priority);
             }
 
-            //if (ImGui::Button("AppData")) {
-            //    ShellExecute(0, NULL, getSongFolder().c_str(), NULL, NULL, SW_SHOW);
-            //}
+            char buffer[256];
+            sprintf(buffer, "Extensions: %d", dllNames.size());
+            if (ImGui::TreeNode(buffer)) {
+                for (const auto& name : dllNames) {
+                    ImGui::Text(name.c_str());
+                }
+                if (ImGui::Button("Extensions Folder")) {
+                    ShellExecute(NULL, "open", "PolzHax\\extensions", NULL, NULL, SW_SHOWNORMAL);
+                }
+                ImGui::TreePop();
+            }
 
             if (ImGui::Button("Cocos Explorer")) {
                 setting().onExplorer = !setting().onExplorer;
@@ -2584,12 +2620,51 @@ void RenderMain() {
 			}
         }
 
+        if (ImGui::Begin("Display", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(80 * setting().UISize);
+            if (ImGui::DragFloat("##fpsbypass", &setting().fps, 1.f, 1.f, 360.f))
+                update_fps_bypass();
+            ImGui::SameLine();
+            if (ImGui::Checkbox("FPS bypass", &setting().onFPSBypass))
+                update_fps_bypass();
+            ImGui::EndTabItem();
+
+            if (ImGui::Checkbox("Vertical Sync", &setting().onVSync)) {
+                gd::GameManager::sharedState()->setGameVariable("0030", setting().onVSync);
+                PlayLayer::CCApplication_toggleVerticalSync(CCApplication::sharedApplication(), setting().onVSync);
+            }
+
+            ImGui::SetNextWindowSize({ ImGui::GetWindowWidth() * setting().UISize, 0 });
+        }
+
+        if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
+        {
+            ImGui::SetWindowFontScale(setting().UISize);
+            ImGui::SetNextItemWidth(80 * setting().UISize);
+
+            if (ImGui::DragFloat("##speedhack", &setting().speedhack, 0.05f, 0.f, 10.f))
+            {
+                update_speed_hack();
+                if (setting().speedhack < 0.f) setting().speedhack = 0;
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack)) {
+                update_speed_hack();
+            }
+            if (ImGui::Checkbox("Classic Mode", &setting().onClassicMode)) {
+                update_speed_hack();
+            }
+            ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
+        }
     }
     ImGui::End();
 
     update_fps_bypass();
     update_speed_hack();
     updatePriority(setting().priority);
+    setting().onVSync = gd::GameManager::sharedState()->getGameVariable("0030");
 
     if (setting().onFPSBypass) {
         update_fps_bypass();
@@ -2601,6 +2676,11 @@ void imgui_init() {
     io.Fonts->Clear();
     io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
     io.Fonts->Build();
+}
+
+void setup_imgui_menu() {
+    SpeedHack::Setup();
+    updatePriority(setting().priority);
 
     if (!std::filesystem::is_directory("PolzHax") || !std::filesystem::exists("PolzHax"))
     {
@@ -2633,11 +2713,7 @@ void imgui_init() {
     for (const auto& name : dllNames) {
         std::cout << name << std::endl;
     }
-}
 
-void setup_imgui_menu() {
-    SpeedHack::Setup();
-    updatePriority(setting().priority);
     ImGuiHook::setToggleCallback([]() {setting().show = !setting().show; });
     ImGuiHook::setRenderFunction(RenderMain);
     ImGuiHook::setInitFunction(imgui_init);

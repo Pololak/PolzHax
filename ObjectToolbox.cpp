@@ -3,8 +3,6 @@
 #include "state.h"
 #include "GameVariables.hpp"
 
-bool unusedObjects_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::UNUSED_OBJECTS);
-
 void objectAdd(int id)
 {
     __asm {
@@ -20,33 +18,26 @@ void objectAdd(int id)
 }
 
 void __fastcall ObjectToolbox::rampTab_H() {
-    //if (unusedObjects_enabled) {
         objectAdd(0x173);
         objectAdd(0x174);
         objectAdd(0x175);
         objectAdd(0x176);
-    //}
     ObjectToolbox::rampTab();
 }
 
 void __fastcall ObjectToolbox::spikesTab_H() {
-    //if (unusedObjects_enabled) {
         objectAdd(0x1A5);
         objectAdd(0x1A6);
-    //}
     ObjectToolbox::spikesTab();
 }
 
 void __fastcall ObjectToolbox::decoSpikesTab_H() {
-    //if (unusedObjects_enabled) {
         objectAdd(0x1A3);
         objectAdd(0x1A4);
-    //}
     ObjectToolbox::decoSpikesTab();
 }
 
 void __fastcall ObjectToolbox::chainTab_H() {
-    //if (unusedObjects_enabled) {
         objectAdd(0x1d2); // another bushes that don't overlaps player
         objectAdd(0x1cd);
         objectAdd(0x1ce);
@@ -57,15 +48,12 @@ void __fastcall ObjectToolbox::chainTab_H() {
         objectAdd(0x197);
         objectAdd(0x198);
         objectAdd(0x2D5); // dot
-    //}
     ObjectToolbox::chainTab();
 }
 
 void __fastcall ObjectToolbox::triggerTab_H() {
-    //if (unusedObjects_enabled) {
         objectAdd(0x37);
         objectAdd(0x8E);
-    //}
     ObjectToolbox::triggerTab();
 }
 

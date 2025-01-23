@@ -205,6 +205,12 @@ namespace gd {
 		void togglePracticeMode(bool p0) {
 			return reinterpret_cast<void(__thiscall*)(PlayLayer*, bool)>(base + 0xf3610)(this, p0);
 		}
+		cocos2d::CCSpriteBatchNode* getPlayerBatchNode() {
+			return from<cocos2d::CCSpriteBatchNode*>(this, 0x2cc);
+		}
+		cocos2d::CCArray* getCheckpoints() {
+			return from<cocos2d::CCArray*>(this, 0x154);
+		}
 	};
 }
 

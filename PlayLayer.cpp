@@ -72,17 +72,20 @@ bool levelCompleted = false;
 
 bool fromZero = true;
 
+bool pressed = false;
+int startPercent = 0;
+
 std::set<int>invisibleObjects = {
     146, 174, 204, 206, 673, 674, 144, 205, 145, 459, 740, 741, 742
 };
 
-//std::vector<gd::GameObject*> g_activatedObjects;
-//std::vector<gd::GameObject*> g_activatedObjects_p2;
-//std::vector<std::pair<size_t, size_t>> g_orbCheckpoints;
-
 gd::CCMenuItemSpriteExtra* showEndLayerButton;
 
 CCMenu* pauseLayerTogglerMenu;
+
+PlayLayer::fCCApplication_toggleVerticalSync PlayLayer::CCApplication_toggleVerticalSync =
+(PlayLayer::fCCApplication_toggleVerticalSync)GetProcAddress(GetModuleHandleA("libcocos2d.dll"),
+    "?toggleVerticalSync@CCApplication@cocos2d@@QAEX_N@Z");
 
 ccColor3B getChromaColour() {
     return ColorUtility::hsvToRgb(cchsv((updateRgb * 180) / 10.f, 1.f, 1.f, true, true));
@@ -121,21 +124,11 @@ void PlayLayer::onNextStartPos() {
                     from<bool>(playLayer, 0x2b8) = true;
                 }
                 playLayer->resetLevel();
-                //if (!from<bool>(playLayer, 0xd0)) {
-                //    gd::GameSoundManager::sharedState()->stopBackgroundMusic();
-                //}
                 spswitcherlbl->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
                 spswitcherlbl->stopAllActions();
                 spswitcherlbl->setOpacity(255);
                 spswitcherlbl->runAction(fadeout);
             }
-            //auto labelsMenu = reinterpret_cast<CCMenu*>(playLayer->getChildByTag(7900));
-            //auto BestRunLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45080));
-            //auto playerStartPosition = playLayer->getPlayerStartPosition().x;
-            //const int playerStartPercentage = playerStartPosition / playLayer->levelLength() * 100.f;
-            //if (from<bool>(playLayer, 0x2b8)) {
-            //    BestRunLabel->setString(CCString::createWithFormat("Best Run: %i%% - %i%%", playerStartPercentage, playLayer->getLastRunPercent())->getCString());
-            //}
         }
     }
 }
@@ -169,21 +162,11 @@ void PlayLayer::onPrevStartPos() {
                     from<bool>(playLayer, 0x2b8) = true;
                 }
                 playLayer->resetLevel();
-                //if (!from<bool>(playLayer, 0xd0)) {
-                //    gd::GameSoundManager::sharedState()->stopBackgroundMusic();
-                //}
                 spswitcherlbl->setString(CCString::createWithFormat("%d/%d", currentStartPos, startPosArr->count() - 1)->getCString());
                 spswitcherlbl->stopAllActions();
                 spswitcherlbl->setOpacity(255);
                 spswitcherlbl->runAction(fadeout);
             }
-            //auto labelsMenu = reinterpret_cast<CCMenu*>(playLayer->getChildByTag(7900));
-            //auto BestRunLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45080));
-            //auto playerStartPosition = playLayer->getPlayerStartPosition().x;
-            //const int playerStartPercentage = playerStartPosition / playLayer->levelLength() * 100.f;
-            //if (from<bool>(playLayer, 0x2b8)) {
-            //    BestRunLabel->setString(CCString::createWithFormat("Best Run: %i%% - %i%%", playerStartPercentage, playLayer->getLastRunPercent())->getCString());
-            //}
         }
     }
 }
@@ -289,6 +272,15 @@ void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::P
     }
     deathPos = player->getPositionX();
     wasDead = true;
+
+    if (pressed) {
+        pressed = false;
+        keybd_event(VK_MENU, 0x38, 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+    }
+
     PlayLayer::destroyPlayer(self, player);
 }
 
@@ -317,6 +309,26 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     }
 
     fromZero = self->getLastRunPercent() == 0;
+
+    if (pressed)
+    {
+        pressed = false;
+        keybd_event(VK_MENU, 0x38, 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+    }
+
+    if (self->getCheckpoints()->count() > 0) {
+        auto porcodio = self->getCheckpoints()->lastObject();
+        gd::CheckpointObject* go = reinterpret_cast<gd::CheckpointObject*>(porcodio);
+        startPercent = (from<gd::PlayerCheckpoint*>(go, 0xec)->getPositionX() / self->levelLength()) * 100.f;
+    }
+    else {
+        startPercent = (self->getPlayerStartPosition().x / self->levelLength()) * 100.f;
+    }
+
+    std::cout << startPercent << std::endl;
 
     PlayLayer::resetLevel(self);
 
@@ -476,20 +488,9 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         //self->addChild(spswitchermenu);
     }
 
-    //auto ayaya = CCSprite::create("image0.png");
-    //self->addChild(ayaya);
-    // If you found this, please, don't ask me what this image was.
-
-    //if (setting().onMeta) {
-    //    auto xPos = CCLabelBMFont::create("", "bigFong.fnt");
-    //    xPos->setZOrder(5);
-    //    xPos->setScale(0.4f);
-    //    xPos->setAnchorPoint({ -0.5, 0 });
-    //    xPos->setString(CCString::createWithFormat("X: %f")->getCString());
-    //    xPos->setPosition({ director->getScreenLeft(), director->getScreenBottom() });
-    //    xPos->setTag(69001);
-    //    self->addChild(xPos);
-    //}
+    if (startPosArr->count() > 0) {
+        pressed = false;
+    }
 
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
 
@@ -853,7 +854,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
 
 
-        for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+        for (int i = self->getFirstVisibleSection() - 1; i < self->getLastVisibleSection() + 1; i++)
         {
             if (i < 0) continue;
             if (i >= arrcount) break;
@@ -879,14 +880,11 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
                 if (obj->getHasColor()) {
                     auto node = obj->getChildSprite();
                     node->setColor(ccc3(255, 255, 255));
-                    node->setBlendFunc({ GL_ONE, GL_SRC_ALPHA });
                 } // Setting color to white and removing blending.
 
             }
         }
     }
-
-    //SmartStartPosSetup(self);
 
     auto arrowMenu = CCMenu::create();
     arrowMenu->setZOrder(105);
@@ -903,6 +901,15 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     xdlabel->setScale(0.5f);
     xdlabel->setPosition({showEndLayerButton->getContentSize().width / 2.f, +35.f});
     xdlabel->setOpacity(50);
+
+    if (gd::GameManager::sharedState()->getGameVariable("0024")) {
+        if (setting().onHidePauseButton) {
+            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(0);
+        }
+        else {
+            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(1);
+        }
+    }
 
     return true;
 }
@@ -946,8 +953,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     isPlayerDead = false;
     if (!isPlayerDead) wasDead = false;
 
-    //const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
-
     auto size = CCDirector::sharedDirector()->getWinSize();
 
     const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
@@ -956,6 +961,14 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     if (percentLabel) {
         if (value < 100.0f) percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
         else percentLabel->setString(CCString::create("100.00%")->getCString());
+    }
+
+    if ((setting().onAutoDeafen && !pressed) && (setting().deafenPercent > startPercent) && (value > setting().deafenPercent) && !self->isDead() && !self->hasCompletedLevel()) {
+        pressed = true;
+        keybd_event(VK_MENU, 0x38, 0, 0);
+        keybd_event(setting().deafenKey, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+        keybd_event(setting().deafenKey, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
     }
 
     auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
@@ -1121,20 +1134,14 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    //if (speed) {
-    //    speed->setString(CCString::createWithFormat("Speed: %.06f%", self->player1()->getPlayerSpeed())->getCString());
-    //}
-
-    /*if (percentLabel) {
-        const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
-
-        percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
-        percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
-
-        if (value < 100.0f) percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
-        else percentLabel->setString(CCString::create("100.00%")->getCString());
-
-    }*/
+    bool shouldKill = false;
+    shouldKill |= value >= setting().killPercent;
+    if (setting().onAutoKill) {
+        if (shouldKill) {
+            if (self->player1() && !self->player1()->getIsDead())
+                self->destroyPlayer(self->player1());
+        }
+    }
 
     auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
     playerDrawNode->clear();
@@ -1301,9 +1308,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     if (setting().onShowLayout) {
         self->getBackgroundSprite()->setColor(
             ccc3(
-                (setting().BGcolor[0] * 255.f),
-                (setting().BGcolor[1] * 255.f),
-                (setting().BGcolor[2] * 255.f)
+                40, 125, 255
             ));
         from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
         from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
@@ -1311,7 +1316,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
 
 
-        for (int i = self->getFirstVisibleSection() + 2; i < self->getLastVisibleSection() - 2; i++)
+        for (int i = self->getFirstVisibleSection() - 2; i < self->getLastVisibleSection() + 2; i++)
         {
             if (arrcount != 0) {
                 if (i < 0) continue;
@@ -1382,6 +1387,15 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
                 node->setColor(getChromaColour());
             }
         };
+    }
+
+    if (gd::GameManager::sharedState()->getGameVariable("0024")) {
+        if (setting().onHidePauseButton) {
+            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(0);
+        }
+        else {
+            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(1);
+        }
     }
 }
 
@@ -1460,16 +1474,18 @@ void PauseLayer::Callback::PercentageToggler(CCObject*) {
     setting().onShowPercentage = !setting().onShowPercentage;
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
     auto size = CCDirector::sharedDirector()->getWinSize();
-    auto percentLabel = reinterpret_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
-    if (percentLabel) {
-        percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
-        percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
+    if (gd::GameManager::sharedState()->getPlayLayer()) {
+        auto percentLabel = reinterpret_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
+        if (percentLabel) {
+            percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
+            percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
 
-        if (setting().onShowPercentage) {
-            percentLabel->setVisible(1);
-        }
-        else {
-            percentLabel->setVisible(0);
+            if (setting().onShowPercentage) {
+                percentLabel->setVisible(1);
+            }
+            else {
+                percentLabel->setVisible(0);
+            }
         }
     }
 }
@@ -1521,6 +1537,14 @@ void __fastcall PauseLayer::customSetupH(gd::PauseLayer* self) {
     optionsSpr->setScale(.66f);
     menu->addChild(optionsBtn);
     self->addChild(menu);
+
+    if (pressed) {
+        pressed = false;
+        keybd_event(VK_MENU, 0x38, 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+    }
 }
 
 void __fastcall PauseLayer::togglerMenuH() {
@@ -1533,16 +1557,18 @@ void __fastcall PauseLayer::togglerMenuH() {
 void __fastcall PauseLayer::onProgressBarH(gd::PauseLayer* self, void*, CCObject* obj) {
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
     auto size = CCDirector::sharedDirector()->getWinSize();
-    auto percentLabel = reinterpret_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
-    if (percentLabel) {
-        percentLabel->setAnchorPoint({ bar ? 0.5f : 0.f, 0.5f });
-        percentLabel->setPosition({ size.width / 2.f + (bar ? 0.f : 107.2f), size.height - 8.f });
+    if (gd::GameManager::sharedState()->getPlayLayer()) {
+        auto percentLabel = reinterpret_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
+        if (percentLabel) {
+            percentLabel->setAnchorPoint({ bar ? 0.5f : 0.f, 0.5f });
+            percentLabel->setPosition({ size.width / 2.f + (bar ? 0.f : 107.2f), size.height - 8.f });
 
-        if (setting().onShowPercentage) {
-            percentLabel->setVisible(1);
-        }
-        else {
-            percentLabel->setVisible(0);
+            if (setting().onShowPercentage) {
+                percentLabel->setVisible(1);
+            }
+            else {
+                percentLabel->setVisible(0);
+            }
         }
     }
     PauseLayer::onProgressBar(self, obj);
@@ -1580,13 +1606,17 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
     if (setting().onZeroPracticeComplete) {
         if (fromZero && self->getPracticeMode()) from<bool>(self, 0x2b9) = false;
     }
-    PlayLayer::levelComplete(self);
-}
 
-//void __fastcall PlayLayer::markCheckpointH(gd::PlayLayer* self) {
-//    g_orbCheckpoints.push_back({ g_activatedObjects.size(), g_activatedObjects_p2.size() });
-//    PlayLayer::markCheckpoint(self);
-//}
+    PlayLayer::levelComplete(self);
+
+    if (pressed) {
+        pressed = false;
+        keybd_event(VK_MENU, 0x38, 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+        keybd_event(setting().deafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+    }
+}
 
 gd::EndLevelLayer* endLevelLayer;
 
@@ -1735,41 +1765,6 @@ void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
     PlayerObject::runBallRotation2(self);
 }
 
-void __fastcall GameObject::setOpacityH(gd::GameObject* self, void*, GLubyte opacity) {
-    //if (!invisibleObjects.contains(self->getObjectID())) {
-    //    GameObject::setOpacity(self, 255.f);
-    //}
-    //else {
-    //    GameObject::setOpacity(self, opacity);
-    //}
-}
-
-//void __fastcall PlayerObject::ringJumpH(gd::PlayerObject* self, void*, gd::GameObject* ring) {
-//    bool a;
-//    bool b;
-//    a = from<bool>(ring, 0x246);
-//    b = from<bool>(ring, 0x247);
-//    PlayerObject::ringJump(self, ring);
-//    if (gd::GameManager::sharedState()->getPlayLayer() && gd::GameManager::sharedState()->getPlayLayer()->getPracticeMode()) {
-//        if (from<bool>(ring, 0x246) && !a) g_activatedObjects.push_back(ring);
-//        if (from<bool>(ring, 0x247) && !b) g_activatedObjects_p2.push_back(ring);
-//    }
-//}
-//
-//void __fastcall GameObject::activateObjectH(gd::GameObject* self) {
-//    bool a = from<bool>(self, 0x246);
-//    bool b = from<bool>(self, 0x247);
-//    GameObject::activateObject(self);
-//    if (gd::GameManager::sharedState()->getPlayLayer() && gd::GameManager::sharedState()->getPlayLayer()->getPracticeMode()) {
-//        if (from<bool>(self, 0x246) && !a) g_activatedObjects.push_back(self);
-//        if (from<bool>(self, 0x247) && !b) g_activatedObjects_p2.push_back(self);
-//    }
-//}
-
-//void __fastcall PlayLayer::bumpPlayer(gd::PlayLayer* self, void*, gd::PlayerObject* player, gd::GameObject* object) {
-//    
-//}
-
 void PauseLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xd5f50),
@@ -1824,16 +1819,12 @@ void PlayLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0xf0af0),
         PlayLayer::releaseButton_H,
         reinterpret_cast<void**>(&PlayLayer::releaseButton));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xec510), PlayLayer::applyEnterEffect_H, reinterpret_cast<void**>(&PlayLayer::applyEnterEffect));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1010), PlayLayer::createCheckpointH, reinterpret_cast<void**>(&PlayLayer::createCheckpoint));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1d70), PlayLayer::removeLastCheckpointH, reinterpret_cast<void**>(&PlayLayer::removeLastCheckpoint));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe52e0), PlayLayer::levelCompleteH, reinterpret_cast<void**>(&PlayLayer::levelComplete));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2_H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2)); // I forgot to hook this xd...
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2_H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef120), PlayLayer::removePlayer2H, reinterpret_cast<void**>(&PlayLayer::removePlayer2));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1560), PlayLayer::markCheckpointH, reinterpret_cast<void**>(&PlayLayer::markCheckpoint));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe9280), PlayLayer::addToSectionH, reinterpret_cast<void**>(&PlayLayer::addToSection));
-        // Hi.
 }
 
 void EndLevelLayer::mem_init() {
@@ -1847,14 +1838,10 @@ void PlayerObject::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdad10), PlayerObject::runBallRotation2H, reinterpret_cast<void**>(&PlayerObject::runBallRotation2));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xde1c0), PlayerObject::ringJumpH, reinterpret_cast<void**>(&PlayerObject::ringJump));
 }
 
 void GameObject::mem_init() {
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setOpacityH, reinterpret_cast<void**>(&GameObject::setOpacity));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColor_H, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
-    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6e970), GameObject::activateObjectH, reinterpret_cast<void**>(&GameObject::activateObject));
 }
 
 void CCCircleWave::mem_init() {

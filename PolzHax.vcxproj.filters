@@ -1602,6 +1602,9 @@
     <ClInclude Include="portable-file-dialogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TrajectorySimulation.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1713,6 +1716,9 @@
       <Filter>Source Files\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="SpeedHack.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="TrajectorySimulation.cpp">
       <Filter>Source Files\Polz2</Filter>
     </ClCompile>
   </ItemGroup>

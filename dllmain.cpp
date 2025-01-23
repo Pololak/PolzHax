@@ -348,35 +348,34 @@ bool __fastcall LeaderboardsLayer_initH(gd::LeaderboardsLayer* self, void*, gd::
     return true;
 }
 
-bool(__thiscall* MenuGameLayer_init)(gd::MenuGameLayer*);
-bool __fastcall MenuGameLayer_initH(gd::MenuGameLayer* self) {
-    if (!MenuGameLayer_init(self)) return false;
-    menuGameLayer = self;
-    std::cout << serverString << std::endl;
-    /*if (serverString == static_cast<int>(ServerAddresses::PLATINUM)) exit(0);*/ // no.
-    return true;
-}
-
-void(__thiscall* MenuGameLayer_tryJump)(gd::MenuGameLayer*, float);
-void __fastcall MenuGameLayer_tryJumpH(gd::MenuGameLayer* self, void* edx, float idk) {
-    if (!setting().onMenuGameplay) MenuGameLayer_tryJump(self, idk);
-}
-
-void(__thiscall* MenuGameLayer_update)(gd::MenuGameLayer*, float);
-void __fastcall MenuGameLayer_updateH(gd::MenuGameLayer* self, void* edx, float dt) {
-    if (setting().onMenuGameplay) {
-        if (self->getPlayerObject()->isRoll() && GetAsyncKeyState(KEY_W)) self->destroyPlayer(); // Destroys player if it's ball gamemode.
-
-        if ((GetAsyncKeyState(KEY_W))) {
-            self->getPlayerObject()->pushButton(gd::PlayerButton::Jump);
-        }
-        else {
-            self->getPlayerObject()->releaseButton(gd::PlayerButton::Jump);
-        }
-    }
-
-    MenuGameLayer_update(self, dt);
-}
+//bool(__thiscall* MenuGameLayer_init)(gd::MenuGameLayer*);
+//bool __fastcall MenuGameLayer_initH(gd::MenuGameLayer* self) {
+//    if (!MenuGameLayer_init(self)) return false;
+//    menuGameLayer = self;
+//    std::cout << serverString << std::endl;
+//    return true;
+//}
+//
+//void(__thiscall* MenuGameLayer_tryJump)(gd::MenuGameLayer*, float);
+//void __fastcall MenuGameLayer_tryJumpH(gd::MenuGameLayer* self, void* edx, float idk) {
+//    if (!setting().onMenuGameplay) MenuGameLayer_tryJump(self, idk);
+//}
+//
+//void(__thiscall* MenuGameLayer_update)(gd::MenuGameLayer*, float);
+//void __fastcall MenuGameLayer_updateH(gd::MenuGameLayer* self, void* edx, float dt) {
+//    if (setting().onMenuGameplay) {
+//        if (self->getPlayerObject()->isRoll() && GetAsyncKeyState(KEY_W)) self->destroyPlayer(); // Destroys player if it's ball gamemode.
+//
+//        if ((GetAsyncKeyState(KEY_W))) {
+//            self->getPlayerObject()->pushButton(gd::PlayerButton::Jump);
+//        }
+//        else {
+//            self->getPlayerObject()->releaseButton(gd::PlayerButton::Jump);
+//        }
+//    }
+//
+//    MenuGameLayer_update(self, dt);
+//}
 
 cocos2d::CCObject* levelObject;
 cocos2d::CCArray* localLevelArray;
@@ -480,9 +479,7 @@ class MoveToTopProtocolLIL : public gd::FLAlertLayerProtocol {
 public:
     void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override {
         if (btn2) {
-            savedLevelsArray->removeObject(savedGameLevel, true);
-            savedLevelsArray->insertObject(savedGameLevel, 0);
-            gd::LocalLevelManager::sharedState()->updateLevelOrder();
+            
         }
     }
 };
@@ -494,6 +491,11 @@ public:
     void onMoveToTop(CCObject*) {
         gd::FLAlertLayer::create(&moveToTopProtocolLIL, "Move To Top", "Move this level to the top of the created levels list?", "NO", "YES", 300.f, false, 140.f)->show();
     }
+    void onGarage(CCObject*) {
+        auto garageScene = gd::GJGarageLayer::scene();
+        CCScene* scene = CCTransitionMoveInT::create(0.5f, garageScene);
+        CCDirector::sharedDirector()->pushScene(garageScene);
+    }
 };
 
 bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
@@ -503,8 +505,6 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	auto winSize = director->getWinSize();
 
     savedGameLevel = (CCObject*)level;
-    savedLevelsArray = gd::GameLevelManager::sharedState()->getSavedLevels();
-    std::cout << gd::GameLevelManager::sharedState()->getSavedLevels()->count() << std::endl;
 
     auto menu = CCMenu::create();
     auto moveToTopSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
@@ -519,22 +519,19 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
         }
     }
 
+    auto garageRope_spr = CCSprite::createWithSpriteFrameName("GJ_garageBtn_001.png");
+    garageRope_spr->setScale(0.6f);
+    auto garageRope = gd::CCMenuItemSpriteExtra::create(garageRope_spr, garageRope_spr, self, menu_selector(LevelInfoLayerCB::onGarage));
+    garageRope->setPosition(menu->convertToNodeSpace({ (winSize.width / 2) + 145.f, director->getScreenTop() - 30.f }));
+    menu->addChild(garageRope);
+
 	return true;
 }
-
-//bool(__thiscall* TextArea_init)(gd::TextArea*, char const*, char const*, float, float, cocos2d::CCPoint, float);
-//bool __fastcall TextArea_initH(gd::TextArea* self, void*, char const* str, char const* font, float size, float width, cocos2d::CCPoint anchor, float lineHeight) {
-//    if (!TextArea_init(self, str, font, 2.f, width, anchor, lineHeight)) return false;
-//
-//
-//
-//    return true;
-//}
 
 class CustomSongLayerCB {
 public:
     void onReupload(CCObject*) {
-        if (serverString == static_cast<int>(ServerAddresses::GHS)) {
+        if (serverString == static_cast<int>(ServerAddresses::GHS)) { // R.I.P.
             CCApplication::sharedApplication()->openURL("http://85.209.2.73:25573/custom/uploadsong");
         }
         else if (serverString == static_cast<int>(ServerAddresses::ABSOLLLUTE)) {
@@ -566,6 +563,22 @@ bool __fastcall CustomSongLayer_initH(gd::FLAlertLayer* self, void*, gd::LevelSe
     return true;
 }
 
+void(__thiscall* GJDropDownLayer_showLayer)(gd::GJDropDownLayer*, bool);
+void __fastcall GJDropDownLayer_showLayerH(gd::GJDropDownLayer* self, void*, bool noTransition) {
+    if (setting().onFastMenu)
+        GJDropDownLayer_showLayer(self, true);
+    else
+        GJDropDownLayer_showLayer(self, noTransition);
+}
+
+void(__thiscall* GJDropDownLayer_hideLayer)(gd::GJDropDownLayer*, bool);
+void __fastcall GJDropDownLayer_hideLayerH(gd::GJDropDownLayer* self, void*, bool noTransition) {
+    if (setting().onFastMenu)
+        GJDropDownLayer_hideLayer(self, true);
+    else
+        GJDropDownLayer_hideLayer(self, noTransition);
+}
+
 void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
 void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     if (setting().onAutoSave)
@@ -576,7 +589,7 @@ void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
 }
 
 DWORD WINAPI my_thread(void* hModule) {
-    setting().loadState();
+    //setting().loadState();
 
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); // Play Music Button
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x428bd5), "\x6a\x00", 2, NULL); // rgba8888 format (better texture quality and colors)
@@ -645,14 +658,17 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9bc10), LevelInfoLayer_initH, reinterpret_cast<void**>(&LevelInfoLayer_init));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3d440), EditLevelLayer_onEditH, reinterpret_cast<void**>(&EditLevelLayer_onEdit));
 
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xadff0), MenuGameLayer_tryJumpH, reinterpret_cast<void**>(&MenuGameLayer_tryJump));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xad4d0), MenuGameLayer_initH, reinterpret_cast<void**>(&MenuGameLayer_init));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xadff0), MenuGameLayer_tryJumpH, reinterpret_cast<void**>(&MenuGameLayer_tryJump));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xad4d0), MenuGameLayer_initH, reinterpret_cast<void**>(&MenuGameLayer_init));
 
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x355f0), GJScoreCell::loadFromScoreH, reinterpret_cast<void**>(&GJScoreCell::loadFromScore));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x859c0), InfoLayer::onLevelInfoH, reinterpret_cast<void**>(&InfoLayer::onLevelInfo));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x342e0), CommentCell::loadFromCommentH, reinterpret_cast<void**>(&CommentCell::loadFromComment));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x36540), CustomSongLayer_initH, reinterpret_cast<void**>(&CustomSongLayer_init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xA3620), MoreSearchLayer_initH, reinterpret_cast<void**>(&MoreSearchLayer_init));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bff0), GJDropDownLayer_hideLayerH, reinterpret_cast<void**>(&GJDropDownLayer_hideLayer));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bf20), GJDropDownLayer_showLayerH, reinterpret_cast<void**>(&GJDropDownLayer_showLayer));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92f20), DrawGridLayer::addToSpeedObjectsH, reinterpret_cast<void**>(&DrawGridLayer::addToSpeedObjects));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

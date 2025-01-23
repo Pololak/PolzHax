@@ -45,6 +45,9 @@ namespace gd {
 		void onBallIcon(CCObject* sender) {
 			reinterpret_cast<void(__thiscall*)(GJGarageLayer*, cocos2d::CCObject*)>(base + 0x7e190)(this, sender);
 		}
+		static cocos2d::CCScene* scene() {
+			return reinterpret_cast<cocos2d::CCScene*(__fastcall*)()>(base + 0x7c240)();
+		}
 	};
 
 	class GaragePage : public cocos2d::CCNode {
