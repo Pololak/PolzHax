@@ -403,3 +403,209 @@ template <class T> void WriteRef(uint32_t vaddress, const T& value)
 	*reinterpret_cast<T**>(vaddress) = x;
 	VirtualProtect((void*)(vaddress), sizeof(size_t), old_prot, &old_prot);
 }
+
+template <class T>
+class Ref final {
+	static_assert(
+		std::is_base_of_v<cocos2d::CCObject, T>,
+		"Ref can only be used with a CCObject-inheriting class!"
+		);
+
+	T* m_obj = nullptr;
+
+public:
+	/**
+	 * Construct a Ref of an object. The object will be retained and
+	 * managed until Ref goes out of scope
+	 * @param obj Object to construct the Ref from
+	 */
+	Ref(T* obj) : m_obj(obj) {
+		CC_SAFE_RETAIN(obj);
+	}
+
+	Ref(Ref<T> const& other) : Ref(other.data()) {}
+
+	Ref(Ref<T>&& other) noexcept : m_obj(other.m_obj) {
+		other.m_obj = nullptr;
+	}
+
+	/**
+	 * Construct an empty Ref (the managed object will be null)
+	 */
+	Ref() = default;
+
+	~Ref() {
+		CC_SAFE_RELEASE(m_obj);
+	}
+
+	/**
+	 * Swap the managed object with another object. The managed object
+	 * will be released, and the new object retained
+	 * @param other The new object to swap to
+	 */
+	void swap(T* other) {
+		CC_SAFE_RELEASE(m_obj);
+		m_obj = other;
+		CC_SAFE_RETAIN(other);
+	}
+
+	/**
+	 * Return the managed object
+	 * @returns The managed object
+	 */
+	T* data() const {
+		return m_obj;
+	}
+
+	operator T* () const {
+		return m_obj;
+	}
+
+	T* operator*() const {
+		return m_obj;
+	}
+
+	T* operator->() const {
+		return m_obj;
+	}
+
+	T* operator=(T* obj) {
+		this->swap(obj);
+		return obj;
+	}
+
+	Ref<T>& operator=(Ref<T> const& other) {
+		this->swap(other.data());
+		return *this;
+	}
+
+	Ref<T>& operator=(Ref<T>&& other) {
+		m_obj = other.data();
+		other.m_obj = nullptr;
+		return *this;
+	}
+
+	bool operator==(T* other) const {
+		return m_obj == other;
+	}
+
+	bool operator==(Ref<T> const& other) const {
+		return m_obj == other.m_obj;
+	}
+
+	bool operator!=(T* other) const {
+		return m_obj != other;
+	}
+
+	bool operator!=(Ref<T> const& other) const {
+		return m_obj != other.m_obj;
+	}
+
+	// for containers
+	bool operator<(Ref<T> const& other) const {
+		return m_obj < other.m_obj;
+	}
+	bool operator<=(Ref<T> const& other) const {
+		return m_obj <= other.m_obj;
+	}
+	bool operator>(Ref<T> const& other) const {
+		return m_obj > other.m_obj;
+	}
+	bool operator>=(Ref<T> const& other) const {
+		return m_obj >= other.m_obj;
+	}
+};
+
+template <class T>
+concept CocosObject = std::derived_from<T, cocos2d::CCObject>;
+
+template <class T>
+concept CocosObjectPtr = std::is_pointer_v<T> && std::is_convertible_v<T, cocos2d::CCObject const*>;
+
+template <class K>
+concept CocosDictionaryKey = std::same_as<K, int> || std::same_as<K, intptr_t> || std::same_as<K, gd::string> || std::same_as<K, std::string>;
+
+/**
+	 * A templated wrapper over CCArray, providing easy iteration and indexing.
+	 * This will keep ownership of the given CCArray*.
+	 *
+	 * @tparam Type Pointer to a type that inherits CCObject.
+	 *
+	 * @example
+	 * CCArrayExt<GameObject*> objects = PlayLayer::get()->m_objects;
+	 * // Easy indexing, giving you the type you assigned
+	 * GameObject* myObj = objects[2];
+	 *
+	 * // Easy iteration using C++ range-based for loops
+	 * for (auto* obj : objects) {
+	 *   log::info("{}", obj->m_objectID);
+	 * }
+	 */
+template <class InpT, CocosObject T = std::remove_pointer_t<InpT>>
+class CCArrayExt {
+protected:
+	Ref<cocos2d::CCArray> m_arr;
+
+public:
+	using value_type = T*;
+	using iterator = T**;
+	using const_iterator = const T**;
+
+	CCArrayExt() : m_arr(cocos2d::CCArray::create()) {}
+
+	CCArrayExt(cocos2d::CCArray* arr)
+		: m_arr(arr) {
+	}
+
+	CCArrayExt(CCArrayExt const& a) : m_arr(a.m_arr) {}
+
+	CCArrayExt(CCArrayExt&& a) : m_arr(a.m_arr) {
+		a.m_arr = nullptr;
+	}
+
+	~CCArrayExt() {}
+
+	T** begin() const {
+		if (!m_arr) {
+			return nullptr;
+		}
+		return reinterpret_cast<T**>(m_arr->data->arr);
+	}
+
+	T** end() const {
+		if (!m_arr) {
+			return nullptr;
+		}
+		return reinterpret_cast<T**>(m_arr->data->arr) + m_arr->count();
+	}
+
+	auto rbegin() const {
+		return std::reverse_iterator(this->end());
+	}
+
+	auto rend() const {
+		return std::reverse_iterator(this->begin());
+	}
+
+	size_t size() const {
+		return m_arr ? m_arr->count() : 0;
+	}
+
+	T* operator[](size_t index) {
+		return static_cast<T*>(m_arr->objectAtIndex(index));
+	}
+
+	void push_back(T* item) {
+		m_arr->addObject(item);
+	}
+
+	T* pop_back() {
+		T* ret = static_cast<T*>(m_arr->lastObject());
+		m_arr->removeLastObject();
+		return ret;
+	}
+
+	cocos2d::CCArray* inner() {
+		return m_arr;
+	}
+};

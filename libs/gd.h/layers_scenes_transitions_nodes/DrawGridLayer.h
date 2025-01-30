@@ -44,6 +44,9 @@ namespace gd {
             auto getPlaybackLinePos() {
                 return from<float>(this, 0x120);
             }
+            LevelEditorLayer* getEditorLayer() {
+                return from<LevelEditorLayer*>(this, 0x124);
+            }
     };
 
 }

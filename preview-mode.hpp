@@ -22,6 +22,9 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* update)(gd::LevelEditorLayer*, float);
 	void __fastcall updateH(gd::LevelEditorLayer* self, void*, float dt);
 
+	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
+	void __fastcall drawH(gd::LevelEditorLayer*);
+
 	void groupStickyObjects(gd::LevelEditorLayer* levelEditor, CCArray* objects);
 
 	void mem_init();
@@ -121,6 +124,12 @@ namespace EditorUI {
 	inline void(__thiscall* onGroupUp)(gd::EditorUI*, CCObject*);
 	void __fastcall onGroupUpH(gd::EditorUI*, void*, CCObject*);
 
+	inline void(__thiscall* editObject)(gd::EditorUI*, CCObject*);
+	void __fastcall editObjectH(gd::EditorUI*, void*, CCObject*);
+
+	inline void(__thiscall* onDuplicate)(gd::EditorUI*, CCObject*);
+	void __fastcall onDuplicateH(gd::EditorUI*, void*, CCObject*);
+
 	void updateObjectInfo();
 
 	void mem_init();
@@ -211,6 +220,17 @@ namespace LevelSettingsLayer {
 namespace DrawGridLayer {
 	inline void(__thiscall* addToSpeedObjects)(gd::DrawGridLayer*, gd::GameObject*);
 	void __fastcall addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject);
+}
+
+namespace PlayerObject {
+	inline void(__thiscall* placeStreakPoint)(gd::PlayerObject*);
+	void __fastcall placeStreakPointH(gd::PlayerObject* self);
+
+	inline void(__thiscall* update)(gd::PlayerObject*, float);
+	void __fastcall updateH(gd::PlayerObject* self, void*, float dt);
+
+	inline void(__thiscall* fadeOutStreak2)(gd::PlayerObject*, float);
+	void __fastcall fadeOutStreak2H(gd::PlayerObject* self, void*, float p0);
 }
 
 namespace Scheduler {

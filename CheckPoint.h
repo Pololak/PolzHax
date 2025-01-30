@@ -57,65 +57,44 @@ struct CheckPoint {
     }
 };
 
-struct ObjectBlending {
-    ccBlendFunc col1;
-    ccBlendFunc col2;
-    ccBlendFunc col3;
-    ccBlendFunc col4;
-    ccBlendFunc dline;
+struct ObjectBlendingStorage {
+    bool col1_blend;
+    bool col2_blend;
+    bool col3_blend;
+    bool col4_blend;
+    bool dl_blend;
+
+    static ObjectBlendingStorage from(gd::PlayLayer* playLayer) {
+        return (ObjectBlendingStorage({
+            *(bool*)((size_t)playLayer + 0x329),
+            *(bool*)((size_t)playLayer + 0x32a),
+            *(bool*)((size_t)playLayer + 0x32b),
+            *(bool*)((size_t)playLayer + 0x32c),
+            *(bool*)((size_t)playLayer + 0x32d),
+            }));
+    }
+
+    void restore(gd::PlayLayer* playLayer) {
+        *(bool*)((size_t)playLayer + 0x329) = col1_blend;
+        *(bool*)((size_t)playLayer + 0x32a) = col2_blend;
+        *(bool*)((size_t)playLayer + 0x32b) = col3_blend;
+        *(bool*)((size_t)playLayer + 0x32c) = col4_blend;
+        *(bool*)((size_t)playLayer + 0x32d) = dl_blend;
+    }
 };
-//#pragma once
-//
-//struct CheckPointStorage {
-//	double velocity;
-//
-//	float rotation;
-//	float rotation_2;
-//
-//	float size;
-//	float size_2;
-//
-//	static CheckPointStorage from(gd::PlayLayer* playLayer) {
-//		return (CheckPointStorage({
-//			*(double*)((size_t)playLayer + 0x45c), // 0x458
-//
-//			*(float*)((size_t)playLayer + 0x018), // 0x18
-//			*(float*)((size_t)playLayer + 0x01C), // 0x1C
-//
-//			*(float*)((size_t)playLayer + 0x25c), // size
-//			*(float*)((size_t)playLayer + 0x260), // size
-//			}));
-//	}
-//
-//	void restore(gd::PlayLayer* playLayer) {
-//		*(double*)((size_t)playLayer + 0x45c) = velocity;
-//
-//		*(float*)((size_t)playLayer + 0x018) = rotation;
-//		*(float*)((size_t)playLayer + 0x01C) = rotation_2;
-//
-//		*(float*)((size_t)playLayer + 0x25c) = size;
-//		*(float*)((size_t)playLayer + 0x260) = size_2;
-//	}
-//};
-//
-//struct CheckPoint {
-//	CheckPointStorage p1;
-//	CheckPointStorage p2;
-//
-//	static CheckPoint from(void* playLayer) {
-//		void* Player1 = *(void**)((char*)playLayer + 0x2a4);
-//		void* Player2 = *(void**)((char*)playLayer + 0x2a8);
-//
-//		return (
-//			CheckPoint({
-//				CheckPointStorage::from(Player1),
-//				CheckPointStorage::from(Player2)
-//				})
-//			);
-//	}
-//
-//	void restore(gd::PlayLayer* playLayer) {
-//		p1.restore(*(void**)((char*)playLayer + 0x2a4));
-//		p2.restore(*(void**)((char*)playLayer + 0x2a8));
-//	}
-//};
+
+struct ObjectBlending {
+    ObjectBlendingStorage obj;
+
+    static ObjectBlending from(gd::PlayLayer* playLayer) {
+        return (
+            ObjectBlending({
+                ObjectBlendingStorage::from(playLayer)
+                })
+            );
+    }
+
+    void restore(gd::PlayLayer* playLayer) {
+        obj.restore(playLayer);
+    }
+};

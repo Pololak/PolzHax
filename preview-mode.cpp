@@ -1079,22 +1079,6 @@ void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
 	//self->getEditorUI()->updateZoom(1.f);
 }
 
-void updateGoToBaseLayerButton(gd::EditorUI* editor) {
-	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(editor->getDeselectBtn(), 0xac)->getChildByTag(45028));
-	auto lel = editor->getLevelEditorLayer();
-
-	if (onBaseLayerBtn) {
-		if (from<int>(lel, 0x12c) == -1) {
-			onBaseLayerBtn->setVisible(0);
-			onBaseLayerBtn->setEnabled(false);
-		}
-		else {
-			onBaseLayerBtn->setVisible(1);
-			onBaseLayerBtn->setEnabled(true);
-		}
-	}
-}
-
 void EditorUI::Callback::onGoToBaseLayer(CCObject* sender) {
 	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = -1;
 	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString("All");
@@ -2292,6 +2276,23 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
 	EditorUI::onGroupUp(self, obj);
 }
 
+void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* obj) {
+
+	for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
+		gd::ColorSelectPopup::create(obj, 0, 0, 0);
+	}
+
+	EditorUI::editObject(self, obj);
+}
+
+void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* obj) {
+
+	for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
+		from<int>(obj, 0x324) = from<int>(obj, 0x324);
+	}
+	EditorUI::onDuplicate(self, obj);
+}
+
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
 	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
@@ -2749,6 +2750,27 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	}
 }
 
+void __fastcall PlayerObject::placeStreakPointH(gd::PlayerObject* self) {
+	if (levelEditorLayer && self->isDart())
+		self->waveTrail()->addPoint(self->getPosition());
+	else
+		PlayerObject::placeStreakPoint(self);
+}
+
+void __fastcall PlayerObject::updateH(gd::PlayerObject* self, void*, float dt) {
+	PlayerObject::update(self, dt);
+
+	if (levelEditorLayer && self->isDart())
+		from<cocos2d::CCPoint>(self->waveTrail(), 0x11c) = self->getPosition();
+}
+
+void __fastcall PlayerObject::fadeOutStreak2H(gd::PlayerObject* self, void*, float p0) {
+	PlayerObject::fadeOutStreak2(self, p0);
+
+	if (levelEditorLayer)
+		self->waveTrail()->runAction(CCFadeTo::create(p0, 0));
+}
+
 void Scheduler::mem_init() {
 	MH_CreateHook(
 		reinterpret_cast<void*>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?update@CCScheduler@cocos2d@@UAEXM@Z")),
@@ -2787,6 +2809,8 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41450), EditorUI::updateButtonsH, reinterpret_cast<void**>(&EditorUI::updateButtons));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4afc0), EditorUI::onGroupDownH, reinterpret_cast<void**>(&EditorUI::onGroupDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4af50), EditorUI::onGroupUpH, reinterpret_cast<void**>(&EditorUI::onGroupUp));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
 	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);

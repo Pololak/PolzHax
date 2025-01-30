@@ -167,7 +167,7 @@ public:
      * @js ctor
      */
     CCSprite(void);
-    
+
     /**
      * Default destructor
      * @js NA

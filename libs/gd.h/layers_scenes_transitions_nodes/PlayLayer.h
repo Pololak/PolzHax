@@ -83,6 +83,10 @@ namespace gd {
 			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xecf30)(this, colorID, isBlend);
 		}
 
+		void updateVisibility(float dt) {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*, float)>(base + 0xeb3f0)(this, dt);
+		}
+
 		auto layer() {
 			return from<cocos2d::CCLayer*>(this, 0x2D4);
 		}

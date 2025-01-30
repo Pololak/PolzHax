@@ -61,6 +61,7 @@ std::vector<gd::GameObject*> gravityPortals, dualPortals, gamemodePortals, miniP
 std::vector<bool> willFlip;
 
 std::vector<CheckPoint> checkpoints;
+std::vector<ObjectBlending> objBlending;
 bool inPractice = false;
 float updateRgb = 0.f;
 
@@ -335,33 +336,17 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     if (setting().onPracticeFix) {
         if (inPractice && checkpoints.size() > 0) {
             checkpoints.back().restore(self);
+            objBlending.back().restore(self);
         }
     }
 
-    //if (from<CCArray*>(self, 0x154)->count() == 0) {
-    //    g_activatedObjects.clear();
-    //    g_activatedObjects_p2.clear();
-    //    g_orbCheckpoints.clear();
-    //}
-    //else {
-    //    if (setting().onPracticeFix && self->getPracticeMode()) {
-    //        const auto [p1, p2] = g_orbCheckpoints.back();
-    //        g_activatedObjects.erase(
-    //            g_activatedObjects.begin() + p1,
-    //            g_activatedObjects.end()
-    //        );
-    //        g_activatedObjects_p2.erase(
-    //            g_activatedObjects_p2.begin() + p1,
-    //            g_activatedObjects_p2.end()
-    //        );
-    //        for (const auto& object : g_activatedObjects) {
-    //            from<bool>(object, 0x246) = true;
-    //        }
-    //        for (const auto& object : g_activatedObjects_p2) {
-    //            from<bool>(object, 0x247) = true;
-    //        }
-    //    }
-    //}
+    std::cout << from<CCArray*>(self, 0x154)->lastObject() << std::endl;
+
+    std::cout << "Col1 Blending: " << from<bool>(self, 0x329) << std::endl;
+    std::cout << "Col2 Blending: " << from<bool>(self, 0x32A) << std::endl;
+    std::cout << "Col3 Blending: " << from<bool>(self, 0x32B) << std::endl;
+    std::cout << "Col4 Blending: " << from<bool>(self, 0x32C) << std::endl;
+    std::cout << "3DL Blending: " << from<bool>(self, 0x32D) << std::endl;
 }
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
@@ -385,6 +370,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
 
     if (setting().onPracticeFix) {
         checkpoints.clear();
+        objBlending.clear();
         inPractice = false;
     }
 
@@ -493,8 +479,27 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     }
 
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
+    const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
 
-    auto percentLabel = CCLabelBMFont::create("0.00%", "bigFont.fnt");
+    auto percentLabel = CCLabelBMFont::create("", "bigFont.fnt");
+    switch (setting().accuratePercentage)
+    {
+    case 4:
+        percentLabel->setString(CCString::createWithFormat("%.0f%%", value)->getCString());
+        break;
+    case 3:
+        percentLabel->setString(CCString::createWithFormat("%.1f%%", value)->getCString());
+        break;
+    case 2:
+        percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
+        break;
+    case 1:
+        percentLabel->setString(CCString::createWithFormat("%.3f%%", value)->getCString());
+        break;
+    case 0:
+        percentLabel->setString(CCString::createWithFormat("%.4f%%", value)->getCString());
+        break;
+    }
     percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
     percentLabel->setScale(0.5f);
     percentLabel->setZOrder(5);
@@ -931,8 +936,12 @@ void __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
             checkpoints.push_back({
                 CheckPoint::from(self)
                 });
+            objBlending.push_back({
+                ObjectBlending::from(self)
+                });
         }
     }
+    
     PlayLayer::createCheckpoint(self);
 }
 
@@ -940,6 +949,7 @@ void __fastcall PlayLayer::removeLastCheckpointH(gd::PlayLayer* self) {
     if (setting().onPracticeFix) {
         if (checkpoints.size() > 0) {
             checkpoints.pop_back();
+            objBlending.pop_back();
         }
     }
     /*g_orbCheckpoints.pop_back();*/
@@ -947,10 +957,11 @@ void __fastcall PlayLayer::removeLastCheckpointH(gd::PlayLayer* self) {
 }
 
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
-    PlayLayer::update(self, dt);
-
     layers().PauseLayerObject = nullptr;
     isPlayerDead = false;
+
+    PlayLayer::update(self, dt);
+
     if (!isPlayerDead) wasDead = false;
 
     auto size = CCDirector::sharedDirector()->getWinSize();
@@ -959,8 +970,42 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
 
     if (percentLabel) {
-        if (value < 100.0f) percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
-        else percentLabel->setString(CCString::create("100.00%")->getCString());
+        if (value < 100.0f) switch (setting().accuratePercentage)
+        {
+        case 4:
+            percentLabel->setString(CCString::createWithFormat("%.0f%%", value)->getCString());
+            break;
+        case 3:
+            percentLabel->setString(CCString::createWithFormat("%.1f%%", value)->getCString());
+            break;
+        case 2:
+            percentLabel->setString(CCString::createWithFormat("%.2f%%", value)->getCString());
+            break;
+        case 1:
+            percentLabel->setString(CCString::createWithFormat("%.3f%%", value)->getCString());
+            break;
+        case 0:
+            percentLabel->setString(CCString::createWithFormat("%.4f%%", value)->getCString());
+            break;
+        }
+        else switch (setting().accuratePercentage)
+        {
+        case 4:
+            percentLabel->setString(CCString::create("100%")->getCString());
+            break;
+        case 3:
+            percentLabel->setString(CCString::create("100.0%")->getCString());
+            break;
+        case 2:
+            percentLabel->setString(CCString::create("100.00%")->getCString());
+            break;
+        case 1:
+            percentLabel->setString(CCString::create("100.000%")->getCString());
+            break;
+        case 0:
+            percentLabel->setString(CCString::create("100.0000%")->getCString());
+            break;
+        } 
     }
 
     if ((setting().onAutoDeafen && !pressed) && (setting().deafenPercent > startPercent) && (value > setting().deafenPercent) && !self->isDead() && !self->hasCompletedLevel()) {
@@ -1066,7 +1111,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     NoclipAcc = ((self->player1()->getPositionX() - deathDifference) / self->player1()->getPositionX()) * 100;
     if (noclipAccLabel)
     {
-        const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
         if (value < 100.0f) reinterpret_cast<CCLabelBMFont*>(noclipAccLabel)->setString(CCString::createWithFormat("%.2f%%", NoclipAcc)->getCString());
         noclipAccLabel->setOpacity(setting().labelsOpacity);
     }
@@ -1397,6 +1441,28 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
             from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(1);
         }
     }
+
+    if (setting().onNoWaveTrailBehind) {
+        if (self->player1()->isDart())
+            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = false;
+        if (self->player2()->isDart())
+            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = false;
+    }
+    else {
+        if (self->player1()->isDart())
+            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = true;
+        if (self->player2()->isDart())
+            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = true;
+    }
+
+    if (setting().onNoWaveTrail) {
+        self->player1()->waveTrail()->setVisible(0);
+        self->player2()->waveTrail()->setVisible(0);
+    }
+    else {
+        self->player1()->waveTrail()->setVisible(1);
+        self->player2()->waveTrail()->setVisible(1);
+    }
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {
@@ -1428,8 +1494,9 @@ void __fastcall PlayLayer::onQuit_H(gd::PlayLayer* self, void* edx) {
 
     if (setting().onPracticeFix) {
         checkpoints.clear();
+        objBlending.clear();
     }
-
+    
     playLayer = nullptr;
     PlayLayer::onQuit(self);
 }
@@ -1600,6 +1667,7 @@ void __fastcall PauseLayer::onQuit_H(CCObject* btn)
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
     if (setting().onPracticeFix) {
         checkpoints.clear();
+        objBlending.clear();
         inPractice = false;
     }
     from<bool>(self, 0x2f9) = true;

@@ -273,6 +273,10 @@ namespace gd {
 			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x411f0)(this, sender);
 		}
 
+		void editObject(CCObject* sender) {
+			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x4ae20)(this, sender);
+		}
+
 	};
 
 	class EditorPauseLayer : public gd::CCBlockLayer {
@@ -305,6 +309,10 @@ namespace gd {
 
 	class ColorSelectPopup : public gd::FLAlertLayer {
 	public:
+		static ColorSelectPopup* create(GameObject* obj, int idk, int idk2, int idk3) {
+			return reinterpret_cast<ColorSelectPopup*(__fastcall*)(GameObject*, int, int, int)>(base + 0x29cf0)(obj, idk, idk2, idk3);
+		}
+
 		auto colorPicker() {
 			return from<cocos2d::extension::CCControlColourPicker*>(this, 0x1c0);
 		}

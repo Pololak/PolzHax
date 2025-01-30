@@ -2,6 +2,7 @@
 #include <imgui-hook.hpp>
 #include <filesystem>
 #include "utils.hpp"
+#include "misc/cpp/imgui_stdlib.h"
 
 
 using namespace cocos2d;
@@ -63,6 +64,14 @@ auto format_addr(void* addr) {
 
 
 void render_node_properties(CCNode* node) {
+	if (ImGui::Button("Deselect")) {
+		selected_node = nullptr;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Add Child")) {
+		ImGui::OpenPopup("Add Child");
+	}
+	ImGui::SameLine();
 	if (ImGui::Button("Delete")) {
 		node->removeFromParentAndCleanup(true);
 		return;
@@ -71,10 +80,6 @@ void render_node_properties(CCNode* node) {
 	ImGui::SameLine();
 	if (ImGui::Button("Copy")) {
 		clipboard::write(CCString::createWithFormat("%p", node)->getCString());
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Add Child")) {
-		ImGui::OpenPopup("Add Child");
 	}
 
 	if (ImGui::BeginPopupModal("Add Child")) {
@@ -158,6 +163,7 @@ void render_node_properties(CCNode* node) {
 		}
 		ImGui::EndPopup();
 	}
+
 	ImGui::Text("Tag: %d", from<int>(node, 0xb0));
 	{
 		auto value = node->getPosition();
@@ -225,10 +231,30 @@ void render_node_properties(CCNode* node) {
 		if (value != node->isVisible()) node->setVisible(value);
 	}
 	{
+		auto value = node->isIgnoreAnchorPointForPosition();
+		ImGui::Checkbox("Ignore Anchor Point for Position", &value);
+		if (value != node->isIgnoreAnchorPointForPosition()) node->ignoreAnchorPointForPosition(value);
+	}
+	{
 		auto value = node->getZOrder();
 		ImGui::InputInt("Z Order", &value);
 		if (value != node->getZOrder()) node->setZOrder(value);
 	}
+
+	ImGui::NewLine();
+	ImGui::Separator();
+	ImGui::NewLine();
+
+	if (auto delegate = dynamic_cast<CCTouchDelegate*>(node)) {
+		if (auto handler = CCDirector::sharedDirector()->m_pTouchDispatcher->findHandler(delegate)) {
+			auto priority = handler->getPriority();
+
+			if (ImGui::DragInt("Touch Priority", &priority, .03f)) {
+				CCDirector::sharedDirector()->m_pTouchDispatcher->setPriority(priority, handler->getDelegate());
+			}
+		}
+	}
+
 	if (auto rgb = dynamic_cast<CCNodeRGBA*>(node)) {
 		const auto color = rgb->getColor();
 		float colors[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgb->getOpacity() / 255.f };
@@ -236,12 +262,12 @@ void render_node_properties(CCNode* node) {
 			rgb->setColor(ccc3(colors[0] * 255.f, colors[1] * 255.f, colors[2] * 255.f));
 		rgb->setOpacity((colors[3] * 255.f));
 	}
-	if (auto label_node = dynamic_cast<CCLabelProtocol*>(node); label_node) {
-		ImGui::Text("NOTE: Entering more than 16 chars will CRASH your game!");
+	if (auto label_node = dynamic_cast<CCLabelProtocol*>(node)) {
 		std::string str = label_node->getString();
-		if (ImGui::InputTextMultiline("Text", (char*)&str, 16, {0, 40}))
+		if (ImGui::InputText("Text", &str, 256))
 			label_node->setString(str.c_str());
 	}
+
 	if (auto sprite_node = dynamic_cast<CCSprite*>(node); sprite_node) {
 		auto* texture = sprite_node->getTexture();
 
@@ -255,16 +281,16 @@ void render_node_properties(CCNode* node) {
 			}
 		}
 
-		/*auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
-		auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
-		const CCRect rect = sprite_node->getTextureRect();
-		CCDICT_FOREACH(cached_frames, el) {
-			auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
-			if ((frame->getTexture() == texture) && (frame->getRectInPixels() == rect) {
-				ImGui::Text("Frame name: %s", el->getStrKey());
-				break;
-			}
-		}*/
+		//auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+		//auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
+		//const auto rect = sprite_node->getTextureRect();
+		//CCDICT_FOREACH(cached_frames, el) {
+		//	auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
+		//	if (frame->getTexture() == texture && frame->getRect() == rect) {
+		//		ImGui::Text("Frame name: %s", el->getStrKey());
+		//		break;
+		//	}
+		//}
 	}
 }
 

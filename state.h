@@ -160,7 +160,7 @@ struct SettingStruct {
     bool onShowLayout;
     bool onSmartStartPos; //
     bool onRainbowIcon;
-    bool b_blank9;
+    bool onNoWaveTrailBehind;
     bool b_blank10;
     bool b_blank11;
     bool b_blank12;
@@ -276,6 +276,8 @@ struct SettingStruct {
     int deafenPercent = 50;
     int deafenKey;
 
+    int accuratePercentage = 4;
+
     // Icons thing
 
     bool onEnableP1;
@@ -314,6 +316,7 @@ DEF_SCHEMA(
     onSliderLimit,
     onTextLength,
 
+    accuratePercentage,
     onAlwaysNewBest,
     onSCoinUncoll,
     onCoinsPractice,
@@ -350,6 +353,7 @@ DEF_SCHEMA(
     onNoWavePulse,
     wavePulseSize,
     onNoWaveTrail,
+    onNoWaveTrailBehind,
     onPracticePulse,
     onRespawnTime,
     respawnTime,

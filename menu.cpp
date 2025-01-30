@@ -416,13 +416,6 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xebfe3), "\x77", 1, NULL);
         }
 
-        if (setting().onNoWaveTrail) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\xeb", 1, NULL);
-        }
-        else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\x74", 1, NULL);
-        }
-
         if (setting().onPracticePulse) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429975), "\x90\x90", 2, NULL);
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EB441), "\xEB\x16", 2, NULL);
@@ -1068,7 +1061,10 @@ void RenderMain() {
             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
         {
             ImGui::SetWindowFontScale(setting().UISize);
-            ImGui::SetNextItemWidth(140 * setting().UISize);
+            
+            const char* const decimals[] = { "4 decimal places", "3 decimal places", "2 decimal places", "1 decimal place", "0 decimal place" };
+            ImGui::SetNextItemWidth(160.f * setting().UISize);
+            ImGui::Combo("##accuratePerc", &setting().accuratePercentage, decimals, 5);
 
             if (ImGui::Checkbox("Always New Best", &setting().onAlwaysNewBest)) {
                 if (setting().onAlwaysNewBest) {
@@ -1424,7 +1420,6 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the disappearing effect on invisible blocks and etc.");
 
-            //ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
             ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
             ImGui::SameLine();
             if (ImGui::TreeNode("##trailSize")) {
@@ -1435,16 +1430,13 @@ void RenderMain() {
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables wave trail pulsing.");
 
-            if (ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail)) {
-                if (setting().onNoWaveTrail) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\xeb", 1, NULL);
-                }
-                else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe0d54), "\x74", 1, NULL);
-                }
-            }
-            if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
+            ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the hard wave trail.");
+
+            ImGui::Checkbox("No Wave Trail Behind", &setting().onNoWaveTrailBehind);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Disables default player trail behind the wave trail.");
 
             if (ImGui::Checkbox("Practice Pulse", &setting().onPracticePulse)) {
                 if (setting().onPracticePulse) {

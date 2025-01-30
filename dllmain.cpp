@@ -579,6 +579,11 @@ void __fastcall GJDropDownLayer_hideLayerH(gd::GJDropDownLayer* self, void*, boo
         GJDropDownLayer_hideLayer(self, noTransition);
 }
 
+void(__thiscall* CCNode_sortAllChildren)(CCNode*);
+void __fastcall CCNode_sortAllChildrenH(CCNode* self) {
+    //CCNode_sortAllChildren(self);
+}
+
 void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
 void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     if (setting().onAutoSave)
@@ -646,6 +651,7 @@ DWORD WINAPI my_thread(void* hModule) {
 
     MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?initWithDuration@CCTransitionScene@cocos2d@@UAE_NMPAVCCScene@2@@Z")), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
     MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?draw@CCParticleSystemQuad@cocos2d@@UAEXXZ")), CCParticleSystemQuad_drawH, reinterpret_cast<void**>(&CCParticleSystemQuad_draw));
+    //MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?sortAllChildren@CCNode@cocos2d@@UAEXXZ")), CCNode_sortAllChildrenH, reinterpret_cast<void**>(&CCNode_sortAllChildren));
     //MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?setString@CCLabelBMFont@cocos2d@@UAEXPBD@Z")), CCLabelBMFont_setStringH, reinterpret_cast<void**>(&CCLabelBMFont_setString));
     //MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?create@CCLabelBMFont@cocos2d@@SAPAV12@PBD0@Z")), CCLabelBMFont_createH, reinterpret_cast<void**>(&CCLabelBMFont_create));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer_onCloneH, reinterpret_cast<void**>(&LevelInfoLayer_onClone));
@@ -669,6 +675,11 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bff0), GJDropDownLayer_hideLayerH, reinterpret_cast<void**>(&GJDropDownLayer_hideLayer));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bf20), GJDropDownLayer_showLayerH, reinterpret_cast<void**>(&GJDropDownLayer_showLayer));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92f20), DrawGridLayer::addToSpeedObjectsH, reinterpret_cast<void**>(&DrawGridLayer::addToSpeedObjects));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe1270), PlayerObject::placeStreakPointH, reinterpret_cast<void**>(&PlayerObject::placeStreakPoint));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9b50), PlayerObject::updateH, reinterpret_cast<void**>(&PlayerObject::update));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject::fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject::fadeOutStreak2));
+
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

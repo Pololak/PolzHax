@@ -12,12 +12,19 @@ namespace gd {
             //float m_pulseSize; // 0x012C
             bool m_isSolid; // 0x0130
 
+            cocos2d::CCPoint currentPoint() {
+                return from<cocos2d::CCPoint>(this, 0x11c);
+            }
+
             auto getStrokeScale() {
                 return from<float>(this, 0x124);
             } // m_waveSize
 
             auto& pulseSize() {
                 return from<float>(this, 0x128);
+            }
+            void addPoint(cocos2d::CCPoint p0) {
+                return reinterpret_cast<void(__thiscall*)(HardStreak*, cocos2d::CCPoint)>(base + 0x83a60)(this, p0);
             }
     }; // size = 0x134
 }
