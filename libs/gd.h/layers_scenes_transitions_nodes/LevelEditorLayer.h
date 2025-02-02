@@ -14,6 +14,7 @@ class GJGameLevel;
 class DrawGridLayer;
 class PlayerObject;
 class LevelSettingsObject;
+class StartPosObject;
 
 enum class UndoCommand {
     Delete = 1,
@@ -37,10 +38,38 @@ public:
 
 class LevelEditorLayer : public cocos2d::CCLayer {
     public:
-        PAD(0x84)
-        int m_nCurrentLayer;
-        PAD(0x2c)
-        EditorUI* m_pEditorUI;
+        PAD(0x14)
+        int m_groupIDFilter; // 0x12c
+        StartPosObject* m_startPosObject; // 0x130
+        float m_gameLayerScale; // 0x134
+        OBB2D* m_obb2d; // 0x138
+        OBB2D* m_obb2d_2; // 0x13c
+        cocos2d::CCSprite* m_deathSprite; // 0x140
+        PAD(0x10)
+        GameObject* m_lastVehicle; // 0x154
+        GameObject* m_dualPortal; // 0x158
+        EditorUI* m_uiLayer; // 0x15c
+        cocos2d::CCSprite* m_backgroundSprite; // 0x160
+        cocos2d::CCSpriteBatchNode* m_objectBatchNode; // 0x164
+        cocos2d::CCSpriteBatchNode* m_playerBatchNode; // 0x168
+        cocos2d::CCArray* m_levelSections; // 0x16c
+        cocos2d::CCArray* m_undoList; // 0x170
+        cocos2d::CCArray* m_redoList; // 0x174
+        cocos2d::CCPoint m_cameraPos; // 0x178
+        int m_objectCount; // 0x180
+        DrawGridLayer* m_gridLayer; // 0x184
+        cocos2d::CCLayer* m_gameLayer; // 0x188
+        GJGameLevel* m_level; // 0x18c
+        LevelSettingsObject* m_levelSettings; // 0x190
+        int m_levelDistance; // 0x194
+        int m_playerState; // 0x198
+        PlayerObject* m_player; // 0x19c
+        PlayerObject* m_player2; // 0x1a0
+        bool m_dualMode; // 0x1a4
+        float m_minPortalY; // 0x1a8
+        float m_maxPortalY; // 0x1ac
+        float m_clkTimer; // 0x1b0
+        std::string m_oldLevelString; // 0x1b4
 
     public:
         static LevelEditorLayer* create(GJGameLevel* level) {
@@ -188,9 +217,6 @@ class LevelEditorLayer : public cocos2d::CCLayer {
                 section = 0;
             return section;
         }
-
-        int getCurrentLayer() { return m_nCurrentLayer; }
-        void setCurrentLayer(int n) { m_nCurrentLayer = n; }
 
         //static cocos2d::CCScene* scene(GJGameLevel* level) {
         //    return cocos2d::CCScene::create()->addChild(LevelEditorLayer::create(level));

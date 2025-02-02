@@ -4,6 +4,7 @@
 #include <variant>
 #include <optional>
 #include <limits>
+#undef max
 
 namespace matplist {
 	struct Value {

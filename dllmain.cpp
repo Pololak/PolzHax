@@ -1,4 +1,5 @@
 #define NOMINMAX
+#define UNICODE
 #include "pch.h"
 #include <DbgHelp.h>
 #include <sstream>
@@ -31,8 +32,12 @@
 #include "InfoLayer.hpp"
 #include "CommentCell.h"
 #include "GameVariables.hpp"
+#include "share.hpp"
+#include <nfd.h>
 
 gd::MenuGameLayer* menuGameLayer;
+gd::EditLevelLayer* editLevelLayer;
+gd::LevelInfoLayer* levelInfoLayer;
 
 int serverString;
 
@@ -40,6 +45,30 @@ enum class ServerAddresses {
     GHS = 808594997,
     ABSOLLLUTE = 1953785198,
     PLATINUM = 1952541808
+};
+
+class ImportExportCB {
+public:
+    void onExportLevelELL(CCObject* obj) {
+        auto* const level = reinterpret_cast<gd::EditLevelLayer*>(reinterpret_cast<CCNode*>(obj)->getParent()->getParent())->level();
+        nfdchar_t* path = nullptr;
+        if (NFD_SaveDialog("gmd", nullptr, &path) == NFD_OKAY) {
+            std::ofstream file(path);
+            dump_level(level, file);
+            free(path);
+            gd::FLAlertLayer::create(nullptr, "Success", "The level has been saved", "OK", nullptr, 320.f, false, 0)->show();
+        }
+    }
+    void onExportLevelLIL(CCObject* obj) {
+        auto* const level = reinterpret_cast<gd::LevelInfoLayer*>(reinterpret_cast<CCNode*>(obj)->getParent()->getParent())->level();
+        nfdchar_t* path = nullptr;
+        if (NFD_SaveDialog("gmd", nullptr, &path) == NFD_OKAY) {
+            std::ofstream file(path);
+            dump_level(level, file);
+            free(path);
+            gd::FLAlertLayer::create(nullptr, "Success", "The level has been saved", "OK", nullptr, 320.f, false, 0)->show();
+        }
+    }
 };
 
 void(__thiscall* fpMainLoop)(cocos2d::CCDirector* self);
@@ -391,8 +420,6 @@ public:
 	}
 };
 
-gd::EditLevelLayer* editLevelLayer;
-
 MoveToTopProtocol moveToTopProtocol;
 
 class EditLevelLayerCB {
@@ -405,9 +432,9 @@ public:
     }
 };
 
-bool(__thiscall* EditLevelLayer_init)(gd::EditLevelLayer*, gd::GJGameLevel*);
-bool __fastcall EditLevelLayer_initH(gd::EditLevelLayer* self, void*, gd::GJGameLevel* gameLevel) {
-    if (!EditLevelLayer_init(self, gameLevel)) return false;
+bool(__thiscall* EditLevelLayer_init_O)(gd::EditLevelLayer*, gd::GJGameLevel*);
+bool __fastcall EditLevelLayer_init_H(gd::EditLevelLayer* self, void*, gd::GJGameLevel* gameLevel) {
+    if (!EditLevelLayer_init_O(self, gameLevel)) return false;
     editLevelLayer = self;
 
     localLevelArray = gd::LocalLevelManager::sharedState()->getLocalLevels();
@@ -434,8 +461,16 @@ bool __fastcall EditLevelLayer_initH(gd::EditLevelLayer* self, void*, gd::GJGame
     auto centerMenu = from<CCMenu*>(self, 0x120);
     reinterpret_cast<CCLabelBMFont*>(self->getChildren()->objectAtIndex(13))->setVisible(0);
     auto idLabel = CCLabelBMFont::create("ID: ", "goldFont.fnt");
-    if (self->level()->m_levelID == 0) {
+    std::string original = std::to_string(self->level()->originalLevel());
+    std::string levelID = std::to_string(self->level()->m_levelID);
+    if ((self->level()->m_levelID == 0) && (self->level()->originalLevel() == 0)) {
         idLabel->setString("ID: na");
+    }
+    else if ((self->level()->originalLevel() != 0) && (self->level()->m_levelID == 0)) {
+        idLabel->setString(std::string("ID: na (" + original + ")").c_str());
+    }
+    else if ((self->level()->m_levelID != 0) && (self->level()->originalLevel() != 0)) {
+        idLabel->setString(std::string("ID: " + levelID + " (" + original + ")").c_str());
     }
     else {
         idLabel->setString(CCString::createWithFormat("ID: %i", self->level()->m_levelID)->getCString());
@@ -450,6 +485,20 @@ bool __fastcall EditLevelLayer_initH(gd::EditLevelLayer* self, void*, gd::GJGame
     }
     centerMenu->addChild(onLevelID);
     onLevelID->setPosition({ 75.f, -121.f });
+
+    auto shareMenu = CCMenu::create();
+
+    auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+    if (!btn_spr->initWithFile("BE_Export_File.png")) {
+        btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
+    }
+    auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, menu_selector(ImportExportCB::onExportLevelELL));
+    button->setPosition({ -30, +30 });
+
+    shareMenu->setZOrder(1);
+    shareMenu->setPosition({ director->getScreenRight(), director->getScreenBottom() });
+    shareMenu->addChild(button);
+    self->addChild(shareMenu);
 
     return true;
 }
@@ -501,6 +550,8 @@ public:
 bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&LevelInfoLayer_init>(self, level)) return false;
 
+    levelInfoLayer = self;
+
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
 
@@ -524,6 +575,17 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
     auto garageRope = gd::CCMenuItemSpriteExtra::create(garageRope_spr, garageRope_spr, self, menu_selector(LevelInfoLayerCB::onGarage));
     garageRope->setPosition(menu->convertToNodeSpace({ (winSize.width / 2) + 145.f, director->getScreenTop() - 30.f }));
     menu->addChild(garageRope);
+
+    auto playButtonMenu = from<CCMenu*>(self, 0x138);
+
+    auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+    if (!btn_spr->initWithFile("BE_Export_File.png")) {
+        btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
+    }
+    auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, menu_selector(ImportExportCB::onExportLevelLIL));
+
+    button->setPosition({ -(winSize.width / 2) + 30, 24 });
+    playButtonMenu->addChild(button);
 
 	return true;
 }
@@ -660,7 +722,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9f830), LevelSearchLayer_initH, reinterpret_cast<void**>(&LevelSearchLayer_init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x84080), InfoLayer::initH, reinterpret_cast<void**>(&InfoLayer::init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x87fc0), LeaderboardsLayer_initH, reinterpret_cast<void**>(&LeaderboardsLayer_init));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3b5a0), EditLevelLayer_initH, reinterpret_cast<void**>(&EditLevelLayer_init));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3b5a0), EditLevelLayer_init_H, reinterpret_cast<void**>(&EditLevelLayer_init_O));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9bc10), LevelInfoLayer_initH, reinterpret_cast<void**>(&LevelInfoLayer_init));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3d440), EditLevelLayer_onEditH, reinterpret_cast<void**>(&EditLevelLayer_onEdit));
 
@@ -675,6 +737,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bff0), GJDropDownLayer_hideLayerH, reinterpret_cast<void**>(&GJDropDownLayer_hideLayer));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bf20), GJDropDownLayer_showLayerH, reinterpret_cast<void**>(&GJDropDownLayer_showLayer));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92f20), DrawGridLayer::addToSpeedObjectsH, reinterpret_cast<void**>(&DrawGridLayer::addToSpeedObjects));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe1270), PlayerObject::placeStreakPointH, reinterpret_cast<void**>(&PlayerObject::placeStreakPoint));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9b50), PlayerObject::updateH, reinterpret_cast<void**>(&PlayerObject::update));

@@ -54,6 +54,10 @@ public:
         return from<GJLevelType>(this, 0x26c);
     }
 
+    int originalLevel() {
+        return from<int>(this, 0x204);
+    }
+
     cocos2d::CCDictionary* m_lastBuildSave;
     int m_levelID;
     gd::string m_levelName;

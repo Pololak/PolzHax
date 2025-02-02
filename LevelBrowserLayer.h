@@ -16,6 +16,7 @@ namespace LevelBrowserLayer {
 		void onRefresh(CCObject*);
 		void onLastPage(CCObject*);
 		void onFirstPage(CCObject*);
+		void onImportLevel(CCObject*);
 	};
 
 	void mem_init();

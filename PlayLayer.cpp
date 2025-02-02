@@ -329,7 +329,7 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
         startPercent = (self->getPlayerStartPosition().x / self->levelLength()) * 100.f;
     }
 
-    std::cout << startPercent << std::endl;
+    /*std::cout << startPercent << std::endl;*/
 
     PlayLayer::resetLevel(self);
 
@@ -337,16 +337,21 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
         if (inPractice && checkpoints.size() > 0) {
             checkpoints.back().restore(self);
             objBlending.back().restore(self);
+            self->m_needsReorderColor01 = true;
+            self->m_needsReorderColor02 = true;
+            self->m_needsReorderColor03 = true;
+            self->m_needsReorderColor04 = true;
+            self->m_needsReorderColorDL = true;
         }
     }
 
-    std::cout << from<CCArray*>(self, 0x154)->lastObject() << std::endl;
+    //std::cout << from<CCArray*>(self, 0x154)->lastObject() << std::endl;
 
-    std::cout << "Col1 Blending: " << from<bool>(self, 0x329) << std::endl;
-    std::cout << "Col2 Blending: " << from<bool>(self, 0x32A) << std::endl;
-    std::cout << "Col3 Blending: " << from<bool>(self, 0x32B) << std::endl;
-    std::cout << "Col4 Blending: " << from<bool>(self, 0x32C) << std::endl;
-    std::cout << "3DL Blending: " << from<bool>(self, 0x32D) << std::endl;
+    std::cout << "Col1 Blending: " << self->m_customColor01Blend << std::endl;
+    std::cout << "Col2 Blending: " << self->m_customColor02Blend << std::endl;
+    std::cout << "Col3 Blending: " << self->m_customColor03Blend << std::endl;
+    std::cout << "Col4 Blending: " << self->m_customColor04Blend << std::endl;
+    std::cout << "3DL Blending: " << self->m_customColorDLBlend << std::endl;
 }
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
@@ -961,6 +966,8 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     isPlayerDead = false;
 
     PlayLayer::update(self, dt);
+
+    std::cout << self->m_player << std::endl;
 
     if (!isPlayerDead) wasDead = false;
 

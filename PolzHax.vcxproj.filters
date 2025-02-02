@@ -46,6 +46,9 @@
     <Filter Include="libs\detours">
       <UniqueIdentifier>{86e30898-bbc5-432a-bdd0-9fdfc479bf40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs\nfd">
+      <UniqueIdentifier>{69c8ce71-9cd5-4838-84e9-ecd09ae2b6ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1605,6 +1608,21 @@
     <ClInclude Include="TrajectorySimulation.h">
       <Filter>Header Files\Polz2</Filter>
     </ClInclude>
+    <ClInclude Include="share.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\common.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\ftg_core.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\include\nfd.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\nfd_common.h">
+      <Filter>libs\nfd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1720,6 +1738,12 @@
     </ClCompile>
     <ClCompile Include="TrajectorySimulation.cpp">
       <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\nfd\src\nfd_common.c">
+      <Filter>libs\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\nfd\src\nfd_win.cpp">
+      <Filter>libs\nfd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

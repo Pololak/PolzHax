@@ -104,6 +104,7 @@ namespace EditorUI {
 		void moveObjectQUnitDown(CCObject*);
 
 		void onGroupSticky(CCObject*);
+		void onCircleTool(CCObject*);
 	};
 
 	inline void(__thiscall* onCopy)(gd::EditorUI*, CCObject*);
@@ -220,6 +221,9 @@ namespace LevelSettingsLayer {
 namespace DrawGridLayer {
 	inline void(__thiscall* addToSpeedObjects)(gd::DrawGridLayer*, gd::GameObject*);
 	void __fastcall addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject);
+
+	inline void(__thiscall* draw)(gd::DrawGridLayer*);
+	void __fastcall drawH(gd::DrawGridLayer*);
 }
 
 namespace PlayerObject {

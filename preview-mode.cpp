@@ -60,6 +60,188 @@ static std::array<float, 9> SNAP_GRID_SIZES{
 	1.f, 2.f, 3.75f, 7.5f, 15.f, 30.f, 60.f, 90.f, 120.f
 };
 
+CCLayer* circleToolPopup;
+static float m_angle;
+static float m_step;
+static float m_fat;
+CCLabelBMFont* m_circleToolLabel = nullptr;
+FloatInputNode* angle_input = nullptr;
+FloatInputNode* step_input = nullptr;
+
+class CircleToolPopup : public CCLayer { // FINALLY
+public:
+	static CircleToolPopup* create() {
+		CircleToolPopup* obj = new CircleToolPopup;
+		if (obj && obj->init()) {
+			obj->autorelease();
+			return obj;
+		}
+		CC_SAFE_DELETE(obj);
+		return nullptr;
+	}
+
+	bool init() {
+		if (!CCLayer::init()) return false;
+		const float width = 300, height = 220;
+		CCLayerColor* CCLayerCol = CCLayerColor::create(ccc4(0, 0, 0, 0));
+		CCLayerCol->setZOrder(1);
+		CCLayerCol->setScale(10.f);
+		this->addChild(CCLayerCol);
+		auto actionColor = CCFadeTo::create(0.1f, 75);
+		CCLayerCol->runAction(actionColor);
+
+		auto touchDispatcher = CCDirector::sharedDirector()->m_pTouchDispatcher;
+		touchDispatcher->incrementForcePrio();
+		this->registerWithTouchDispatcher();
+		setTouchEnabled(true);
+		setKeypadEnabled(true);
+		setMouseEnabled(true);
+
+		auto director = CCDirector::sharedDirector();
+
+		auto bgSprite = CCSprite::create("GJ_button_03.png");
+		bgSprite->setScale(100.f);
+		bgSprite->setOpacity(0);
+		auto bgButton = gd::CCMenuItemSpriteExtra::create(bgSprite, nullptr, this, nullptr);
+		auto bgMenu = CCMenu::create();
+		bgMenu->addChild(bgButton);
+		bgMenu->setZOrder(0);
+		bgMenu->setPosition((CCDirector::sharedDirector()->getScreenRight()) - 25, (CCDirector::sharedDirector()->getScreenTop()) - 25);
+		this->addChild(bgMenu); // DONT EVEN ASK WHAT IS THIS
+
+		auto bg = extension::CCScale9Sprite::create("GJ_square01.png");
+		bg->setContentSize({ width, height });
+		bg->setPosition(director->getWinSize().width / 2, director->getWinSize().height / 2);
+		bg->setZOrder(2);
+		this->addChild(bg);
+
+		const CCPoint offset = director->getWinSize() / 2.f;
+
+		auto appearAction = CCEaseElasticOut::create(CCScaleTo::create(.5f, 1.f), .6f);
+
+		auto menu = CCMenu::create();
+		menu->setZOrder(3);
+		this->addChild(menu);
+
+		auto closeBtn = gd::CCMenuItemSpriteExtra::create(
+			(CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png")),
+			nullptr,
+			this,
+			menu_selector(CircleToolPopup::onClose));
+		closeBtn->setPosition(-((width / 2) - 5), (height / 2) - 5);
+
+		menu->addChild(closeBtn);
+
+		auto mainLabel = CCLabelBMFont::create("Circle Tool", "bigFont.fnt");
+		mainLabel->setPosition(ccp(0.f, 95.f) + offset);
+		mainLabel->setScale(0.75f);
+		mainLabel->setZOrder(5);
+		this->addChild(mainLabel);
+
+		auto arcLabel = CCLabelBMFont::create("Arc:", "goldFont.fnt");
+		arcLabel->setPosition(ccp(-60, 64) + offset);
+		arcLabel->setScale(0.75f);
+		arcLabel->setZOrder(5);
+		this->addChild(arcLabel);
+		angle_input = FloatInputNode::create(CCSize(60, 30), 2.f, "bigFont.fnt");
+		angle_input->set_value(m_angle);
+		angle_input->setPosition(ccp(-60, 38) + offset);
+		angle_input->setZOrder(5);
+		this->addChild(angle_input);
+
+		auto stepLabel = CCLabelBMFont::create("Step:", "goldFont.fnt");
+		stepLabel->setPosition(ccp(60, 64) + offset);
+		stepLabel->setScale(0.75f);
+		stepLabel->setZOrder(5);
+		this->addChild(stepLabel);
+		step_input = FloatInputNode::create(CCSize(60, 30), 2.f, "bigFont.fnt");
+		step_input->set_value(m_step);
+		step_input->setPosition(ccp(60, 38) + offset);
+		step_input->setZOrder(5);
+		this->addChild(step_input);
+
+		m_circleToolLabel = CCLabelBMFont::create("copies: 69\nobjects: 69420", "chatFont.fnt", 0.f, kCCTextAlignmentLeft);
+		m_circleToolLabel->setPosition(ccp(-83, -41) + offset);
+		m_circleToolLabel->setZOrder(5);
+		this->addChild(m_circleToolLabel);
+		this->update_labels();
+
+		auto originalAuthorLbl = CCLabelBMFont::create("Original by Mat", "goldFont.fnt");
+		originalAuthorLbl->setScale(0.5f);
+		auto originalAuthor = gd::CCMenuItemSpriteExtra::create(originalAuthorLbl, nullptr, this, menu_selector(CircleToolPopup::originalAuthor));
+		originalAuthor->setPosition(ccp(-92, -96));
+		menu->addChild(originalAuthor);
+
+		auto apply_btn = gd::CCMenuItemSpriteExtra::create(
+			gd::ButtonSprite::create("Apply", 0, 0, 0.75f, false, "goldFont.fnt", "GJ_button_01.png", 25.f),
+			nullptr,
+			this, menu_selector(CircleToolPopup::onApply)
+		);
+		apply_btn->setPosition({ 0, -85 });
+		menu->addChild(apply_btn);
+
+		this->setScale(0.1f);
+		this->runAction(appearAction);
+
+		return true;
+	}
+
+	void keyBackClicked() override {
+		this->removeFromParentAndCleanup(true);
+		circleToolPopup = nullptr;
+	}
+
+	void onClose(CCObject*) {
+		this->removeFromParentAndCleanup(true);
+		circleToolPopup = nullptr;
+	}
+
+	void update_labels() {
+		m_angle = angle_input->get_value().value_or(m_angle);
+		m_step = step_input->get_value().value_or(m_step);
+		auto objs = editUI->getSelectedObjectsOfCCArray();
+		const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
+		const auto obj_count = amt * objs->count();
+		m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
+	}
+
+	void onApply(CCObject*) {
+		perform();
+	}
+
+	void perform() {
+		CCArray* objs = CCArray::create();
+		for (float i = 1; i * m_step < m_angle; i++) {
+			editUI->onDuplicate(nullptr);
+			auto selected = editUI->getSelectedObjectsOfCCArray();
+			editUI->rotateObjects(selected, m_step, { 0.f, 0.f });
+
+			const float angle = i * m_step;
+
+			from<CCArray*>(levelEditorLayer, 0x170)->removeLastObject();
+			objs->addObjectsFromArray(selected);
+		}
+		from<CCArray*>(levelEditorLayer, 0x170)->addObject(gd::UndoObject::createWithArray(objs, gd::UndoCommand::Paste));
+		editUI->selectObjects(objs);
+		this->keyBackClicked();
+	}
+
+	void originalAuthor(CCObject*) {
+		CCApplication::sharedApplication()->openURL("https://github.com/matcool/small-gd-mods/blob/main/src/circle-tool.cpp");
+	}
+
+	void showCallback(CCObject* btn) {
+		if (editUI->getSelectedObjectsOfCCArray()->count()) {
+			auto director = CCDirector::sharedDirector();
+			auto myCircleTool = CircleToolPopup::create();
+			myCircleTool->setZOrder(9999);
+			auto myLayer2 = CCDirector::sharedDirector()->getRunningScene();
+			myLayer2->addChild(myCircleTool);
+			circleToolPopup = myCircleTool;
+		}
+	}
+};
+
 void updateGridSizeLabel() {
 	m_gridSizeLabel->setString(CCString::createWithFormat("%.02f%", setting().gridSize)->getCString());
 }
@@ -263,14 +445,18 @@ public:
 		menu->addChild(button);
 		menu->addChild(button2);
 
-		auto resetSprite = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
+		auto resetSprite = CCSprite::create("GJ_button_04.png");
+		resetSprite->setScale(0.7f);
+		auto dhaskjfhajklsdhflkah = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
+		dhaskjfhajklsdhflkah->setPosition({ resetSprite->getContentSize() / 2.f });
+		resetSprite->addChild(dhaskjfhajklsdhflkah);
 		auto resetButton = gd::CCMenuItemSpriteExtra::create(
 			resetSprite,
 			nullptr,
 			this,
 			menu_selector(ColorFilterPopup::onReset)
 		);
-		resetButton->setPosition({ -70, -30 });
+		resetButton->setPosition({ -70, -34 });
 		menu->addChild(resetButton);
 
 		this->setScale(0.1f);
@@ -792,7 +978,15 @@ public:
 					}
 				}
 			}
-			//}
+		}
+
+		if (circleToolPopup) {
+			m_angle = angle_input->get_value().value_or(m_angle);
+			m_step = step_input->get_value().value_or(m_step);
+			auto objs = editUI->getSelectedObjectsOfCCArray();
+			const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
+			const auto obj_count = amt * objs->count();
+			m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
 		}
 		
 		if (is_editor_paused) return;
@@ -1601,7 +1795,8 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 
 	auto boomScrollLayer = from<gd::BoomScrollLayer*>(self->editButtonBar(), 0xe8);
 	auto extendLayer = from<CCLayer*>(boomScrollLayer, 0x158);
-	auto buttonPage2 = reinterpret_cast<CCMenu*>(extendLayer->getChildren()->objectAtIndex(1));
+	auto buttonPage2 = reinterpret_cast<gd::ButtonPage*>(extendLayer->getChildren()->objectAtIndex(1));
+	auto buttonPage2_menu = reinterpret_cast<CCMenu*>(buttonPage2->getChildren()->objectAtIndex(0));
 
 	auto dotsNode = reinterpret_cast<CCLayer*>(boomScrollLayer->getChildren()->objectAtIndex(1));
 	CCArray* dotsArray = from<CCArray*>(boomScrollLayer, 0x118);
@@ -1950,6 +2145,20 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	movePageMenu2->addChild(rotate45CCW_btn);
 	movePageMenu2->addChild(rotate265CW_btn);
 	movePageMenu2->addChild(rotate265CCW_btn);
+
+	auto circleToolBase_spr = CCSprite::create("GJ_button_01.png");
+	auto circleToolSecond_spr = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
+	auto circleToolLabel = CCLabelBMFont::create("Circle\ntool", "bigFont.fnt", 0.f, CCTextAlignment::kCCTextAlignmentCenter);
+	circleToolBase_spr->addChild(circleToolSecond_spr);
+	circleToolSecond_spr->setPosition({ (circleToolBase_spr->getContentSize().width) / 2, ((circleToolBase_spr->getContentSize().height) / 2) + 2 });
+	circleToolBase_spr->setScale(0.9f);
+	circleToolBase_spr->addChild(circleToolLabel);
+	circleToolLabel->setScale(0.35f);
+	circleToolLabel->setPosition({ (circleToolBase_spr->getContentSize().width) / 2, ((circleToolBase_spr->getContentSize().height) / 2) + 2 });
+	auto circleToolBtn = gd::CCMenuItemSpriteExtra::create(circleToolBase_spr, circleToolBase_spr, self, menu_selector(CircleToolPopup::showCallback));
+	circleToolBtn->setPosition({ -105, -(winSize.height / 2) + 28 });
+
+	buttonPage2_menu->addChild(circleToolBtn);
 }
 
 void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void* edx, gd::GameObject* object) {
@@ -2226,6 +2435,8 @@ void __fastcall EditorUI::keyDownH(gd::EditorUI* self, void*, enumKeyCodes key) 
 }
 
 void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self) {
+	EditorUI::updateButtons(self);
+
 	auto deleteBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(self->getRedoBtn(), 0xac)->getChildByTag(45030));
 
 	if (deleteBtn) {
@@ -2253,7 +2464,6 @@ void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self) {
 			onGoToGroup->setEnabled(false);
 		}
 	}
-	EditorUI::updateButtons(self);
 }
 
 void __fastcall EditorUI::onGroupDownH(gd::EditorUI* self, void*, CCObject* obj) {
@@ -2278,9 +2488,9 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
 
 void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* obj) {
 
-	for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
-		gd::ColorSelectPopup::create(obj, 0, 0, 0);
-	}
+	//for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
+	//	gd::ColorSelectPopup::create(obj, 0, 0, 0);
+	//}
 
 	EditorUI::editObject(self, obj);
 }
@@ -2368,6 +2578,8 @@ float timeXPos(gd::LevelEditorLayer* self, float time) {
 void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	editorPauseLayer = self;
 	EditorPauseLayer::customSetup(self);
+
+	std::cout << self->m_editorLayer << std::endl;
 
 	auto director = CCDirector::sharedDirector();
 	auto size = director->getWinSize();
@@ -2703,6 +2915,44 @@ void __fastcall DrawGridLayer::addToSpeedObjectsH(gd::DrawGridLayer* self, void*
 		speedObjects->addObject(gameObject);
 		from<int>(self, 0x17c) = 1;
 	}
+}
+
+float timeBetweenPosition(float a, float b) {
+	auto l = levelEditorLayer->getDrawGrid();
+	return std::abs(l->timeForXPos(a) - l->timeForXPos(b));
+}
+
+void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
+	DrawGridLayer::draw(self);
+
+	gd::LevelEditorLayer* lel = from<gd::LevelEditorLayer*>(self, 0x124);
+
+	auto secarr = lel->getLevelSections();
+	auto arrcount = secarr->count();
+	auto layer = lel->gameLayer();
+	float xp = -layer->getPositionX() / layer->getScale();
+	for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
+		if (i < 0) continue;
+		if (i >= arrcount) break;
+		auto objAtInd = secarr->objectAtIndex(i);
+		auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+		for (int j = 0; j < objarr->count(); j++) {
+			auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+			switch (obj->getObjectID())
+			{
+			case 29:
+
+				glLineWidth(2);
+				cocos2d::ccDrawColor4B(255, 255, 255, 100);
+				ccDrawLine(obj->getPosition(), ccp(obj->getPositionX() + 50, obj->getPositionY()));
+				break;
+			}
+			
+			
+		}
+	}
+		
 }
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {

@@ -1,4 +1,6 @@
 #include "LevelBrowserLayer.h"
+#include "share.hpp"
+#include <nfd.h>
 
 gd::LevelBrowserLayer* levelBrowserLayer;
 gd::ButtonSprite* m_moveToPageButtonSprite = nullptr;
@@ -212,6 +214,21 @@ void LevelBrowserLayer::Callback::onFirstPage(CCObject*) {
 	m_moveToLast->setVisible(1);
 }
 
+void LevelBrowserLayer::Callback::onImportLevel(CCObject*) {
+	nfdchar_t* path = nullptr;
+	if (NFD_OpenDialog("gmd", nullptr, &path) == NFD_OKAY) {
+		std::ifstream file(path);
+		auto* const level = import_level(file);
+		free(path);
+		if (!level) {
+			gd::FLAlertLayer::create(nullptr, "Error", "Failed to import", "OK", nullptr, 320.f, false, 0)->show();
+			return;
+		}
+		auto scene = gd::EditLevelLayer::scene(level);
+		CCDirector::sharedDirector()->pushScene(scene);
+	}
+}
+
 bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* obj) {
     if (!LevelBrowserLayer::init(self, obj)) return false;
     levelBrowserLayer = self;
@@ -263,6 +280,21 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 
         self->addChild(menu);
     }
+	if (obj->m_type == gd::SearchType::MyLevels) {
+		auto menu = CCMenu::create();
+		menu->setPosition(CCDirector::sharedDirector()->getWinSize().width - 30.f, 90);
+		self->addChild(menu);
+
+		auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+		if (!btn_spr->initWithFile("BE_Import_File.png")) {
+			btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
+		}
+
+		auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, menu_selector(LevelBrowserLayer::Callback::onImportLevel));
+
+		menu->setZOrder(1);
+		menu->addChild(button);
+	}
 
     return true;
 }
