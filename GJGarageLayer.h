@@ -11,11 +11,15 @@ namespace GJGarageLayer {
 	inline void(__thiscall* selectPage)(gd::GJGarageLayer*, int);
 	void __fastcall selectPageH(gd::GJGarageLayer* self, void* edx, int iconType);
 
+	inline void(__thiscall* backButtonMenu)();
+	void __fastcall backButtonMenuH();
+
 	class Callback {
 	public:
 		void onDartIcon(CCObject*);
 		void onNext(CCObject*);
 		void onPrev(CCObject*);
+		void onGarageRopeBack(CCObject*);
 	};
 
 	void switchToPage(int page);

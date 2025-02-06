@@ -2,9 +2,6 @@
 #include "ObjectsIds.h"
 #include "state.h"
 
-//std::deque<cocos2d::CCRect> boo1;
-//std::deque<cocos2d::CCRect> boo2;
-
 void Hitboxes::drawRect(CCDrawNode* drawer, CCRect const& rect, ccColor4F col) {
     constexpr size_t N = 4;
     CCPoint vert[N];
@@ -67,22 +64,6 @@ void Hitboxes::drawRectObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col
     vert[3] = ob->getOrientedBox()->getPoint4();
 
     drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
-
-    /*if (setting().onSolidsHitbox && solids.contains(ob->getObjectID())) {
-        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
-    }
-    else if (setting().onSolidsHitbox && ramps.contains(ob->getObjectID())) {
-        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
-    }
-    else if (setting().onHazardsHitbox && hazard.contains(ob->getObjectID())) {
-        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
-    }
-    else if (setting().onHazardsHitbox && saws.contains(ob->getObjectID())) {
-        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
-    }
-    else if (setting().onSpecialsHitbox && orbsnportals.contains(ob->getObjectID())) {
-        drawer->drawPolygon(vert, 4, { 0, 0, 0, 0 }, 0.5, col);
-    }*/
 }
 
 void Hitboxes::drawCircleObj(CCDrawNode* drawer, gd::GameObject* ob, ccColor4F col) {
@@ -127,25 +108,7 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
     Hitboxes::drawRect(drawNode, rectRectangleSmall, { setting().solidsColor[0], setting().solidsColor[1], setting().solidsColor[2], (setting().hitboxOpacity * 255.f)});
     drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0}, 0.5, { (setting().hazardsColor[0] / 2), (setting().hazardsColor[1] / 2), (setting().hazardsColor[2] / 2), (setting().hitboxOpacity * 255.f)});
     Hitboxes::drawRect(drawNode, rectRectangle, { setting().hazardsColor[0], setting().hazardsColor[1], setting().hazardsColor[2], (setting().hitboxOpacity * 255.f) });
-
-    //while (boo1.size() > 0 && boo1.front().origin.x < rectRectangle.origin.x - 400)
-    //{
-    //    boo1.pop_front();
-    //}
 }
-
-//void Hitboxes::drawObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
-//    if (hazard.contains(obj->getObjectID()))
-//        Hitboxes::drawRectObj(drawNode, obj, { 1, 0, 0, 1 });
-//    else if (orbsnportals.contains(obj->getObjectID()))
-//        Hitboxes::drawRectObj(drawNode, obj, { 0, 1, 0, 1 });
-//    else if (solids.contains(obj->getObjectID()))
-//        Hitboxes::drawRectObj(drawNode, obj, { 0, 0, 1, 1 });
-//    else if (ramps.contains(obj->getObjectID()))
-//        Hitboxes::drawTriangleObj(drawNode, obj, { 0, 0, 1, 1 });
-//    else if (saws.contains(obj->getObjectID()))
-//        Hitboxes::drawCircleObj(drawNode, obj, { 1, 0, 0, 1 });
-//}
 
 void Hitboxes::drawSolidsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
     if (solids.contains(obj->getObjectID()))

@@ -50,7 +50,7 @@ enum class ServerAddresses {
 class ImportExportCB {
 public:
     void onExportLevelELL(CCObject* obj) {
-        auto* const level = reinterpret_cast<gd::EditLevelLayer*>(reinterpret_cast<CCNode*>(obj)->getParent()->getParent())->level();
+        auto* const level = reinterpret_cast<gd::EditLevelLayer*>(reinterpret_cast<CCNode*>(obj)->getParent()->getParent())->m_level;
         nfdchar_t* path = nullptr;
         if (NFD_SaveDialog("gmd", nullptr, &path) == NFD_OKAY) {
             std::ofstream file(path);
@@ -60,7 +60,7 @@ public:
         }
     }
     void onExportLevelLIL(CCObject* obj) {
-        auto* const level = reinterpret_cast<gd::LevelInfoLayer*>(reinterpret_cast<CCNode*>(obj)->getParent()->getParent())->level();
+        auto* const level = reinterpret_cast<gd::LevelInfoLayer*>(reinterpret_cast<CCNode*>(obj)->getParent()->getParent())->m_level;
         nfdchar_t* path = nullptr;
         if (NFD_SaveDialog("gmd", nullptr, &path) == NFD_OKAY) {
             std::ofstream file(path);
@@ -84,7 +84,7 @@ void __fastcall LevelInfoLayer_onCloneH(gd::LevelInfoLayer* self, void*, CCObjec
     LevelInfoLayer_onClone(self, sender);
     if (!self->shouldDownloadLevel()) {
         auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
-        level->songID() = self->level()->songID();
+        level->m_songID = self->m_level->m_songID;
     }
 }
 
@@ -92,7 +92,7 @@ void(__thiscall* EditLevelLayer_onClone)(gd::EditLevelLayer*);
 void __fastcall EditLevelLayer_onCloneH(gd::EditLevelLayer* self) {
     EditLevelLayer_onClone(self);
     auto level = static_cast<gd::GJGameLevel*>(gd::LocalLevelManager::sharedState()->getLocalLevels()->objectAtIndex(0));
-    level->songID() = self->level()->songID();
+    level->m_songID = self->m_level->m_songID;
 }
 
 bool(__thiscall* CCKeyboardDispatcher_dispatchKeyboardMSG)(cocos2d::CCKeyboardDispatcher* self, int key, bool down);
@@ -132,9 +132,12 @@ void __fastcall CCKeyboardDispatcher_dispatchKeyboardMSG_H(CCKeyboardDispatcher*
     CCKeyboardDispatcher_dispatchKeyboardMSG(self, key, down);
 }
 
-class CustomizeObjectLayer : public gd::FLAlertLayer
-{
+class CustomizeObjectLayer : public gd::FLAlertLayer {
 public:
+    gd::GameObject* m_targetObject; // 0x1bc
+    cocos2d::CCArray* m_selectedObjects; // 0x1c0
+    cocos2d::CCArray* m_buttonsArray; // 0x1c4
+
     void hightlightSelected(gd::ButtonSprite* spr) {
         reinterpret_cast<void(__thiscall*)(CustomizeObjectLayer*, gd::ButtonSprite*)>(gd::base + 0x2e730)(this, spr);
     }
@@ -154,18 +157,27 @@ bool __fastcall CustomizeObjectLayer_init_H(CustomizeObjectLayer* self, void* ed
     btn_wht->setTag(static_cast<int>(gd::CustomColorMode::White));
     btn_wht->setPosition({ -82, 5 });
 
-    from<CCArray*>(self, 0x1c4)->addObject(spr_3dl);
-    from<CCArray*>(self, 0x1c4)->addObject(spr_wht);
+    self->m_buttonsArray->addObject(spr_3dl);
+    self->m_buttonsArray->addObject(spr_wht);
 
-    self->getMenu()->addChild(btn_3dl);
-    self->getMenu()->addChild(btn_wht);
+    self->m_buttonMenu->addChild(btn_3dl);
+    self->m_buttonMenu->addChild(btn_wht);
 
-    if (obj && obj->getColorMode() == gd::CustomColorMode::DL) {
-        self->hightlightSelected(spr_3dl);
-    }
-    
-    if (obj && obj->getColorMode() == gd::CustomColorMode::White) {
-        self->hightlightSelected(spr_wht);
+    for (auto obj2 : CCArrayExt<gd::GameObject*>(objs)) {
+        if (obj2) {
+            switch (obj2->getColorMode())
+            {
+            case gd::CustomColorMode::Default:
+                break;
+
+            case gd::CustomColorMode::DL:
+                self->hightlightSelected(spr_3dl);
+                break;
+            case gd::CustomColorMode::White:
+                self->hightlightSelected(spr_wht);
+                break;
+            }
+        }
     }
 
     return true;
@@ -321,7 +333,7 @@ bool(__thiscall* MoreSearchLayer_init)(gd::FLAlertLayer*);
 bool __fastcall MoreSearchLayer_initH(gd::FLAlertLayer* self) {
     if (!MoreSearchLayer_init(self)) return false;
 
-    auto menu = self->menu();
+    auto menu = self->m_buttonMenu;
 
     auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
     auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
@@ -334,7 +346,7 @@ bool __fastcall MoreSearchLayer_initH(gd::FLAlertLayer* self) {
     ELLabel->setScale(0.5f);
     ELLabel->setAnchorPoint({ 0.f, 0.5f });
     menu->addChild(ELToggler);
-    self->getLayer()->addChild(ELLabel);
+    self->m_mainLayer->addChild(ELLabel);
 
     return true;
 }
@@ -428,13 +440,38 @@ public:
         gd::FLAlertLayer::create(&moveToTopProtocol, "Move To Top", "Move this level to the top of the created levels list?", "NO", "YES", 300.f, false, 140.f)->show();
     }
     void onLevelID(CCObject*) {
-        gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(gd::SearchType::Search, std::to_string(editLevelLayer->level()->m_levelID)));
+        gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(gd::SearchType::Search, std::to_string(editLevelLayer->m_level->m_levelID)));
+    }
+};
+
+class MoveToTopProtocolLIL : public gd::FLAlertLayerProtocol {
+public:
+    void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override {
+        if (btn2) {
+
+        }
+    }
+};
+
+MoveToTopProtocolLIL moveToTopProtocolLIL;
+
+class LevelInfoLayerCB {
+public:
+    void onMoveToTop(CCObject*) {
+        gd::FLAlertLayer::create(&moveToTopProtocolLIL, "Move To Top", "Move this level to the top of the created levels list?", "NO", "YES", 300.f, false, 140.f)->show();
+    }
+    void onGarage(CCObject*) {
+        auto garageScene = gd::GJGarageLayer::scene();
+        CCScene* scene = CCTransitionMoveInT::create(0.5f, garageScene);
+        CCDirector::sharedDirector()->pushScene(scene);
     }
 };
 
 bool(__thiscall* EditLevelLayer_init_O)(gd::EditLevelLayer*, gd::GJGameLevel*);
 bool __fastcall EditLevelLayer_init_H(gd::EditLevelLayer* self, void*, gd::GJGameLevel* gameLevel) {
     if (!EditLevelLayer_init_O(self, gameLevel)) return false;
+    gd::GameManager::sharedState()->m_lastScene2 = static_cast<gd::LastGameScene>(99);
+    gd::GameManager::sharedState()->m_premiumPopup = gameLevel;
     editLevelLayer = self;
 
     localLevelArray = gd::LocalLevelManager::sharedState()->getLocalLevels();
@@ -456,28 +493,34 @@ bool __fastcall EditLevelLayer_init_H(gd::EditLevelLayer* self, void*, gd::GJGam
 	auto onMoveToTop_btn = gd::CCMenuItemSpriteExtra::create(onMoveToTop_spr, onMoveToTop_spr, self, menu_selector(EditLevelLayerCB::onMoveToTop));
 	onMoveToTop_btn->setPosition({ -30, -210 });
 
+    auto garageRope_spr = CCSprite::createWithSpriteFrameName("GJ_garageBtn_001.png");
+    garageRope_spr->setScale(0.6f);
+    auto garageRope = gd::CCMenuItemSpriteExtra::create(garageRope_spr, garageRope_spr, self, menu_selector(LevelInfoLayerCB::onGarage));
+    garageRope->setPosition(menu->convertToNodeSpace({ director->getScreenRight() - 84.f, director->getScreenTop() - 30.f }));
+    menu->addChild(garageRope);
+
 	menu->addChild(onMoveToTop_btn);
 
-    auto centerMenu = from<CCMenu*>(self, 0x120);
+    auto centerMenu = self->m_buttonMenu;
     reinterpret_cast<CCLabelBMFont*>(self->getChildren()->objectAtIndex(13))->setVisible(0);
     auto idLabel = CCLabelBMFont::create("ID: ", "goldFont.fnt");
-    std::string original = std::to_string(self->level()->originalLevel());
-    std::string levelID = std::to_string(self->level()->m_levelID);
-    if ((self->level()->m_levelID == 0) && (self->level()->originalLevel() == 0)) {
+    std::string original = std::to_string(self->m_level->m_originalLevel);
+    std::string levelID = std::to_string(self->m_level->m_levelID);
+    if ((self->m_level->m_levelID == 0) && (self->m_level->m_originalLevel == 0)) {
         idLabel->setString("ID: na");
     }
-    else if ((self->level()->originalLevel() != 0) && (self->level()->m_levelID == 0)) {
+    else if ((self->m_level->m_originalLevel != 0) && (self->m_level->m_levelID == 0)) {
         idLabel->setString(std::string("ID: na (" + original + ")").c_str());
     }
-    else if ((self->level()->m_levelID != 0) && (self->level()->originalLevel() != 0)) {
+    else if ((self->m_level->m_levelID != 0) && (self->m_level->m_originalLevel != 0)) {
         idLabel->setString(std::string("ID: " + levelID + " (" + original + ")").c_str());
     }
     else {
-        idLabel->setString(CCString::createWithFormat("ID: %i", self->level()->m_levelID)->getCString());
+        idLabel->setString(CCString::createWithFormat("ID: %i", self->m_level->m_levelID)->getCString());
     }
     idLabel->setScale(0.6f);
     auto onLevelID = gd::CCMenuItemSpriteExtra::create(idLabel, nullptr, self, menu_selector(EditLevelLayerCB::onLevelID));
-    if (self->level()->m_levelID == 0) {
+    if (self->m_level->m_levelID == 0) {
         onLevelID->setEnabled(false);
     }
     else {
@@ -524,31 +567,11 @@ bool __fastcall EditLevelLayer_init_H(gd::EditLevelLayer* self, void*, gd::GJGam
 CCArray* savedLevelsArray;
 CCObject* savedGameLevel;
 
-class MoveToTopProtocolLIL : public gd::FLAlertLayerProtocol {
-public:
-    void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override {
-        if (btn2) {
-            
-        }
-    }
-};
-
-MoveToTopProtocolLIL moveToTopProtocolLIL;
-
-class LevelInfoLayerCB {
-public:
-    void onMoveToTop(CCObject*) {
-        gd::FLAlertLayer::create(&moveToTopProtocolLIL, "Move To Top", "Move this level to the top of the created levels list?", "NO", "YES", 300.f, false, 140.f)->show();
-    }
-    void onGarage(CCObject*) {
-        auto garageScene = gd::GJGarageLayer::scene();
-        CCScene* scene = CCTransitionMoveInT::create(0.5f, garageScene);
-        CCDirector::sharedDirector()->pushScene(garageScene);
-    }
-};
-
 bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&LevelInfoLayer_init>(self, level)) return false;
+
+    gd::GameManager::sharedState()->m_lastScene2 = static_cast<gd::LastGameScene>(98);
+    gd::GameManager::sharedState()->m_premiumPopup = level;
 
     levelInfoLayer = self;
 
@@ -573,10 +596,8 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
     auto garageRope_spr = CCSprite::createWithSpriteFrameName("GJ_garageBtn_001.png");
     garageRope_spr->setScale(0.6f);
     auto garageRope = gd::CCMenuItemSpriteExtra::create(garageRope_spr, garageRope_spr, self, menu_selector(LevelInfoLayerCB::onGarage));
-    garageRope->setPosition(menu->convertToNodeSpace({ (winSize.width / 2) + 145.f, director->getScreenTop() - 30.f }));
-    menu->addChild(garageRope);
-
-    auto playButtonMenu = from<CCMenu*>(self, 0x138);
+    garageRope->setPosition(self->m_likeBtn->getParent()->convertToNodeSpace({ director->getScreenRight() - 84.f, director->getScreenTop() - 30.f}));
+    self->m_likeBtn->getParent()->addChild(garageRope);
 
     auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
     if (!btn_spr->initWithFile("BE_Export_File.png")) {
@@ -585,7 +606,7 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
     auto button = gd::CCMenuItemSpriteExtra::create(btn_spr, nullptr, self, menu_selector(ImportExportCB::onExportLevelLIL));
 
     button->setPosition({ -(winSize.width / 2) + 30, 24 });
-    playButtonMenu->addChild(button);
+    self->m_playBtnMenu->addChild(button);
 
 	return true;
 }
@@ -610,7 +631,7 @@ bool __fastcall CustomSongLayer_initH(gd::FLAlertLayer* self, void*, gd::LevelSe
     if (!CustomSongLayer_init(self, levelSettings)) return false;
 
     if ((serverString == static_cast<int>(ServerAddresses::GHS)) || (serverString == static_cast<int>(ServerAddresses::ABSOLLLUTE)) || (serverString == static_cast<int>(ServerAddresses::PLATINUM))) {
-        auto menu = self->menu();
+        auto menu = self->m_buttonMenu;
 
         auto newgroundsButton = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildren()->objectAtIndex(4));
         newgroundsButton->setPositionX(newgroundsButton->getPositionX() - 55.f);

@@ -1476,9 +1476,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="libs\gd.h\level_nodes\SettingsColorObject.h">
-      <Filter>libs\gd.h</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1623,6 +1620,12 @@
     <ClInclude Include="libs\nfd\src\nfd_common.h">
       <Filter>libs\nfd</Filter>
     </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ColorSelectPopup.h">
+      <Filter>libs\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorObjectLayering.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1744,6 +1747,9 @@
     </ClCompile>
     <ClCompile Include="libs\nfd\src\nfd_win.cpp">
       <Filter>libs\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorObjectLayering.cpp">
+      <Filter>Source Files\Polz2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

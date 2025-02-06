@@ -37,6 +37,8 @@ static CCScene* scene(bool p0) {
 
 bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 	if (!MenuLayer::init(self)) return false;
+	gd::GameManager::sharedState()->m_lastScene2 = static_cast<gd::LastGameScene>(0);
+	gd::GameManager::sharedState()->m_premiumPopup = nullptr;
 
 	auto director = CCDirector::sharedDirector();
 	auto menu = CCMenu::create();
@@ -67,6 +69,10 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 		self->addChild(snow);
 		break;
 	}
+
+	std::cout << gd::GameManager::sharedState()->m_texQuality << std::endl;
+	std::cout << gd::GameManager::sharedState()->m_playerUserID << std::endl;
+	std::cout << gd::GameManager::sharedState()->m_inMenuLayer << std::endl;
 
 	return true;
 }

@@ -1,5 +1,5 @@
-//#ifndef __CUSTOMCOLORMODE_H__
-//#define __CUSTOMCOLORMODE_H__
+//#ifndef __GJCustomColorMode_H__
+//#define __GJCustomColorMode_H__
 //
 //#include <gd.h>
 //#include <stdint.h>

@@ -38,7 +38,9 @@ public:
 
 class LevelEditorLayer : public cocos2d::CCLayer {
     public:
-        PAD(0x14)
+        PAD(12)
+        int m_firstVisibleSection; // 0x124
+        int m_lastVisibleSection; // 0x128
         int m_groupIDFilter; // 0x12c
         StartPosObject* m_startPosObject; // 0x130
         float m_gameLayerScale; // 0x134

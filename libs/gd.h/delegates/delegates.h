@@ -114,6 +114,14 @@ namespace gd {
         virtual void loadLeaderboardFinished(cocos2d::CCArray*, const char*) {}
         virtual void loadLeaderboardFailed(const char*) {}
     };
+
+    class LevelSettingsDelegate {
+        virtual void levelSettingsUpdated() {}
+    };
+
+    class GameRateDelegate {
+        virtual void updateRate();
+    };
 }
 
 #endif

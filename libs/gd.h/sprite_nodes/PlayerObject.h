@@ -24,118 +24,102 @@ namespace gd {
 
 	class PlayerObject : public GameObject {
 	public:
-
-		double m_slopeTime;
-		bool m_bUnknown1;
-		cocos2d::CCNode* m_pUnknown1;
-		cocos2d::CCDictionary* m_pUnknown2;
-		cocos2d::CCDictionary* m_pUnknown3;
-		int m_iUnknown1;
-		int m_iUnknown2;
-		bool m_isRotating;
-		bool m_bUnknown2;
-		GameObject* m_pUnknown4;
-		GameObject* m_pUnknown5;
-		float m_fUnknown1;
-		int m_iUnknown3;
-		bool m_bUnknown3;
-		cocos2d::CCArray* m_particleSystems;
-		int m_iUnused1;
-		GhostType m_ghostEffect;
-		GhostTrailEffect* m_ghostTrailEffect;
-		cocos2d::CCSprite* m_playerFrame;
-		cocos2d::CCSprite* m_playerFrameSecondary;
-		cocos2d::CCSprite* m_playerFrameGlow;
-		cocos2d::CCSprite* m_vehicleFrame;
-		cocos2d::CCSprite* m_vehicleFrameSecondary;
-		cocos2d::CCSprite* m_vehicleFrameThird;
-		cocos2d::CCSprite* m_vehicleFrameGlow;
-		cocos2d::CCSprite* m_pUnknown6;
-		cocos2d::CCMotionStreak* m_playerStreak;
-		HardStreak* m_hardStreak;
-		double m_speed;
-		double m_yStart;
-		double m_gravity;
-		float m_fUnknown2;
-		float m_fUnknown3;
-		bool m_bUnknown4;
-		bool m_bUnknown5;
-		bool m_placedJumpCheckpoint;
-		bool m_hasPlayLayer;
-		bool m_bUnknown6;
-		bool m_particlesActive;
-		bool m_flyFallParticlesActive;
-		bool m_inBallFall;
-		bool m_bUnknown8;
-		double m_dUnknown1;
-		double m_lastJumpTime;
-		double m_dUnknown2;
-		bool m_bUnknown9;
-		bool m_bUnknown10;
-		double m_dUnknown3;
-		double m_dUnknown4;
-		GameObject* m_snapToObject;
-		CheckpointObject* m_pendingCheckpoint;
-		int m_iUnknown4;
-		cocos2d::CCPoint m_lastUpdatePos;
-		cocos2d::CCParticleSystemQuad* m_dragParticle;
-		cocos2d::CCParticleSystemQuad* m_birdDragParticle;
-		cocos2d::CCParticleSystemQuad* m_dragParticle2;
-		cocos2d::CCParticleSystemQuad* m_shipDragParticle;
-		cocos2d::CCParticleSystemQuad* m_burstParticle;
-		bool m_bUnknown11;
-		cocos2d::CCParticleSystemQuad* m_landParticle;
-		cocos2d::CCParticleSystemQuad* m_landParticle2;
-		float m_fUnknown4;
-		float m_fUnknown5;
-		int m_streakType;
-		float m_fUnknown6;
-		float m_fUnknown7;
-		float m_fUnknown8;
-		bool m_inBoost;
-		bool m_bUnknown12;
-		float m_fUnknown9;
-		float m_fUnknown10;
-		bool m_hardStreakActive;
-		bool m_bUnknown14;
-		bool m_tookDamage;
-		bool m_upKeyDown;
-		bool m_upKeyPressed;
-		double m_yVelocity;
-		bool m_onSlope;
-		bool m_wasOnSlope;
-		float m_slopeYVel;
-		bool m_flyMode;
-		bool m_birdMode;
-		bool m_rollMode;
-		bool m_dartMode;
-		bool m_gravityFlipped;
-		bool m_isDead;
-		bool m_canJump;
-		float m_playerScale;
-		float m_timeMod;
-		cocos2d::CCPoint m_lastPos; // m_lastP
-		cocos2d::CCPoint m_portalPos; // m_portalP
-		cocos2d::CCLayer* m_gameLayer;
-		bool m_onGround;
-		bool m_isJumping;
-		bool m_isLocked;
-		bool m_allowRollJump;
-		cocos2d::CCPoint m_lastGroundPos;
-		GameObject* m_touchedRing;
-		GameObject* m_portalObject;
-		bool m_hasJumped;
-		bool m_hasRingJumped;
-		cocos2d::ccColor3B m_glowColor1;
-		cocos2d::ccColor3B m_glowColor2;
-		cocos2d::CCPoint m_realPlayerPos;
-		bool m_isSecondPlayer;
-		bool m_dualMode;
-		double m_clkTimer;
-		bool m_disableEffects;
-		GameplayDelegate* m_gameDelegate;
-		float m_audioScale;
-		float m_groundHeight;
+		double m_slopeTime; // 0x328
+		PAD(24)
+		bool m_isRotating; // 0x348
+		PAD(3)
+		GameObject* m_nextSlope; // 0x34c
+		GameObject* m_collidingSlope; // 0x350
+		PAD(12)
+		cocos2d::CCArray* m_particleSystems; // 0x360
+		PAD(4)
+		GhostType m_ghostEffect; // 0x368
+		GhostTrailEffect* m_ghostTrailEffect; // 0x36c
+		cocos2d::CCSprite* m_playerFrame; // 0x370
+		cocos2d::CCSprite* m_playerFrameSecondary; // 0x374
+		cocos2d::CCSprite* m_playerFrameGlow; // 0x378
+		cocos2d::CCSprite* m_vehicleFrame; // 0x37c
+		cocos2d::CCSprite* m_vehicleFrameSecondary; // 0x380
+		cocos2d::CCSprite* m_vehicleFrameThird; // 0x384
+		cocos2d::CCSprite* m_vehicleFrameGlow; // 0x388
+		cocos2d::CCSprite* m_unkCCSprite; // 0x38c
+		cocos2d::CCMotionStreak* m_playerStreak; // 0x390
+		HardStreak* m_hardStreak; // 0x394
+		double m_speed; // 0x398
+		double m_yStart; // 0x3a0
+		double m_gravity; // 0x3a8
+		PAD(10)
+		bool m_placedJumpCheckpoint; // 0x3ba
+		bool m_hasPlayLayer; // 0x3bb
+		PAD(1)
+		bool m_particlesActive; // 0x3bd
+		bool m_flyFallParticlesActive; // 0x3be
+		bool m_inBallFall; // 0x3bf
+		PAD(12)
+		double m_lastJumpTime; // 0x3cc
+		PAD(26)
+		GameObject* m_snapToObject; // 0x3f8
+		CheckpointObject* m_pendingCheckpoint; // 0x3fc
+		PAD(4)
+		cocos2d::CCPoint m_lastUpdatePos; // 0x404
+		cocos2d::CCParticleSystemQuad* m_dragParticle; // 0x40c
+		cocos2d::CCParticleSystemQuad* m_birdDragParticle; // 0x410
+		cocos2d::CCParticleSystemQuad* m_dragParticle2; // 0x414
+		cocos2d::CCParticleSystemQuad* m_shipDragParticle; // 0x418
+		cocos2d::CCParticleSystemQuad* m_burstParticle; // 0x41c
+		PAD(4)
+		cocos2d::CCParticleSystemQuad* m_landParticle; // 0x424
+		cocos2d::CCParticleSystemQuad* m_landParticle2; // 0x424
+		PAD(8)
+		int m_streakType; // 0x434
+		PAD(12)
+		bool m_inBoost; // 0x444
+		PAD(12)
+		bool m_hardStreakActive; // 0x450
+		PAD(1)
+		bool m_tookDamage; // 0x452
+		bool m_upKeyDown; // 0x453
+		bool m_upKeyPressed; // 0x454
+		double m_yVelocity; // 0x458
+		bool m_onSlope; // 0x460
+		bool m_wasOnSlope; // 0x461
+		PAD(2)
+		float m_slopeYVel; // 0x464
+		bool m_flyMode; // 0x468
+		bool m_birdMode; // 0x469
+		bool m_rollMode; // 0x46a
+		bool m_dartMode; // 0x46b
+		bool m_gravityFlipped; // 0x46c
+		bool m_isDead; // 0x46d
+		bool m_canJump; // 0x46e
+		PAD(1)
+		float m_playerScale; // 0x470
+		float m_timeMod; // 0x474
+		cocos2d::CCPoint m_lastPos; // 0x478
+		cocos2d::CCPoint m_portalPos; // 0x480
+		cocos2d::CCLayer* m_gameLayer; // 0x488
+		bool m_onGround; // 0x48c
+		bool m_isJumping; // 0x48d
+		bool m_isLocked; // 0x48e
+		bool m_allowRollJump; // 0x48f
+		cocos2d::CCPoint m_lastGroundPos; // 0x490
+		GameObject* m_touchedRing; // 0x498
+		GameObject* m_portalObject; // 0x49c
+		bool m_hasJumped; // 0x4a0
+		bool m_hasRingJumped; // 0x4a1
+		PAD(2)
+		cocos2d::ccColor3B m_glowColor1; // 0x4a4
+		cocos2d::ccColor3B m_glowColor2; // 0x4a8
+		cocos2d::CCPoint m_realPlayerPos; // 0x4ac
+		bool m_isSecondPlayer; // 0x4b4
+		bool m_dualMode; // 0x4b5
+		PAD(2)
+		double m_clkTimer; // 0x4b8
+		bool m_disableEffects; // 0x4c0
+		PAD(3)
+		GameplayDelegate* m_gameDelegate; // 0x4c4
+		float m_audioScale; // 0x4c8
+		float m_groundHeight; // 0x4cc
 
 		virtual void setVisible(bool visible) {
 			return reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(

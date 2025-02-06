@@ -9,58 +9,26 @@ namespace gd {
 	class ButtonSprite;
 	class ScrollingLayer;
 
-	#pragma runtime_checks("s", off)
 	class FLAlertLayer : public cocos2d::CCLayerColor {
-	protected:
-		cocos2d::CCMenu* m_buttonMenu;
-		int m_controlConnected;
-		int m_ZOrder;
-		FLAlertLayerProtocol* m_alertProtocol; // m_pParent
-		cocos2d::CCNode* m_scene; // m_targetScene
-		bool m_reverseKeyBack;
-		CCLayer* m_mainLayer; // m_internalLayer
-		ScrollingLayer* m_scrollingLayer;
-		int m_scrollAction;
-		bool m_containsBorder;
-		bool m_noAction;
-
 	public:
-		CCNode vtable;
-		auto getMenu()
-		{
-			return m_buttonMenu;
-		}
+		cocos2d::CCMenu* m_buttonMenu; // 0x194
+		int m_controlConnected; // 0x198
+		int m_ZOrder; // 0x19c
+		FLAlertLayerProtocol* m_alertProtocol; // 0x1a0
+		cocos2d::CCNode* m_scene; // 0x1a4
+		bool m_reverseKeyBack; // 0x1a8
+		CCLayer* m_mainLayer; // 0x1ac
+		ScrollingLayer* m_scrollingLayer; // 0x1b0
+		int m_scrollAction; // 0x1b4
+		bool m_containsBorder; // 0x1b8
+		bool m_noAction; // 0x1bc
 
-		auto menu()
-		{
-			return from<cocos2d::CCMenu*>(this, 0x194);
-		}
-
-		auto getLayer()
-		{
-			return from<cocos2d::CCLayer*>(this, 0x1AC);
-		}
-
-		void setMenu(cocos2d::CCMenu* menu) {
-			from<cocos2d::CCMenu*>(this, 0x194) = menu;
-		}
-
-		void setLayer(cocos2d::CCLayer* layer) {
-			from<cocos2d::CCLayer*>(this, 0x1ac) = layer;
-		}
-
-		virtual void onEnter() {
-			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
-				base + 0x23750
-				)(this);
-		}
 		virtual void registerWithTouchDispatcher() {
 			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
 				base + 0x161c0 //16110 //0x236F0
 				)(this);
 		}
 
-		//CCTouchDelegate vtable
 		virtual bool ccTouchBegan(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) { 
 			return reinterpret_cast<bool(__thiscall*)(char*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
 				base + 0x15f00 //15e50 //0x233C0
@@ -82,33 +50,21 @@ namespace gd {
 				)(reinterpret_cast<char*>(this) + 0xEC, pTouch, pEvent);
 		}
 
-		//CCKeyboardDelegate vtable
 		virtual void keyDown(cocos2d::enumKeyCodes key) {
 			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*, cocos2d::enumKeyCodes)>(
 				base + 0x15d70 //15cd0 //0x23250 2.1
 				)(this, key);
 		}
 
-		//CCKeypadDelegate vtable
 		virtual void keyBackClicked() {
 			return reinterpret_cast<void(__thiscall*)(char*)>(
 				base + 0x15de0 //15d30 //0x232C0 2.1
 				)(reinterpret_cast<char*>(this) + 0xF4);
 		}
 
-		//vtable
 		virtual void show() {
 			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
 				base + 0x160a0
-				)(this);
-			//base + 0x160a0 GHS 1.92
-			//base + 0x23560 GD 2.13
-			//base + 0x15ff0 GHS 1.91
-		}
-
-		FLAlertLayer() {
-			reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
-				base + 0x15160 //150d0 //0x224B0 2.1
 				)(this);
 		}
 
@@ -122,44 +78,6 @@ namespace gd {
 				base + 0x15eb0 //15e00 //0x23380 2.1
 				)(this, btn);
 		}
-		/*FLAlertLayer supports colors of text for the caption. wrap desired text in "<cx></c>"
-			* where x is the color desired. colors are:
-			* r - red
-			* l - cyan
-			* g - green
-			* y - yellow
-			* o - orange
-			* c - REDDD
-			* p - purple
-			* b - blue
-			* and more that i'm too lazy to find.
-			* MAKE SURE YOU FOLLOW THIS FORMAT. ROB'S PARSING CAN AND WILL MESS UP OTHERWISE.
-			*/
-		//static FLAlertLayer* create_original(FLAlertLayerProtocol* target, const char* title,
-		//	const char* btn1, const char* btn2, std::string caption) {
-		//	auto pRet = reinterpret_cast<FLAlertLayer* (__fastcall*)(FLAlertLayerProtocol*, const char*,
-		//		const char*, const char*, std::string)>(
-		//			base + 0x22680
-		//			)(target, title, btn1, btn2, caption);
-		//	//clean stack.
-		//	__asm add esp, 0x20
-		//	return pRet;
-		//}
-		//static FLAlertLayer* create_original(FLAlertLayerProtocol* target, const char* title,
-		//	const char* btn1, const char* btn2, float width, std::string caption) {
-		//	auto pRet = reinterpret_cast<FLAlertLayer* (__fastcall*)(FLAlertLayerProtocol*, const char*,
-		//		const char*, const char*, float, std::string)>(
-		//			base + 0x22730
-		//			)(target, title, btn1, btn2, width, caption);
-		//	__asm add esp, 0x24
-		//	return pRet;
-		//}
-		
-		/*
-		auto menu() {
-			return from<CCMenu*>(this, 0x194);
-		}
-		*/
 
 		static auto create(FLAlertLayerProtocol* protocol, const char* title,
 			const char* caption, const char* button1, const char* button2,
@@ -170,17 +88,8 @@ namespace gd {
 					caption, button1, button2, width, absolute, height);
 			__asm add esp, 24
 			return ret;
-
-
 		}
-		//base + 0x15360 - GHS 1.92
-		//base + 0x22680 and //base + 0x22730 - GD 2.13
-		//base + 0x152d0 - GHS 1.91
-
-		
-		
 	};
-	#pragma runtime_checks("s", restore)
 }
 
 

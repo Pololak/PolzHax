@@ -22,7 +22,7 @@ void showManagerView(bool& open) {
 		}
 		ImGui::Text("GameManager: 0x%p", gd::GameManager::sharedState());
 		ImGui::SameLine();
-		if (ImGui::Button("Copy")) {
+		if (ImGui::Button("Copy GM")) {
 			clipboard::write(CCString::createWithFormat("%p", gd::GameManager::sharedState())->getCString());
 		}
 		ImGui::Text("GameSoundManager: 0x%p", gd::GameSoundManager::sharedState());

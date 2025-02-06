@@ -9,6 +9,8 @@ Fields* fields = nullptr;
 gd::GJGarageLayer* garageLayer;
 CCLayer* iconKitPreview;
 
+CCMenu* m_backButtonMenu = nullptr;
+
 class IconKitPreview : public CCLayer {
 public:
 	static IconKitPreview* create() {
@@ -160,6 +162,21 @@ public:
 	}
 };
 
+void GJGarageLayer::Callback::onGarageRopeBack(CCObject*) {
+	auto lastScene = static_cast<int>(gd::GameManager::sharedState()->m_lastScene2);
+	gd::GJGameLevel* level = static_cast<gd::GJGameLevel*>(gd::GameManager::sharedState()->m_premiumPopup);
+	if (lastScene == 99) {
+		auto ellScene = gd::EditLevelLayer::scene(level);
+		CCScene* scene = CCTransitionMoveInB::create(0.5, ellScene);
+		CCDirector::sharedDirector()->pushScene(scene);
+	}
+	else if (lastScene == 98) {
+		auto lilScene = gd::LevelInfoLayer::scene(level);
+		CCScene* scene = CCTransitionMoveInB::create(0.5, lilScene);
+		CCDirector::sharedDirector()->pushScene(scene);
+	}
+}
+
 bool __fastcall GJGarageLayer::init_H(gd::GJGarageLayer* self) {
 	garageLayer = self;
 	delete fields;
@@ -216,6 +233,15 @@ bool __fastcall GJGarageLayer::init_H(gd::GJGarageLayer* self) {
 	//hammerCount->setAnchorPoint({ 1.f, 0.5f });
 	//hammerCount->setPosition({ director->getScreenRight() - 58.f, director->getScreenTop() - 124.f });
 	//self->addChild(hammerCount);
+
+	auto lastScene = static_cast<int>(gd::GameManager::sharedState()->m_lastScene2);
+
+	if (lastScene >= 98) {
+		auto garageRopeBackSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
+		auto garageRopeBackBtn = gd::CCMenuItemSpriteExtra::create(garageRopeBackSpr, nullptr, self, menu_selector(GJGarageLayer::Callback::onGarageRopeBack));
+		static_cast<gd::CCMenuItemSpriteExtra*>(m_backButtonMenu->getChildren()->objectAtIndex(0))->setVisible(0);
+		m_backButtonMenu->addChild(garageRopeBackBtn);
+	}
 
 	return true;
 }
@@ -392,8 +418,16 @@ void __fastcall GJGarageLayer::selectPageH(gd::GJGarageLayer* self, void* edx, i
 	self->getSpecialBtn()->setEnabled(iconType != 99);
 }
 
+void __fastcall GJGarageLayer::backButtonMenuH() {
+	__asm {
+		mov m_backButtonMenu, eax
+	}
+	GJGarageLayer::backButtonMenu();
+}
+
 void GJGarageLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7c5c0), GJGarageLayer::init_H, reinterpret_cast<void**>(&GJGarageLayer::init_));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7d790), GJGarageLayer::setupIconSelectH, reinterpret_cast<void**>(&GJGarageLayer::setupIconSelect));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7de70), GJGarageLayer::selectPageH, reinterpret_cast<void**>(&GJGarageLayer::selectPage));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7cef5), GJGarageLayer::backButtonMenuH, reinterpret_cast<void**>(&GJGarageLayer::backButtonMenu));
 }

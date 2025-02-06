@@ -23,6 +23,69 @@ enum class GJLevelType {
 
 class GJGameLevel : public cocos2d::CCNode {
 public:
+    cocos2d::CCDictionary* m_lastBuildSave;
+    int m_levelID; // 0xec
+    gd::string m_levelName; // 0xf0
+    gd::string m_levelDesc; // 0x108
+    gd::string m_levelString; // 0x120
+    gd::string m_userName; // 0x138
+    gd::string m_recordString; // 0x150
+    gd::string m_uploadDate; // 0x168
+    gd::string m_updateDate; // 0x180
+    int m_userID; // 0x198
+    PAD(0x4)
+    int m_audioTrack; // 0x1a0
+    int m_songID; // 0x1a4
+    PAD(0x14)
+    int m_downloads; // 0x1bc
+    PAD(0x5)
+    bool m_isVerified; // 0x1c5
+    bool m_isUploaded; // 0x1c6
+    bool m_hasBeenModified; // 0x1c7
+    int m_levelVersion; // 0x1c8
+    int m_gameVersion; // 0x1cc
+    int m_attempts; // 0x1d0
+    int m_jumps; // 0x1d4
+    int m_normalPercent; // 0x1d8
+    int m_practicePercent; // 0x1dc
+    int m_likes; // 0x1e0
+    int m_dislikes; // 0x1e4
+    int m_levelLength; // 0x1e8
+    int m_featured; // 0x1ec
+    bool m_demon; // 0x1f0
+    int m_stars; // 0x1f4
+    bool m_autoLevel; // 0x1f8
+    int m_coins; // 0x1fc
+    int m_password; // 0x200
+    int m_originalLevel; // 0x204
+    bool m_twoPlayerMode; // 0x208
+    int m_failedPasswordAttempts; // 0x20c
+    bool m_showedSongWarning; // 0x210
+    int m_starRatings;
+    int m_starRatingsSum;
+    int m_maxStarRatings;
+    int m_minStarRatings;
+    int m_demonVotes;
+    int m_rateStars;
+    bool m_rateFeature;
+    gd::string m_rateUser;
+    bool m_dontSave;
+    bool m_isHidden;
+    //int m_requiredCoins;
+    //bool m_isUnlocked;
+    cocos2d::CCPoint m_lastCameraPos; // 0x254
+    float m_lastEditorZoom; // 0x25c
+    int m_lastBuildTab; // 0x260
+    int m_lastBuildPage; // 0x264
+    int m_lastBuildGroupID; // 0x268
+    GJLevelType m_levelType; // 0x26c
+    int m_ID; // 0x270
+    gd::string m_tempName; // 0x274
+    int m_capacity001; // 0x278
+    int m_capacity002; // 0x27c
+    int m_capacity003; // 0x280
+    int m_capacity004; // 0x284
+
     static auto create() {
         return reinterpret_cast<GJGameLevel * (__stdcall*)()>(base + 0x621c0)(); //0x621C0 - GD 1.92
     }
@@ -58,74 +121,6 @@ public:
         return from<int>(this, 0x204);
     }
 
-    cocos2d::CCDictionary* m_lastBuildSave;
-    int m_levelID;
-    gd::string m_levelName;
-    gd::string m_levelDesc;
-    gd::string m_levelString;
-    gd::string m_userName;
-    gd::string m_recordString;
-    gd::string m_uploadDate;
-    gd::string m_updateDate;
-    gd::string m_audioFileName;
-    int m_userID;
-    int m_difficulty;
-    int m_audioTrack;
-    int m_songID;
-    int m_levelRev;
-    int m_objectCount;
-    int m_order;
-    int m_ratings;
-    int m_ratingsSum;
-    int m_downloads;
-    int m_completes;
-    bool m_isEditable;
-    bool m_isVerified;
-    bool m_isUploaded;
-    bool m_hasBeenModified;
-    int m_levelVersion;
-    int m_gameVersion;
-    int m_attempts;
-    int m_jumps;
-    int m_normalPercent;
-    int m_practicePercent;
-    int m_likes;
-    int m_dislikes;
-    int m_levelLength;
-    int m_featured;
-    bool m_demon;
-    int m_stars;
-    bool m_autoLevel;
-    int m_coins;
-    int m_password;
-    int m_originalLevel;
-    bool m_twoPlayerMode;
-    int m_failedPasswordAttempts;
-    bool m_showedSongWarning;
-    int m_starRatings;
-    int m_starRatingsSum;
-    int m_maxStarRatings;
-    int m_minStarRatings;
-    int m_demonVotes;
-    int m_rateStars;
-    bool m_rateFeature;
-    gd::string m_rateUser;
-    bool m_dontSave;
-    bool m_isHidden;
-    int m_requiredCoins;
-    bool m_isUnlocked;
-    cocos2d::CCPoint m_lastCameraPos;
-    float m_lastEditorZoom;
-    int m_lastBuildTab;
-    int m_lastBuildPage;
-    int m_lastBuildGroupID;
-    GJLevelType m_levelType;
-    int m_ID;
-    gd::string m_tempName;
-    int m_capacity001;
-    int m_capacity002;
-    int m_capacity003;
-    int m_capacity004;
 };
 /*
 class GJGameLevel : public cocos2d::CCNode {

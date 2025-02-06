@@ -14,7 +14,6 @@
 #include <iostream>
 #include <cmath>
 #include "utils.hpp"
-#include <algorithm>
 #include <unordered_map>
 #include <memory>
 #include <unordered_set>
@@ -31,6 +30,7 @@
 #include "RotatingSaws.hpp"
 #include "EditorSettingsLayer.hpp"
 #include "RGBColorInputWidget.hpp"
+#include "EditorObjectLayering.hpp"
 
 using namespace cocos2d;
 
@@ -50,6 +50,7 @@ CCLabelBMFont* m_objectKey = nullptr; // ID
 CCLabelBMFont* m_objectAddress = nullptr;
 CCLabelBMFont* m_objectType = nullptr;
 CCLabelBMFont* m_objectsSelected = nullptr;
+CCLabelBMFont* m_objectZ = nullptr;
 
 FloatInputNode* m_fadeTime_input = nullptr;
 float m_fadeTime;
@@ -632,7 +633,7 @@ struct GDColor {
 	GDColor() {}
 	constexpr GDColor(u8 r, u8 g, u8 b, bool blending) : r(r), g(g), b(b), blending(blending) {}
 	constexpr GDColor(const ccColor3B color, bool blending = false) : r(color.r), g(color.g), b(color.b), blending(blending) {}
-	GDColor(gd::GameObject* object) : GDColor(object->triggerColor(), object->triggerBlending()) {}
+	GDColor(gd::GameObject* object) : GDColor(object->m_triggerColor, object->m_triggerBlending) {}
 	GDColor(gd::ColorAction* color) : GDColor(color->m_color, color->m_blending) {}
 	operator ccColor3B() const { return { r, g, b }; }
 
@@ -712,12 +713,15 @@ public:
 		ExtendBase::destroy();
 		matdash::orig<&MyEditorLayer::dtor>(this);
 		s_instance = nullptr;
+		levelEditorLayer = nullptr;
+		//gd::GameManager::sharedState()->m_levelEditorLayer = nullptr;
 	}
 
 	bool init(gd::GJGameLevel* level) {
 		if (!matdash::orig<&MyEditorLayer::init>(this, level)) return false;
 		s_instance = this;
 		levelEditorLayer = this;
+		//gd::GameManager::sharedState()->m_levelEditorLayer = this;
 
 		auto& triggers = this->*m_color_triggers;
 		triggers[ColorTriggers::BG];
@@ -809,6 +813,8 @@ public:
 			previewLine->setVisible(1);
 		}
 		this->addChild(previewLine);
+
+		std::cout << this->m_levelSettings << std::endl;
 
 		return true;
 	}
@@ -988,7 +994,7 @@ public:
 			const auto obj_count = amt * objs->count();
 			m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
 		}
-		
+
 		if (is_editor_paused) return;
 		if (!setting().onEditorPreview) {
 			if (was_preview_mode_enabled)
@@ -1026,31 +1032,31 @@ public:
 			GDColor starting_color;
 			switch (type) {
 			case ColorTriggers::BG:
-				starting_color = settings->m_background_color;
+				starting_color = settings->m_backgroundColor;
 				color = &bg_color;
 				break;
 			case ColorTriggers::Obj:
-				starting_color = settings->m_object_color;
+				starting_color = settings->m_objectColor;
 				color = &obj_color;
 				break;
 			case ColorTriggers::DLine:
-				starting_color = settings->m_3dl_color;
+				starting_color = settings->m_dlColor;
 				color = &dl_color;
 				break;
 			case ColorTriggers::Col1:
-				starting_color = settings->m_color1;
+				starting_color = settings->m_customColor1;
 				color = &color1;
 				break;
 			case ColorTriggers::Col2:
-				starting_color = settings->m_color2;
+				starting_color = settings->m_customColor2;
 				color = &color2;
 				break;
 			case ColorTriggers::Col3:
-				starting_color = settings->m_color3;
+				starting_color = settings->m_customColor3;
 				color = &color3;
 				break;
 			case ColorTriggers::Col4:
-				starting_color = settings->m_color4;
+				starting_color = settings->m_customColor4;
 				color = &color4;
 				break;
 			default:
@@ -1084,18 +1090,6 @@ public:
 					object->setObjectColor(obj_color);
 				}
 
-				//if (object->getType() == gd::GameObjectType::kGameObjectTypeSolid) {
-				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
-				//}
-
-				//if (object->getType() == gd::GameObjectType::kGameObjectTypeSlope) {
-				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
-				//}
-
-				//if (object->getType() == gd::GameObjectType::kGameObjectTypeHazard) {
-				//	from<CCSpriteBatchNode*>(object, 0xac)->setZOrder(100);
-				//}
-
 				auto mode = object->getColorMode();
 				switch (mode) {
 				case gd::CustomColorMode::DL:
@@ -1127,6 +1121,8 @@ public:
 					break; // bro
 				default:;
 				}
+
+				//EditorObjectLayering::updateObjLayering(object);
 			}
 		}
 	}
@@ -1186,6 +1182,12 @@ void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, flo
 		if (self->player2())
 		{
 			Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
+		}
+	}
+
+	if (self->m_player) {
+		if (self->m_player->m_hardStreak) {
+			std::cout << self->m_player->m_hardStreak->m_pointArray << std::endl;
 		}
 	}
 }
@@ -1433,6 +1435,13 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	m_objectType->setScale(0.66f);
 	m_objectType->setPosition({ leftInfoSide, director->getScreenTop() - 120.f });
 	self->addChild(m_objectType);
+
+	m_objectZ = CCLabelBMFont::create("Object Z:", "chatFont.fnt");
+	m_objectZ->setVisible(0);
+	m_objectZ->setAnchorPoint({ 0.f, 0.5f });
+	m_objectZ->setScale(0.66f);
+	m_objectZ->setPosition({ leftInfoSide, director->getScreenTop() - 130.f });
+	self->addChild(m_objectZ);
 
 	auto custommenu = CCMenu::create();
 	custommenu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
@@ -2248,7 +2257,7 @@ void EditorUI::updateObjectInfo() {
 		if (editUI->getSelectedObjectsOfCCArray()->count() == 1) {
 			if (m_objectColor) {
 				m_objectColor->setVisible(1);
-				auto colorID = editUI->getSingleSelectedObj()->getObjectColor();
+				auto colorID = static_cast<int>(editUI->m_selectedObject->m_customColorMode);
 				switch (colorID) {
 				case 0:
 					m_objectColor->setString(CCString::createWithFormat("C: Default (0)", colorID)->getCString());
@@ -2284,31 +2293,31 @@ void EditorUI::updateObjectInfo() {
 			}
 			if (m_objectGroup) {
 				m_objectGroup->setVisible(1);
-				m_objectGroup->setString(CCString::createWithFormat("G: %i", editUI->getSingleSelectedObj()->getObjectGroup())->getCString());
+				m_objectGroup->setString(CCString::createWithFormat("G: %i", editUI->m_selectedObject->m_editorGroup)->getCString());
 			}
 			if (m_objectRotation) {
 				m_objectRotation->setVisible(1);
-				m_objectRotation->setString(CCString::createWithFormat("Rot: %.01f%", editUI->getSingleSelectedObj()->getRotation())->getCString());
+				m_objectRotation->setString(CCString::createWithFormat("Rot: %.01f%", editUI->m_selectedObject->getRotation())->getCString());
 			}
 			if (m_objectXPos) {
 				m_objectXPos->setVisible(1);
-				m_objectXPos->setString(CCString::createWithFormat("X: %.01f%", editUI->getSingleSelectedObj()->getPositionX())->getCString());
+				m_objectXPos->setString(CCString::createWithFormat("X: %.01f%", editUI->m_selectedObject->getPositionX())->getCString());
 			}
 			if (m_objectYPos) {
 				m_objectYPos->setVisible(1);
-				m_objectYPos->setString(CCString::createWithFormat("Y: %.01f%", editUI->getSingleSelectedObj()->getPositionY())->getCString());
+				m_objectYPos->setString(CCString::createWithFormat("Y: %.01f%", editUI->m_selectedObject->getPositionY())->getCString());
 			}
 			if (m_objectKey) {
 				m_objectKey->setVisible(1);
-				m_objectKey->setString(CCString::createWithFormat("ID: %i", editUI->getSingleSelectedObj()->getObjectID())->getCString());
+				m_objectKey->setString(CCString::createWithFormat("ID: %i", editUI->m_selectedObject->m_objectID)->getCString());
 			}
 			if (m_objectAddress) {
 				m_objectAddress->setVisible(1);
-				m_objectAddress->setString(CCString::createWithFormat("Addr: 0x%p", editUI->getSingleSelectedObj())->getCString());
+				m_objectAddress->setString(CCString::createWithFormat("Addr: 0x%p", editUI->m_selectedObject)->getCString());
 			}
 			if (m_objectType) {
 				m_objectType->setVisible(1);
-				auto objectType = editUI->getSingleSelectedObj()->getType();
+				auto objectType = editUI->m_selectedObject->m_objectType;
 				switch (objectType)
 				{
 				case gd::GameObjectType::kGameObjectTypeSolid:
@@ -2394,6 +2403,10 @@ void EditorUI::updateObjectInfo() {
 					break;
 				}
 			}
+			if (m_objectZ) {
+				m_objectZ->setString(CCString::createWithFormat("Object Z: %i", editUI->m_selectedObject->m_objectZ)->getCString());
+				m_objectZ->setVisible(1);
+			}
 		}
 		else {
 			m_objectColor->setVisible(0);
@@ -2404,6 +2417,7 @@ void EditorUI::updateObjectInfo() {
 			m_objectKey->setVisible(0);
 			m_objectAddress->setVisible(0);
 			m_objectType->setVisible(0);
+			m_objectZ->setVisible(0);
 		}
 		if (editUI->getSelectedObjectsOfCCArray()->count() > 1) {
 			if (m_objectsSelected) {
@@ -2578,8 +2592,6 @@ float timeXPos(gd::LevelEditorLayer* self, float time) {
 void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	editorPauseLayer = self;
 	EditorPauseLayer::customSetup(self);
-
-	std::cout << self->m_editorLayer << std::endl;
 
 	auto director = CCDirector::sharedDirector();
 	auto size = director->getWinSize();
@@ -2792,7 +2804,7 @@ void SetGroupIDLayer::Callback::onCurrentGroup(CCObject*) {
 bool __fastcall SetGroupIDLayer::initH(gd::SetGroupIDLayer* self, void* edx, gd::GameObject* obj, CCArray* arr) {
 	if (!SetGroupIDLayer::init(self, obj, arr)) return false;
 
-	auto menu = self->getMenu();
+	auto menu = self->m_buttonMenu;
 	auto onDown_btn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildren()->objectAtIndex(1));
 	auto onUp_btn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildren()->objectAtIndex(2));
 	onDown_btn->setSizeMult(1.f);
@@ -2811,16 +2823,16 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 	setting().onShouldHue = true;
 	if (!ColorSelectPopup::init(self, obj, color_id, idk, idk2)) return false;
 
-	m_fadeTime = self->fadeTime();
+	m_fadeTime = self->m_duration;
 
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-	if (from<CCLabelBMFont*>(self, 0x1c8) != nullptr) { // use this if you want to use on color triggers
-		from<CCLabelBMFont*>(self, 0x1c8)->setVisible(0);
+	if (self->m_durationLabel != nullptr) { // use this if you want to use on color triggers
+		self->m_durationLabel->setVisible(0);
 
 		auto fadeTimeLabel = CCLabelBMFont::create("FadeTime:", "goldFont.fnt");
 		fadeTimeLabel->setPosition({ (winSize.width / 2) - 33, (winSize.height / 2) - 70 });
-		self->getLayer()->addChild(fadeTimeLabel);
+		self->m_mainLayer->addChild(fadeTimeLabel);
 
 		m_fadeTime_input = FloatInputNode::create(CCSize(70, 35), 2.f, "bigFont.fnt");
 		m_fadeTime_input->setScale(0.9f);
@@ -2830,7 +2842,7 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 			//m_fadeTime = input.get_value().value_or(m_fadeTime);
 			//self->setFadeTime(m_fadeTime_input->get_value().value_or(m_fadeTime));
 			};
-		self->getLayer()->addChild(m_fadeTime_input);
+		self->m_mainLayer->addChild(m_fadeTime_input);
 		m_fadeTime_input->setPosition({ (winSize.width / 2) + 61, (winSize.height / 2) - 70 }); // 16:9: 346, 90
 	}
 
@@ -2838,7 +2850,7 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 
 	m_colorInputWidget->setPosition({ CCDirector::sharedDirector()->getScreenLeft() + 67.5f, (winSize.height / 2.f) + 20.f });
 
-	self->getLayer()->addChild(m_colorInputWidget);
+	self->m_mainLayer->addChild(m_colorInputWidget);
 
 	return true;
 }
@@ -2849,7 +2861,7 @@ void __fastcall ColorSelectPopup::dtorH(gd::ColorSelectPopup* self) {
 }
 
 void __fastcall ColorSelectPopup::sliderChangedH(gd::ColorSelectPopup* self, void*, CCObject* sender) {
-	auto slider = from<gd::Slider*>(self, 0x1cc);
+	auto slider = self->m_durationSlider;
 	auto sliderValue = slider->getValue() * 10.f;
 	m_fadeTime_input->set_value(floor(sliderValue * 100) / 100);
 	std::cout << sliderValue << std::endl;
@@ -2858,7 +2870,7 @@ void __fastcall ColorSelectPopup::sliderChangedH(gd::ColorSelectPopup* self, voi
 
 void __fastcall ColorSelectPopup::closeColorSelectH(gd::ColorSelectPopup* self, void*, CCObject* sender) {
 	if (m_fadeTime_input != nullptr) {
-		self->setFadeTime(m_fadeTime_input->get_value().value_or(m_fadeTime));
+		self->m_duration = m_fadeTime_input->get_value().value_or(m_fadeTime);
 	}
 	m_fadeTime_input = nullptr;
 	m_colorInputWidget = nullptr;
@@ -2875,7 +2887,7 @@ void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* self,
 gd::LevelSettingsLayer* levelSettingsLayer;
 
 auto flipGravityToggle(CCSprite* toggleOn, CCSprite* toggleOff) {
-	auto flipGravity_enabled = from<bool>(levelSettingsLayer->getLevelSettings(), 0x129);
+	auto flipGravity_enabled = levelSettingsLayer->m_settingsObject->m_isFlipped;
 	return (flipGravity_enabled) ? toggleOn : toggleOff;
 }
 
@@ -2891,14 +2903,12 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 		flipGravityLabel->setScale(0.5f);
 		flipGravityLabel->setAnchorPoint({ 0.f, 0.5f });
 		flipGravityLabel->setPosition({ (winSize.width / 2.f) - 120.f, (winSize.height / 2.f) - 134.f });
-		self->getLayer()->addChild(flipGravityLabel);
+		self->m_mainLayer->addChild(flipGravityLabel);
 
 		auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
 		auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
 
-		auto ccscale9idontcare = reinterpret_cast<extension::CCScale9Sprite*>(self->getLayer()->getChildren()->objectAtIndex(0));
-
-		auto menu = from<CCMenu*>(self, 0x194);
+		auto menu = self->m_buttonMenu;
 		auto flipGravityToggler = gd::CCMenuItemToggler::create(flipGravityToggle(toggleOn, toggleOff), flipGravityToggle(toggleOff, toggleOn), self, menu_selector(gd::LevelSettingsLayer::onGravityFlipped));
 		flipGravityToggler->setScale(0.7f);
 		flipGravityToggler->setPosition(menu->convertToNodeSpace({(winSize.width / 2.f) - 135.f, (winSize.height / 2.f) - 135.f}));
@@ -2925,6 +2935,8 @@ float timeBetweenPosition(float a, float b) {
 void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	DrawGridLayer::draw(self);
 
+	auto director = CCDirector::sharedDirector();
+
 	gd::LevelEditorLayer* lel = from<gd::LevelEditorLayer*>(self, 0x124);
 
 	auto secarr = lel->getLevelSections();
@@ -2942,18 +2954,44 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 			switch (obj->getObjectID())
 			{
 			case 29:
-
-				glLineWidth(2);
-				cocos2d::ccDrawColor4B(255, 255, 255, 100);
-				ccDrawLine(obj->getPosition(), ccp(obj->getPositionX() + 50, obj->getPositionY()));
 				break;
 			}
-			
-			
 		}
-	}
-		
+	}	
 }
+
+//void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
+//void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float p0) {
+//	if (MyEditorLayer::s_instance)
+//		if (MyEditorLayer::s_instance->m_player)
+//			MyEditorLayer::s_instance->m_player->m_hardStreakActive = true;
+//
+//	HardStreak_updateStroke(self, p0);
+//}
+//
+//void(__thiscall* PlayerObject_placeStreakPoint)(gd::PlayerObject*);
+//void __fastcall PlayerObject_placeStreakPointH(gd::PlayerObject* self) {
+//	if (MyEditorLayer::s_instance && self->m_dartMode)
+//		self->m_hardStreak->addPoint(self->getPosition());
+//	else
+//		PlayerObject_placeStreakPoint(self);
+//}
+//
+//void(__thiscall* PlayerObject_update)(gd::PlayerObject*, float);
+//void __fastcall PlayerObject_updateH(gd::PlayerObject* self, void*, float dt) {
+//	PlayerObject_update(self, dt);
+//
+//	if (MyEditorLayer::s_instance && self->m_dartMode)
+//		self->m_hardStreak->m_currentPoint = self->getPosition();
+//}
+//
+//void(__thiscall* PlayerObject_fadeOutStreak2)(gd::PlayerObject*, float);
+//void __fastcall PlayerObject_fadeOutStreak2H(gd::PlayerObject* self, void*, float p0) {
+//	PlayerObject_fadeOutStreak2(self, p0);
+//
+//	if (MyEditorLayer::s_instance)
+//		self->m_hardStreak->runAction(CCFadeTo::create(p0, 0));
+//}
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	Scheduler::update(self, dt);
@@ -3000,27 +3038,6 @@ void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	}
 }
 
-void __fastcall PlayerObject::placeStreakPointH(gd::PlayerObject* self) {
-	if (levelEditorLayer && self->isDart())
-		self->waveTrail()->addPoint(self->getPosition());
-	else
-		PlayerObject::placeStreakPoint(self);
-}
-
-void __fastcall PlayerObject::updateH(gd::PlayerObject* self, void*, float dt) {
-	PlayerObject::update(self, dt);
-
-	if (levelEditorLayer && self->isDart())
-		from<cocos2d::CCPoint>(self->waveTrail(), 0x11c) = self->getPosition();
-}
-
-void __fastcall PlayerObject::fadeOutStreak2H(gd::PlayerObject* self, void*, float p0) {
-	PlayerObject::fadeOutStreak2(self, p0);
-
-	if (levelEditorLayer)
-		self->waveTrail()->runAction(CCFadeTo::create(p0, 0));
-}
-
 void Scheduler::mem_init() {
 	MH_CreateHook(
 		reinterpret_cast<void*>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?update@CCScheduler@cocos2d@@UAEXM@Z")),
@@ -3031,6 +3048,7 @@ void Scheduler::mem_init() {
 void LevelEditorLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8e180), LevelEditorLayer::removeObjectH, reinterpret_cast<void**>(&LevelEditorLayer::removeObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x91620), LevelEditorLayer::updateH, reinterpret_cast<void**>(&LevelEditorLayer::update));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee5e0), LevelEditorLayer::drawH, reinterpret_cast<void**>(&LevelEditorLayer::draw));
 }
 
 void EditorUI::mem_init() {
@@ -3061,6 +3079,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4af50), EditorUI::onGroupUpH, reinterpret_cast<void**>(&EditorUI::onGroupUp));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4cbb0), EditorUI::drawH, reinterpret_cast<void**>(&EditorUI::draw));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
 	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);
@@ -3104,6 +3123,11 @@ void preview_mode::init() {
 	matdash::add_hook<&EditorPauseLayer_dtor>(gd::base + 0x3e280);
 
 	matdash::add_hook<&GameObject_shouldBlendColor>(gd::base + 0x6ece0);
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe1270), PlayerObject_placeStreakPointH, reinterpret_cast<void**>(&PlayerObject_placeStreakPoint));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9b50), PlayerObject_updateH, reinterpret_cast<void**>(&PlayerObject_update));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject_fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject_fadeOutStreak2));
 }
 
 void SetGroupIDLayer::mem_init() {

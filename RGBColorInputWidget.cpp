@@ -161,7 +161,7 @@ void RGBColorInputWidget::textChanged(gd::CCTextInputNode* input) {
         }
 
         ignore = true;
-        parent->colorPicker()->setColorValue(color);
+        parent->m_colorPicker->setColorValue(color);
         ignore = false;
 
         update_labels(false, true);
@@ -176,7 +176,7 @@ void RGBColorInputWidget::textChanged(gd::CCTextInputNode* input) {
                 input->setString("255");
             }
             GLubyte num = static_cast<GLubyte>(_num);
-            auto color = parent->colorPicker()->getColorValue();
+            auto color = parent->m_colorPicker->getColorValue();
             if (input == red_input)
                 color.r = num;
             else if (input == green_input)
@@ -184,7 +184,7 @@ void RGBColorInputWidget::textChanged(gd::CCTextInputNode* input) {
             else if (input == blue_input)
                 color.b = num;
             ignore = true;
-            parent->colorPicker()->setColorValue(color);
+            parent->m_colorPicker->setColorValue(color);
             ignore = false;
             update_labels(true, false);
         }
@@ -195,7 +195,7 @@ void RGBColorInputWidget::textChanged(gd::CCTextInputNode* input) {
 void RGBColorInputWidget::update_labels(bool hex, bool rgb) {
     if (ignore) return;
     ignore = true;
-    auto color = parent->colorPicker()->getColorValue();
+    auto color = parent->m_colorPicker->getColorValue();
     if (hex) {
         hex_input->setString(color_to_hex(color).c_str());
     }

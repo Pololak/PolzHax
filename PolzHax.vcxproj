@@ -538,6 +538,7 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
     <ClInclude Include="CheckPoint.h" />
     <ClInclude Include="CrashLogger.hpp" />
+    <ClInclude Include="EditorObjectLayering.hpp" />
     <ClInclude Include="EditorSettingsLayer.hpp" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
@@ -563,6 +564,7 @@
     <ClInclude Include="libs\gd.h\include\GDProtocols.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCBlockLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCNodeContainer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ColorSelectPopup.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CommentCell.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CreatorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongLayer.h" />
@@ -599,7 +601,6 @@
     <ClInclude Include="libs\gd.h\level_nodes\GJComment.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h" />
     <ClInclude Include="libs\gd.h\level_nodes\LevelSettingsObject.h" />
-    <ClInclude Include="libs\gd.h\level_nodes\SettingsColorObject.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\AchievementManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameLevelManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameManager.h" />
@@ -690,6 +691,7 @@
     <ClCompile Include="CommentCell.h" />
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EditorObjectLayering.cpp" />
     <ClCompile Include="EditorSettingsLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
     <ClCompile Include="GJGarageLayer.cpp" />

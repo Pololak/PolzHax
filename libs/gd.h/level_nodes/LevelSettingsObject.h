@@ -4,13 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-    class ColorAction;
-    class SettingsColorObject : public cocos2d::CCNode {
-    public:
-        const cocos2d::ccColor3B getColor()  {
-            return from<cocos2d::ccColor3B>(this, 0xe8);
-        }
-    };
 
     enum Gamemode {
         kGamemodeCube = 0,
@@ -27,17 +20,37 @@ namespace gd {
         kSpeedFaster = 3
     };
 
+    class ColorAction;
+
     class LevelSettingsObject : public cocos2d::CCNode {
     public:
-        ColorAction* m_background_color;
-        ColorAction* m_ground_color;
-        ColorAction* m_line_color;
-        ColorAction* m_object_color;
-        ColorAction* m_3dl_color;
-        ColorAction* m_color1;
-        ColorAction* m_color2;
-        ColorAction* m_color3;
-        ColorAction* m_color4;
+        ColorAction* m_backgroundColor; // 0xe8
+        ColorAction* m_groundColor; // 0xec
+        ColorAction* m_lineColor; // 0xf0
+        ColorAction* m_objectColor; // 0xf4
+        ColorAction* m_dlColor; // 0xf8
+        ColorAction* m_customColor1; // 0xfc
+        ColorAction* m_customColor2; // 0x100
+        ColorAction* m_customColor3; // 0x104
+        ColorAction* m_customColor4; // 0x108
+        int m_startMode; // 0x10c
+        int m_startSpeed; // 0x110
+        bool m_startMini; // 0x114
+        bool m_startDual; // 0x115
+        bool m_twoPlayerMode; // 0x116
+        PAD(1)
+        float m_songOffset; // 0x118
+        bool m_fadeIn; // 0x11c
+        bool m_fadeOut; // 0x11d
+        PAD(2)
+        int m_BGIdx; // 0x120
+        int m_GIdx; // 0x124
+        bool m_startsWithStartPos; // 0x128
+        bool m_isFlipped; // 0x129
+        PAD(2)
+        GJGameLevel* m_level; // 0x12c
+        gd::string m_guidelineString; // 0x130
+        bool m_songChanged; // 0x148
 
         auto getBGColor() {
             return from<int*>(this, 0xe8);
@@ -106,8 +119,8 @@ namespace gd {
             from<bool>(this, 0x129) = isFlipped;
         }
 
-        SettingsColorObject* getColorObjectBG() {
-            return from<SettingsColorObject*>(this, 0xe8);
+        ColorAction* getColorObjectBG() {
+            return from<ColorAction*>(this, 0xe8);
         }
 
         /*auto getGJGameLevel() {

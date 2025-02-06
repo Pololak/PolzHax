@@ -131,6 +131,9 @@ namespace EditorUI {
 	inline void(__thiscall* onDuplicate)(gd::EditorUI*, CCObject*);
 	void __fastcall onDuplicateH(gd::EditorUI*, void*, CCObject*);
 
+	inline void(__thiscall* draw)(gd::EditorUI*);
+	void __fastcall drawH(gd::EditorUI* self);
+
 	void updateObjectInfo();
 
 	void mem_init();

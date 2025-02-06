@@ -171,7 +171,7 @@ bool __fastcall InfoLayer::initH(gd::InfoLayer* self, void*, gd::GJGameLevel* ga
 
 	menu->addChild(button);
 
-	reinterpret_cast<CCLabelBMFont*>(self->getLayer()->getChildren()->objectAtIndex(6))->setVisible(0);
+	reinterpret_cast<CCLabelBMFont*>(self->m_mainLayer->getChildren()->objectAtIndex(6))->setVisible(0);
 	auto idLabel = CCLabelBMFont::create("ID:", "goldFont.fnt");
 	idLabel->setString(CCString::createWithFormat("ID: %i", gameLevel->m_levelID)->getCString());
 	idLabel->setScale(0.6f);
@@ -190,7 +190,7 @@ bool __fastcall InfoLayer::initH(gd::InfoLayer* self, void*, gd::GJGameLevel* ga
 	label->setZOrder(1000);
 	label->setOpacity(0);
 	copiedLabel->addChild(label);
-	self->getLayer()->addChild(copiedLabel);
+	self->m_mainLayer->addChild(copiedLabel);
 
 	return true;
 }

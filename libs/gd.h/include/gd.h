@@ -113,6 +113,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/EditLevelLayer.h"
 #include "layers_scenes_transitions_nodes/LevelBrowserLayer.h"
 #include "layers_scenes_transitions_nodes/CreatorLayer.h"
+#include "layers_scenes_transitions_nodes/ColorSelectPopup.h"
 
 #include "scroll_nodes/CCContentLayer.h"
 #include "scroll_nodes/CCIndexPath.h"
@@ -143,9 +144,8 @@ namespace gd {
 
 #include "level_nodes/GJGameLevel.h"
 #include "level_nodes/LevelSettingsObject.h"
-#include "level_nodes/ColorAction.h"
 #include "level_nodes/GJComment.h"
-//#include "level_nodes/SettingsColorObject.h"
+#include "level_nodes/ColorAction.h"
 //#include "level_nodes/CustomColorMode.h"
 
 #include "sprite_nodes/CCSpritePlus.h"

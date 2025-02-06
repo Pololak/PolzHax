@@ -3,10 +3,6 @@
 
 #include <gd.h>
 
-#define PLAYER_ICON_FUNC(x) void setPlayer##x(int v) { m_nPlayer##x = v; __STR_CAT__(m_nPlayer##x,Rand1) = v + __STR_CAT__(m_nPlayer##x,Rand2); }
-
-
-
 namespace gd {
 	enum IconType {
 		Cube = 0,
@@ -33,120 +29,95 @@ namespace gd {
 		kUnlockTypeGlow = 12,
 	};
 
+	enum LastGameScene {
+
+	};
+
 	class PlayLayer;
+	class LevelSelectLayer {}; // todo
 
 	class GameManager : public GManager {
-	protected:
-		bool m_bSwitchModes;
-		bool m_bToFullscreen;
-		bool m_bReloading;
-		bool m_bUnknown;
-		PAD(4);
-		cocos2d::CCDictionary* m_pValueKeeper;
-		cocos2d::CCDictionary* m_pUnlockValueKeeper;
-		cocos2d::CCDictionary* m_pCustomObjectDict;
-		PAD(4);
-		double m_dUnknown;
-		PAD(16);
-		double m_dUnknown2;
-		PAD(8);
-		bool m_bLoaded; //?
-		std::string m_sUnknown;
-		PlayLayer* m_pPlayLayer;
-		LevelEditorLayer* m_pLevelEditorLayer;
-		PAD(20);
-		std::string m_sPlayerUDID;
-		std::string m_sPlayerName;
-		bool m_bCommentsEnabled;
-		int m_nPlayerUserIDRand1;
-		int m_nPlayerUserIDRand2;
-		int m_nPlayerUserID;
-		float m_fBackgroundMusicVolume;
-		float m_fEffectsVolume;
-		int m_nTimeOffset;
-		PAD(28);
-		int m_nPlayerFrameRand1;
-		int m_nPlayerFrameRand2;
-		int m_nPlayerFrame;
-		int m_nPlayerShipRand1;
-		int m_nPlayerShipRand2;
-		int m_nPlayerShip;
-		int m_nPlayerBallRand1;
-		int m_nPlayerBallRand2;
-		int m_nPlayerBall;
-		int m_nPlayerBirdRand1;
-		int m_nPlayerBirdRand2;
-		int m_nPlayerBird;
-		int m_nPlayerDartRand1;
-		int m_nPlayerDartRand2;
-		int m_nPlayerDart;
-		int m_nPlayerRobotRand1;
-		int m_nPlayerRobotRand2;
-		int m_nPlayerRobot;
-		int m_nPlayerSpiderRand1;
-		int m_nPlayerSpiderRand2;
-		int m_nPlayerSpider;
-		int m_nPlayerColorRand1;
-		int m_nPlayerColorRand2;
-		//int m_nPlayerColor;
-		int m_nPlayerColor2Rand1;
-		int m_nPlayerColor2Rand2;
-		//int m_nPlayerColor2;
-		int m_nPlayerStreakRand1;
-		int m_nPlayerStreakRand2;
-		int m_nPlayerStreak;
-		int m_nPlayerDeathEffectRand1;
-		int m_nPlayerDeathEffectRand2;
-		int m_nPlayerDeathEffect;
-		PAD(8);
-		int m_nSecretNumberRand1; //? may be named differently
-		int m_nSecretNumberRand2;
-		bool m_bPlayerGlow;
-		IconType m_nPlayerIconType;
-		bool m_bUnknown2;
-		bool m_bShowSongMarkers;
-		bool m_bShowBPMMarkers;
-		bool m_bRecordGameplay;
-		bool m_bShowProgressBar;
-		bool m_bPerformanceMode;
-		bool m_bClickedGarage;
-		bool m_bClickedEditor;
-		bool m_bClickedName;
-		bool m_bClickedPractice;
-		bool m_bShowedEditorGuide;
-		bool m_bShowedRateDiffDialog;
-		bool m_bShowedRateStarDialog;
-		bool m_bShowedLowDetailDialog;
-		PAD(48);
-		int m_nBootups;
-		bool m_bHasRatedGame;
-		PAD(3);
-		bool m_bGameCenterEnabled;
-		bool m_bSmoothFix;
-		PAD(16);
-		int m_nResolution;
-		cocos2d::TextureQuality m_eQuality; //more after that i havent re'd
-
 	public:
+		bool m_switchMode; // 0x104
+		bool m_toFullScreen; // 0x105
+		bool m_reloading; // 0x106
+		PAD(5)
+		cocos2d::CCDictionary* m_valueKeeper; // 0x10c
+		double m_adTimer; // 0x110
+		double m_adCache; // 0x118
+		PAD(4)
+		bool m_loaded; // 0x128
+		bool m_didSyncAchiviements; // 0x129
+		PAD(2)
+		gd::string m_editorCopyString; // 0x12c
+		PlayLayer* m_playLayer; // 0x144
+		LevelSelectLayer* m_levelSelectLayer; // 0x148
+		bool m_inMenuLayer; // 0x14c
+		PAD(3)
+		void* m_premiumPopup; // 0x150 // unused // used in polzhax
+		bool m_firstSetup; // 0x154
+		bool m_showedMenu; // 0x155
+		PAD(2)
+		gd::string m_playerUDID; // 0x158
+		gd::string m_playerName; // 0x170
+		int m_playerUserID; // 0x188
+		bool m_playerScoreValid; // 0x18c
+		PAD(3)
+		float m_bgVolume; // 0x190
+		float m_sfxVolume; // 0x194
+		int m_timeOffset; // 0x198
+		bool m_ratedGame; // 0x19c
+		bool m_clickedFacebook; // 0x19d
+		bool m_clickedTwitter; // 0x19e
+		bool m_clickedYouTube; // 0x19f
+		bool m_didPauseBGMusic; // 0x1a0
+		bool m_wasHigh; // 0x1a1
+		bool m_editorEnabled; // 0x1a2
+		PAD(1)
+		LastGameScene m_lastScene; // 0x1a4
+		LastGameScene m_lastScene2; // 0x1a8
+		bool m_searchObjectBool; // 0x1ac
+		int m_playerFrame; // 0x1b0
+		int m_playerShip; // 0x1b4
+		int m_playerBall; // 0x1b8
+		int m_playerBird; // 0x1bc
+		int m_playerColor; // 0x1c0
+		int m_playerColor2; // 0x1c4
+		int m_playerStreak; // 0x1c8
+		IconType m_playerIconType; // 0x1cc
+		bool m_everyPlaySetup; // 0x1d0
+		bool m_showSongMarkers; // 0x1d1
+		bool m_showBPMMarkers; // 0x1d2
+		bool m_recordGameplay; // 0x1d3
+		bool m_showProgressBar; // 0x1d4
+		bool m_performanceMode; // 0x1d5
+		bool m_commentSortRecent; // 0x1d6
+		bool m_showedPirateMessage; // 0x1d7
+		bool m_clickedGarage; // 0x1d8
+		bool m_clickedEditor; // 0x1d9
+		bool m_clickedName; // 0x1da
+		bool m_clickedPractice; // 0x1db
+		bool m_showedEditorGuide; // 0x1dc
+		bool m_showedRateDiffDialog; // 0x1dd
+		bool m_showedRateStarDialog; // 0x1de
+		bool m_showedLowDetailDialog; // 0x1df
+		GameRateDelegate* m_rateDelegate; // 0x1e0
+		PAD(4)
+		int m_lastLevelID; // 0x1e8
+		int m_loadedBgID; // 0x1ec
+		int m_loadedGroundID; // 0x1f0
+		int m_totalAttempts; // 0x1f4
+		int m_bootups; // 0x1f8
+		bool m_hasRatedGame; // 0x1fc
+		bool m_didPlayGame; // 0x1fd
+		bool m_isResetting; // 0x1fe
+		PAD(1)
+		int m_resolution; // 0x200
+		cocos2d::TextureQuality m_texQuality; // 0x204
+
 		std::string getPlayerUDID() {
 			return from<std::string>(this, 0x158);
 		}
-
-		PLAYER_ICON_FUNC(Frame)
-		PLAYER_ICON_FUNC(Ship)
-		PLAYER_ICON_FUNC(Ball)
-		PLAYER_ICON_FUNC(Bird)
-		PLAYER_ICON_FUNC(Dart)
-		PLAYER_ICON_FUNC(Robot)
-		PLAYER_ICON_FUNC(Spider)
-		PLAYER_ICON_FUNC(Streak)
-		PLAYER_ICON_FUNC(DeathEffect)
-		//PLAYER_ICON_FUNC(Color)
-		//PLAYER_ICON_FUNC(Color2)
-		void setPlayerGlow(bool v) { m_bPlayerGlow = v; }
-		void setPlayerIconType(IconType v) { m_nPlayerIconType = v; }
-
-		#undef FUCK_THIS
 		
 		bool isColorUnlocked(int _id, bool _type) {
 			return reinterpret_cast<bool(__thiscall*)(
@@ -204,9 +175,6 @@ namespace gd {
 				base + 0x6c990
 				)(this, bSwitch, bFullscreen, bReloadedInSession);
 		}
-		void setQuality(cocos2d::TextureQuality quality) {
-			m_eQuality = quality;
-		}
 		bool getGameVariable(const char* key) {
 			return reinterpret_cast<bool(__thiscall*)(GameManager*, const char*)>(
 				base + 0x6ace0
@@ -238,14 +206,14 @@ namespace gd {
 		static void toggleGameVariable(const char* key) {
 			reinterpret_cast<void(__stdcall*)(const char*)>(base + 0x6add0)(key);
 		}
+
 		PlayLayer* getPlayLayer() {
 			return from<PlayLayer*>(this, 0x144);
 		}
+
 		int getUserID() {
 			return from<int>(gd::GameManager::sharedState(), 0x188);
 		}
-		//PlayLayer* getPlayLayer() { return m_pPlayLayer; }
-		LevelEditorLayer* getEditorLayer() { return m_pLevelEditorLayer; }
 
 		int getPlayerFrame() {
 			return from<int>(this, 0x1b0);

@@ -7,6 +7,13 @@
 
 namespace gd {
 
+	class CustomSongWidget;
+	class CCMenuItemSpriteExtra;
+	class CCMenuItemToggler;
+	class Slider;
+	class GameObject;
+	class LevelSettingsObject;
+
 	enum EditCommand {
 		kEditCommandSmallLeft = 1,
 		kEditCommandSmallRight = 2,
@@ -47,24 +54,6 @@ namespace gd {
 		}
 	};
 
-	class EditButtonBar : public cocos2d::CCNode {
-	public:
-		cocos2d::CCArray* m_buttonArray;
-
-
-	};
-	class GJRotationControl : public cocos2d::CCLayer {};
-	class GJScaleControl : public cocos2d::CCLayer {};
-
-	class SetGroupIDLayer : public FLAlertLayer {};
-
-	class CCMenuItemSpriteExtra;
-	class CCMenuItemToggler;
-	class Slider;
-	class GameObject;
-
-	class LevelSettingsObject;
-
 	class BoomScrollLayer : public cocos2d::CCLayer {
 	public:
 		void instantMoveToPage(int page) {
@@ -79,6 +68,17 @@ namespace gd {
 				)(this, page);
 		}
 	};
+
+	class EditButtonBar : public cocos2d::CCNode {
+	public:
+		BoomScrollLayer* m_scrollLayer; // 0x1e0
+		cocos2d::CCArray* m_pagesArray; // 0x1e4
+	};
+
+	class GJRotationControl : public cocos2d::CCLayer {};
+	class GJScaleControl : public cocos2d::CCLayer {};
+
+	class SetGroupIDLayer : public FLAlertLayer {};
 
 	class EditorUI : public cocos2d::CCLayer {
 	public:
@@ -332,9 +332,9 @@ namespace gd {
 		}
 	};
 
-	class EditorPauseLayer : public gd::CCBlockLayer {
+	class EditorPauseLayer : public gd::CCBlockLayer, FLAlertLayerProtocol {
 	public:
-		PAD(0x8)
+		PAD(0x4)
 		CCMenuItemSpriteExtra* m_audioOnBtn;
 		CCMenuItemSpriteExtra* m_audioOffBtn;
 		LevelEditorLayer* m_editorLayer;
@@ -360,30 +360,36 @@ namespace gd {
 		}
 	};
 
-	class ColorSelectPopup : public gd::FLAlertLayer {
-	public:
-		static ColorSelectPopup* create(GameObject* obj, int idk, int idk2, int idk3) {
-			return reinterpret_cast<ColorSelectPopup*(__fastcall*)(GameObject*, int, int, int)>(base + 0x29cf0)(obj, idk, idk2, idk3);
-		}
-
-		auto colorPicker() {
-			return from<cocos2d::extension::CCControlColourPicker*>(this, 0x1c0);
-		}
-		auto fadeTime() {
-			return from<float>(this, 0x1ec); //1d0
-		}
-		void setFadeTime(float time) {
-			from<float>(this, 0x1ec) = time;
-		}
-	};
-
 	class LevelSettingsLayer : public gd::FLAlertLayer {
 	public:
+		PAD(0x18)
+		cocos2d::CCSprite* m_bgBtnSpr; // 0x1d4
+		cocos2d::CCSprite* m_gBtnSpr; // 0x1d8
+		cocos2d::CCSprite* m_lBtnSpr; // 0x1dc
+		cocos2d::CCSprite* m_objBtnSpr; // 0x1e0
+		cocos2d::CCSprite* m_dlBtnSpr; // 0x1e4
+		cocos2d::CCSprite* m_col1BtnSpr; // 0x1e8
+		cocos2d::CCSprite* m_col2BtnSpr; // 0x1ec
+		cocos2d::CCSprite* m_col3BtnSpr; // 0x1f0
+		cocos2d::CCSprite* m_col4BtnSpr; // 0x1f4
+		cocos2d::CCSprite* m_bgIcon; // 0x1f8
+		cocos2d::CCSprite* m_gIcon; // 0x1fc
+		LevelSettingsObject* m_settingsObject; // 0x200
+		cocos2d::CCLabelBMFont* m_selectedSong; // 0x204
+		cocos2d::CCArray* m_unkArray208; // 0x208
+		cocos2d::CCArray* m_unkArray20c; // 0x20c
+		LevelSettingsDelegate* m_delegate; // 0x210
+		LevelEditorLayer* m_editorLayer; // 0x214
+		cocos2d::CCArray* m_unkArray218; // 0x218
+		cocos2d::CCArray* m_unkArray21c; // 0x21c
+		CCMenuItemSpriteExtra* m_normalBtn; // 0x220
+		CCMenuItemSpriteExtra* m_customBtn; // 0x224
+		CCMenuItemSpriteExtra* m_selectCustomSongBtn; // 0x228
+		CCMenuItemSpriteExtra* m_changeSongBtn; // 0x22c
+		CustomSongWidget* m_customSongWidget; // 0x230
+
 		void onGravityFlipped(CCObject* sender) {
 			return reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, CCObject*)>(base + 0x99b10)(this, sender);
-		}
-		LevelSettingsObject* getLevelSettings() {
-			return from<LevelSettingsObject*>(this, 0x200);
 		}
 		static CCMenuItemToggler* createToggleButton(cocos2d::SEL_MenuHandler callback, bool toggled, cocos2d::CCMenu* menu, cocos2d::CCPoint point) {
 			auto pRet = reinterpret_cast<CCMenuItemToggler * (__fastcall*)(cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, cocos2d::CCPoint)>(base + 0x99830)(callback, toggled, menu, point);

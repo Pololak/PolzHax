@@ -1,6 +1,6 @@
 # gd.h
 
-Windows headers for Geometry Dash. Originally copied from pie's textureldr.
+Windows headers for Geometry Dash 1.92.
 
 # Usage
 

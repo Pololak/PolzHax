@@ -296,9 +296,6 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     m_totalClicks = 0;
     from<bool>(self, 0x2f9) = false;
 
-    std::cout << "Reset Level" << std::endl;
-    std::cout << "Attempt " << self->attemptsCount() << std::endl;
-
     if (setting().onSmartStartPos) {
         if (from<bool>(self, 0xd0)) {
             for (gd::StartPosObject* object : startPositions) {
@@ -329,8 +326,6 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
         startPercent = (self->getPlayerStartPosition().x / self->levelLength()) * 100.f;
     }
 
-    /*std::cout << startPercent << std::endl;*/
-
     PlayLayer::resetLevel(self);
 
     if (setting().onPracticeFix) {
@@ -345,8 +340,6 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
         }
     }
 
-    //std::cout << from<CCArray*>(self, 0x154)->lastObject() << std::endl;
-
     std::cout << "Col1 Blending: " << self->m_customColor01Blend << std::endl;
     std::cout << "Col2 Blending: " << self->m_customColor02Blend << std::endl;
     std::cout << "Col3 Blending: " << self->m_customColor03Blend << std::endl;
@@ -356,6 +349,8 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     if (!PlayLayer::init(self, level)) return false;
+
+    std::cout << gd::GameManager::sharedState()->m_playLayer << std::endl;
 
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     playLayer = self;
@@ -966,8 +961,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     isPlayerDead = false;
 
     PlayLayer::update(self, dt);
-
-    std::cout << self->m_player << std::endl;
 
     if (!isPlayerDead) wasDead = false;
 

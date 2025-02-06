@@ -12,6 +12,25 @@ namespace gd {
 
 	class GJGarageLayer : public cocos2d::CCLayer {
 	public:
+		PAD(16)
+		CCTextInputNode* m_nameInput; // 0x128
+		SimplePlayer* m_playerPreview; // 0x12c
+		PAD(8)
+		cocos2d::CCSprite* m_colorSelector1; // 0x138
+		cocos2d::CCSprite* m_colorSelector2; // 0x13c
+		CCMenuItemSpriteExtra* m_selectedColor1; // 0x140
+		CCMenuItemSpriteExtra* m_selectedColor2; // 0x144
+		PAD(8)
+		cocos2d::CCArray* m_pagesArray; // 0x150
+		float m_colorMinX; // 0x154
+		float m_colorMaxX; // 0x158
+		CCMenuItemToggler* m_tabToggleCube; // 0x15c
+		CCMenuItemToggler* m_tabToggleShip; // 0x160
+		CCMenuItemToggler* m_tabToggleBall; // 0x164
+		CCMenuItemToggler* m_tabToggleUfo; // 0x168
+		CCMenuItemToggler* m_tabToggleSpecial; // 0x16c
+
+
 		CCMenuItemToggler* getCubeBtn() {
 			return from<CCMenuItemToggler*>(this, 0x15c);
 		}
@@ -52,6 +71,14 @@ namespace gd {
 
 	class GaragePage : public cocos2d::CCNode {
 	public:
+		PAD(0x34)
+		GJGarageLayer* m_garageLayer; // 0x11c
+		cocos2d::SEL_MenuHandler m_callback; // 0x120
+		cocos2d::CCSprite* m_selectSprite; // 0x124
+		CCMenuItemSpriteExtra* m_selectedSprite; // 0x128
+		IconType m_iconType; // 0x12c
+
+
 		static auto create(IconType p0, GJGarageLayer* p1, cocos2d::SEL_MenuHandler p2) {
 			return reinterpret_cast<GaragePage * (__stdcall*)(IconType, GJGarageLayer*, cocos2d::SEL_MenuHandler)>(base + 0x7fc90)(p0, p1, p2);
 		}
