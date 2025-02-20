@@ -365,6 +365,9 @@ namespace gd {
 		void onDuplicate(CCObject* sender) {
 			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x48e70)(this, sender);
 		}
+		void updateGridNodeSize() {
+			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41ae0)(this);
+		}
 	};
 
 	class EditorPauseLayer : public gd::CCBlockLayer, FLAlertLayerProtocol {

@@ -251,19 +251,21 @@ void updateGridSizeLabel() {
 	m_gridSizeLabel->setString(CCString::createWithFormat("%.02f%", setting().gridSize)->getCString());
 }
 
-class GridSizeCB {
+class GridSizeCB : public gd::EditorUI {
 public:
 	void onIncrement(CCObject*) {
 		auto next = std::upper_bound(SNAP_GRID_SIZES.begin(), SNAP_GRID_SIZES.end(), setting().gridSize);
 		if (next == SNAP_GRID_SIZES.end()) next--;
 		setting().gridSize = *next;
 		updateGridSizeLabel();
+		this->updateGridNodeSize();
 	}
 	void onDecrement(CCObject*) {
 		auto next = std::lower_bound(SNAP_GRID_SIZES.begin(), SNAP_GRID_SIZES.end(), setting().gridSize);
 		if (next != SNAP_GRID_SIZES.begin()) next--;
 		setting().gridSize = *next;
 		updateGridSizeLabel();
+		this->updateGridNodeSize();
 	}
 };
 
@@ -1571,14 +1573,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	self->m_currentGroupLabel->setVisible(0);
 	self->addChild(m_editorLayerInput);
 
-	auto someButtonIdc = gd::CCMenuItemSpriteExtra::create(CCSprite::create("GJ_button_04.png"), nullptr, self, menu_selector(EditorUI::Callback::onGroupSticky));
-	self->m_tabsMenu->addChild(someButtonIdc);
-
 	return result;
-}
-
-void EditorUI::Callback::onGroupSticky(CCObject*) {
-	ObjectIDEnterPopup::create(this)->show();
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -3196,7 +3191,7 @@ void EditorUI::mem_init() {
 		reinterpret_cast<void*>(gd::base + 0x4ee90),
 		EditorUI::scrollWheel_H,
 		reinterpret_cast<void**>(&EditorUI::scrollWheel));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49d20), EditorUI::createMoveMenuH, reinterpret_cast<void**>(&EditorUI::createMoveMenu));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47f10), EditorUI::selectObjectH, reinterpret_cast<void**>(&EditorUI::selectObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
