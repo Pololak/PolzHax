@@ -5,6 +5,8 @@
 #include "nodes.hpp"
 #include <filesystem>
 
+#include "FullscreenManager.h"
+
 bool isReload = false;
 
 class ReloadTexAlertProtocol : public gd::FLAlertLayerProtocol {
@@ -70,9 +72,7 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 		break;
 	}
 
-	std::cout << gd::GameManager::sharedState()->m_texQuality << std::endl;
-	std::cout << gd::GameManager::sharedState()->m_playerUserID << std::endl;
-	std::cout << gd::GameManager::sharedState()->m_inMenuLayer << std::endl;
+	//FullscreenManager::setFullscreenMode(FullscreenMode::Borderless);
 
 	return true;
 }

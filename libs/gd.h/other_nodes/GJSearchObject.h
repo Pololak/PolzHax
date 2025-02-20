@@ -93,6 +93,22 @@ enum class SearchType {
 
 class GJSearchObject : public cocos2d::CCNode {
 public:
+    SearchType m_type;
+    gd::string m_string;
+    gd::string m_difficultyStr;
+    gd::string m_lengthStr;
+    int m_page;
+    bool m_star;
+    bool m_noStar;
+    int m_total;
+    bool m_uncompleted;
+    bool m_featured;
+    bool m_original;
+    bool m_twoPlayer;
+    int m_song;
+    bool m_customSong;
+    bool m_songFilter;
+
     static auto create(SearchType type, const std::string& query, const std::string& difficultyStr,
         const std::string& lengthStr, int page, bool isStar, bool isCompleted,
         bool isFeatured, int song, bool isOriginal, bool isTwoP,
@@ -122,22 +138,6 @@ public:
     const char* getKey() {
         return reinterpret_cast<const char*(__fastcall*)(GJSearchObject*)>(base + 0x65570)(this);
     }
-
-    SearchType m_type;
-    gd::string m_string;
-    gd::string m_difficultyStr;
-    gd::string m_lengthStr;
-    int m_page;
-    bool m_star;
-    bool m_noStar;
-    int m_total;
-    bool m_uncompleted;
-    bool m_featured;
-    bool m_original;
-    bool m_twoPlayer;
-    int m_song;
-    bool m_customSong;
-    bool m_songFilter;
 };
 
 

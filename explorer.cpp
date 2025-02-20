@@ -10,6 +10,38 @@ using namespace cocos2d;
 static CCNode* selected_node = nullptr;
 static bool reached_selected_node;
 
+bool operator!=(const cocos2d::CCSize& a, const cocos2d::CCSize& b) { return a.width != b.width || a.height != b.height; }
+ImVec2 operator*(const ImVec2& vec, const float m) { return { vec.x * m, vec.y * m }; }
+ImVec2 operator/(const ImVec2& vec, const float m) { return { vec.x / m, vec.y / m }; }
+ImVec2 operator+(const ImVec2& a, const ImVec2& b) { return { a.x + b.x, a.y + b.y }; }
+ImVec2 operator-(const ImVec2& a, const ImVec2& b) { return { a.x - b.x, a.y - b.y }; }
+
+bool operator==(const cocos2d::CCPoint& a, const cocos2d::CCPoint& b) { return a.x == b.x && a.y == b.y; }
+bool operator==(const cocos2d::CCRect& a, const cocos2d::CCRect& b) { return a.origin == b.origin && a.size == b.size; }
+
+cocos2d::CCPoint& operator-=(cocos2d::CCPoint& point, const cocos2d::CCPoint& other) {
+	point = point - other;
+	return point;
+}
+
+ImVec2 cocos_to_vec2(const cocos2d::CCPoint& a) {
+	const auto size = ImGui::GetMainViewport()->Size;
+	const auto win_size = cocos2d::CCDirector::sharedDirector()->getWinSize();
+	return {
+		a.x / win_size.width * size.x,
+		(1.f - a.y / win_size.height) * size.y
+	};
+}
+
+ImVec2 cocos_to_vec2(const cocos2d::CCSize& a) {
+	const auto size = ImGui::GetMainViewport()->Size;
+	const auto win_size = cocos2d::CCDirector::sharedDirector()->getWinSize();
+	return {
+		a.width / win_size.width * size.x,
+		-a.height / win_size.height * size.y
+	};
+}
+
 auto name_for_node(const CCNode* node) {
 	return typeid(*node).name() + 6;
 	// return "hon hon hon";
@@ -165,6 +197,7 @@ void render_node_properties(CCNode* node) {
 	}
 
 	ImGui::Text("Tag: %d", from<int>(node, 0xb0));
+	ImGui::Text("User Data: %p", from<void*>(node, 0xb4));
 	{
 		auto value = node->getPosition();
 		ImGui::DragFloat2("Position", (float*)&value);
@@ -179,6 +212,10 @@ void render_node_properties(CCNode* node) {
 		auto value = node->getContentSize();
 		ImGui::DragFloat2("Content Size", (float*)&value);
 		if (value != node->getContentSize()) node->setContentSize(value);
+	}
+	{
+		auto value = CCSize({ node->getScaleX() * node->getContentSize().width, node->getScaleY() * node->getContentSize().height });
+		ImGui::TextWrapped("Scaled Content Size: %.2fx%.2f", value.width, value.height);
 	}
 	if (ImGui::TreeNode("Advanced Position PRO")) {
 		if (node->getParent()) {
@@ -221,8 +258,8 @@ void render_node_properties(CCNode* node) {
 		auto thing = format_addr(union_cast<void*>(item->getSelector())).c_str();
 		ImGui::Text("CCMenuItem selector: %s", thing);
 		ImGui::SameLine();
-		if (ImGui::Button("Copy")) {
-			clipboard::write(CCString::createWithFormat("%p", thing)->getCString());
+		if (ImGui::Button("Copy##ccMenuItem")) {
+			clipboard::write(CCString::createWithFormat("%s", thing)->getCString());
 		}
 	}
 	{
@@ -269,6 +306,9 @@ void render_node_properties(CCNode* node) {
 	}
 
 	if (auto sprite_node = dynamic_cast<CCSprite*>(node); sprite_node) {
+
+
+
 		auto* texture = sprite_node->getTexture();
 
 		auto* texture_cache = CCTextureCache::sharedTextureCache();
@@ -281,16 +321,20 @@ void render_node_properties(CCNode* node) {
 			}
 		}
 
-		//auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
-		//auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
-		//const auto rect = sprite_node->getTextureRect();
-		//CCDICT_FOREACH(cached_frames, el) {
-		//	auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
-		//	if (frame->getTexture() == texture && frame->getRect() == rect) {
-		//		ImGui::Text("Frame name: %s", el->getStrKey());
-		//		break;
-		//	}
-		//}
+		auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+		auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
+		const auto rect = sprite_node->getTextureRect();
+		CCDICT_FOREACH(cached_frames, el) {
+			auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
+			if (frame->getTexture() == texture && frame->getRect() == rect) {
+				ImGui::Text("Frame name: %s", el->getStrKey());
+				ImGui::SameLine();
+				if (ImGui::Button("Copy##copyFrameName")) {
+					clipboard::write(el->getStrKey());
+				}
+				break;
+			}
+		}
 	}
 }
 

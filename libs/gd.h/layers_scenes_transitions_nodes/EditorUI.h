@@ -47,6 +47,8 @@ namespace gd {
 		kEditCommandScale = 25,
 	};
 
+	class ExtendedLayer : public cocos2d::CCLayer {};
+
 	class ButtonPage : public cocos2d::CCLayer {
 	public:
 		static ButtonPage* create(cocos2d::CCArray* array) {
@@ -56,6 +58,39 @@ namespace gd {
 
 	class BoomScrollLayer : public cocos2d::CCLayer {
 	public:
+		cocos2d::CCArray* m_dotsArray; // 0x118
+		int m_animatingToPage; // 0x11c
+		float m_touchX; // 0x120
+		float m_animateSpeed; // 0x124
+		PAD(4)
+		DynamicScrollDelegate* m_dynamicScrollDelegate; // 0x12c
+		cocos2d::CCArray* m_dynamicScrollPages; // 0x130
+		bool m_dynamic; // 0x134
+		int m_touchHasMoved; // 0x138
+		PAD(4)
+		cocos2d::CCTouch* m_currentTouch; // 0x140
+		cocos2d::CCArray* m_pages; // 0x144
+		double m_touchTimer; // 0x148
+		PAD(8)
+		ExtendedLayer* m_mainLayer; // 0x158
+		cocos2d::CCRect m_scrollArea; // 0x15c
+		float m_minTouchSpeed; // 0x16c
+		float m_touchSpeedFast; // 0x170
+		float m_touchSpeedMid; // 0x174
+		BoomScrollLayerDelegate* m_delegate; // 0x178
+		bool m_movingToPage; // 0x17c
+		float m_minimumTouchLengthToSlide; // 0x180
+		float m_minimumTouchLengthToChangePage; // 0x184
+		float m_marginOffset; // 0x18c
+		bool m_stealTouches; // 0x190
+		bool m_showPagesIndicator; // 0x191
+		cocos2d::CCPoint m_pagesIndicatorPosition; // 0x194
+		cocos2d::ccColor4B m_pagesIndicatorSelectedColor; // 0x19c
+		cocos2d::ccColor4B m_pagesIndicatorNormalColor; // 0x1a0
+		int m_currentScreen; // 0x1a4
+		float m_pagesWidthOffset; // 0x1a8
+		void* m_unusedPages; // 0x1ac
+		
 		void instantMoveToPage(int page) {
 			reinterpret_cast<void(__thiscall*)(BoomScrollLayer*, int)>(
 				base + 0x8430

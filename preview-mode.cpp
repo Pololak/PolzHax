@@ -31,13 +31,15 @@
 #include "EditorSettingsLayer.hpp"
 #include "RGBColorInputWidget.hpp"
 #include "EditorObjectLayering.hpp"
+#include "EditorLayerInput.h"
+#include "ObjectIDEnterPopup.h"
 
 using namespace cocos2d;
 
 gd::EditorPauseLayer* editorPauseLayer;
-gd::LevelEditorLayer* levelEditorLayer;
 gd::EditorUI* editUI;
 std::string savedClipboard;
+gd::LevelSettingsLayer* levelSettingsLayer;
 
 CCLabelBMFont* m_gridSizeLabel = nullptr;
 
@@ -68,6 +70,8 @@ static float m_fat;
 CCLabelBMFont* m_circleToolLabel = nullptr;
 FloatInputNode* angle_input = nullptr;
 FloatInputNode* step_input = nullptr;
+
+EditorLayerInput* m_editorLayerInput = nullptr;
 
 class CircleToolPopup : public CCLayer { // FINALLY
 public:
@@ -219,10 +223,10 @@ public:
 
 			const float angle = i * m_step;
 
-			from<CCArray*>(levelEditorLayer, 0x170)->removeLastObject();
+			from<CCArray*>(editUI->m_editorLayer, 0x170)->removeLastObject();
 			objs->addObjectsFromArray(selected);
 		}
-		from<CCArray*>(levelEditorLayer, 0x170)->addObject(gd::UndoObject::createWithArray(objs, gd::UndoCommand::Paste));
+		from<CCArray*>(editUI->m_editorLayer, 0x170)->addObject(gd::UndoObject::createWithArray(objs, gd::UndoCommand::Paste));
 		editUI->selectObjects(objs);
 		this->keyBackClicked();
 	}
@@ -275,7 +279,7 @@ float getLevelLength() {
 		if (g_lastObject->retainCount() == 1u) {
 			g_lastObject->release();
 			g_lastObject = nullptr;
-			updateLastObjectX(levelEditorLayer);
+			updateLastObjectX(editUI->m_editorLayer);
 		}
 		else {
 			res = g_lastObject->getPositionX() + 340.f;
@@ -511,55 +515,56 @@ public:
 		case 0:
 			colorSelected->setString("D");
 			colorFilterLabel->setString("D");
+			colorFilterLabel->setScale(.75f);
 			break;
 		case 1:
 			colorSelected->setString("P1");
 			colorFilterLabel->setString("P1");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 2:
 			colorSelected->setString("P2");
 			colorFilterLabel->setString("P2");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 3:
 			colorSelected->setString("C1");
 			colorFilterLabel->setString("C1");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 4:
 			colorSelected->setString("C2");
 			colorFilterLabel->setString("C2");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 5:
 			colorSelected->setString("LBG");
 			colorFilterLabel->setString("LBG");
+			colorFilterLabel->setScale(.45f);
 			break;
 		case 6:
 			colorSelected->setString("C3");
 			colorFilterLabel->setString("C3");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 7:
 			colorSelected->setString("C4");
 			colorFilterLabel->setString("C4");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 8:
 			colorSelected->setString("DL");
 			colorFilterLabel->setString("DL");
+			colorFilterLabel->setScale(.65f);
 			break;
 		case 9:
 			colorSelected->setString("W");
 			colorFilterLabel->setString("W");
+			colorFilterLabel->setScale(.75f);
 			break;
 		}
 	}
 };
-
-void LevelEditorLayer::groupStickyObjects(gd::LevelEditorLayer* levelEditor, CCArray* objects) {
-	auto objectsCount = objects->count();
-	auto idk = CCArray::createWithCapacity(objectsCount);
-	for (int i = 0; i < objectsCount; i++) {
-		auto obj = reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i));
-		
-	}
-}
 
 struct CompareTriggers {
 	bool operator()(gd::GameObject* a, gd::GameObject* b) const {
@@ -713,14 +718,12 @@ public:
 		ExtendBase::destroy();
 		matdash::orig<&MyEditorLayer::dtor>(this);
 		s_instance = nullptr;
-		levelEditorLayer = nullptr;
 		//gd::GameManager::sharedState()->m_levelEditorLayer = nullptr;
 	}
 
 	bool init(gd::GJGameLevel* level) {
 		if (!matdash::orig<&MyEditorLayer::init>(this, level)) return false;
 		s_instance = this;
-		levelEditorLayer = this;
 		//gd::GameManager::sharedState()->m_levelEditorLayer = this;
 
 		auto& triggers = this->*m_color_triggers;
@@ -786,7 +789,7 @@ public:
 
 		auto zoomLabel = CCLabelBMFont::create("Zoom: ", "bigFont.fnt");
 		zoomLabel->setScale(0.5f);
-		zoomLabel->setZOrder(9999);
+		zoomLabel->setZOrder(99);
 		zoomLabel->setPosition({ winSize.width / 2, director->getScreenTop() - 50.f });
 		zoomLabel->setOpacity(0);
 		zoomLabel->setTag(87600);
@@ -800,21 +803,6 @@ public:
 		//groundLayer->setZOrder(100);
 
 		//this->gameLayer()->addChild(groundLayer);
-		auto previewLine = CCSprite::create("gravityLine_001.png");
-		previewLine->setTag(87601);
-		previewLine->setScaleX(1.5f);
-		previewLine->setScaleY(100.f);
-		previewLine->setOpacity(75);
-		previewLine->setPosition({ winSize / 2.f });
-		if (gd::GameManager::sharedState()->getGameVariable(GameVariable::HIDE_PREVIEW_LINE)) {
-			previewLine->setVisible(0);
-		}
-		else {
-			previewLine->setVisible(1);
-		}
-		this->addChild(previewLine);
-
-		std::cout << this->m_levelSettings << std::endl;
 
 		return true;
 	}
@@ -1255,13 +1243,37 @@ CCPoint* EditorUI_getLimitedPosition(CCPoint* retVal, CCPoint point) {
 
 static bool g_holding_in_editor = false;
 
+bool touchIntersectsInput(CCNode* input, CCTouch* touch) {
+	if (!input)
+		return false;
+
+	auto inp = reinterpret_cast<gd::CCTextInputNode*>(input);
+	auto isize = CCSize({ inp->getScaleX() * inp->getContentSize().width, inp->getScaleY() * inp->getContentSize().height });
+
+	auto rect = cocos2d::CCRect{
+		inp->getPositionX() - isize.width / 2,
+		inp->getPositionY() - isize.height / 2,
+		isize.width,
+		isize.height
+	};
+
+	if (!rect.containsPoint(input->getParent()->convertTouchToNodeSpace(touch))) {
+		reinterpret_cast<gd::CCTextInputNode*>(input)->getTextField()->detachWithIME();
+		return false;
+	}
+	else
+		return true;
+}
+
 void EditorUI_onPlaytest(gd::EditorUI* self, void* btn) {
 	if (!g_holding_in_editor)
 		return matdash::orig<&EditorUI_onPlaytest>(self, btn);
 }
 
-void EditorUI_ccTouchBegan(gd::EditorUI* self, void* idc, void* idc2) {
+bool EditorUI_ccTouchBegan(gd::EditorUI* self, void* idc, void* idc2) {
 	g_holding_in_editor = true;
+	if (touchIntersectsInput(m_editorLayerInput->m_layerInput, reinterpret_cast<CCTouch*>(idc)))
+		return true;
 	return matdash::orig<&EditorUI_ccTouchBegan>(self, idc, idc2);
 }
 
@@ -1284,6 +1296,8 @@ void EditorUI::Callback::onGoToBaseLayer(CCObject* sender) {
 		onBaseLayerBtn->setVisible(0);
 		onBaseLayerBtn->setEnabled(false);
 	}
+	if (m_editorLayerInput)
+		m_editorLayerInput->m_layerInput->setString(from<gd::EditorUI*>(sender, 0xFC)->m_currentGroupLabel->getString());
 }
 
 void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
@@ -1322,6 +1336,8 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 		onBaseLayerBtn->setVisible(1);
 		onBaseLayerBtn->setEnabled(true);
 	}
+	if (m_editorLayerInput)
+		m_editorLayerInput->m_layerInput->setString(leveleditor->m_uiLayer->m_currentGroupLabel->getString());
 }
 
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
@@ -1337,6 +1353,9 @@ bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
 	m_objectAddress = nullptr;
 	m_objectType = nullptr;
 	m_objectsSelected = nullptr;
+	m_editorLayerInput = nullptr;
+	levelSettingsLayer = nullptr;
+	MyEditorLayer::s_instance = nullptr;
 	EditorUI::dtor(self);
 }
 
@@ -1350,13 +1369,6 @@ void EditorUI::Callback::onGoToGroup(CCObject* sender) {
 	if (onBaseLayerBtn) {
 		onBaseLayerBtn->setVisible(1);
 		onBaseLayerBtn->setEnabled(true);
-	}
-}
-
-void EditorUI::Callback::onGroupSticky(CCObject*) {
-	if (editUI->getSelectedObjectsOfCCArray()->count() != 0) {
-		LevelEditorLayer::groupStickyObjects(editUI->getLevelEditorLayer(), editUI->getSelectedObjectsOfCCArray());
-		editUI->updateButtons();
 	}
 }
 
@@ -1468,7 +1480,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	onBaseLayerSpr->setScale(0.5f);
 	onBaseLayerSpr->setOpacity(175);
 	rightMenu->addChild(onBaseLayerBtn);
-	if (from<int>(self->getLevelEditorLayer(), 0x12c) == -1) {
+	if (self->m_editorLayer->m_groupIDFilter == -1) {
 		onBaseLayerBtn->setVisible(0);
 		onBaseLayerBtn->setEnabled(false);
 	}
@@ -1524,7 +1536,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 	setting().gridSize = 30.f;
 	auto offset = ccp((size.width / 2.f) + 140.f, (size.height) - 19.5f);
-	if ((size.width / size.height) < 1.6f) offset = ccp((size.width) - 55.f, +130.f);
+	if ((size.width / size.height) < 1.7f) offset = ccp(size.width / 2.f, director->getScreenTop() - 50.f);
 	auto gridSizeMenu = CCMenu::create();
 	gridSizeMenu->setPosition(offset);
 	self->addChild(gridSizeMenu);
@@ -1554,7 +1566,19 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 	updateLastObjectX(self->getLevelEditorLayer());
 
+	m_editorLayerInput = EditorLayerInput::create(self);
+	m_editorLayerInput->setPosition({ self->m_currentGroupLabel->getPositionX() - 1.f, self->m_currentGroupLabel->getPositionY() - 1.f });
+	self->m_currentGroupLabel->setVisible(0);
+	self->addChild(m_editorLayerInput);
+
+	auto someButtonIdc = gd::CCMenuItemSpriteExtra::create(CCSprite::create("GJ_button_04.png"), nullptr, self, menu_selector(EditorUI::Callback::onGroupSticky));
+	self->m_tabsMenu->addChild(someButtonIdc);
+
 	return result;
+}
+
+void EditorUI::Callback::onGroupSticky(CCObject*) {
+	ObjectIDEnterPopup::create(this)->show();
 }
 
 void __fastcall EditorUI::scrollWheel_H(gd::EditorUI* _self, void* edx, float dy, float dx) {
@@ -1682,20 +1706,22 @@ CCPoint* __fastcall EditorUI::moveForCommandH(gd::EditorUI* self, void* edx, CCP
 void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void* edx, gd::GameObject* obj, gd::EditCommand com, bool idk) {
 	CCArray* selectedObjects = self->getSelectedObjectsOfCCArray();
 	auto selectedObjCount = selectedObjects->count();
-	switch (com)
-	{
-	case rotationForCommand::kEditCommandRotate45CW:
-		self->rotateObjects(selectedObjects, (45.f / selectedObjCount), { 0,0 });
-		break;
-	case rotationForCommand::kEditCommandRotate45CCW:
-		self->rotateObjects(selectedObjects, -(45.f / selectedObjCount), { 0,0 });
-		break;
-	case rotationForCommand::kEditCommandRotate265CW:
-		self->rotateObjects(selectedObjects, (26.5f / selectedObjCount), { 0,0 });
-		break;
-	case rotationForCommand::kEditCommandRotate265CCW:
-		self->rotateObjects(selectedObjects, -(26.5f / selectedObjCount), { 0,0 });
-		break;
+	if (obj->canRotateFree()) {
+		switch (com)
+		{
+		case rotationForCommand::kEditCommandRotate45CW:
+			self->rotateObjects(selectedObjects, (45.f / selectedObjCount), { 0,0 });
+			break;
+		case rotationForCommand::kEditCommandRotate45CCW:
+			self->rotateObjects(selectedObjects, -(45.f / selectedObjCount), { 0,0 });
+			break;
+		case rotationForCommand::kEditCommandRotate265CW:
+			self->rotateObjects(selectedObjects, (26.5f / selectedObjCount), { 0,0 });
+			break;
+		case rotationForCommand::kEditCommandRotate265CCW:
+			self->rotateObjects(selectedObjects, -(26.5f / selectedObjCount), { 0,0 });
+			break;
+		}
 	}
 
 	EditorUI::transformObject(self, obj, com, idk);
@@ -1803,11 +1829,11 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
 	auto boomScrollLayer = from<gd::BoomScrollLayer*>(self->editButtonBar(), 0xe8);
-	auto extendLayer = from<CCLayer*>(boomScrollLayer, 0x158);
+	auto extendLayer = from<gd::ExtendedLayer*>(boomScrollLayer, 0x158);
 	auto buttonPage2 = reinterpret_cast<gd::ButtonPage*>(extendLayer->getChildren()->objectAtIndex(1));
 	auto buttonPage2_menu = reinterpret_cast<CCMenu*>(buttonPage2->getChildren()->objectAtIndex(0));
 
-	auto dotsNode = reinterpret_cast<CCLayer*>(boomScrollLayer->getChildren()->objectAtIndex(1));
+	auto dotsNode = reinterpret_cast<CCSpriteBatchNode*>(boomScrollLayer->getChildren()->objectAtIndex(1));
 	CCArray* dotsArray = from<CCArray*>(boomScrollLayer, 0x118);
 	CCArray* pagesArray = from<CCArray*>(boomScrollLayer, 0x144);
 
@@ -2431,22 +2457,22 @@ void EditorUI::updateObjectInfo() {
 	}
 }
 
-void __fastcall EditorUI::keyDownH(gd::EditorUI* self, void*, enumKeyCodes key) {
-	static_assert(offsetof(CCDirector, m_pKeyboardDispatcher) == 0x4c, "it wrong!");
-	auto kb = CCDirector::sharedDirector()->m_pKeyboardDispatcher;
-
-	if (kb->getShiftKeyPressed() && key == KEY_E) {
-		self->transformObjectCall(rotationForCommand::kEditCommandRotate45CW);
-		return;
-	}
-	else if (kb->getShiftKeyPressed() && key == KEY_Q) {
-		self->transformObjectCall(rotationForCommand::kEditCommandRotate45CCW);
-		return;
-	}
-	else {
-		EditorUI::keyDown(self, key);
-	}
-}
+//void __fastcall EditorUI::keyDownH(gd::EditorUI* self, void*, enumKeyCodes key) {
+//	static_assert(offsetof(CCDirector, m_pKeyboardDispatcher) == 0x4c, "it wrong!");
+//	auto kb = CCDirector::sharedDirector()->m_pKeyboardDispatcher;
+//
+//	if (kb->getShiftKeyPressed() && key == KEY_E) {
+//		EditorUI::Callback::rotate45CW(nullptr);
+//		return;
+//	}
+//	else if (kb->getShiftKeyPressed() && key == KEY_Q) {
+//		self->transformObjectCall(rotationForCommand::kEditCommandRotate45CCW);
+//		return;
+//	}
+//	else {
+//		EditorUI::keyDown(self, key);
+//	}
+//}
 
 void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self) {
 	EditorUI::updateButtons(self);
@@ -2489,6 +2515,8 @@ void __fastcall EditorUI::onGroupDownH(gd::EditorUI* self, void*, CCObject* obj)
 		}
 	}
 	EditorUI::onGroupDown(self, obj);
+	if (m_editorLayerInput)
+		m_editorLayerInput->m_layerInput->setString(self->m_currentGroupLabel->getString());
 }
 
 void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
@@ -2498,6 +2526,8 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
 		onBaseLayerBtn->setEnabled(true);
 	}
 	EditorUI::onGroupUp(self, obj);
+	if (m_editorLayerInput)
+		m_editorLayerInput->m_layerInput->setString(self->m_currentGroupLabel->getString());
 }
 
 void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* obj) {
@@ -2584,6 +2614,32 @@ void EditorPauseLayer::Callback::onSaveLevel(CCObject* obj) {
 	gd::FLAlertLayer::create(&saveLevelProtocol, "Save", "<cy>Save</c> the level?", "NO", "YES", 300.f, false, 140.f)->show();
 }
 
+void EditorPauseLayer::Callback::onCreateTriggers(CCObject* obj) {
+	//auto lel = MyEditorLayer::s_instance;
+	//lel->m_uiLayer->onDeselectAll(nullptr);
+	//
+	//auto pos = lel->m_gameLayer->convertToNodeSpace(CCDirector::sharedDirector()->getWinSize() / 2.f);
+	//float y = pos.y;
+	//auto objs = CCArray::create();
+
+	//auto bgTrig = lel->createObject(29, { pos.x, y });
+	//bgTrig->m_triggerColor = lel->m_levelSettings->m_backgroundColor->m_color;
+	//bgTrig->m_triggerBlending = lel->m_levelSettings->m_backgroundColor->m_blending;
+	//bgTrig->m_copyPlayerColor1 = lel->m_levelSettings->m_backgroundColor->m_custom == 1;
+	//bgTrig->m_copyPlayerColor2 = lel->m_levelSettings->m_backgroundColor->m_custom == 2;
+
+	//if (lel->m_groupIDFilter != -1)
+	//	bgTrig->m_editorGroup = lel->m_groupIDFilter;
+
+	//objs->addObject(bgTrig);
+
+	//y += 30;
+
+	//lel->m_uiLayer->selectObjects(objs);
+	//objs->release();
+	//lel->m_uiLayer->updateButtons();
+}
+
 float timeXPos(gd::LevelEditorLayer* self, float time) {
 	auto l = self->getDrawGrid();
 	return (l->timeForXPos(time));
@@ -2626,6 +2682,7 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 		auto text = clipboard::read();
 		auto editor = reinterpret_cast<gd::LevelEditorLayer*>(reinterpret_cast<CCNode*>(self)->getParent());
 		editor->getEditorUI()->pasteObjects(text);
+		editor->m_uiLayer->updateButtons();
 		};
 
 	auto pssprite = gd::ButtonSprite::create("Paste\nString", 0x28, 0, 0.6f, true, "bigFont.fnt", "GJ_button_04.png", 30.0);
@@ -2659,25 +2716,27 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	self->addChild(levellength);
 
 	if (levellength) {
-		auto levelLength = levelEditorLayer->getLevel()->getLevelLength();
-		switch (levelLength) {
-		case 0:
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Tiny", levelLength)->getCString());
-			break;
-		case 1:
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Short", levelLength)->getCString());
-			break;
-		case 2:
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Medium", levelLength)->getCString());
-			break;
-		case 3:
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Long", levelLength)->getCString());
-			break;
-		case 4:
-			reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelLength)->getCString());
-			break;
-		default:
-			break;
+		if (MyEditorLayer::s_instance) {
+			auto levelLength = MyEditorLayer::s_instance->m_level->m_levelLength;
+			switch (levelLength) {
+			case 0:
+				reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Tiny", levelLength)->getCString());
+				break;
+			case 1:
+				reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Short", levelLength)->getCString());
+				break;
+			case 2:
+				reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Medium", levelLength)->getCString());
+				break;
+			case 3:
+				reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Long", levelLength)->getCString());
+				break;
+			case 4:
+				reinterpret_cast<CCLabelBMFont*>(levellength)->setString(CCString::createWithFormat("Extra-Long", levelLength)->getCString());
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -2695,6 +2754,8 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	self->addChild(menu);
 
 	auto mainMenu = reinterpret_cast<CCMenu*>(self->getChildren()->objectAtIndex(0));
+	//mainMenu->setScale(.8f);
+	//mainMenu->setAnchorPoint({ 0.f, 0.f });
 
 	auto saveLevel_spr = gd::ButtonSprite::create("Save", 0xdc, 0, 1.f, true, "goldFont.fnt", "GJ_button_01.png", 30.f);
 	auto saveLevel_btn = gd::CCMenuItemSpriteExtra::create(saveLevel_spr, nullptr, self, menu_selector(EditorPauseLayer::Callback::onSaveLevel));
@@ -2710,12 +2771,10 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	saveLevel_btn->setPositionY(-45.f);
 	onExitNoSave_btn->setPositionY(-90.f);
 
-	auto bpmButton_on = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(bottommenu->getChildren()->objectAtIndex(0));
 	auto helpButton = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(bottommenu->getChildren()->objectAtIndex(1));
-	auto bpmButton_off = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(bottommenu->getChildren()->objectAtIndex(2));
 
-	bpmButton_off->setPositionY(bpmButton_off->getPositionY() - 12);
-	bpmButton_on->setPositionY(bpmButton_on->getPositionY() - 12);
+	self->m_audioOffBtn->setPositionY(self->m_audioOffBtn->getPositionY() - 12);
+	self->m_audioOnBtn->setPositionY(self->m_audioOnBtn->getPositionY() - 12);
 	helpButton->setPositionY(helpButton->getPositionY() - 12);
 
 	mainMenu->addChild(saveLevel_btn);
@@ -2725,18 +2784,20 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	lengthLabel->setScale(0.5f);
 	lengthLabel->setAnchorPoint({ 0, 0.5f });
 	// time logic
-	float time = floorf(timeXPos(levelEditorLayer, getLevelLength())); // fVar5
-	int minutes = time / 60.f; // fVar10 = fvar5 / 60.0;
-	float seconds = time - (minutes * 60); // iVar11 = fVar5 - (iVar1 * 60);
-	std::string mins = CCString::createWithFormat("%i", minutes)->getCString();
-	std::string secs = CCString::createWithFormat("%.00f%", seconds)->getCString();
-	if (minutes < 1) {
-		lengthLabel->setString(std::string("Length: " + secs + " seconds").c_str());
+	if (MyEditorLayer::s_instance) {
+		float time = floorf(timeXPos(MyEditorLayer::s_instance, getLevelLength())); // fVar5
+		int minutes = time / 60.f; // fVar10 = fvar5 / 60.0;
+		float seconds = time - (minutes * 60); // iVar11 = fVar5 - (iVar1 * 60);
+		std::string mins = CCString::createWithFormat("%i", minutes)->getCString();
+		std::string secs = CCString::createWithFormat("%.00f%", seconds)->getCString();
+		if (minutes < 1) {
+			lengthLabel->setString(std::string("Length: " + secs + " seconds").c_str());
+		}
+		else {
+			lengthLabel->setString(std::string("Length: " + mins + "min " + secs + "s").c_str());
+		}
+		self->addChild(lengthLabel);
 	}
-	else {
-		lengthLabel->setString(std::string("Length: " + mins + "min " + secs + "s").c_str());
-	}
-	self->addChild(lengthLabel);
 }
 
 void __fastcall EditorPauseLayer::onSaveAndPlayH(gd::EditorPauseLayer* self, void*, CCObject* sender) {
@@ -2765,9 +2826,8 @@ void __fastcall EditorPauseLayer::onExitEditorH(gd::EditorPauseLayer* self, void
 }
 
 void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* edx, enumKeyCodes key) {
-
 	if (key == KEY_Escape) {
-		editorPauseLayer->onResume(nullptr);
+		self->onResume(nullptr);
 	}
 	else {
 		EditorPauseLayer::keyDown(self, key);
@@ -2823,8 +2883,6 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 	setting().onShouldHue = true;
 	if (!ColorSelectPopup::init(self, obj, color_id, idk, idk2)) return false;
 
-	m_fadeTime = self->m_duration;
-
 	auto winSize = CCDirector::sharedDirector()->getWinSize();
 
 	if (self->m_durationLabel != nullptr) { // use this if you want to use on color triggers
@@ -2836,14 +2894,30 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 
 		m_fadeTime_input = FloatInputNode::create(CCSize(70, 35), 2.f, "bigFont.fnt");
 		m_fadeTime_input->setScale(0.9f);
-		m_fadeTime_input->set_value(m_fadeTime);
+		m_fadeTime_input->set_value(self->m_duration);
 		m_fadeTime_input->callback = [&](FloatInputNode& input) {
+			//std::cout << "Duration: " << input.get_value().value_or(self->m_duration) << std::endl;
+			//if (self->m_durationSlider) {
+			//	self->m_durationSlider->setValue(0.5f);
+			//	self->m_durationSlider->updateBar();
+			//}
+			//self->m_durationSlider->setValue(input.get_value().value_or(self->m_duration) * 10);
+			//self->m_durationSlider->updateBar();
+			//self->m_duration = input.get_value().value_or(self->m_duration);
 			//self->setFadeTime(m_fadeTime_input->get_value().value_or(m_fadeTime));
 			//m_fadeTime = input.get_value().value_or(m_fadeTime);
 			//self->setFadeTime(m_fadeTime_input->get_value().value_or(m_fadeTime));
 			};
 		self->m_mainLayer->addChild(m_fadeTime_input);
 		m_fadeTime_input->setPosition({ (winSize.width / 2) + 61, (winSize.height / 2) - 70 }); // 16:9: 346, 90
+
+		//self->m_durationSlider->setValue(1);
+		//self->m_durationSlider->updateBar();
+		//std::cout << self->m_durationSlider->getValue() << std::endl;
+
+		//m_customFadeTimeInput = CustomFadeTimeInput::create(self);
+
+		//self->m_mainLayer->addChild(m_customFadeTimeInput);
 	}
 
 	m_colorInputWidget = RGBColorInputWidget::create(self);
@@ -2865,6 +2939,9 @@ void __fastcall ColorSelectPopup::sliderChangedH(gd::ColorSelectPopup* self, voi
 	auto sliderValue = slider->getValue() * 10.f;
 	m_fadeTime_input->set_value(floor(sliderValue * 100) / 100);
 	std::cout << sliderValue << std::endl;
+	////if (m_customFadeTimeInput) {
+	////	m_customFadeTimeInput->updateInput();
+	////}
 	ColorSelectPopup::sliderChanged(self, sender);
 }
 
@@ -2874,6 +2951,7 @@ void __fastcall ColorSelectPopup::closeColorSelectH(gd::ColorSelectPopup* self, 
 	}
 	m_fadeTime_input = nullptr;
 	m_colorInputWidget = nullptr;
+	//m_customFadeTimeInput = nullptr;
 	ColorSelectPopup::closeColorSelect(self, sender);
 }
 
@@ -2883,8 +2961,6 @@ void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* self,
 		m_colorInputWidget->update_labels(true, true);
 	}
 }
-
-gd::LevelSettingsLayer* levelSettingsLayer;
 
 auto flipGravityToggle(CCSprite* toggleOn, CCSprite* toggleOff) {
 	auto flipGravity_enabled = levelSettingsLayer->m_settingsObject->m_isFlipped;
@@ -2928,7 +3004,7 @@ void __fastcall DrawGridLayer::addToSpeedObjectsH(gd::DrawGridLayer* self, void*
 }
 
 float timeBetweenPosition(float a, float b) {
-	auto l = levelEditorLayer->getDrawGrid();
+	auto l = editUI->m_editorLayer->getDrawGrid();
 	return std::abs(l->timeForXPos(a) - l->timeForXPos(b));
 }
 
@@ -2938,6 +3014,12 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	auto director = CCDirector::sharedDirector();
 
 	gd::LevelEditorLayer* lel = from<gd::LevelEditorLayer*>(self, 0x124);
+
+	if (setting().onEditorExtension) {
+		glLineWidth(1);
+		ccDrawColor4B(0xff, 0xff, 0xff, 0x96);
+		ccDrawLine({ 0, 90 }, { 0, 1590 });
+	}
 
 	auto secarr = lel->getLevelSections();
 	auto arrcount = secarr->count();
@@ -2960,38 +3042,88 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	}	
 }
 
-//void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
-//void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float p0) {
-//	if (MyEditorLayer::s_instance)
-//		if (MyEditorLayer::s_instance->m_player)
-//			MyEditorLayer::s_instance->m_player->m_hardStreakActive = true;
+//bool isEasedScrollLayer(gd::BoomScrollLayer* self) {
+//	if (!self->getParent())
+//		return false;
 //
-//	HardStreak_updateStroke(self, p0);
+//	if (vtable_cast(self->getParent(), 0x11c804))
+//		return false;
+//
+//	if (vtable_cast(self->getParent(), 0x114b90))
+//		return false;
+//
+//	return true;
 //}
 //
-//void(__thiscall* PlayerObject_placeStreakPoint)(gd::PlayerObject*);
-//void __fastcall PlayerObject_placeStreakPointH(gd::PlayerObject* self) {
-//	if (MyEditorLayer::s_instance && self->m_dartMode)
-//		self->m_hardStreak->addPoint(self->getPosition());
-//	else
-//		PlayerObject_placeStreakPoint(self);
+//class BoomScrollLayerCB : public gd::BoomScrollLayer {
+//public:
+//	void onGoToPage(CCObject* obj) {
+//		auto p = static_cast<CCNode*>(obj)->getTag();
+//		if (isEasedScrollLayer(this))
+//			this->moveToPage(p);
+//		else {
+//			this->instantMoveToPage(p - 1);
+//			this->instantMoveToPage(p);
+//		}
+//	}
+//};
+//
+//void(__thiscall* BoomScrollLayer_updateDots)(gd::BoomScrollLayer*, float);
+//void __fastcall BoomScrollLayer_updateDotsH(gd::BoomScrollLayer* self, void*, float width) {
+//	BoomScrollLayer_updateDots(self, width);
+//
+//	if (editUI) {
+//		if (self->m_dotsArray && self->m_dotsArray->count()) {
+//			auto scale = static_cast<CCSprite*>(self->m_dotsArray->objectAtIndex(0))->getScale();
+//			auto menu = self->getChildByTag(0x4490);
+//			if (menu) {
+//				menu->setPosition((self->getScaleX() * self->getContentSize().width) / 2.f, 5.f * scale);
+//			}
+//		}
+//	}
 //}
 //
-//void(__thiscall* PlayerObject_update)(gd::PlayerObject*, float);
-//void __fastcall PlayerObject_updateH(gd::PlayerObject* self, void*, float dt) {
-//	PlayerObject_update(self, dt);
+//bool(__thiscall* BoomScrollLayer_init)(gd::BoomScrollLayer*, CCArray*, int, bool, CCArray*, gd::DynamicScrollDelegate*);
+//bool __fastcall BoomScrollLayer_initH(gd::BoomScrollLayer* self, void*, CCArray* pages, int idk, bool idk2, CCArray* idk3, gd::DynamicScrollDelegate* delegate) {
+//	if (!BoomScrollLayer_init(self, pages, idk, idk2, idk3, delegate)) return false;
 //
-//	if (MyEditorLayer::s_instance && self->m_dartMode)
-//		self->m_hardStreak->m_currentPoint = self->getPosition();
+//	if (editUI) {
+//		WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x823e), "\x90\x90\x90\x90", 4, NULL);
+//		auto menu = CCMenu::create();
+//
+//		auto i = 0;
+//		for (auto dot : CCArrayExt<CCSprite*>(self->m_dotsArray)) {
+//			dot->retain();
+//			dot->removeFromParent();
+//			dot->setPosition({ 0.f, 0.f });
+//			auto dotBtn = gd::CCMenuItemSpriteExtra::create(dot, nullptr, self, menu_selector(BoomScrollLayerCB::onGoToPage));
+//			dotBtn->setSizeMult(3.f);
+//			dotBtn->setTag(i++);
+//			dotBtn->setUserData(reinterpret_cast<void*>(idk2));
+//			menu->addChild(dotBtn);
+//			dot->release();
+//		}
+//
+//		menu->alignItemsHorizontallyWithPadding((9.f - self->m_dotsArray->count()) / 2.2f);
+//		menu->setPosition((self->getScaleX() * self->getContentSize().width) / 2.f, 8.f);
+//		menu->setTag(0x4490);
+//		self->addChild(menu, 5);
+//	}
+//
+//	return true;
 //}
-//
-//void(__thiscall* PlayerObject_fadeOutStreak2)(gd::PlayerObject*, float);
-//void __fastcall PlayerObject_fadeOutStreak2H(gd::PlayerObject* self, void*, float p0) {
-//	PlayerObject_fadeOutStreak2(self, p0);
-//
-//	if (MyEditorLayer::s_instance)
-//		self->m_hardStreak->runAction(CCFadeTo::create(p0, 0));
-//}
+
+void(__thiscall* GameObject_customSetup)(gd::GameObject*);
+void __fastcall GameObject_customSetupH(gd::GameObject* self) {
+	GameObject_customSetup(self);
+
+	if (editUI && setting().onHitboxBugFix) {
+		if (self->canRotateFree() && self->m_objectRadius == 0) {
+			self->m_isOriented = true;
+			self->updateOrientedBox();
+		}
+	}
+}
 
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	Scheduler::update(self, dt);
@@ -3070,7 +3202,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47fa0), EditorUI::selectObjectsH, reinterpret_cast<void**>(&EditorUI::selectObjects));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b040), EditorUI::moveForCommandH, reinterpret_cast<void**>(&EditorUI::moveForCommand));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b7e0), EditorUI::transformObjectH, reinterpret_cast<void**>(&EditorUI::transformObject));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41850), EditorUI::sliderChangedH, reinterpret_cast<void**>(&EditorUI::sliderChanged));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x490c0), EditorUI::onCopyH, reinterpret_cast<void**>(&EditorUI::onCopy));
@@ -3083,6 +3215,10 @@ void EditorUI::mem_init() {
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);
 	matdash::add_hook<&EditorUI_ccTouchEnded>(gd::base + 0x4de40);
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8110), BoomScrollLayer_updateDotsH, reinterpret_cast<void**>(&BoomScrollLayer_updateDots));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x79b0), BoomScrollLayer_initH, reinterpret_cast<void**>(&BoomScrollLayer_init));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject_customSetupH, reinterpret_cast<void**>(&GameObject_customSetup));
 }
 
 void EditorPauseLayer::mem_init() {

@@ -790,7 +790,7 @@ public:
      */
      //Robtop Modification
     virtual int getTag() const {
-        return reinterpret_cast<int(__thiscall*)()>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?getTag@CCNode@cocos2d@@UBEHXZ"))();
+        return reinterpret_cast<int(__thiscall*)(const CCNode*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?getTag@CCNode@cocos2d@@UBEHXZ"))(this);
     }
     /**
      * Changes the tag that is used to identify the node easily.
@@ -802,7 +802,7 @@ public:
 
      //Robtop Modification
     virtual void setTag(int nTag) {
-        return reinterpret_cast<void(__thiscall*)()>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?setTag@CCNode@cocos2d@@UAEXH@Z"))();
+        return reinterpret_cast<void(__thiscall*)(const CCNode*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?setTag@CCNode@cocos2d@@UAEXH@Z"))(this);
     }
 
     /**
@@ -1268,7 +1268,7 @@ public:
      * The matrix is in Pixels.
      */
     virtual const CCAffineTransform parentToNodeTransform(void) {
-        return reinterpret_cast<CCAffineTransform(__thiscall*)()>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?parentToNodeTransform@CCNode@cocos2d@@UAE?BUCCAffineTransform@2@XZ"))();
+        return reinterpret_cast<CCAffineTransform(__thiscall*)(CCNode*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?parentToNodeTransform@CCNode@cocos2d@@UAE?BUCCAffineTransform@2@XZ"))(this);
     }
 
     /** 

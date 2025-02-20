@@ -33,12 +33,17 @@ public:
     gd::string m_uploadDate; // 0x168
     gd::string m_updateDate; // 0x180
     int m_userID; // 0x198
-    PAD(0x4)
+    int m_difficulty; // 0x19c
     int m_audioTrack; // 0x1a0
     int m_songID; // 0x1a4
-    PAD(0x14)
+    int m_levelRev; // 0x1a8
+    int m_objectCount; // 0x1ac
+    int m_order; // 0x1b0
+    int m_ratings; // 0x1b4
+    int m_ratingsSum; // 0x1b8
     int m_downloads; // 0x1bc
-    PAD(0x5)
+    int m_completes; // 0x1c0
+    bool m_isEditable; // 0x1c4
     bool m_isVerified; // 0x1c5
     bool m_isUploaded; // 0x1c6
     bool m_hasBeenModified; // 0x1c7
@@ -61,18 +66,18 @@ public:
     bool m_twoPlayerMode; // 0x208
     int m_failedPasswordAttempts; // 0x20c
     bool m_showedSongWarning; // 0x210
-    int m_starRatings;
-    int m_starRatingsSum;
-    int m_maxStarRatings;
-    int m_minStarRatings;
-    int m_demonVotes;
-    int m_rateStars;
-    bool m_rateFeature;
-    gd::string m_rateUser;
-    bool m_dontSave;
-    bool m_isHidden;
-    //int m_requiredCoins;
-    //bool m_isUnlocked;
+    int m_starRatings; // 0x214
+    int m_starRatingsSum; // 0x218
+    int m_maxStarRatings; // 0x21c
+    int m_minStarRatings; // 0x220
+    int m_demonVotes; // 0x224
+    int m_rateStars; // 0x228
+    bool m_rateFeature; // 0x22c
+    std::string m_rateUser; // 0x230
+    bool m_dontSave; // 0x248
+    bool m_isHidden; // 0x249
+    int m_requiredCoins; // 0x24c
+    bool m_isUnlocked; // 0x250
     cocos2d::CCPoint m_lastCameraPos; // 0x254
     float m_lastEditorZoom; // 0x25c
     int m_lastBuildTab; // 0x260

@@ -350,7 +350,6 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     if (!PlayLayer::init(self, level)) return false;
 
-    std::cout << gd::GameManager::sharedState()->m_playLayer << std::endl;
 
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     playLayer = self;
@@ -581,24 +580,6 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
             if (self->player2()) Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
         }
 
-    }
-
-    if (setting().onDontFade) {
-        for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-        {
-            if (i < 0) continue;
-            if (i >= arrcount) break;
-            auto objAtInd = secarr->objectAtIndex(i);
-            auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-            for (int j = 0; j < objarr->count(); j++)
-            {
-                auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                if (!invisibleObjects.contains(obj->getObjectID())) {
-                    obj->setOpacity(255);
-                }
-            }
-        }
     }
 
     if (setting().onHideAttempts) {
@@ -1259,24 +1240,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-	if (setting().onDontFade) {
-		for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-		{
-			if (i < 0) continue;
-			if (i >= arrcount) break;
-			auto objAtInd = secarr->objectAtIndex(i);
-			auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-			for (int j = 0; j < objarr->count(); j++)
-			{
-				auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-				if (!invisibleObjects.contains(obj->getObjectID())) {
-					obj->setOpacity(255);
-				}
-			}
-		}
-	}
-
     if (setting().onHideAttempts) {
         self->attemptsLabel()->setVisible(false);
     }
@@ -1331,7 +1294,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->player2()->setVisible(1);
     }
 
-    if (setting().onLockCursor && !setting().show && !self->hasCompletedLevel() && !self->isDead()) {
+    if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->isDead()) {
         SetCursorPos(size.width / 2, size.height / 2);
     }
 

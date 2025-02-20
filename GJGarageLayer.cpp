@@ -8,7 +8,6 @@
 Fields* fields = nullptr;
 gd::GJGarageLayer* garageLayer;
 CCLayer* iconKitPreview;
-
 CCMenu* m_backButtonMenu = nullptr;
 
 class IconKitPreview : public CCLayer {
@@ -39,7 +38,6 @@ public:
 		setTouchEnabled(true);
 		setKeypadEnabled(true);
 		setMouseEnabled(true);
-
 
 		auto director = CCDirector::sharedDirector();
 

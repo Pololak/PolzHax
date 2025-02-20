@@ -178,17 +178,15 @@ public:
 };
 
 void updateButtonLabel() {
-		auto currentPage = (from<int>(levelBrowserLayer, 0x140)) / 10 + 1;
-		m_moveToPageButtonSprite->getLabel()->setString(CCString::createWithFormat("%i", currentPage)->getCString());
+	auto currentPage = (from<int>(levelBrowserLayer, 0x140)) / 10 + 1;
+	m_moveToPageButtonSprite->getLabel()->setString(CCString::createWithFormat("%i", currentPage)->getCString());
 }
 
 void LevelBrowserLayer::Callback::onRefresh(CCObject*) {
-    if (from<gd::GJSearchObject*>(levelBrowserLayer, 0x134) != nullptr) {
-        auto gameLevelManager = gd::GameLevelManager::sharedState();
-		std::cout << gameLevelManager << std::endl;
+    if (from<gd::GJSearchObject*>(levelBrowserLayer, 0x134) != nullptr) {	
         auto searchObject = from<gd::GJSearchObject*>(levelBrowserLayer, 0x134);
         std::cout << searchObject->getKey() << " getKey" << std::endl;
-        gameLevelManager->resetTimerForKey(searchObject->getKey());
+		gd::GameLevelManager::sharedState()->resetTimerForKey(searchObject->getKey());
         levelBrowserLayer->loadPage(searchObject);
         if (from<bool>(levelBrowserLayer, 0x9c) != 0)
             from<bool>(levelBrowserLayer, 0x9c) = 0;
@@ -226,6 +224,19 @@ void LevelBrowserLayer::Callback::onImportLevel(CCObject*) {
 		}
 		auto scene = gd::EditLevelLayer::scene(level);
 		CCDirector::sharedDirector()->pushScene(scene);
+	}
+}
+
+void LevelBrowserLayer::Callback::onSearch(CCObject*) {
+	auto searchObject = gd::GJSearchObject::create(gd::SearchType::MyLevels, "ice");
+	gd::LevelBrowserLayer::scene(searchObject);
+}
+
+void LevelBrowserLayer::Callback::onClearSearch(CCObject*) {
+	gd::GJSearchObject* searchObject = from<gd::GJSearchObject*>(this, 0x134);
+	if (searchObject != nullptr) {
+		searchObject->m_page = 0;
+		this->loadPage(searchObject);
 	}
 }
 
@@ -294,6 +305,18 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 
 		menu->setZOrder(1);
 		menu->addChild(button);
+
+		auto testSearchButton_spr = CCSprite::create("GJ_button_01.png");
+		auto testSearchButton = gd::CCMenuItemSpriteExtra::create(testSearchButton_spr, nullptr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
+		testSearchButton->setPosition({ -500.f, 70.f });
+
+		menu->addChild(testSearchButton);
+
+		auto testUSearchButton_spr = CCSprite::create("GJ_button_04.png");
+		auto testUSearchButton = gd::CCMenuItemSpriteExtra::create(testUSearchButton_spr, nullptr, self, menu_selector(LevelBrowserLayer::Callback::onClearSearch));
+		testUSearchButton->setPosition({ -500.f, 0.f });
+
+		menu->addChild(testUSearchButton);
 	}
 
     return true;

@@ -14,11 +14,6 @@ LayersStruct& layers() {
 	return inst;
 }
 
-FuckThis& fuckThis() {
-	static FuckThis inst;
-	return inst;
-}
-
 auto get_save_path() {
 	return get_exe_path() / "polzhax.txt";
 }

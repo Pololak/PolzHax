@@ -11,12 +11,14 @@ namespace LevelBrowserLayer {
 	inline void(__thiscall* onPrevPage)(gd::LevelBrowserLayer*, CCObject*);
 	void __fastcall onPrevPageH(gd::LevelBrowserLayer* self, void*, CCObject* sender);
 
-	class Callback {
+	class Callback : public gd::LevelBrowserLayer {
 	public:
 		void onRefresh(CCObject*);
 		void onLastPage(CCObject*);
 		void onFirstPage(CCObject*);
 		void onImportLevel(CCObject*);
+		void onSearch(CCObject*);
+		void onClearSearch(CCObject*);
 	};
 
 	void mem_init();

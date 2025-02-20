@@ -43,7 +43,7 @@ int serverString;
 
 enum class ServerAddresses {
     GHS = 808594997,
-    ABSOLLLUTE = 1953785198,
+    ABSOLLLUTE = 1869832801, // 1953785198 old server
     PLATINUM = 1952541808
 };
 
@@ -99,7 +99,7 @@ bool(__thiscall* CCKeyboardDispatcher_dispatchKeyboardMSG)(cocos2d::CCKeyboardDi
 void __fastcall CCKeyboardDispatcher_dispatchKeyboardMSG_H(CCKeyboardDispatcher* self, void* edx, int key, bool down) {
     auto pl = gd::GameManager::sharedState()->getPlayLayer();
     if (down) {
-        if ((key == 'R') && setting().onRetryBind) {
+        if ((key == setting().retryKeybind) && setting().onRetryBind) {
             if (pl) {
                 if (!pl->hasCompletedLevel()) {
                     pl->resetLevel();
@@ -115,17 +115,10 @@ void __fastcall CCKeyboardDispatcher_dispatchKeyboardMSG_H(CCKeyboardDispatcher*
         }
         if (pl) {
             if (setting().onSPSwitcher) {
-                switch (key)
-                {
-                case KEY_Q:
-                case KEY_Left:
+                if (key == setting().spsPrevKey)
                     PlayLayer::onPrevStartPos();
-                    break;
-                case KEY_E:
-                case KEY_Right:
+                if (key == setting().spsNextKey)
                     PlayLayer::onNextStartPos();
-                    break;
-                }
             }
         }
     }
@@ -608,6 +601,8 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
     button->setPosition({ -(winSize.width / 2) + 30, 24 });
     self->m_playBtnMenu->addChild(button);
 
+    std::cout << serverString << std::endl;
+
 	return true;
 }
 
@@ -757,7 +752,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xA3620), MoreSearchLayer_initH, reinterpret_cast<void**>(&MoreSearchLayer_init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bff0), GJDropDownLayer_hideLayerH, reinterpret_cast<void**>(&GJDropDownLayer_hideLayer));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bf20), GJDropDownLayer_showLayerH, reinterpret_cast<void**>(&GJDropDownLayer_showLayer));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92f20), DrawGridLayer::addToSpeedObjectsH, reinterpret_cast<void**>(&DrawGridLayer::addToSpeedObjects));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92f20), DrawGridLayer::addToSpeedObjectsH, reinterpret_cast<void**>(&DrawGridLayer::addToSpeedObjects));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe1270), PlayerObject::placeStreakPointH, reinterpret_cast<void**>(&PlayerObject::placeStreakPoint));

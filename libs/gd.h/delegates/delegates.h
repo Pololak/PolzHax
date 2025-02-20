@@ -10,6 +10,7 @@ namespace gd {
     class CCTextInputNode;
     class SongInfoObject;
     class GJSpecialColorSelect;
+    class BoomScrollLayer;
 
     enum GJSongError {
         kGJSongErrorUnknown = 0,
@@ -121,6 +122,16 @@ namespace gd {
 
     class GameRateDelegate {
         virtual void updateRate();
+    };
+
+    class DynamicScrollDelegate {
+        virtual void updatePageWithObject(cocos2d::CCObject*, cocos2d::CCObject*) {}
+    };
+
+    class BoomScrollLayerDelegate {
+        virtual void scrollLayerScrollingStarted(BoomScrollLayer*);
+        virtual void scrollLayerScrolledToPage(BoomScrollLayer*, int);
+        virtual void scrollLayerMoved(cocos2d::CCPoint);
     };
 }
 

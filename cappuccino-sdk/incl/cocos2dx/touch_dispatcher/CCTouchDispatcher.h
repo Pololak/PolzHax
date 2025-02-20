@@ -173,7 +173,9 @@ public:
     /**
      * @lua NA
      */
-    void touches(CCSet *pTouches, CCEvent *pEvent, unsigned int uIndex);
+    void touches(CCSet* pTouches, CCEvent* pEvent, unsigned int uIndex) {
+        reinterpret_cast<void(__thiscall*)(CCTouchDispatcher*, CCSet*, CCEvent*, unsigned int)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?touches@CCTouchDispatcher@cocos2d@@QAEXPAVCCSet@2@PAVCCEvent@2@I@Z"))(this, pTouches, pEvent, uIndex);
+    }
     /**
      * @lua NA
      */
@@ -197,12 +199,12 @@ public:
      */
     CCTouchHandler* findHandler(CCTouchDelegate *pDelegate);
 
-    RT_ADD(
-        void incrementForcePrio() {
+    void incrementForcePrio() {
         return reinterpret_cast<void(__thiscall*)(CCTouchDispatcher*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?incrementForcePrio@CCTouchDispatcher@cocos2d@@QAEXXZ"))(this);
     }
-        void decrementForcePrio(int priority);
-    )
+
+    void decrementForcePrio(int priority);
+
 protected:
     void forceRemoveDelegate(CCTouchDelegate *pDelegate);
     void forceAddHandler(CCTouchHandler *pHandler, CCArray* pArray);

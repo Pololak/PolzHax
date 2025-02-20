@@ -445,6 +445,14 @@ namespace gd {
 		cocos2d::CCRect* getObjectRect(cocos2d::CCRect* rect, float fl1, float fl2) {
 			return reinterpret_cast<cocos2d::CCRect * (__thiscall*)(GameObject*, cocos2d::CCRect*, float, float)>(base + 0x71bd0)(this, rect, fl1, fl2);
 		}
+
+		bool canRotateFree() {
+			return (
+				m_objectType != GameObjectType::kGameObjectTypeSolid &&
+				m_objectType != GameObjectType::kGameObjectTypeBreakable &&
+				m_objectType != GameObjectType::kGameObjectTypeSlope
+				);
+		}
 	};
 }
 

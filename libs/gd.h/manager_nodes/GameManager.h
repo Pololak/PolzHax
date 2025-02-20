@@ -50,6 +50,7 @@ namespace gd {
 		bool m_didSyncAchiviements; // 0x129
 		PAD(2)
 		gd::string m_editorCopyString; // 0x12c
+		PAD(4)
 		PlayLayer* m_playLayer; // 0x144
 		LevelSelectLayer* m_levelSelectLayer; // 0x148
 		bool m_inMenuLayer; // 0x14c

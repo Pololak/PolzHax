@@ -1,6 +1,6 @@
 #include "CommentCell.h"
 
-void __fastcall CommentCell::loadFromCommentH(CCLayer* self, void*, gd::GJComment* comment) {
+void __fastcall CommentCell::loadFromCommentH(gd::CommentCell* self, void*, gd::GJComment* comment) {
 	CommentCell::loadFromComment(self, comment);
 
 	auto mainLayer = from<CCLayer*>(self, 0x16c);
@@ -15,4 +15,5 @@ void __fastcall CommentCell::loadFromCommentH(CCLayer* self, void*, gd::GJCommen
 	mainLayer->addChild(commentID);
 
 	std::cout << mainLayer << std::endl;
+	std::cout << self->m_idk << std::endl;
 }

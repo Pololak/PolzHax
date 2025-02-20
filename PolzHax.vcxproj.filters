@@ -1476,9 +1476,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h">
-      <Filter>libs\gd.h</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1581,9 +1578,6 @@
     <ClInclude Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.h">
       <Filter>libs\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="InfoLayer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\level_nodes\GJComment.h">
       <Filter>libs\gd.h</Filter>
     </ClInclude>
@@ -1624,6 +1618,21 @@
       <Filter>libs\gd.h</Filter>
     </ClInclude>
     <ClInclude Include="EditorObjectLayering.hpp">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="FullscreenManager.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorLayerInput.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomRotateInput.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoLayer.hpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectIDEnterPopup.h">
       <Filter>Header Files\Polz2</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1749,6 +1758,24 @@
       <Filter>libs\nfd</Filter>
     </ClCompile>
     <ClCompile Include="EditorObjectLayering.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="FullscreenManager.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorLayerInput.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomRotateInput.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiUtils.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiUtils.cpp">
+      <Filter>Source Files\Polz2</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectIDEnterPopup.cpp">
       <Filter>Source Files\Polz2</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,7 +8,7 @@ namespace gd {
     class Slider;
 
     class SliderThumb : public cocos2d::CCMenuItemImage {
-        protected:
+        public:
             float m_fLength;
             bool m_bVertical;
 
@@ -22,12 +22,12 @@ namespace gd {
             }
 
             float getValue() {
-                return (this->getPosition().x + this->getScale() * 200.0 * 0.5) / (this->getScale() * 200.0);
+                return (this->getPosition().x + this->getScale() * 200.0f * 0.5f) / (this->getScale() * 200.0f);
             }
     };
 
     class SliderTouchLogic : public cocos2d::CCMenu {
-        protected:
+        public:
             PAD(0x4)
             float m_fLength;
             SliderThumb* m_pThumb;
@@ -43,24 +43,24 @@ namespace gd {
     };
 
     class Slider : public cocos2d::CCLayer {
-        protected:
-            SliderTouchLogic* m_pTouchLogic;
-            cocos2d::CCSprite* m_pSliderBar;
-            cocos2d::CCSprite* m_pGroove;
-            float m_fUnknown;
-            float m_fHeight;
+        public:
+            SliderTouchLogic* m_touchLogic;
+            cocos2d::CCSprite* m_groove;
+            float m_width;
+            float m_height;
 
         public:
             SliderTouchLogic* getTouchLogic() {
                 return from<SliderTouchLogic*>(this, 0x118);
             }
-
-            void setValue(float val) {
-                this->m_pTouchLogic->getThumb()->setValue(val);
+            SliderThumb* getThumb() {
+                return from<SliderThumb*>((this->getTouchLogic()), 0x13C);
             }
-
             float getValue() {
-                return this->getTouchLogic()->getThumb()->getValue();
+                return from<float>((this->getThumb()), 0x2C);
+            }
+            void setValue(float newVal) {
+                from<float>((this->getThumb()), 0x2C) = newVal;
             }
 
             auto getBarSprite() {
@@ -75,10 +75,8 @@ namespace gd {
                 this->getBarSprite()->setVisible(v);
             }
 
-            void updateBar() {
-                reinterpret_cast<void(__fastcall*)(Slider*)>(
-                    base + 0x1d310
-                    )(this);
+			void updateBar() {
+				reinterpret_cast<void(__fastcall*)(Slider*)>(base + 0x1d310)(this);
             }
 
             static Slider* create(

@@ -105,7 +105,9 @@ namespace gd {
 		cocos2d::CCSprite* m_custom04ColorRef; // 0x220
 		cocos2d::CCSprite* m_sliderGroove; // 0x224
 		cocos2d::CCSprite* m_sliderBar; // 0x228
-		PAD(0x44)
+		PAD(0x28)
+		gd::string m_replayString; // 0x
+		cocos2d::CCArray* m_replayActions; // 0x26c
 		double m_levelTime; // 0x270
 		bool m_needsReorderColor01; // 0x278
 		bool m_needsReorderColor02; // 0x279

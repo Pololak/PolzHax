@@ -538,10 +538,13 @@
     <ClInclude Include="cappuccino-sdk\incl\extensions\spine\spine.h" />
     <ClInclude Include="CheckPoint.h" />
     <ClInclude Include="CrashLogger.hpp" />
+    <ClInclude Include="CustomRotateInput.h" />
+    <ClInclude Include="EditorLayerInput.h" />
     <ClInclude Include="EditorObjectLayering.hpp" />
     <ClInclude Include="EditorSettingsLayer.hpp" />
     <ClInclude Include="explorer.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="FullscreenManager.h" />
     <ClInclude Include="GameVariables.hpp" />
     <ClInclude Include="GJGarageLayer.h" />
     <ClInclude Include="GJScoreCell.h" />
@@ -597,7 +600,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SetIDPopup.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\TextAlertPopup.h" />
     <ClInclude Include="libs\gd.h\level_nodes\ColorAction.h" />
-    <ClInclude Include="libs\gd.h\level_nodes\CustomColorMode.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJComment.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h" />
     <ClInclude Include="libs\gd.h\level_nodes\LevelSettingsObject.h" />
@@ -668,6 +670,7 @@
     <ClInclude Include="MenuLayer.h" />
     <ClInclude Include="moveForCommand.h" />
     <ClInclude Include="nodes.hpp" />
+    <ClInclude Include="ObjectIDEnterPopup.h" />
     <ClInclude Include="ObjectsIds.h" />
     <ClInclude Include="ObjectToolbox.h" />
     <ClInclude Include="pch.h" />
@@ -690,13 +693,18 @@
     <ClCompile Include="CommentCell.cpp" />
     <ClCompile Include="CommentCell.h" />
     <ClCompile Include="CrashLogger.cpp" />
+    <ClCompile Include="CustomRotateInput.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="EditorLayerInput.cpp" />
     <ClCompile Include="EditorObjectLayering.cpp" />
     <ClCompile Include="EditorSettingsLayer.cpp" />
     <ClCompile Include="explorer.cpp" />
+    <ClCompile Include="FullscreenManager.cpp" />
     <ClCompile Include="GJGarageLayer.cpp" />
     <ClCompile Include="GJScoreCell.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
+    <ClCompile Include="ImGuiUtils.cpp" />
+    <ClCompile Include="ImGuiUtils.h" />
     <ClCompile Include="InfoLayer.cpp" />
     <ClCompile Include="Labels.cpp" />
     <ClCompile Include="LevelBrowserLayer.cpp" />
@@ -717,6 +725,7 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="nodes.cpp" />
+    <ClCompile Include="ObjectIDEnterPopup.cpp" />
     <ClCompile Include="ObjectToolbox.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />

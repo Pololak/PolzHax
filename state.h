@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include "schema.hpp"
+#include <fstream>
 
 struct LayersStruct {
     cocos2d::CCLayer* PauseLayerObject;
@@ -43,9 +44,7 @@ struct SettingStruct {
     bool onMiniCube;
     bool onNoAnimations;
     bool onNoBGFlash;
-    bool b_blank8; //
     bool onNoDeathEffect;
-    bool b_blank7; //
     bool onNoGhostTrail;
     bool onNoGlowObject;
     bool onNoGravityEffect;
@@ -125,14 +124,10 @@ struct SettingStruct {
     bool onTransparentBG;
     bool onTransparentLists;
     bool onTransparentTextLabels;
-    bool b_blank6; //
     bool onShouldHue;
     bool onAlwaysHue;
     bool onSameDualColor;
-    bool b_blank5; //
     bool onRespawnTime;
-    bool b_blank4; //
-    bool b_blank3; //
     bool onResetPercentage; //
     bool onSpeedhack;
     bool onSpeedhackMusic;
@@ -161,58 +156,11 @@ struct SettingStruct {
     bool onSmartStartPos; //
     bool onRainbowIcon;
     bool onNoWaveTrailBehind;
-    bool b_blank10;
-    bool b_blank11;
-    bool b_blank12;
-    bool b_blank13;
-    bool b_blank14;
-    bool b_blank15;
-    bool b_blank16;
-    bool b_blank17;
-    bool b_blank18;
-    bool b_blank19;
-    bool b_blank20;
-    bool b_blank21;
-    bool b_blank22;
-    bool b_blank23;
-    bool b_blank24;
-    bool b_blank25;
-    bool b_blank26;
-    bool b_blank27;
-    bool b_blank28;
-    bool b_blank29;
-    bool b_blank30;
-    bool b_blank31;
-    bool b_blank32;
-    bool b_blank33;
-    bool b_blank34;
-    bool b_blank35;
-    bool b_blank36;
-    bool b_blank37;
-    bool b_blank38;
-    bool b_blank39;
-    bool b_blank40;
+    bool onNoForceGlow;
 
     float respawnTime = 1.f;
-    float f_blank2;
-    float f_blank3;
-    float f_blank4;
-    float f_blank5;
-    float f_blank6;
-    float f_blank7;
-    float f_blank8;
-    float f_blank9;
-    float f_blank10;
-    float f_blank11;
-    float f_blank12;
-    float f_blank13;
-    float f_blank14;
-    float f_blank15[3];
-    float f_blank16[3];
-    float f_blank17[3];
-    float f_blank18[3];
     float LevelGColor[3] = { 1, 1, 1 };
-    float LevelBGColor[3] = { 0.156, 0.490, 1 };
+    float LevelBGColor[3] = { 0.156f, 0.490f, 1.f };
     float labelsScale = 1.f;
     float solidsColor[3] = { 0, 0, 1 };
     float hazardsColor[3] = { 1, 0, 0 };
@@ -221,31 +169,11 @@ struct SettingStruct {
     float speedhack = 1.f;
     float UISize = 1.0f;
     float wavePulseSize = 2.1f;
-    float Overlaycolor[4] = { 0.235, 0.235, 0.235, 1 };
-    float BGcolor[4] = { 0, 0, 0, 0.902 };
+    float Overlaycolor[4] = { 0.235f, 0.235f, 0.235f, 1.f };
+    float BGcolor[4] = { 0.f, 0.f, 0.f, 0.902f };
     float gridSize = 30.f;
     float rgbSpeed = 1.f;
-    
-    int i_blank1;
-    int i_blank2;
-    int i_blank3;
-    int i_blank4;
-    int i_blank5;
-    int i_blank6;
-    int i_blank7;
-    int i_blank8;
-    int i_blank9;
-    int i_blank10;
-    int i_blank11;
-    int i_blank12;
-    int i_blank13;
-    int i_blank14;
-    int i_blank15;
-    int i_blank16;
-    int i_blank17;
-    int i_blank18;
-    int i_blank19;
-    int i_blank20;
+
     int selected_dart = 1;
 
     std::string message = "Your Text";
@@ -278,6 +206,12 @@ struct SettingStruct {
 
     int accuratePercentage = 4;
 
+    bool onHitboxBugFix;
+    int retryKeybind = 0x52;
+
+    int spsPrevKey = 37;
+    int spsNextKey = 39;
+
     // Icons thing
 
     bool onEnableP1;
@@ -294,14 +228,8 @@ enum LabelPosition {
     BR,
 };
 
-struct FuckThis {
-    cocos2d::extension::CCControlColourPicker* onColorPicker = nullptr;
-    bool onValueEnter = false;
-};
-
 SettingStruct& setting();
 LayersStruct& layers();
-FuckThis& fuckThis();
 
 DEF_SCHEMA(
     SettingStruct,
@@ -338,6 +266,7 @@ DEF_SCHEMA(
     onNoBGFlash,
     onNoDeathEffect,
     onNoEffectCircle,
+    onNoForceGlow,
     onNoGhostTrail,
     onNoGlowObject,
     onNoGravityEffect,
@@ -350,13 +279,11 @@ DEF_SCHEMA(
     onNoPulse,
     onNoRespawnFlash,
     onNoShadeEffect,
-    onNoWavePulse,
-    wavePulseSize,
+    onNoWavePulse, wavePulseSize,
     onNoWaveTrail,
     onNoWaveTrailBehind,
     onPracticePulse,
-    onRespawnTime,
-    respawnTime,
+    onRespawnTime, respawnTime,
     onSolidPlayerTrail,
     onSolidWaveTrail,
     onTrailAlwaysOff,
@@ -372,6 +299,7 @@ DEF_SCHEMA(
     onFreeScroll,
     onHideGrid,
     onHideTrigLine,
+    onHitboxBugFix,
     onLevelEdit,
     onNoCMark,
     onNoDeathX,
@@ -385,11 +313,8 @@ DEF_SCHEMA(
     onZoomBypass,
 
     onZeroPracticeComplete,
-    onAutoDeafen,
-    deafenPercent,
-    deafenKey,
-    onAutoKill,
-    killPercent,
+    onAutoDeafen, deafenPercent, deafenKey,
+    onAutoKill, killPercent,
     onAutoPractice,
     onAutoDownloadSong,
     onBallRotationFix,
@@ -416,7 +341,7 @@ DEF_SCHEMA(
     respawnTime,
     onShowLayout, 
     onSmartStartPos,
-    onSPSwitcher,
+    onSPSwitcher, spsPrevKey, spsNextKey,
     onSuicide,
 
 	onAllowLowVolume,
@@ -434,7 +359,7 @@ DEF_SCHEMA(
 	onNoRotation,
 	onNoTransition,
     onFastMenu,
-	onRetryBind,
+	onRetryBind, retryKeybind,
 	onSafeMode,
 	onRestartButton,
 	onTransparentBG,

@@ -8,7 +8,6 @@ namespace gd {
 class GJGameLevel;
 
 class GameLevelManager : public cocos2d::CCNode {
-    protected:
     public:
         cocos2d::CCDictionary* m_mainLevels;
         cocos2d::CCDictionary* m_valueDict;
@@ -38,7 +37,7 @@ class GameLevelManager : public cocos2d::CCNode {
         //}
 
         cocos2d::CCArray* getSavedLevels() {
-            return reinterpret_cast<cocos2d::CCArray*(__thiscall*)(GameLevelManager*)>( gd::base + 0x57640)(this); //1.91 56f80
+            return reinterpret_cast<cocos2d::CCArray*(__thiscall*)(GameLevelManager*)>(gd::base + 0x57640)(this); //1.91 56f80
         }
 
         virtual void levelUpdate(GJGameLevel* level) {
@@ -55,8 +54,8 @@ class GameLevelManager : public cocos2d::CCNode {
             return reinterpret_cast<void(__thiscall*)(GameLevelManager*, char const*)>(gd::base + 0x5440)(this, key);
         }
 
-        int getTimeLeft(char const* key/*, float delay*/) {
-            return reinterpret_cast<int(__thiscall*)(GameLevelManager*, char const*/*, float*/)>(gd::base + 0x585d0)(this, key/*, delay*/);
+        auto getTimeLeft(char const* key) {
+            return reinterpret_cast<int(__thiscall*)(GameLevelManager*, char const*)>(gd::base + 0x585d0)(this, key);
         }
 
         const char* getPostCommentKey(int level) {

@@ -25,8 +25,6 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
 	void __fastcall drawH(gd::LevelEditorLayer*);
 
-	void groupStickyObjects(gd::LevelEditorLayer* levelEditor, CCArray* objects);
-
 	void mem_init();
 }
 
@@ -68,7 +66,7 @@ namespace EditorUI {
 	inline void(__thiscall* transformObject)(gd::EditorUI*, gd::GameObject*, gd::EditCommand, bool);
 	void __fastcall transformObjectH(gd::EditorUI* self, void* edx, gd::GameObject* obj, gd::EditCommand com, bool idk);
 
-	class Callback {
+	class Callback : public gd::EditorUI {
 	public:
 		void onGoToBaseLayer(CCObject*);
 		void onGoToNextFreeLayer(CCObject*);
@@ -171,6 +169,7 @@ namespace EditorPauseLayer {
 		void selectFilterToggle(CCObject*);
 
 		void onSaveLevel(CCObject*);
+		void onCreateTriggers(CCObject*);
 	};
 
 	void mem_init();

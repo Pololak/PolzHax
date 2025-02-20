@@ -126,19 +126,10 @@ void __fastcall InfoLayer::onLevelInfoH(gd::InfoLayer* self, void*, CCObject* ob
 }
 
 void InfoLayer::Callback::onRefreshComments(CCObject*) {
-	auto gameLevelManager = gd::GameLevelManager::sharedState();
-	auto timeLeft = gameLevelManager->getTimeLeft("upd_comments");
-	std::cout << timeLeft << std::endl;
-	if (timeLeft < 1) {
-		gameLevelManager->makeTimeStamp("upd_comments");
-		auto currentPage = from<int>(infoLayer, 0x214);
-		infoLayer->loadPage(currentPage);
-	}
-	if (from<int>(infoLayer, 0x218) == 0) {
-		from<int>(infoLayer, 0x218) = 1;
-		return;
-	}
-	return;
+	auto glm = gd::GameLevelManager::sharedState();
+	glm->makeTimeStamp("upd_comments");
+	glm->resetTimerForKey(infoLayer->m_commentsKey.c_str());
+	infoLayer->loadPage(infoLayer->m_page);
 }
 
 void InfoLayer::Callback::onCopyLevelID(CCObject*) {
@@ -163,11 +154,12 @@ bool __fastcall InfoLayer::initH(gd::InfoLayer* self, void*, gd::GJGameLevel* ga
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
 
-	auto menu = from<CCMenu*>(self, 0x194);
+	auto menu = self->m_buttonMenu;
 
 	auto sprite = CCSprite::createWithSpriteFrameName("GJ_updateBtn_001.png");
+	sprite->setScale(.7f);
 	auto button = gd::CCMenuItemSpriteExtra::create(sprite, nullptr, self, menu_selector(InfoLayer::Callback::onRefreshComments));
-	button->setPositionY(-60);
+	button->setPosition({ 406.f, -134.f });
 
 	menu->addChild(button);
 

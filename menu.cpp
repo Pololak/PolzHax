@@ -16,6 +16,7 @@
 #include <shellapi.h>
 #include "PlayLayer.h"
 #include "portable-file-dialogs.h"
+#include "ImGuiUtils.h"
 
 DWORD libcocosbase = (DWORD)GetModuleHandleA("libcocos2d.dll");
 
@@ -99,8 +100,6 @@ bool oneX = true;
 
 void RenderMain() {
     if (oneX) {
-        setting().loadState();
-
         float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6, addingX7;
         float addingInterfaceY, addingSpeedhackY, addingIconsY, addingShortcutsY;
         if (ImGui::Begin("PolzHax", nullptr)) {
@@ -244,6 +243,15 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4eb138), "\x75\x4c", 2, NULL);
         }
 
+        if (setting().onDontFade) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x90\x90", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\xeb\x11", 2, NULL);
+        }
+        else {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x74\x5d", 2, NULL);
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\x74\x11", 2, NULL);
+        }
+
         if (setting().onDontEnter) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x90\x90", 2, NULL);
         }
@@ -298,13 +306,6 @@ void RenderMain() {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F0D33), "\xc7\x04\x24\x00\x00\x00\x3F", 7, NULL); // 0F 84 9A 01 00 00
         }
 
-        if (setting().onInversedTrail) {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x85\x55\x02\x00\x00", 6, NULL);
-        }
-        else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
-        }
-
         if (setting().onMaxParticles) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xB64D7), "\x8b\x7d\x07", 3, NULL);
         }
@@ -343,6 +344,13 @@ void RenderMain() {
         else {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
         }
+
+        //if (setting().onNoForceGlow) {
+        //    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce5), "\x00", 1, NULL);
+        //}
+        //else {
+        //    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce5), "\x01", 1, NULL);
+        //}
 
         if (setting().onNoGhostTrail) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f3374), "\x6a\x00\x90", 3, NULL);
@@ -442,12 +450,11 @@ void RenderMain() {
         if (setting().onTrailAlwaysOff) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\xe9\x56\x02\x00\x00\x90", 6, NULL);
         }
-        else {
-            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
-        }
-
-        if (setting().onTrailAlwaysOn) {
+        else if (setting().onTrailAlwaysOn) {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x90\x90\x90\x90\x90\x90", 6, NULL);
+        }
+        else if (setting().onInversedTrail) {
+            WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x85\x55\x02\x00\x00", 6, NULL);
         }
         else {
             WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0xac6a6), "\x0f\x84\x55\x02\x00\x00", 6, NULL);
@@ -1101,7 +1108,7 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Allows for coins to be picked up in practice mode.");
 
-            if (ImGui::Checkbox("Don't Enter", &setting().onDontEnter)) {
+            if (ImGui::Checkbox("Force Don't Enter", &setting().onDontEnter)) {
                 if (setting().onDontEnter) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4EC51C), "\x90\x90", 2, NULL);
                 }
@@ -1112,7 +1119,16 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables transition trigger effects.");
 
-            ImGui::Checkbox("Don't Fade", &setting().onDontFade);
+            if (ImGui::Checkbox("Force Don't Fade", &setting().onDontFade)) {
+                if (setting().onDontFade) {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x90\x90", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\xeb\x11", 2, NULL);
+                }
+                else {
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x74\x5d", 2, NULL);
+                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\x74\x11", 2, NULL);
+                }
+            }
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables fading when objects leave the viewable play area.");
 
@@ -1283,18 +1299,20 @@ void RenderMain() {
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("No visual effects on death.");
 
-            /*if (ImGui::Checkbox("No Force Player Glow", &setting().onNoForceGlow)) {
-                if (setting().onNoForceGlow) {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x00", 1, NULL);
-                }
-                else {
-                    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x01", 1, NULL);
-                }
-            }*/
-
             ImGui::Checkbox("No Effect Circle", &setting().onNoEffectCircle);
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Removes effect circles from orb, portal & pad activations.");
+
+            //if (ImGui::Checkbox("No Force Player Glow", &setting().onNoForceGlow)) {
+            //    if (setting().onNoForceGlow) {
+            //        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x00", 1, NULL);
+            //    }
+            //    else {
+            //        WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dfce6), "\x01", 1, NULL);
+            //    }
+            //}
+            //if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+            //    ImGui::SetTooltip("Doesn't force a white glow when using black secondary color.");
 
             if (ImGui::Checkbox("No Ghost Trail", &setting().onNoGhostTrail)) {
                 if (setting().onNoGhostTrail) {
@@ -1370,7 +1388,7 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables orb ring effect when touching it.");
 
-            if (ImGui::Checkbox("No Particles", &setting().onNoParticles))
+            ImGui::Checkbox("No Particles", &setting().onNoParticles);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Disables the particle system.");
 
@@ -1421,14 +1439,14 @@ void RenderMain() {
                 ImGui::SetTooltip("Disables the disappearing effect on invisible blocks and etc.");
 
             ImGui::Checkbox("No Wave Pulse", &setting().onNoWavePulse);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Disables wave trail pulsing.");
             ImGui::SameLine();
             if (ImGui::TreeNode("##trailSize")) {
                 ImGui::SetNextItemWidth(50.f);
                 ImGui::DragFloat("Trail Size", &setting().wavePulseSize, 0.1f, 0.1f, 10.f);
                 ImGui::TreePop();
             }
-            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-                ImGui::SetTooltip("Disables wave trail pulsing.");
 
             ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail);
             if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
@@ -1652,6 +1670,10 @@ void RenderMain() {
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Hides trigger lines.");
 
+            ImGui::Checkbox("Hitbox Bug Fix", &setting().onHitboxBugFix);
+            if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+                ImGui::SetTooltip("Fixes oriented hitboxes in the editor.");
+
             if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
                 if (setting().onLevelEdit) {
                     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4D62EF), "\x90\x90", 2, NULL);
@@ -1797,7 +1819,10 @@ void RenderMain() {
             if (ImGui::TreeNode("##autodeafen")) {
                 ImGui::SetNextItemWidth(60.f * setting().UISize);
                 ImGui::DragInt("Deafen At", &setting().deafenPercent, 1, 0, 100);
-                ImGui::InputInt("Deafen Key", &setting().deafenKey, 1);
+                ImGui::SetNextItemWidth(60.f * setting().UISize);
+                ImGui::Hotkey("##deafenKey", &setting().deafenKey);
+                ImGui::SameLine();
+                ImGui::Text("Deafen Key");
                 ImGui::TreePop();
             }
 
@@ -1863,7 +1888,8 @@ void RenderMain() {
                 ImGui::SetTooltip("Fixes vehicles rotation on high fps (affects hitboxes).");
 
             ImGui::Checkbox("Hitboxes", &setting().onHitboxes);
-            if (ImGui::TreeNode("Hitboxes settings")) {
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##hitboxesSettings")) {
                 ImGui::SetNextItemWidth(setting().UISize * 60);
                 ImGui::DragInt("Opacity", &setting().hitboxOpacity, 1.f, 0, 255);
 
@@ -2016,6 +2042,18 @@ void RenderMain() {
             ImGui::Checkbox("StartPos Switcher", &setting().onSPSwitcher);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
                 ImGui::SetTooltip("Lets you switch between multiple start positions in-level.");
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##startPosSwitcherSettings")) {
+                ImGui::SetNextItemWidth(60.f * setting().UISize);
+                ImGui::Hotkey("##prevKey", &setting().spsPrevKey);
+                ImGui::SameLine();
+                ImGui::Text("Previous Key");
+                ImGui::SetNextItemWidth(60.f * setting().UISize);
+                ImGui::Hotkey("##nextKey", &setting().spsNextKey);
+                ImGui::SameLine();
+                ImGui::Text("Next Key");
+                ImGui::TreePop();
+            }
 
             if (ImGui::Checkbox("Suicide", &setting().onSuicide)) {
                 if (setting().onSuicide) {
@@ -2258,7 +2296,15 @@ void RenderMain() {
 
             ImGui::Checkbox("Retry Keybind", &setting().onRetryBind);
             if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
-                ImGui::SetTooltip("Lets you restart level by pressing R.");
+                ImGui::SetTooltip("Lets you restart level by pressing keybind.");
+            ImGui::SameLine();
+            if (ImGui::TreeNode("##retryKeybind")) {
+                ImGui::SetNextItemWidth(60.f * setting().UISize);
+                ImGui::Hotkey("##retryKey", &setting().retryKeybind);
+                ImGui::SameLine();
+                ImGui::Text("Retry Key");
+                ImGui::TreePop();
+            }
 
             if (ImGui::Checkbox("Safe Mode", &setting().onSafeMode)) {
                 if (setting().onSafeMode) safeModeON();
@@ -2573,7 +2619,7 @@ void RenderMain() {
             ImGui::SetWindowFontScale(setting().UISize);
             ImGui::SetNextItemWidth(120 * setting().UISize);
 
-            ImGui::Text("v1.2.0-alpha.1");
+            ImGui::Text("v1.2.0-RC.1");
 
             ImGui::Checkbox("Auto Save", &setting().onAutoSave);
             ImGui::SameLine();
@@ -2622,10 +2668,10 @@ void RenderMain() {
                 update_fps_bypass();
             ImGui::EndTabItem();
 
-            if (ImGui::Checkbox("Vertical Sync", &setting().onVSync)) {
-                gd::GameManager::sharedState()->setGameVariable("0030", setting().onVSync);
-                PlayLayer::CCApplication_toggleVerticalSync(CCApplication::sharedApplication(), setting().onVSync);
-            }
+            //if (ImGui::Checkbox("Vertical Sync", &setting().onVSync)) {
+            //    gd::GameManager::sharedState()->setGameVariable("0030", setting().onVSync);
+            //    PlayLayer::CCApplication_toggleVerticalSync(CCApplication::sharedApplication(), setting().onVSync);
+            //}
 
             ImGui::SetNextWindowSize({ ImGui::GetWindowWidth() * setting().UISize, 0 });
         }
@@ -2656,7 +2702,6 @@ void RenderMain() {
     update_fps_bypass();
     update_speed_hack();
     updatePriority(setting().priority);
-    setting().onVSync = gd::GameManager::sharedState()->getGameVariable("0030");
 
     if (setting().onFPSBypass) {
         update_fps_bypass();
@@ -2664,10 +2709,69 @@ void RenderMain() {
 }
 
 void imgui_init() {
+    setting().loadState();
+
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
     io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
     io.Fonts->Build();
+
+    auto* colors = ImGui::GetStyle().Colors;
+
+    color1.x = setting().Overlaycolor[0];
+    color1.y = setting().Overlaycolor[1];
+    color1.z = setting().Overlaycolor[2];
+    color1.w = setting().Overlaycolor[3] - 0.4;
+
+    color2.x = setting().Overlaycolor[0];
+    color2.y = setting().Overlaycolor[1];
+    color2.z = setting().Overlaycolor[2];
+    color2.w = 1;
+
+    color3.x = setting().Overlaycolor[0] + 0.3;
+    color3.y = setting().Overlaycolor[1] + 0.3;
+    color3.z = setting().Overlaycolor[2] + 0.3;
+    color3.w = setting().Overlaycolor[3] + 0.3;
+
+    color4.x = setting().Overlaycolor[0] - 0.1;
+    color4.y = setting().Overlaycolor[1] - 0.1;
+    color4.z = setting().Overlaycolor[2] - 0.1;
+    color4.w = setting().Overlaycolor[3] - 0.1;
+
+    color5.x = setting().Overlaycolor[0] + 0.1;
+    color5.y = setting().Overlaycolor[1] + 0.1;
+    color5.z = setting().Overlaycolor[2] + 0.1;
+    color5.w = setting().Overlaycolor[3] + 0.1;
+
+    color6.x = setting().BGcolor[0];
+    color6.y = setting().BGcolor[1];
+    color6.z = setting().BGcolor[2];
+    color6.w = setting().BGcolor[3];
+
+    //colors[ImGuiCol_Text] = ImVec4(1, 0, 0, 1);
+    colors[ImGuiCol_WindowBg] = color6;
+    colors[ImGuiCol_Border] = color2;
+    colors[ImGuiCol_BorderShadow] = color2;
+    colors[ImGuiCol_Button] = color3;
+    colors[ImGuiCol_ButtonHovered] = color1;
+    colors[ImGuiCol_ButtonActive] = color1;
+    colors[ImGuiCol_CheckMark] = ImVec4(1, 1, 1, 1);
+    colors[ImGuiCol_FrameBg] = color1;
+    colors[ImGuiCol_FrameBgHovered] = color3;
+    colors[ImGuiCol_FrameBgActive] = color3;
+    colors[ImGuiCol_Tab] = ImVec4(color5.x, color5.y, color5.z, color5.w - 0.2);
+    colors[ImGuiCol_TabHovered] = color3;
+    colors[ImGuiCol_TabActive] = color3;
+    colors[ImGuiCol_TitleBg] = color3;
+    colors[ImGuiCol_TitleBgActive] = color3;
+    colors[ImGuiCol_TitleBgCollapsed] = color3;
+    colors[ImGuiCol_SliderGrab] = color4;
+    colors[ImGuiCol_SliderGrabActive] = color4;
+    colors[ImGuiCol_TextSelectedBg] = color2;
+    colors[ImGuiCol_Header] = color1;
+    colors[ImGuiCol_HeaderHovered] = color1;
+    colors[ImGuiCol_HeaderActive] = color2;
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
 }
 
 void setup_imgui_menu() {
@@ -2714,22 +2818,3 @@ void setup_imgui_menu() {
         MH_EnableHook(addr);
         });
 }
-//void imgui_render() {
-//	const bool force = state().just_loaded;
-//	const auto& font = ImGui::GetIO().Fonts->Fonts.back();
-//	ImGui::PushFont(font);
-//	if (state().visible || force) {
-//
-//		// ImGui::ShowDemoWindow();
-//		auto frame_size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
-//
-//		constexpr float border = 25;
-//		ImGui::SetNextWindowPos({ border, border });
-//		ImGui::SetNextWindowSizeConstraints({ 0, 0 }, { frame_size.width, frame_size.height - border * 2.f });
-//
-//		if (ImGui::Begin("mat's nice hacks", nullptr,
-//			ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_MenuBar)) {
-//
-//		}
-//	}
-//		ImGui::End();
