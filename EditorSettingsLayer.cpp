@@ -270,7 +270,7 @@ void EditorSettingsLayer::onClose(CCObject*) {
 
 void EditorSettingsLayer::showCallback(CCObject*) {
 	auto myLayer = EditorSettingsLayer::create();
-	myLayer->setZOrder(100);
+	myLayer->setZOrder(105);
 	CCDirector::sharedDirector()->getRunningScene()->addChild(myLayer);
 	editorSettingsLayer = myLayer;
 }

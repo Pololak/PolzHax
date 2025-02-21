@@ -73,6 +73,10 @@ FloatInputNode* step_input = nullptr;
 
 EditorLayerInput* m_editorLayerInput = nullptr;
 
+CCArray* m_hideableUIElements;
+
+ObjectGroupInput* m_objectGroupInput = nullptr;
+
 class CircleToolPopup : public CCLayer { // FINALLY
 public:
 	static CircleToolPopup* create() {
@@ -1142,6 +1146,9 @@ public:
 					{ gd::CustomColorMode::White, GDColor(255,255,255, false)}
 				};
 				this->update_object_color(object, default_colors.at(mode));
+
+				if (object->m_invisibleMode)
+					object->setObjectColor(ccc3(255, 127, 0));
 			}
 		}
 	}
@@ -1362,15 +1369,20 @@ bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
 }
 
 void EditorUI::Callback::onGoToGroup(CCObject* sender) {
-	int objectGroup = from<int>(editUI->getSingleSelectedObj(), 0x324);
+	for (auto obj : CCArrayExt<gd::GameObject*>(this->getSelectedObjectsOfCCArray())) {
+		if (obj) {
+			int objectGroup = obj->m_editorGroup;
+			from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = objectGroup;
+			from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(objectGroup).c_str());
 
-	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = objectGroup;
-	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(objectGroup).c_str());
-
-	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(from<gd::EditorUI*>(sender, 0xFC)->getDeselectBtn(), 0xac)->getChildByTag(45028));
-	if (onBaseLayerBtn) {
-		onBaseLayerBtn->setVisible(1);
-		onBaseLayerBtn->setEnabled(true);
+			auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(from<gd::EditorUI*>(sender, 0xFC)->getDeselectBtn(), 0xac)->getChildByTag(45028));
+			if (onBaseLayerBtn) {
+				onBaseLayerBtn->setVisible(1);
+				onBaseLayerBtn->setEnabled(true);
+			}
+			if (m_editorLayerInput)
+				m_editorLayerInput->m_layerInput->setString(this->m_currentGroupLabel->getString());
+		}
 	}
 }
 
@@ -1398,63 +1410,63 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	m_objectColor->setVisible(0);
 	m_objectColor->setAnchorPoint({ 0.f, 0.5f });
 	m_objectColor->setScale(0.66f);
-	m_objectColor->setPosition({ leftInfoSide, director->getScreenTop() - 50.f });
+	m_objectColor->setPosition({ leftInfoSide, director->getScreenTop() - 60.f });
 	self->addChild(m_objectColor);
 
 	m_objectGroup = CCLabelBMFont::create("G:", "chatFont.fnt");
 	m_objectGroup->setVisible(0);
 	m_objectGroup->setAnchorPoint({ 0.f, 0.5f });
 	m_objectGroup->setScale(0.66f);
-	m_objectGroup->setPosition({ leftInfoSide, director->getScreenTop() - 60.f });
+	m_objectGroup->setPosition({ leftInfoSide, director->getScreenTop() - 70.f });
 	self->addChild(m_objectGroup);
 
 	m_objectRotation = CCLabelBMFont::create("Rot:", "chatFont.fnt");
 	m_objectRotation->setVisible(0);
 	m_objectRotation->setAnchorPoint({ 0.f, 0.5f });
 	m_objectRotation->setScale(0.66f);
-	m_objectRotation->setPosition({ leftInfoSide, director->getScreenTop() - 70.f });
+	m_objectRotation->setPosition({ leftInfoSide, director->getScreenTop() - 80.f });
 	self->addChild(m_objectRotation);
 
 	m_objectXPos = CCLabelBMFont::create("X:", "chatFont.fnt");
 	m_objectXPos->setVisible(0);
 	m_objectXPos->setAnchorPoint({ 0.f, 0.5f });
 	m_objectXPos->setScale(0.66f);
-	m_objectXPos->setPosition({ leftInfoSide, director->getScreenTop() - 80.f });
+	m_objectXPos->setPosition({ leftInfoSide, director->getScreenTop() - 90.f });
 	self->addChild(m_objectXPos);
 
 	m_objectYPos = CCLabelBMFont::create("Y:", "chatFont.fnt");
 	m_objectYPos->setVisible(0);
 	m_objectYPos->setAnchorPoint({ 0.f, 0.5f });
 	m_objectYPos->setScale(0.66f);
-	m_objectYPos->setPosition({ leftInfoSide, director->getScreenTop() - 90.f });
+	m_objectYPos->setPosition({ leftInfoSide, director->getScreenTop() - 100.f });
 	self->addChild(m_objectYPos);
 
 	m_objectKey = CCLabelBMFont::create("ObjID:", "chatFont.fnt");
 	m_objectKey->setVisible(0);
 	m_objectKey->setAnchorPoint({ 0.f, 0.5f });
 	m_objectKey->setScale(0.66f);
-	m_objectKey->setPosition({ leftInfoSide, director->getScreenTop() - 100.f });
+	m_objectKey->setPosition({ leftInfoSide, director->getScreenTop() - 110.f });
 	self->addChild(m_objectKey);
 
 	m_objectAddress = CCLabelBMFont::create("Addr:", "chatFont.fnt");
 	m_objectAddress->setVisible(0);
 	m_objectAddress->setAnchorPoint({ 0.f, 0.5f });
 	m_objectAddress->setScale(0.66f);
-	m_objectAddress->setPosition({ leftInfoSide, director->getScreenTop() - 110.f });
+	m_objectAddress->setPosition({ leftInfoSide, director->getScreenTop() - 120.f });
 	self->addChild(m_objectAddress);
 
 	m_objectType = CCLabelBMFont::create("Type:", "chatFont.fnt");
 	m_objectType->setVisible(0);
 	m_objectType->setAnchorPoint({ 0.f, 0.5f });
 	m_objectType->setScale(0.66f);
-	m_objectType->setPosition({ leftInfoSide, director->getScreenTop() - 120.f });
+	m_objectType->setPosition({ leftInfoSide, director->getScreenTop() - 130.f });
 	self->addChild(m_objectType);
 
 	m_objectZ = CCLabelBMFont::create("Object Z:", "chatFont.fnt");
 	m_objectZ->setVisible(0);
 	m_objectZ->setAnchorPoint({ 0.f, 0.5f });
 	m_objectZ->setScale(0.66f);
-	m_objectZ->setPosition({ leftInfoSide, director->getScreenTop() - 130.f });
+	m_objectZ->setPosition({ leftInfoSide, director->getScreenTop() - 140.f });
 	self->addChild(m_objectZ);
 
 	auto custommenu = CCMenu::create();
@@ -2428,8 +2440,13 @@ void EditorUI::updateObjectInfo() {
 				m_objectZ->setString(CCString::createWithFormat("Object Z: %i", editUI->m_selectedObject->m_objectZ)->getCString());
 				m_objectZ->setVisible(1);
 			}
+			if (m_objectsSelected) {
+				m_objectsSelected->setVisible(1);
+				m_objectsSelected->setString(CCString::createWithFormat("Objects: %i", editUI->getSelectedObjectsOfCCArray()->count())->getCString());
+			}
 		}
 		else {
+			m_objectsSelected->setVisible(0);
 			m_objectColor->setVisible(0);
 			m_objectGroup->setVisible(0);
 			m_objectRotation->setVisible(0);
@@ -2439,15 +2456,6 @@ void EditorUI::updateObjectInfo() {
 			m_objectAddress->setVisible(0);
 			m_objectType->setVisible(0);
 			m_objectZ->setVisible(0);
-		}
-		if (editUI->getSelectedObjectsOfCCArray()->count() > 1) {
-			if (m_objectsSelected) {
-				m_objectsSelected->setVisible(1);
-				m_objectsSelected->setString(CCString::createWithFormat("Objects: %i", editUI->getSelectedObjectsOfCCArray()->count())->getCString());
-			}
-		}
-		else {
-			m_objectsSelected->setVisible(0);
 		}
 	}
 }
@@ -2490,7 +2498,7 @@ void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self) {
 	auto onGoToGroup = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(self->getDeselectBtn(), 0xac)->getChildByTag(45031));
 
 	if (onGoToGroup) {
-		if (self->getSelectedObjectsOfCCArray()->count() == 1) {
+		if (self->getSelectedObjectsOfCCArray()->count()/* == 1*/) {
 			onGoToGroup->setVisible(1);
 			onGoToGroup->setEnabled(true);
 		}
@@ -2565,6 +2573,12 @@ void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 
 void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
 	setting().onEditorPreview = !setting().onEditorPreview;
+	if (MyEditorLayer::s_instance) {
+		if (setting().onEditorPreview)
+			MyEditorLayer::s_instance->update_preview_mode();
+		else
+			MyEditorLayer::s_instance->reset_colors();
+	}
 }
 
 bool SEP = false;
@@ -2854,6 +2868,8 @@ void SetGroupIDLayer::Callback::onCurrentGroup(CCObject*) {
 		}
 	}
 
+	if (m_objectGroupInput)
+		m_objectGroupInput->m_layerInput->setString(from<CCLabelBMFont*>(this, 0x1c4)->getString());
 }
 
 bool __fastcall SetGroupIDLayer::initH(gd::SetGroupIDLayer* self, void* edx, gd::GameObject* obj, CCArray* arr) {
@@ -2871,7 +2887,23 @@ bool __fastcall SetGroupIDLayer::initH(gd::SetGroupIDLayer* self, void* edx, gd:
 
 	menu->addChild(setCurrentGroup_btn);
 
+	m_objectGroupInput = ObjectGroupInput::create(self);
+	self->m_mainLayer->addChild(m_objectGroupInput, 5);
+	m_objectGroupInput->setPosition(from<CCLabelBMFont*>(self, 0x1c4)->getPosition());
+	from<CCLabelBMFont*>(self, 0x1c4)->setVisible(0);
+
 	return true;
+}
+
+void __fastcall SetGroupIDLayer::updateGroupIDH(gd::SetGroupIDLayer* self) {
+	SetGroupIDLayer::updateGroupID(self);
+	if (m_objectGroupInput)
+		m_objectGroupInput->m_layerInput->setString(from<CCLabelBMFont*>(self, 0x1c4)->getString());
+}
+
+void __fastcall SetGroupIDLayer::dtorH(gd::SetGroupIDLayer* self) {
+	m_objectGroupInput = nullptr;
+	SetGroupIDLayer::dtor(self);
 }
 
 bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::GameObject* obj, int color_id, int idk, int idk2) {
@@ -3263,6 +3295,8 @@ void preview_mode::init() {
 
 void SetGroupIDLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf78d0), SetGroupIDLayer::initH, reinterpret_cast<void**>(&SetGroupIDLayer::init));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf7e80), SetGroupIDLayer::updateGroupIDH, reinterpret_cast<void**>(&SetGroupIDLayer::updateGroupID));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf7760), SetGroupIDLayer::dtorH, reinterpret_cast<void**>(&SetGroupIDLayer::dtor));
 }
 
 void ColorSelectPopup::mem_init() {

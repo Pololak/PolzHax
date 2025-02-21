@@ -188,7 +188,13 @@ namespace SetGroupIDLayer {
 	inline bool(__thiscall* init)(gd::SetGroupIDLayer*, gd::GameObject*, CCArray*);
 	bool __fastcall initH(gd::SetGroupIDLayer* self, void* edx, gd::GameObject* obj, CCArray* arr);
 
-	class Callback {
+	inline void(__thiscall* updateGroupID)(gd::SetGroupIDLayer*);
+	void __fastcall updateGroupIDH(gd::SetGroupIDLayer*);
+
+	inline void(__thiscall* dtor)(gd::SetGroupIDLayer*);
+	void __fastcall dtorH(gd::SetGroupIDLayer*);
+
+	class Callback : public gd::SetGroupIDLayer {
 	public:
 		void onCurrentGroup(CCObject*);
 	};

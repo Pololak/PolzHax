@@ -86,9 +86,9 @@ namespace gd {
 		PAD(0x10)
 		int m_firstVisibleSection; // 0x1bc
 		int m_lastVisibleSection; // 0x1c0
-		PAD(0x8)
+		PAD(0xC)
 		float m_levelLength; // 0x1d0
-		PAD(0x4)
+		float m_realLevelLength; // 0x1d4
 		cocos2d::CCLabelBMFont* m_attemptsLabel; // 0x1d8
 		PAD(0x18)
 		cocos2d::CCDictionary* m_particlesDictionary; // 0x1f4

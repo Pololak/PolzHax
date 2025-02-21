@@ -350,7 +350,6 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
     if (!PlayLayer::init(self, level)) return false;
 
-
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     playLayer = self;
     isPlayerColorGot = false;
@@ -582,17 +581,10 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
 
     }
 
-    if (setting().onHideAttempts) {
-        self->attemptsLabel()->setVisible(false);
-    }
-    else {
-        self->attemptsLabel()->setVisible(true);
-    }
+    self->m_attemptsLabel->setVisible(!setting().onHideAttempts);
 
-    if (setting().onHidePlayer) {
-        self->player1()->setVisible(0);
-        self->player2()->setVisible(0);
-    }
+    self->m_player->setVisible(!setting().onHidePlayer);
+    self->m_player2->setVisible(!setting().onHidePlayer);
 
     auto labelsMenu = CCMenu::create();
     labelsMenu->setPosition({ 0, 0 });
@@ -827,50 +819,50 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         //self->addChild(speed);
     }
 
-    if (setting().onShowLayout) {
-        self->getBackgroundSprite()->setColor(
-            ccc3(
-                (setting().BGcolor[0] * 255.f),
-                (setting().BGcolor[1] * 255.f),
-                (setting().BGcolor[2] * 255.f)
-            ));
-        from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
-        from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
-        from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
-        from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
+    //if (setting().onShowLayout) {
+    //    self->getBackgroundSprite()->setColor(
+    //        ccc3(
+    //            (setting().BGcolor[0] * 255.f),
+    //            (setting().BGcolor[1] * 255.f),
+    //            (setting().BGcolor[2] * 255.f)
+    //        ));
+    //    from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
+    //    from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
+    //    from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
+    //    from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
 
 
-        for (int i = self->getFirstVisibleSection() - 1; i < self->getLastVisibleSection() + 1; i++)
-        {
-            if (i < 0) continue;
-            if (i >= arrcount) break;
-            auto objAtInd = secarr->objectAtIndex(i);
-            auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+    //    for (int i = self->getFirstVisibleSection() - 1; i < self->getLastVisibleSection() + 1; i++)
+    //    {
+    //        if (i < 0) continue;
+    //        if (i >= arrcount) break;
+    //        auto objAtInd = secarr->objectAtIndex(i);
+    //        auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
-            for (int j = 0; j < objarr->count(); j++)
-            {
-                auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                if (obj->getIsTintObject()) {
-                    obj->setObjectColor(ccc3(255, 255, 255));
-                } // Setting OBJ to white.
-                if (cornerObjects.contains(obj->getObjectID())) {
-                    obj->getGlowSprite()->setVisible(0);
-                }
-                if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
-                    obj->removeMeAndCleanup();
-                    if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
-                } // Hiding deco objects.
-                if (pulseObjects.contains(obj->getObjectID())) {
-                    obj->removeMeAndCleanup();
-                } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
-                if (obj->getHasColor()) {
-                    auto node = obj->getChildSprite();
-                    node->setColor(ccc3(255, 255, 255));
-                } // Setting color to white and removing blending.
+    //        for (int j = 0; j < objarr->count(); j++)
+    //        {
+    //            auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+    //            if (obj->getIsTintObject()) {
+    //                obj->setObjectColor(ccc3(255, 255, 255));
+    //            } // Setting OBJ to white.
+    //            if (cornerObjects.contains(obj->getObjectID())) {
+    //                obj->getGlowSprite()->setVisible(0);
+    //            }
+    //            if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
+    //                obj->removeMeAndCleanup();
+    //                if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
+    //            } // Hiding deco objects.
+    //            if (pulseObjects.contains(obj->getObjectID())) {
+    //                obj->removeMeAndCleanup();
+    //            } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
+    //            if (obj->getHasColor()) {
+    //                auto node = obj->getChildSprite();
+    //                node->setColor(ccc3(255, 255, 255));
+    //            } // Setting color to white and removing blending.
 
-            }
-        }
-    }
+    //        }
+    //    }
+    //}
 
     auto arrowMenu = CCMenu::create();
     arrowMenu->setZOrder(105);
@@ -894,6 +886,15 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         }
         else {
             from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(1);
+        }
+    }
+
+    if (self->m_practiceMode) {
+        if (setting().onHidePracticeBtn && (self->m_uiLayer->m_checkpointMenu != nullptr)) {
+            self->m_uiLayer->m_checkpointMenu->setVisible(0);
+        }
+        else {
+            self->m_uiLayer->m_checkpointMenu->setVisible(1);
         }
     }
 
@@ -996,6 +997,17 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         keybd_event(setting().deafenKey, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
         keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
     }
+
+    if (self->m_practiceMode) {
+        if (setting().onHidePracticeBtn && (self->m_uiLayer->m_checkpointMenu != nullptr)) {
+            self->m_uiLayer->m_checkpointMenu->setVisible(0);
+        }
+        else {
+            self->m_uiLayer->m_checkpointMenu->setVisible(1);
+        }
+    }
+
+    self->m_attemptsLabel->setVisible(!setting().onHideAttempts);
 
     auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
     float fps = ImGui::GetIO().Framerate;
@@ -1240,13 +1252,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    if (setting().onHideAttempts) {
-        self->attemptsLabel()->setVisible(false);
-    }
-    else {
-        self->attemptsLabel()->setVisible(true);
-    }
-
     if (isPlayerColorGot == false)
     {
         playerColor1 = self->player1()->getFirstColor();
@@ -1285,15 +1290,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     //    self->player2()->setWaveTrailColor(self->player1()->getSecondColor());
     //}
 
-    if (setting().onHidePlayer) {
-        self->player1()->setVisible(0);
-        self->player2()->setVisible(0);
-    }
-    else {
-        self->player1()->setVisible(1);
-        self->player2()->setVisible(1);
-    }
-
     if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->isDead()) {
         SetCursorPos(size.width / 2, size.height / 2);
     }
@@ -1312,60 +1308,51 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         hardStreak_p2->pulseSize() = setting().wavePulseSize;
     }
 
-    if (setting().onShowLayout) {
-        self->getBackgroundSprite()->setColor(
-            ccc3(
-                40, 125, 255
-            ));
-        from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
-        from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
-        from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
-        from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
+    //if (setting().onShowLayout) {
+    //    self->getBackgroundSprite()->setColor(
+    //        ccc3(
+    //            40, 125, 255
+    //        ));
+    //    from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
+    //    from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
+    //    from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
+    //    from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
 
 
-        for (int i = self->getFirstVisibleSection() - 2; i < self->getLastVisibleSection() + 2; i++)
-        {
-            if (arrcount != 0) {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+    //    for (int i = self->getFirstVisibleSection() - 2; i < self->getLastVisibleSection() + 2; i++)
+    //    {
+    //        if (arrcount != 0) {
+    //            if (i < 0) continue;
+    //            if (i >= arrcount) break;
+    //            auto objAtInd = secarr->objectAtIndex(i);
+    //            auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                    if (obj->getIsTintObject()) {
-                        obj->setObjectColor(ccc3(255, 255, 255));
-                    } // Setting OBJ to white.
-                    if (cornerObjects.contains(obj->getObjectID())) {
-                        obj->getGlowSprite()->setVisible(0);
-                    }
-                    if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
-                        obj->removeMeAndCleanup();
-                        if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
-                    } // Hiding deco objects.
-                    if (pulseObjects.contains(obj->getObjectID())) {
-                        obj->removeMeAndCleanup();
-                    } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
-                    if (obj->getHasColor()) {
-                        auto node = obj->getChildSprite();
-                        node->setColor(ccc3(255, 255, 255));
-                        node->setBlendFunc({ GL_ONE, GL_SRC_ALPHA });
-                    } // Setting color to white and removing blending.
+    //            for (int j = 0; j < objarr->count(); j++)
+    //            {
+    //                auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+    //                if (obj->getIsTintObject()) {
+    //                    obj->setObjectColor(ccc3(255, 255, 255));
+    //                } // Setting OBJ to white.
+    //                if (cornerObjects.contains(obj->getObjectID())) {
+    //                    obj->getGlowSprite()->setVisible(0);
+    //                }
+    //                if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
+    //                    obj->removeMeAndCleanup();
+    //                    if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
+    //                } // Hiding deco objects.
+    //                if (pulseObjects.contains(obj->getObjectID())) {
+    //                    obj->removeMeAndCleanup();
+    //                } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
+    //                if (obj->getHasColor()) {
+    //                    auto node = obj->getChildSprite();
+    //                    node->setColor(ccc3(255, 255, 255));
+    //                    node->setBlendFunc({ GL_ONE, GL_SRC_ALPHA });
+    //                } // Setting color to white and removing blending.
 
-                }
-            }
-        }
-    }
-
-    if (self->getPracticeMode()) {
-        if (setting().onHidePracticeBtn && (self->getUILayer()->m_checkpointMenu != nullptr)) {
-            self->getUILayer()->m_checkpointMenu->setVisible(0);
-        }
-        else {
-            self->getUILayer()->m_checkpointMenu->setVisible(1);
-        }
-    }
+    //            }
+    //        }
+    //    }
+    //}
 
     if (setting().onRainbowIcon) {
         auto player1 = self->player1();
