@@ -206,29 +206,33 @@ namespace gd {
 				)>(base + 0x4c280)(this, objects, center);
 		}
 
-		CCMenuItemSpriteExtra* getSpriteButton(
-			const char* sprite,
-			cocos2d::SEL_MenuHandler callback,
-			cocos2d::CCMenu* menu,
-			float scale,
-			int idk,
-			cocos2d::CCPoint* idk2,
-			cocos2d::CCPoint* idk3
-		) {
-			return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(
-				EditorUI*,
-				const char*,
-				cocos2d::SEL_MenuHandler,
-				cocos2d::CCMenu*,
-				float,
-				int,
-				cocos2d::CCPoint*,
-				cocos2d::CCPoint*
-				)>(
-					base + 0x41790
-					)(
-						this, sprite, callback, menu, scale, idk, idk2, idk3
-						);
+		//CCMenuItemSpriteExtra* getSpriteButton(
+		//	const char* sprite,
+		//	cocos2d::SEL_MenuHandler callback,
+		//	cocos2d::CCMenu* menu,
+		//	float scale,
+		//	int idk,
+		//	cocos2d::CCPoint* idk2,
+		//	cocos2d::CCPoint* idk3
+		//) {
+		//	return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(
+		//		EditorUI*,
+		//		const char*,
+		//		cocos2d::SEL_MenuHandler,
+		//		cocos2d::CCMenu*,
+		//		float,
+		//		int,
+		//		cocos2d::CCPoint*,
+		//		cocos2d::CCPoint*
+		//		)>(
+		//			base + 0x41790
+		//			)(
+		//				this, sprite, callback, menu, scale, idk, idk2, idk3
+		//				);
+		//}
+
+		CCMenuItemSpriteExtra* getSpriteButton(const char* sprite, cocos2d::SEL_MenuHandler callback, cocos2d::CCMenu* menu, float scale, int buttonID, cocos2d::CCPoint point) {
+			return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(gd::EditorUI*, const char*, cocos2d::SEL_MenuHandler, cocos2d::CCMenu*, float, int, cocos2d::CCPoint)>(base + 0x41790)(this, sprite, callback, menu, scale, buttonID, point);
 		}
 
 		void moveObjectCall(cocos2d::CCObject* pSender) {

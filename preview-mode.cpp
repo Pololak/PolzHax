@@ -1116,7 +1116,7 @@ public:
 				default:;
 				}
 
-				//EditorObjectLayering::updateObjLayering(object);
+				EditorObjectLayering::updateObjLayering(object);
 			}
 		}
 	}
@@ -1705,9 +1705,8 @@ CCPoint* __fastcall EditorUI::moveForCommandH(gd::EditorUI* self, void* edx, CCP
 		*pos = CCPoint(0.f, -.1f);
 		return pos;
 		break;
+	default: return EditorUI::moveForCommand(self, pos, com);
 	}
-
-	EditorUI::moveForCommand(self, pos, com);
 }
 
 void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void* edx, gd::GameObject* obj, gd::EditCommand com, bool idk) {
@@ -2287,6 +2286,17 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 
 void EditorUI::updateObjectInfo() {
 	if (editUI) {
+		m_objectsSelected->setVisible(0);
+		m_objectColor->setVisible(0);
+		m_objectGroup->setVisible(0);
+		m_objectRotation->setVisible(0);
+		m_objectXPos->setVisible(0);
+		m_objectYPos->setVisible(0);
+		m_objectKey->setVisible(0);
+		m_objectAddress->setVisible(0);
+		m_objectType->setVisible(0);
+		m_objectZ->setVisible(0);
+
 		if (editUI->getSelectedObjectsOfCCArray()->count() == 1) {
 			if (m_objectColor) {
 				m_objectColor->setVisible(1);
@@ -2444,18 +2454,6 @@ void EditorUI::updateObjectInfo() {
 				m_objectsSelected->setVisible(1);
 				m_objectsSelected->setString(CCString::createWithFormat("Objects: %i", editUI->getSelectedObjectsOfCCArray()->count())->getCString());
 			}
-		}
-		else {
-			m_objectsSelected->setVisible(0);
-			m_objectColor->setVisible(0);
-			m_objectGroup->setVisible(0);
-			m_objectRotation->setVisible(0);
-			m_objectXPos->setVisible(0);
-			m_objectYPos->setVisible(0);
-			m_objectKey->setVisible(0);
-			m_objectAddress->setVisible(0);
-			m_objectType->setVisible(0);
-			m_objectZ->setVisible(0);
 		}
 	}
 }
@@ -2714,8 +2712,6 @@ void __fastcall EditorPauseLayer::customSetup_H(gd::EditorPauseLayer* self) {
 	menu->addChild(optionsBtn);
 	menu->addChild(options2Btn);
 
-
-
 	auto levellength = CCLabelBMFont::create("", "goldFont.fnt");
 	levellength->setString(CCString::createWithFormat("", 0)->getCString());
 	levellength->setTag(49001);
@@ -2861,10 +2857,12 @@ void SetGroupIDLayer::Callback::onCurrentGroup(CCObject*) {
 	for (int i = 0; i < (objs->count()); i++)
 	{
 		auto obj = reinterpret_cast<gd::GameObject*>(objs->objectAtIndex(i));
-		if (currentEditorGroup != -1) {
-			from<int>(obj, 0x324) = currentEditorGroup;
-			from<CCLabelBMFont*>(setGroupIDLayer, 0x1c4)->setString(std::to_string(currentEditorGroup).c_str());
-			from<int>(setGroupIDLayer, 0x1c8) = currentEditorGroup;
+		if (obj) {
+			if (currentEditorGroup != -1) {
+				from<int>(obj, 0x324) = currentEditorGroup;
+				from<CCLabelBMFont*>(setGroupIDLayer, 0x1c4)->setString(std::to_string(currentEditorGroup).c_str());
+				from<int>(setGroupIDLayer, 0x1c8) = currentEditorGroup;
+			}
 		}
 	}
 
@@ -3152,6 +3150,10 @@ void __fastcall GameObject_customSetupH(gd::GameObject* self) {
 	}
 }
 
+//gd::CCMenuItemSpriteExtra* __fastcall EditorUI::getSpriteButtonH(gd::EditorUI* self, void*, const char* sprite, SEL_MenuHandler callback, CCMenu* menu, float scale, int buttonID, CCPoint idk) {
+//	return EditorUI::getSpriteButton(self, sprite, callback, menu, scale, 1, {0,-10});
+//}
+
 void __fastcall Scheduler::update_H(CCScheduler* self, void* edx, float dt) {
 	Scheduler::update(self, dt);
 
@@ -3236,8 +3238,9 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41450), EditorUI::updateButtonsH, reinterpret_cast<void**>(&EditorUI::updateButtons));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4afc0), EditorUI::onGroupDownH, reinterpret_cast<void**>(&EditorUI::onGroupDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4af50), EditorUI::onGroupUpH, reinterpret_cast<void**>(&EditorUI::onGroupUp));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41790), EditorUI::getSpriteButtonH, reinterpret_cast<void**>(&EditorUI::getSpriteButton));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4cbb0), EditorUI::drawH, reinterpret_cast<void**>(&EditorUI::draw));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
 	matdash::add_hook<&EditorUI_ccTouchBegan>(gd::base + 0x4d5e0);

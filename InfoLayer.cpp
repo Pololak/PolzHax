@@ -109,20 +109,21 @@ public:
 };
 
 void __fastcall InfoLayer::onLevelInfoH(gd::InfoLayer* self, void*, CCObject* obj) {
-	auto gameLevel = from<gd::GJGameLevel*>(self, 0x1c8);
-	
-	std::cout << "Level Name: " << gameLevel->m_levelName.c_str() << std::endl;
-	std::cout << "Level Desc: " << gameLevel->m_levelDesc.c_str() << std::endl;
-	std::cout << "Username: " << gameLevel->m_userName.c_str() << std::endl;
-	std::cout << "UserID: " << gameLevel->m_userID << std::endl;
-	std::cout << "Uploaded: " << gameLevel->m_uploadDate.c_str() << std::endl;
-	std::cout << "Updated: " << gameLevel->m_updateDate.c_str() << std::endl;
-	std::cout << "Two-Player Mode: " << gameLevel->getUserID() << std::endl;
+	//auto gameLevel = from<gd::GJGameLevel*>(self, 0x1c8);
+	//
+	//std::cout << "Level Name: " << gameLevel->m_levelName.c_str() << std::endl;
+	//std::cout << "Level Desc: " << gameLevel->m_levelDesc.c_str() << std::endl;
+	//std::cout << "Username: " << gameLevel->m_userName.c_str() << std::endl;
+	//std::cout << "UserID: " << gameLevel->m_userID << std::endl;
+	//std::cout << "Uploaded: " << gameLevel->m_uploadDate.c_str() << std::endl;
+	//std::cout << "Updated: " << gameLevel->m_updateDate.c_str() << std::endl;
+	//std::cout << "Two-Player Mode: " << gameLevel->getUserID() << std::endl;
 
-	auto extendedInfo = ExtendedLevelInfo::create(gameLevel);
-	extendedInfo->setZOrder(600);
-	CCDirector::sharedDirector()->getRunningScene()->addChild(extendedInfo);
-	extendedLevelInfo = extendedInfo;
+	//auto extendedInfo = ExtendedLevelInfo::create(gameLevel);
+	//extendedInfo->setZOrder(600);
+	//CCDirector::sharedDirector()->getRunningScene()->addChild(extendedInfo);
+	//extendedLevelInfo = extendedInfo;
+	InfoLayer::onLevelInfo(self, obj);
 }
 
 void InfoLayer::Callback::onRefreshComments(CCObject*) {

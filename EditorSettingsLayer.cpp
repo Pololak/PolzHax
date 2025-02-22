@@ -213,18 +213,18 @@ bool EditorSettingsLayer::init() {
 	menu->addChild(GCLabel);
 	menu->addChild(GCInfo);
 
-	auto PAToggler = gd::CCMenuItemToggler::create(previewAnimationsInfoToggle(toggleOn, toggleOff), previewAnimationsInfoToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onPrevAnimations));
-	auto PALabel = CCLabelBMFont::create("Preview Rotations", "bigFont.fnt");
-	//auto PAInfo = gd::CCMenuItemSpriteExtra::create(infoSprite, nullptr, this, menu_selector(EditorSettingsLayer::onPrevAnimationsInfo));
-	PAToggler->setScale(0.8f);
-	PAToggler->setPosition({ -150, -20 });
-	PALabel->setAnchorPoint({ 0.f, 0.5f });
-	PALabel->setScale(0.35f);
-	PALabel->setPosition({ PAToggler->getPosition().x + 20.f, PAToggler->getPosition().y });
-	//PAInfo->setPosition({ PAToggler->getPosition().x - 17.5f, PAToggler->getPosition().y + 15.f });
-	menu->addChild(PAToggler);
-	menu->addChild(PALabel);
-	//menu->addChild(PAInfo);
+	//auto PAToggler = gd::CCMenuItemToggler::create(previewAnimationsInfoToggle(toggleOn, toggleOff), previewAnimationsInfoToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onPrevAnimations));
+	//auto PALabel = CCLabelBMFont::create("Preview Rotations", "bigFont.fnt");
+	////auto PAInfo = gd::CCMenuItemSpriteExtra::create(infoSprite, nullptr, this, menu_selector(EditorSettingsLayer::onPrevAnimationsInfo));
+	//PAToggler->setScale(0.8f);
+	//PAToggler->setPosition({ -150, -20 });
+	//PALabel->setAnchorPoint({ 0.f, 0.5f });
+	//PALabel->setScale(0.35f);
+	//PALabel->setPosition({ PAToggler->getPosition().x + 20.f, PAToggler->getPosition().y });
+	////PAInfo->setPosition({ PAToggler->getPosition().x - 17.5f, PAToggler->getPosition().y + 15.f });
+	//menu->addChild(PAToggler);
+	//menu->addChild(PALabel);
+	////menu->addChild(PAInfo);
 
 	auto SOIToggler = gd::CCMenuItemToggler::create(showObjectInfoToggle(toggleOn, toggleOff), showObjectInfoToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onShowObjInfo));
 	auto SOILabel = CCLabelBMFont::create("Show Object Info", "bigFont.fnt");
@@ -239,18 +239,18 @@ bool EditorSettingsLayer::init() {
 	menu->addChild(SOILabel);
 	//menu->addChild(SOIInfo);
 
-	auto HPLToggler = gd::CCMenuItemToggler::create(hidePreviewLineToggle(toggleOn, toggleOff), hidePreviewLineToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onHidePreviewLine));
-	auto HPLLabel = CCLabelBMFont::create("Hide Preview Line", "bigFont.fnt");
-	//auto HPLInfo = gd::CCMenuItemSpriteExtra::create(infoSprite, nullptr, this, menu_selector(EditorSettingsLayer::onHidePreviewLineInfo));
-	HPLToggler->setScale(0.8f);
-	HPLToggler->setPosition({ 20, -20 });
-	HPLLabel->setAnchorPoint({ 0.f, 0.5f });
-	HPLLabel->setScale(0.4f);
-	HPLLabel->setPosition({ HPLToggler->getPosition().x + 20.f, HPLToggler->getPosition().y });
-	//HPLInfo->setPosition({ HPLToggler->getPosition().x - 17.5f, HPLToggler->getPosition().y + 15.f });
-	menu->addChild(HPLToggler);
-	menu->addChild(HPLLabel);
-	//menu->addChild(HPLInfo);
+	//auto HPLToggler = gd::CCMenuItemToggler::create(hidePreviewLineToggle(toggleOn, toggleOff), hidePreviewLineToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onHidePreviewLine));
+	//auto HPLLabel = CCLabelBMFont::create("Hide Preview Line", "bigFont.fnt");
+	////auto HPLInfo = gd::CCMenuItemSpriteExtra::create(infoSprite, nullptr, this, menu_selector(EditorSettingsLayer::onHidePreviewLineInfo));
+	//HPLToggler->setScale(0.8f);
+	//HPLToggler->setPosition({ 20, -20 });
+	//HPLLabel->setAnchorPoint({ 0.f, 0.5f });
+	//HPLLabel->setScale(0.4f);
+	//HPLLabel->setPosition({ HPLToggler->getPosition().x + 20.f, HPLToggler->getPosition().y });
+	////HPLInfo->setPosition({ HPLToggler->getPosition().x - 17.5f, HPLToggler->getPosition().y + 15.f });
+	//menu->addChild(HPLToggler);
+	//menu->addChild(HPLLabel);
+	////menu->addChild(HPLInfo);
 
 	this->setScale(0.1f);
 	this->runAction(appearAction);

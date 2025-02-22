@@ -132,6 +132,9 @@ namespace EditorUI {
 	inline void(__thiscall* draw)(gd::EditorUI*);
 	void __fastcall drawH(gd::EditorUI* self);
 
+	inline gd::CCMenuItemSpriteExtra* (__thiscall* getSpriteButton)(gd::EditorUI*, const char*, SEL_MenuHandler, CCMenu*, float, int, CCPoint);
+	gd::CCMenuItemSpriteExtra* __fastcall getSpriteButtonH(gd::EditorUI*, void*, const char*, SEL_MenuHandler, CCMenu*, float, int, CCPoint);
+
 	void updateObjectInfo();
 
 	void mem_init();
