@@ -1061,7 +1061,8 @@ void RenderMain() {
 			ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize));
 		{
 			ImGui::SetWindowFontScale(setting().UISize);
-			
+
+			ImGui::Text("Accurate Percentage:");
 			const char* const decimals[] = { "4 decimal places", "3 decimal places", "2 decimal places", "1 decimal place", "0 decimal place" };
 			ImGui::SetNextItemWidth(160.f * setting().UISize);
 			ImGui::Combo("##accuratePerc", &setting().accuratePercentage, decimals, 5);
@@ -1116,10 +1117,12 @@ void RenderMain() {
 				if (setting().onDontFade) {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x90\x90", 2, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\xeb\x11", 2, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe20), "\x90\x90", 2, NULL);
 				}
 				else {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x74\x5d", 2, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\x74\x11", 2, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe20), "\x75\x18", 2, NULL);
 				}
 			}
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
@@ -1672,9 +1675,9 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Hides trigger lines.");
 
-			ImGui::Checkbox("Hitbox Bug Fix", &setting().onHitboxBugFix);
-			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-				ImGui::SetTooltip("Fixes oriented hitboxes in the editor.");
+			//ImGui::Checkbox("Hitbox Bug Fix", &setting().onHitboxBugFix);
+			//if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+			//	ImGui::SetTooltip("Fixes oriented hitboxes in the editor.");
 
 			if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
 				if (setting().onLevelEdit) {

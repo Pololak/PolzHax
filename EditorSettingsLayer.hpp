@@ -30,4 +30,6 @@ public:
 	void onLinkControlsInfo(CCObject*);
 
 	void onHidePreviewLine(CCObject*);
+
+	void onExperimentalLayering(CCObject*);
 };

@@ -108,6 +108,15 @@ void EditorSettingsLayer::onHidePreviewLine(CCObject* obj) {
 	}
 }
 
+auto eltog(CCSprite* toggleOn, CCSprite* toggleOff) {
+	bool el = gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING);
+	return (el) ? toggleOn : toggleOff;
+}
+
+void EditorSettingsLayer::onExperimentalLayering(CCObject*) {
+	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::EXPERIMENTAL_LAYERING);
+}
+
 //void EditorSettingsLayer::onHidePreviewLineInfo(CCObject*) {
 //	gd::FLAlertLayer::create(nullptr, "Link Controls", "Enables option to link objects together in the editor. Linked objects are always selected and deleted together.", "OK", nullptr, 320.f, false, 160.f)->show();
 //}
@@ -225,6 +234,19 @@ bool EditorSettingsLayer::init() {
 	//menu->addChild(PAToggler);
 	//menu->addChild(PALabel);
 	////menu->addChild(PAInfo);
+
+	auto ELToggler = gd::CCMenuItemToggler::create(eltog(toggleOn, toggleOff), eltog(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onExperimentalLayering));
+	auto ELLabel = CCLabelBMFont::create("Experimental Layering", "bigFont.fnt");
+	//auto ELInfo = gd::CCMenuItemSpriteExtra::create(infoSprite, nullptr, this, menu_selector(EditorSettingsLayer::onPrevAnimationsInfo));
+	ELToggler->setScale(0.8f);
+	ELToggler->setPosition({ -150, -20 });
+	ELLabel->setAnchorPoint({ 0.f, 0.5f });
+	ELLabel->setScale(0.35f);
+	ELLabel->setPosition({ ELToggler->getPosition().x + 20.f, ELToggler->getPosition().y });
+	//ELInfo->setPosition({ ELToggler->getPosition().x - 17.5f, ELToggler->getPosition().y + 15.f });
+	menu->addChild(ELToggler);
+	menu->addChild(ELLabel);
+	//menu->addChild(ELInfo);
 
 	auto SOIToggler = gd::CCMenuItemToggler::create(showObjectInfoToggle(toggleOn, toggleOff), showObjectInfoToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onShowObjInfo));
 	auto SOILabel = CCLabelBMFont::create("Show Object Info", "bigFont.fnt");

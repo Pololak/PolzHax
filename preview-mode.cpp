@@ -933,6 +933,8 @@ public:
 		auto arrcount = secarr->count();
 		auto objectDrawNode = reinterpret_cast<CCDrawNode*>(this->gameLayer()->getChildByTag(125));
 		objectDrawNode->clear();
+		//auto playerDrawNode = reinterpret_cast<CCDrawNode*>(this->gameLayer()->getChildByTag(124));
+		//playerDrawNode->clear();
 		if (setting().onHitboxes) {
 			//if (arrcount != 0) {
 			auto layer = this->gameLayer();
@@ -1115,8 +1117,8 @@ public:
 					break; // bro
 				default:;
 				}
-
-				EditorObjectLayering::updateObjLayering(object);
+				if (gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
+					EditorObjectLayering::updateObjLayering(object);
 			}
 		}
 	}
@@ -2541,12 +2543,15 @@ void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* obj) 
 }
 
 void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* obj) {
-
-	for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
-		from<int>(obj, 0x324) = from<int>(obj, 0x324);
-	}
+	//for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
+	//	from<int>(obj, 0x324) = from<int>(obj, 0x324);
+	//}
 	EditorUI::onDuplicate(self, obj);
 }
+
+//CCPoint __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, CCPoint* pos, int objID) {
+//	return EditorUI::offsetForKey(self, pos, objID);
+//}
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
@@ -3046,26 +3051,36 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 		ccDrawLine({ 0, 90 }, { 0, 1590 });
 	}
 
-	auto secarr = lel->getLevelSections();
-	auto arrcount = secarr->count();
-	auto layer = lel->gameLayer();
-	float xp = -layer->getPositionX() / layer->getScale();
-	for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
-		if (i < 0) continue;
-		if (i >= arrcount) break;
-		auto objAtInd = secarr->objectAtIndex(i);
-		auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+	//glLineWidth(2);
+	//ccDrawColor4B(0x32, 0x32, 0x32, 0x32);
+	//ccDrawLine({ director->getWinSize().width / 2.f, director->getScreenTop() }, { director->getWinSize().width / 2.f, director->getScreenBottom() });
 
-		for (int j = 0; j < objarr->count(); j++) {
-			auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-			switch (obj->getObjectID())
-			{
-			case 29:
-				break;
-			}
-		}
-	}	
+	//auto secarr = lel->getLevelSections();
+	//auto arrcount = secarr->count();
+	//auto layer = lel->gameLayer();
+	//float xp = -layer->getPositionX() / layer->getScale();
+	//for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
+	//	if (i < 0) continue;
+	//	if (i >= arrcount) break;
+	//	auto objAtInd = secarr->objectAtIndex(i);
+	//	auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+
+	//	for (int j = 0; j < objarr->count(); j++) {
+	//		auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+	//		switch (obj->getObjectID())
+	//		{
+	//		case 29:
+	//			break;
+	//		}
+	//	}
+	//}	
 }
+
+//void __fastcall LevelEditorLayer::drawH(gd::LevelEditorLayer* self) {
+//	LevelEditorLayer::draw(self);
+//
+//	auto director = CCDirector::sharedDirector();
+//}
 
 //bool isEasedScrollLayer(gd::BoomScrollLayer* self) {
 //	if (!self->getParent())
@@ -3238,6 +3253,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41450), EditorUI::updateButtonsH, reinterpret_cast<void**>(&EditorUI::updateButtons));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4afc0), EditorUI::onGroupDownH, reinterpret_cast<void**>(&EditorUI::onGroupDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4af50), EditorUI::onGroupUpH, reinterpret_cast<void**>(&EditorUI::onGroupUp));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4efe0), EditorUI::offsetForKeyH, reinterpret_cast<void**>(&EditorUI::offsetForKey));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41790), EditorUI::getSpriteButtonH, reinterpret_cast<void**>(&EditorUI::getSpriteButton));
@@ -3248,7 +3264,7 @@ void EditorUI::mem_init() {
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8110), BoomScrollLayer_updateDotsH, reinterpret_cast<void**>(&BoomScrollLayer_updateDots));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x79b0), BoomScrollLayer_initH, reinterpret_cast<void**>(&BoomScrollLayer_init));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject_customSetupH, reinterpret_cast<void**>(&GameObject_customSetup));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject_customSetupH, reinterpret_cast<void**>(&GameObject_customSetup));
 }
 
 void EditorPauseLayer::mem_init() {
