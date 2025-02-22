@@ -1692,30 +1692,32 @@ void __fastcall EndLevelLayer::customSetup_H(gd::EndLevelLayer* self) {
 
             buttonsMenu = from<CCMenu*>(self, 0x1c0);
 
-            auto practiceSprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png");
-            practiceSprite->setScale(1.f);
-            auto practiceButton = gd::CCMenuItemSpriteExtra::create(
-                practiceSprite,
-                nullptr,
-                self,
-                menu_selector(EndLevelLayer::Callback::onReset)
-            );
+            if (buttonsMenu != nullptr) {
+                auto practiceSprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png");
+                practiceSprite->setScale(1.f);
+                auto practiceButton = gd::CCMenuItemSpriteExtra::create(
+                    practiceSprite,
+                    nullptr,
+                    self,
+                    menu_selector(EndLevelLayer::Callback::onReset)
+                );
 
-            if (buttonsMenu->getChildrenCount() == 2)
-            {
-                reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
-                reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
-            }
-            else
-            {
-                reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-130.f);
-                reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(130.f);
-                reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(2))->setPositionX(-45.f);
-                practiceButton->setPositionX(45.f);
-            }
+                if (buttonsMenu->getChildrenCount() == 2)
+                {
+                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
+                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
+                }
+                else
+                {
+                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-130.f);
+                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(130.f);
+                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(2))->setPositionX(-45.f);
+                    practiceButton->setPositionX(45.f);
+                }
 
-            practiceButton->setPositionY(-125.f);
-            buttonsMenu->addChild(practiceButton);
+                practiceButton->setPositionY(-125.f);
+                buttonsMenu->addChild(practiceButton);
+            }
         }
     }
 }
