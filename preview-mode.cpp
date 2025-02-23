@@ -1118,7 +1118,7 @@ public:
 				default:;
 				}
 				if (gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
-					EditorObjectLayering::updateObjLayering(object);
+					EditorObjectLayering::updateObjLayering(this, object);
 			}
 		}
 	}
@@ -2543,10 +2543,6 @@ void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* obj) 
 }
 
 void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* obj) {
-	//for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
-	//	from<int>(obj, 0x324) = from<int>(obj, 0x324);
-	//}
-	EditorUI::onDuplicate(self, obj);
 }
 
 //CCPoint __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, CCPoint* pos, int objID) {

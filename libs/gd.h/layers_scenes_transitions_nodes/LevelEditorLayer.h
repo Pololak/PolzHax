@@ -219,10 +219,6 @@ class LevelEditorLayer : public cocos2d::CCLayer {
                 section = 0;
             return section;
         }
-
-        //static cocos2d::CCScene* scene(GJGameLevel* level) {
-        //    return cocos2d::CCScene::create()->addChild(LevelEditorLayer::create(level));
-        //}
     };
 
 }

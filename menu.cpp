@@ -2263,7 +2263,7 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Locks all rotation at 0 degrees.");
 
-			ImGui::Checkbox("Menu Gameplay", &setting().onMenuGameplay);
+			//ImGui::Checkbox("Menu Gameplay", &setting().onMenuGameplay);
 
 			ImGui::Checkbox("No Transition", &setting().onNoTransition);
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)

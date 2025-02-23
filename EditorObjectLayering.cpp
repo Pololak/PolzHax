@@ -1,7 +1,14 @@
 #include "EditorObjectLayering.hpp"
 #include "utils.hpp"
 
-void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
+void reorderObjectSection(gd::LevelEditorLayer* lel, gd::GameObject* obj) {
+	auto sObj = lel->m_levelSections->objectAtIndex(obj->m_sectionIdx);
+	lel->m_levelSections->removeObject((CCObject*)sObj, true);
+	lel->m_objectCount -= 1;
+	lel->addToSection(obj);
+}
+
+void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, gd::GameObject* obj) {
 	switch (obj->m_objectID)
 	{
 	case 10:
@@ -21,7 +28,10 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 472:
 	case 473:
 	case 474:
-		if (obj && (obj->m_objectZ != 12)) obj->m_objectZ = 12; break;
+		if (obj && (obj->m_objectZ != 12)) {
+			obj->m_objectZ = 12;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 1:
 	case 83:
 	case 2:
@@ -199,7 +209,10 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 243:
 	case 244:
 	case 135:
-		if (obj && (obj->m_objectZ != 11)) obj->m_objectZ = 11; break;
+		if (obj && (obj->m_objectZ != 11)) {
+			obj->m_objectZ = 11;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 363:
 	case 364:
 	case 365:
@@ -238,11 +251,17 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 740:
 	case 741:
 	case 742:
-		if (obj && (obj->m_objectZ != 10)) obj->m_objectZ = 10; break;
+		if (obj && (obj->m_objectZ != 10)) {
+			obj->m_objectZ = 10;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 678:
 	case 679:
 	case 680:
-		if (obj && (obj->m_objectZ != 9)) obj->m_objectZ = 9; break;
+		if (obj && (obj->m_objectZ != 9)) {
+			obj->m_objectZ = 9;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 35:
 	case 36:
 	case 67:
@@ -256,7 +275,10 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 201:
 	case 202:
 	case 203:
-		if (obj && (obj->m_objectZ != 8)) obj->m_objectZ = 8; break;
+		if (obj && (obj->m_objectZ != 8)) {
+			obj->m_objectZ = 8;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 132:
 	case 133:
 	case 136:
@@ -267,7 +289,10 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 495:
 	case 496:
 	case 497:
-		if (obj && (obj->m_objectZ != 7)) obj->m_objectZ = 7; break;
+		if (obj && (obj->m_objectZ != 7)) {
+			obj->m_objectZ = 7;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 18:
 	case 19:
 	case 20:
@@ -372,12 +397,18 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 148:
 	case 149:
 	case 405:
-		if (obj && (obj->m_objectZ != 6)) obj->m_objectZ = 6; break;
+		if (obj && (obj->m_objectZ != 6)) {
+			obj->m_objectZ = 6;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 191:
 	case 198:
 	case 199:
 	case 393:
-		if (obj && (obj->m_objectZ != 5)) obj->m_objectZ = 5; break;
+		if (obj && (obj->m_objectZ != 5)) {
+			obj->m_objectZ = 5;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 725:
 	case 15:
 	case 16:
@@ -391,7 +422,10 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 512:
 	case 513:
 	case 514:
-		if (obj && (obj->m_objectZ != 4)) obj->m_objectZ = 4; break;
+		if (obj && (obj->m_objectZ != 4)) {
+			obj->m_objectZ = 4;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 578:
 	case 579:
 	case 580:
@@ -437,7 +471,10 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 620:
 	case 621:
 	case 622:
-		if (obj && (obj->m_objectZ != 3)) obj->m_objectZ = 3; break;
+		if (obj && (obj->m_objectZ != 3)) {
+			obj->m_objectZ = 3;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 5:
 	case 502:
 	case 73:
@@ -612,12 +649,18 @@ void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	case 723:
 	case 655:
 	case 735:
-		if (obj && (obj->m_objectZ != 2)) obj->m_objectZ = 2; break;
+		if (obj && (obj->m_objectZ != 2)) {
+			obj->m_objectZ = 2;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 211:
 	case 251:
 	case 259:
 	case 266:
 	case 273:
-		if (obj && (obj->m_objectZ != 1)) obj->m_objectZ = 1; break;
+		if (obj && (obj->m_objectZ != 1)) {
+			obj->m_objectZ = 1;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	}
 }
