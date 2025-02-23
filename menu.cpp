@@ -163,12 +163,12 @@ void RenderMain() {
 
 		// Bypass
 
-		if (setting().onCharFilter) {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x90\x90", 2, NULL);
-		}
-		else {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x75\x04", 2, NULL);
-		}
+		//if (setting().onCharFilter) {
+		//	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x90\x90", 2, NULL);
+		//}
+		//else {
+		//	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x75\x04", 2, NULL);
+		//}
 
 		if (setting().onIcons) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x48000F), "\xe9\x74\x02\x00\x00\x90", 6, NULL);
@@ -211,12 +211,12 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x41cf3b), "\x76\x07", 2, NULL);
 		}
 
-		if (setting().onTextLength) {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\xeb\x04", 2, NULL);
-		}
-		else {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\x7c\x04", 2, NULL);
-		}
+		//if (setting().onTextLength) {
+		//	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\xeb\x04", 2, NULL);
+		//}
+		//else {
+		//	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\x7c\x04", 2, NULL);
+		//}
 
 		// Cosmetic
 
@@ -981,14 +981,7 @@ void RenderMain() {
 			ImGui::SetWindowFontScale(setting().UISize);
 			ImGui::SetNextItemWidth(120 * setting().UISize);
 
-			if (ImGui::Checkbox("Character Filter", &setting().onCharFilter)) {
-				if (setting().onCharFilter) {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x90\x90", 2, NULL);
-				}
-				else {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147A7), "\x75\x04", 2, NULL);
-				}
-			}
+			ImGui::Checkbox("Character Filter", &setting().onCharFilter);
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Lets you input any character in text fields.");
 
@@ -1045,14 +1038,7 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Lets sliders be dragged beyond the visible limit.");
 
-			if (ImGui::Checkbox("Text Length", &setting().onTextLength)) {
-				if (setting().onTextLength) {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\xeb\x04", 2, NULL);
-				}
-				else {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4147DE), "\x7c\x04", 2, NULL);
-				}
-			}
+			ImGui::Checkbox("Text Length", &setting().onTextLength);
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Allows for unlimited text length in text inputs.");
 		}

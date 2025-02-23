@@ -665,6 +665,23 @@ void __fastcall CCNode_sortAllChildrenH(CCNode* self) {
     //CCNode_sortAllChildren(self);
 }
 
+void(__thiscall* CCTextInputNode_updateLabel)(gd::CCTextInputNode*, std::string);
+void __fastcall CCTextInputNode_updateLabelH(gd::CCTextInputNode* self, void*, std::string string) {
+    if (setting().onTextLength)
+        self->setMaxLabelLength(99999);
+
+    CCTextInputNode_updateLabel(self, string);
+
+    if (setting().onCharFilter) {
+        self->setAllowedChars("abcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "0123456789!@#$%^&*()-=_+"
+            "`~[]{}/?.>,<\\|;:'\""
+            " ");
+        CCTextInputNode_updateLabel(self, std::move(string));
+    }
+}
+
 void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
 void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     if (setting().onAutoSave)
@@ -761,7 +778,7 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe1270), PlayerObject::placeStreakPointH, reinterpret_cast<void**>(&PlayerObject::placeStreakPoint));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9b50), PlayerObject::updateH, reinterpret_cast<void**>(&PlayerObject::update));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject::fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject::fadeOutStreak2));
-
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x13e90), CCTextInputNode_updateLabelH, reinterpret_cast<void**>(&CCTextInputNode_updateLabel));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 
