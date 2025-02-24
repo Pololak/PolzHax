@@ -705,6 +705,19 @@ void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     AppDelegate_trySaveGame(self);
 }
 
+void(__thiscall* LevelCell_loadCustomLevelCell)(gd::LevelCell*);
+void __fastcall LevelCell_loadCustomLevelCellH(gd::LevelCell* self) {
+    LevelCell_loadCustomLevelCell(self);
+    auto idLabel = CCLabelBMFont::create("#", "chatFont.fnt");
+    idLabel->setColor({ 0,0,0 });
+    idLabel->setString(CCString::createWithFormat("#%i", self->m_level->m_levelID)->getCString());
+    idLabel->setScale(.6f);
+    idLabel->setOpacity(75);
+    idLabel->setAnchorPoint({ 1.f, 0.5f });
+    idLabel->setPosition({ 350, 7 });
+    from<CCLayer*>(self, 0x16c)->addChild(idLabel);
+}
+
 DWORD WINAPI my_thread(void* hModule) {
     //setting().loadState();
 
@@ -718,8 +731,8 @@ DWORD WINAPI my_thread(void* hModule) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
 
-    //AllocConsole();
-    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    AllocConsole();
+    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
     auto cocos_ext = GetModuleHandleA("libExtensions.dll");
@@ -793,6 +806,7 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9b50), PlayerObject::updateH, reinterpret_cast<void**>(&PlayerObject::update));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject::fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject::fadeOutStreak2));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x13e90), CCTextInputNode_updateLabelH, reinterpret_cast<void**>(&CCTextInputNode_updateLabel));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x30360), LevelCell_loadCustomLevelCellH, reinterpret_cast<void**>(&LevelCell_loadCustomLevelCell));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

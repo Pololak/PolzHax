@@ -6,6 +6,7 @@
 namespace gd {
 
 	class CCContentLayer;
+	class GJGameLevel;
 
 	class CCScrollLayerExt : public cocos2d::CCLayer {
 	protected:
@@ -52,6 +53,12 @@ namespace gd {
 		virtual void scrollViewDidEndMoving(CCScrollLayerExt*) {}
 		virtual void scrollViewTouchBegin(CCScrollLayerExt*) {}
 		virtual void scrollViewTouchEnd(CCScrollLayerExt*) {}
+	};
+
+	class LevelCell : public cocos2d::CCLayer {
+	public:
+		PAD(88)
+		GJGameLevel* m_level;
 	};
 }
 
