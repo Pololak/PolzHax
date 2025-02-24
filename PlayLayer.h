@@ -123,8 +123,8 @@ namespace PlayerObject {
 	inline void(__thiscall* runBallRotation2)(gd::PlayerObject*);
 	void __fastcall runBallRotation2H(gd::PlayerObject* self);
 
-	inline void(__thiscall* ringJump)(gd::PlayerObject*, gd::GameObject*);
-	void __fastcall ringJumpH(gd::PlayerObject* self, void*, gd::GameObject* object);
+	inline void(__thiscall* togglePlayerScale)(gd::PlayerObject*, bool);
+	void __fastcall togglePlayerScaleH(gd::PlayerObject*, void*, bool);
 
 	void mem_init();
 }

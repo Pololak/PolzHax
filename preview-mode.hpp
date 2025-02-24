@@ -240,17 +240,6 @@ namespace DrawGridLayer {
 	void __fastcall drawH(gd::DrawGridLayer*);
 }
 
-namespace PlayerObject {
-	inline void(__thiscall* placeStreakPoint)(gd::PlayerObject*);
-	void __fastcall placeStreakPointH(gd::PlayerObject* self);
-
-	inline void(__thiscall* update)(gd::PlayerObject*, float);
-	void __fastcall updateH(gd::PlayerObject* self, void*, float dt);
-
-	inline void(__thiscall* fadeOutStreak2)(gd::PlayerObject*, float);
-	void __fastcall fadeOutStreak2H(gd::PlayerObject* self, void*, float p0);
-}
-
 namespace Scheduler {
 	inline bool(__thiscall* update)(CCScheduler* self, float dt);
 	void __fastcall update_H(CCScheduler* self, void* edx, float dt);

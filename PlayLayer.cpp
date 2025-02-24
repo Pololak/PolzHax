@@ -1783,6 +1783,13 @@ void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
     PlayerObject::runBallRotation2(self);
 }
 
+void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, bool p0) {
+    PlayerObject::togglePlayerScale(self, p0);
+    if (gd::GameManager::sharedState()->getPlayerGlow() == 2)
+        if (self->m_playerScale == 1.f)
+            from<float>(self->m_playerStreak, 0x114) = 14.f;
+}
+
 void PauseLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xd5f50),
@@ -1856,6 +1863,7 @@ void PlayerObject::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdad10), PlayerObject::runBallRotation2H, reinterpret_cast<void**>(&PlayerObject::runBallRotation2));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe12e0), PlayerObject::togglePlayerScaleH, reinterpret_cast<void**>(&PlayerObject::togglePlayerScale));
 }
 
 void GameObject::mem_init() {
