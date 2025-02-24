@@ -2287,20 +2287,10 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 }
 
 void EditorUI::updateObjectInfo() {
-	if (editUI) {
-		m_objectsSelected->setVisible(0);
-		m_objectColor->setVisible(0);
-		m_objectGroup->setVisible(0);
-		m_objectRotation->setVisible(0);
-		m_objectXPos->setVisible(0);
-		m_objectYPos->setVisible(0);
-		m_objectKey->setVisible(0);
-		m_objectAddress->setVisible(0);
-		m_objectType->setVisible(0);
-		m_objectZ->setVisible(0);
-
-		if (editUI->getSelectedObjectsOfCCArray()->count() == 1) {
-			if (m_objectColor) {
+	if (MyEditorLayer::s_instance) {
+		if (m_objectColor) {
+			if (editUI->m_selectedObject == 0) m_objectColor->setVisible(0);
+			else {
 				m_objectColor->setVisible(1);
 				auto colorID = static_cast<int>(editUI->m_selectedObject->m_customColorMode);
 				switch (colorID) {
@@ -2336,31 +2326,52 @@ void EditorUI::updateObjectInfo() {
 					break;
 				}
 			}
-			if (m_objectGroup) {
+		}
+		if (m_objectGroup) {
+			if (editUI->m_selectedObject == 0) m_objectGroup->setVisible(0);
+			else {
 				m_objectGroup->setVisible(1);
 				m_objectGroup->setString(CCString::createWithFormat("G: %i", editUI->m_selectedObject->m_editorGroup)->getCString());
 			}
-			if (m_objectRotation) {
+		}
+		if (m_objectRotation) {
+			if (editUI->m_selectedObject == 0) m_objectRotation->setVisible(0);
+			else {
 				m_objectRotation->setVisible(1);
 				m_objectRotation->setString(CCString::createWithFormat("Rot: %.01f%", editUI->m_selectedObject->getRotation())->getCString());
 			}
-			if (m_objectXPos) {
+		}
+		if (m_objectXPos) {
+			if (editUI->m_selectedObject == 0) m_objectXPos->setVisible(0);
+			else {
 				m_objectXPos->setVisible(1);
 				m_objectXPos->setString(CCString::createWithFormat("X: %.01f%", editUI->m_selectedObject->getPositionX())->getCString());
 			}
-			if (m_objectYPos) {
+		}
+		if (m_objectYPos) {
+			if (editUI->m_selectedObject == 0) m_objectYPos->setVisible(0);
+			else {
 				m_objectYPos->setVisible(1);
 				m_objectYPos->setString(CCString::createWithFormat("Y: %.01f%", editUI->m_selectedObject->getPositionY())->getCString());
 			}
-			if (m_objectKey) {
+		}
+		if (m_objectKey) {
+			if (editUI->m_selectedObject == 0) m_objectKey->setVisible(0);
+			else {
 				m_objectKey->setVisible(1);
 				m_objectKey->setString(CCString::createWithFormat("ID: %i", editUI->m_selectedObject->m_objectID)->getCString());
 			}
-			if (m_objectAddress) {
+		}
+		if (m_objectAddress) {
+			if (editUI->m_selectedObject == 0) m_objectAddress->setVisible(0);
+			else {
 				m_objectAddress->setVisible(1);
 				m_objectAddress->setString(CCString::createWithFormat("Addr: 0x%p", editUI->m_selectedObject)->getCString());
 			}
-			if (m_objectType) {
+		}
+		if (m_objectType) {
+			if (editUI->m_selectedObject == 0) m_objectType->setVisible(0);
+			else {
 				m_objectType->setVisible(1);
 				auto objectType = editUI->m_selectedObject->m_objectType;
 				switch (objectType)
@@ -2448,14 +2459,18 @@ void EditorUI::updateObjectInfo() {
 					break;
 				}
 			}
-			if (m_objectZ) {
+		}
+		if (m_objectZ) {
+			if (editUI->m_selectedObject == 0) m_objectZ->setVisible(0);
+			else {
 				m_objectZ->setString(CCString::createWithFormat("Object Z: %i", editUI->m_selectedObject->m_objectZ)->getCString());
 				m_objectZ->setVisible(1);
 			}
-			if (m_objectsSelected) {
-				m_objectsSelected->setVisible(1);
-				m_objectsSelected->setString(CCString::createWithFormat("Objects: %i", editUI->getSelectedObjectsOfCCArray()->count())->getCString());
-			}
+		}
+		if (m_objectsSelected) {
+			if (editUI->getSelectedObjectsOfCCArray()->count() == 0) m_objectsSelected->setVisible(0);
+			else m_objectsSelected->setVisible(1);
+			m_objectsSelected->setString(CCString::createWithFormat("Objects: %i", editUI->getSelectedObjectsOfCCArray()->count())->getCString());
 		}
 	}
 }

@@ -159,22 +159,32 @@ bool __fastcall CustomizeObjectLayer_init_H(CustomizeObjectLayer* self, void* ed
     self->m_buttonMenu->addChild(btn_3dl);
     self->m_buttonMenu->addChild(btn_wht);
 
-    for (auto obj2 : CCArrayExt<gd::GameObject*>(objs)) {
-        if (obj2) {
-            switch (obj2->getColorMode())
-            {
-            case gd::CustomColorMode::Default:
-                break;
+    auto default_spr = static_cast<gd::ButtonSprite*>(self->m_buttonsArray->objectAtIndex(7));
 
-            case gd::CustomColorMode::DL:
-                self->hightlightSelected(spr_3dl);
-                break;
-            case gd::CustomColorMode::White:
-                self->hightlightSelected(spr_wht);
-                break;
-            }
-        }
+    if (obj && obj->getColorMode() == gd::CustomColorMode::DL) {
+        self->hightlightSelected(spr_3dl);
     }
+
+    if (obj && obj->getColorMode() == gd::CustomColorMode::White) {
+        self->hightlightSelected(spr_wht);
+    }
+
+	for (auto obj2 : CCArrayExt<gd::GameObject*>(objs)) {
+		if (obj2) {
+			switch (obj2->getColorMode())
+			{
+			case gd::CustomColorMode::DL:
+				self->hightlightSelected(spr_3dl);
+				break;
+			case gd::CustomColorMode::White:
+				self->hightlightSelected(spr_wht);
+				break;
+			default:
+				self->hightlightSelected(default_spr);
+				break;
+			}
+		}
+	}
 
     return true;
 }
@@ -708,8 +718,8 @@ DWORD WINAPI my_thread(void* hModule) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
 
-    AllocConsole();
-    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    //AllocConsole();
+    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
     auto cocos_ext = GetModuleHandleA("libExtensions.dll");
