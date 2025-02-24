@@ -1229,14 +1229,6 @@ bool GameObject_shouldBlendColor(gd::GameObject* self) {
 	}
 }
 
-void EditorUI_moveObject(gd::EditorUI* self, gd::GameObject* object, CCPoint to) {
-	if (object == nullptr)
-		return;
-	matdash::orig<&EditorUI_moveObject>(self, object, to);
-	reinterpret_cast<MyEditorLayer*>(self->getParent())->move_trigger(object);
-	updateLastObjectX(self->getLevelEditorLayer(), object);
-}
-
 void EditorUI_deselectAll(gd::EditorUI* self) {
 	const auto objs = self->getSelectedObjects();
 	matdash::orig<&EditorUI_deselectAll>(self);
@@ -2562,6 +2554,8 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
 void __fastcall EditorUI::moveObjectH(gd::EditorUI* self, void*, gd::GameObject* obj, CCPoint pos) {
 	if (obj == nullptr) return; // rob is funny
 	EditorUI::moveObject(self, obj, pos);
+	reinterpret_cast<MyEditorLayer*>(self->getParent())->move_trigger(obj);
+	updateLastObjectX(self->getLevelEditorLayer(), obj);
 }
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
@@ -3304,7 +3298,6 @@ void preview_mode::init() {
 	matdash::add_hook<&MyEditorLayer::addSpecial>(gd::base + 0x8ed10);
 	matdash::add_hook<&MyEditorLayer::init>(gd::base + 0x8c2c0);
 	matdash::add_hook<&MyEditorLayer::dtor>(gd::base + 0x8c080);
-	matdash::add_hook<&EditorUI_moveObject>(gd::base + 0x4b410);
 	matdash::add_hook<&MyEditorLayer::removeSpecial>(gd::base + 0x8ee30);
 
 	matdash::add_hook<&EditorUI_deselectAll>(gd::base + 0x48380);
