@@ -2287,7 +2287,7 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 }
 
 void EditorUI::updateObjectInfo() {
-	if (MyEditorLayer::s_instance) {
+	if (editUI) {
 		if (m_objectColor) {
 			if (editUI->m_selectedObject == 0) m_objectColor->setVisible(0);
 			else {
