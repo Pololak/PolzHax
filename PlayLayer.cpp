@@ -1070,7 +1070,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     }
 
     if (BestRunLabel) {
-        if (!inPractice) {
+        if (!self->m_practiceMode && !self->m_testMode) {
             int newBest = self->getLastRunPercent();
             if (newBest >= currentBest) {
                 currentBest = newBest;
