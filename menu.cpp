@@ -1472,11 +1472,23 @@ void RenderMain() {
 				ImGui::TreePop();
 			}
 
-			ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail);
+			if (ImGui::Checkbox("No Wave Trail", &setting().onNoWaveTrail)) {
+				if (playLayer) {
+					playLayer->m_player->m_hardStreak->setVisible(!setting().onNoWaveTrail);
+					playLayer->m_player2->m_hardStreak->setVisible(!setting().onNoWaveTrail);
+				}
+			}
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Disables the hard wave trail.");
 
-			ImGui::Checkbox("No Wave Trail Behind", &setting().onNoWaveTrailBehind);
+			if (ImGui::Checkbox("No Wave Trail Behind", &setting().onNoWaveTrailBehind)) {
+				if (playLayer) {
+					if (playLayer->m_player->m_dartMode)
+						from<bool>(playLayer->m_player->m_playerStreak, 0xfe) = !setting().onNoWaveTrailBehind;
+					if (playLayer->m_player2->m_dartMode)
+						from<bool>(playLayer->m_player2->m_playerStreak, 0xfe) = !setting().onNoWaveTrailBehind;
+				}
+			}
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Disables default player trail behind the wave trail.");
 
