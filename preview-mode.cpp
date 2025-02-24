@@ -2272,7 +2272,6 @@ void __fastcall EditorUI::onCopyH(gd::EditorUI* self, void*, CCObject* sender) {
 }
 
 void __fastcall EditorUI::sliderChangedH(gd::EditorUI* self, void*, CCObject* object) {
-	std::cout << getLevelLength() << std::endl;
 	EditorUI::sliderChanged(self, object);
 }
 
@@ -2560,21 +2559,10 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
 		m_editorLayerInput->m_layerInput->setString(self->m_currentGroupLabel->getString());
 }
 
-void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* obj) {
-
-	//for (auto obj : CCArrayExt<gd::GameObject*>(self->getSelectedObjectsOfCCArray())) {
-	//	gd::ColorSelectPopup::create(obj, 0, 0, 0);
-	//}
-
-	EditorUI::editObject(self, obj);
+void __fastcall EditorUI::moveObjectH(gd::EditorUI* self, void*, gd::GameObject* obj, CCPoint pos) {
+	if (obj == nullptr) return; // rob is funny
+	EditorUI::moveObject(self, obj, pos);
 }
-
-void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* obj) {
-}
-
-//CCPoint __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, CCPoint* pos, int objID) {
-//	return EditorUI::offsetForKey(self, pos, objID);
-//}
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
@@ -2606,8 +2594,6 @@ void EditorPauseLayer::Callback::PreviewModeToggler(CCObject*) {
 			MyEditorLayer::s_instance->reset_colors();
 	}
 }
-
-bool SEP = false;
 
 void EditorPauseLayer::Callback::SmallEditorStepToggler(CCObject*) {
 	gd::GameManager::sharedState()->toggleGameVariable("0035");
@@ -3270,12 +3256,13 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b040), EditorUI::moveForCommandH, reinterpret_cast<void**>(&EditorUI::moveForCommand));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b7e0), EditorUI::transformObjectH, reinterpret_cast<void**>(&EditorUI::transformObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41850), EditorUI::sliderChangedH, reinterpret_cast<void**>(&EditorUI::sliderChanged));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41850), EditorUI::sliderChangedH, reinterpret_cast<void**>(&EditorUI::sliderChanged));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x490c0), EditorUI::onCopyH, reinterpret_cast<void**>(&EditorUI::onCopy));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41450), EditorUI::updateButtonsH, reinterpret_cast<void**>(&EditorUI::updateButtons));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4afc0), EditorUI::onGroupDownH, reinterpret_cast<void**>(&EditorUI::onGroupDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4af50), EditorUI::onGroupUpH, reinterpret_cast<void**>(&EditorUI::onGroupUp));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b410), EditorUI::moveObjectH, reinterpret_cast<void**>(&EditorUI::moveObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4efe0), EditorUI::offsetForKeyH, reinterpret_cast<void**>(&EditorUI::offsetForKey));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));

@@ -135,6 +135,9 @@ namespace EditorUI {
 	inline CCPoint(__thiscall* offsetForKey)(gd::EditorUI*, CCPoint*, int);
 	CCPoint __fastcall offsetForKeyH(gd::EditorUI*, void*, CCPoint*, int);
 
+	inline void(__thiscall* moveObject)(gd::EditorUI*, gd::GameObject*, CCPoint);
+	void __fastcall moveObjectH(gd::EditorUI*, void*, gd::GameObject*, CCPoint);
+
 	void updateObjectInfo();
 
 	void mem_init();
