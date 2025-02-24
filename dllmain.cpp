@@ -686,7 +686,11 @@ void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
 void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     if (setting().onAutoSave)
     {
-        setting().saveState();
+        auto file = fopen("Resources/polzsave.dat", "wb");
+        if (file) {
+            fwrite(&setting(), sizeof(setting()), 1, file);
+            fclose(file);
+        }
     }
     AppDelegate_trySaveGame(self);
 }

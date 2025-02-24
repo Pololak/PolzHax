@@ -96,10 +96,89 @@ static std::string getResourcesFolder() {
 
 std::vector<std::string> dllNames;
 
+void colorSet() {
+	auto* colors = ImGui::GetStyle().Colors;
+
+	color1.x = setting().Overlaycolor[0];
+	color1.y = setting().Overlaycolor[1];
+	color1.z = setting().Overlaycolor[2];
+	color1.w = setting().Overlaycolor[3] - 0.4;
+
+	color2.x = setting().Overlaycolor[0];
+	color2.y = setting().Overlaycolor[1];
+	color2.z = setting().Overlaycolor[2];
+	color2.w = 1;
+
+	color3.x = setting().Overlaycolor[0] + 0.3;
+	color3.y = setting().Overlaycolor[1] + 0.3;
+	color3.z = setting().Overlaycolor[2] + 0.3;
+	color3.w = setting().Overlaycolor[3] + 0.3;
+
+	color4.x = setting().Overlaycolor[0] - 0.1;
+	color4.y = setting().Overlaycolor[1] - 0.1;
+	color4.z = setting().Overlaycolor[2] - 0.1;
+	color4.w = setting().Overlaycolor[3] - 0.1;
+
+	color5.x = setting().Overlaycolor[0] + 0.1;
+	color5.y = setting().Overlaycolor[1] + 0.1;
+	color5.z = setting().Overlaycolor[2] + 0.1;
+	color5.w = setting().Overlaycolor[3] + 0.1;
+
+	color6.x = setting().BGcolor[0];
+	color6.y = setting().BGcolor[1];
+	color6.z = setting().BGcolor[2];
+	color6.w = setting().BGcolor[3];
+
+	//colors[ImGuiCol_Text] = ImVec4(0.3, 0.3, 0.3, 1);
+	colors[ImGuiCol_WindowBg] = color6;
+	colors[ImGuiCol_Border] = color2;
+	colors[ImGuiCol_BorderShadow] = color2;
+	colors[ImGuiCol_Button] = color3;
+	colors[ImGuiCol_ButtonHovered] = color1;
+	colors[ImGuiCol_ButtonActive] = color1;
+	colors[ImGuiCol_CheckMark] = ImVec4(1, 1, 1, 1);
+	colors[ImGuiCol_FrameBg] = color1;
+	colors[ImGuiCol_FrameBgHovered] = color3;
+	colors[ImGuiCol_FrameBgActive] = color3;
+	colors[ImGuiCol_Tab] = ImVec4(color5.x, color5.y, color5.z, color5.w - 0.2);
+	colors[ImGuiCol_TabHovered] = color3;
+	colors[ImGuiCol_TabActive] = color3;
+	colors[ImGuiCol_TitleBg] = color3;
+	colors[ImGuiCol_TitleBgActive] = color3;
+	colors[ImGuiCol_TitleBgCollapsed] = color3;
+	colors[ImGuiCol_SliderGrab] = color4;
+	colors[ImGuiCol_SliderGrabActive] = color4;
+	colors[ImGuiCol_TextSelectedBg] = color2;
+	colors[ImGuiCol_Header] = color1;
+	colors[ImGuiCol_HeaderHovered] = color1;
+	colors[ImGuiCol_HeaderActive] = color2;
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
+}
+
+void saveState() {
+	auto file = fopen("Resources/polzsave.dat", "wb");
+	if (file) {
+		fwrite(&setting(), sizeof(setting()), 1, file);
+		fclose(file);
+	}
+}
+
 bool oneX = true;
 
 void RenderMain() {
 	if (oneX) {
+		auto file = fopen("Resources/polzsave.dat", "rb");
+		if (file) {
+			fseek(file, 0, SEEK_END);
+			auto size = ftell(file);
+
+			if (size == sizeof(setting())) {
+				fseek(file, 0, SEEK_SET);
+				fread(&setting(), sizeof(setting()), 1, file);
+				fclose(file);
+			}
+		}
+
 		float addingX1, addingX2, addingX3, addingX4, addingX5, addingX6, addingX7;
 		float addingInterfaceY, addingSpeedhackY, addingIconsY, addingShortcutsY;
 		if (ImGui::Begin("PolzHax", nullptr)) {
@@ -899,66 +978,7 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4A06FC), "\x68\xff", 2, NULL);
 		}
 
-		// fuck it.
-
-		
-	  
-		auto* colors = ImGui::GetStyle().Colors;
-
-		color1.x = setting().Overlaycolor[0];
-		color1.y = setting().Overlaycolor[1];
-		color1.z = setting().Overlaycolor[2];
-		color1.w = setting().Overlaycolor[3] - 0.4;
-
-		color2.x = setting().Overlaycolor[0];
-		color2.y = setting().Overlaycolor[1];
-		color2.z = setting().Overlaycolor[2];
-		color2.w = 1;
-
-		color3.x = setting().Overlaycolor[0] + 0.3;
-		color3.y = setting().Overlaycolor[1] + 0.3;
-		color3.z = setting().Overlaycolor[2] + 0.3;
-		color3.w = setting().Overlaycolor[3] + 0.3;
-
-		color4.x = setting().Overlaycolor[0] - 0.1;
-		color4.y = setting().Overlaycolor[1] - 0.1;
-		color4.z = setting().Overlaycolor[2] - 0.1;
-		color4.w = setting().Overlaycolor[3] - 0.1;
-
-		color5.x = setting().Overlaycolor[0] + 0.1;
-		color5.y = setting().Overlaycolor[1] + 0.1;
-		color5.z = setting().Overlaycolor[2] + 0.1;
-		color5.w = setting().Overlaycolor[3] + 0.1;
-
-		color6.x = setting().BGcolor[0];
-		color6.y = setting().BGcolor[1];
-		color6.z = setting().BGcolor[2];
-		color6.w = setting().BGcolor[3];
-
-		//colors[ImGuiCol_Text] = ImVec4(1, 0, 0, 1);
-		colors[ImGuiCol_WindowBg] = color6;
-		colors[ImGuiCol_Border] = color2;
-		colors[ImGuiCol_BorderShadow] = color2;
-		colors[ImGuiCol_Button] = color3;
-		colors[ImGuiCol_ButtonHovered] = color1;
-		colors[ImGuiCol_ButtonActive] = color1;
-		colors[ImGuiCol_CheckMark] = ImVec4(1, 1, 1, 1);
-		colors[ImGuiCol_FrameBg] = color1;
-		colors[ImGuiCol_FrameBgHovered] = color3;
-		colors[ImGuiCol_FrameBgActive] = color3;
-		colors[ImGuiCol_Tab] = ImVec4(color5.x, color5.y, color5.z, color5.w - 0.2);
-		colors[ImGuiCol_TabHovered] = color3;
-		colors[ImGuiCol_TabActive] = color3;
-		colors[ImGuiCol_TitleBg] = color3;
-		colors[ImGuiCol_TitleBgActive] = color3;
-		colors[ImGuiCol_TitleBgCollapsed] = color3;
-		colors[ImGuiCol_SliderGrab] = color4;
-		colors[ImGuiCol_SliderGrabActive] = color4;
-		colors[ImGuiCol_TextSelectedBg] = color2;
-		colors[ImGuiCol_Header] = color1;
-		colors[ImGuiCol_HeaderHovered] = color1;
-		colors[ImGuiCol_HeaderActive] = color2;
-		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
+		colorSet();
 
 		oneX = false;
 	}
@@ -2072,6 +2092,7 @@ void RenderMain() {
 			if (ImGui::Button("Options", { 180 * setting().UISize, 0 })) {
 				auto optionsLayer = gd::OptionsLayer::create();
 				optionsLayer->showLayer(false);
+				optionsLayer->setZOrder(CCDirector::sharedDirector()->getRunningScene()->getHighestChildZ() + 1);
 				CCDirector::sharedDirector()->getRunningScene()->addChild(optionsLayer);
 			}
 
@@ -2471,58 +2492,7 @@ void RenderMain() {
 		{
 			ImGui::SetWindowFontScale(setting().UISize);
 			if (ImGui::ColorEdit4("Color Style", setting().Overlaycolor, ImGuiColorEditFlags_NoInputs)) {
-
-				auto* colors = ImGui::GetStyle().Colors;
-
-				color1.x = setting().Overlaycolor[0];
-				color1.y = setting().Overlaycolor[1];
-				color1.z = setting().Overlaycolor[2];
-				color1.w = setting().Overlaycolor[3] - 0.4;
-
-				color2.x = setting().Overlaycolor[0];
-				color2.y = setting().Overlaycolor[1];
-				color2.z = setting().Overlaycolor[2];
-				color2.w = 1;
-
-				color3.x = setting().Overlaycolor[0] + 0.3;
-				color3.y = setting().Overlaycolor[1] + 0.3;
-				color3.z = setting().Overlaycolor[2] + 0.3;
-				color3.w = setting().Overlaycolor[3] + 0.3;
-
-				color4.x = setting().Overlaycolor[0] - 0.1;
-				color4.y = setting().Overlaycolor[1] - 0.1;
-				color4.z = setting().Overlaycolor[2] - 0.1;
-				color4.w = setting().Overlaycolor[3] - 0.1;
-
-				color5.x = setting().Overlaycolor[0] + 0.1;
-				color5.y = setting().Overlaycolor[1] + 0.1;
-				color5.z = setting().Overlaycolor[2] + 0.1;
-				color5.w = setting().Overlaycolor[3] + 0.1;
-
-				//colors[ImGuiCol_Text] = ImVec4(0.3, 0.3, 0.3, 1);
-				colors[ImGuiCol_WindowBg] = color6;
-				colors[ImGuiCol_Border] = color2;
-				colors[ImGuiCol_BorderShadow] = color2;
-				colors[ImGuiCol_Button] = color3;
-				colors[ImGuiCol_ButtonHovered] = color1;
-				colors[ImGuiCol_ButtonActive] = color1;
-				colors[ImGuiCol_CheckMark] = ImVec4(1, 1, 1, 1);
-				colors[ImGuiCol_FrameBg] = color1;
-				colors[ImGuiCol_FrameBgHovered] = color3;
-				colors[ImGuiCol_FrameBgActive] = color3;
-				colors[ImGuiCol_Tab] = ImVec4(color5.x, color5.y, color5.z, color5.w - 0.2);
-				colors[ImGuiCol_TabHovered] = color3;
-				colors[ImGuiCol_TabActive] = color3;
-				colors[ImGuiCol_TitleBg] = color3;
-				colors[ImGuiCol_TitleBgActive] = color3;
-				colors[ImGuiCol_TitleBgCollapsed] = color3;
-				colors[ImGuiCol_SliderGrab] = color4;
-				colors[ImGuiCol_SliderGrabActive] = color4;
-				colors[ImGuiCol_TextSelectedBg] = color2;
-				colors[ImGuiCol_Header] = color1;
-				colors[ImGuiCol_HeaderHovered] = color1;
-				colors[ImGuiCol_HeaderActive] = color2;
-				colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
+				colorSet();
 			}
 
 			if (ImGui::ColorEdit4("Background Color", setting().BGcolor, ImGuiColorEditFlags_NoInputs)) {
@@ -2610,13 +2580,13 @@ void RenderMain() {
 			ImGui::SetWindowFontScale(setting().UISize);
 			ImGui::SetNextItemWidth(120 * setting().UISize);
 
-			ImGui::Text("v1.2.0-RC.1");
+			ImGui::Text("v1.2.0-alpha.1");
 
 			ImGui::Checkbox("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine();
 			if (ImGui::Button("Save"))
 			{
-				setting().saveState();
+				saveState();
 				gd::FLAlertLayer::create(nullptr, "Saved!", "Your hack state is saved!", "Ok", nullptr, 240.f, false, 0)->show();
 			}
 			ImGui::EndTabItem();
@@ -2682,10 +2652,10 @@ void RenderMain() {
 			if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack)) {
 				update_speed_hack();
 			}
+			ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
 			if (ImGui::Checkbox("Classic Mode", &setting().onClassicMode)) {
 				update_speed_hack();
 			}
-			ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
 		}
 	}
 	ImGui::End();
@@ -2700,69 +2670,24 @@ void RenderMain() {
 }
 
 void imgui_init() {
-	setting().loadState();
+	auto file = fopen("Resources/polzsave.dat", "rb");
+	if (file) {
+		fseek(file, 0, SEEK_END);
+		auto size = ftell(file);
+
+		if (size == sizeof(setting())) {
+			fseek(file, 0, SEEK_SET);
+			fread(&setting(), sizeof(setting()), 1, file);
+			fclose(file);
+		}
+	}
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
 	io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
 	io.Fonts->Build();
 
-	auto* colors = ImGui::GetStyle().Colors;
-
-	color1.x = setting().Overlaycolor[0];
-	color1.y = setting().Overlaycolor[1];
-	color1.z = setting().Overlaycolor[2];
-	color1.w = setting().Overlaycolor[3] - 0.4;
-
-	color2.x = setting().Overlaycolor[0];
-	color2.y = setting().Overlaycolor[1];
-	color2.z = setting().Overlaycolor[2];
-	color2.w = 1;
-
-	color3.x = setting().Overlaycolor[0] + 0.3;
-	color3.y = setting().Overlaycolor[1] + 0.3;
-	color3.z = setting().Overlaycolor[2] + 0.3;
-	color3.w = setting().Overlaycolor[3] + 0.3;
-
-	color4.x = setting().Overlaycolor[0] - 0.1;
-	color4.y = setting().Overlaycolor[1] - 0.1;
-	color4.z = setting().Overlaycolor[2] - 0.1;
-	color4.w = setting().Overlaycolor[3] - 0.1;
-
-	color5.x = setting().Overlaycolor[0] + 0.1;
-	color5.y = setting().Overlaycolor[1] + 0.1;
-	color5.z = setting().Overlaycolor[2] + 0.1;
-	color5.w = setting().Overlaycolor[3] + 0.1;
-
-	color6.x = setting().BGcolor[0];
-	color6.y = setting().BGcolor[1];
-	color6.z = setting().BGcolor[2];
-	color6.w = setting().BGcolor[3];
-
-	//colors[ImGuiCol_Text] = ImVec4(1, 0, 0, 1);
-	colors[ImGuiCol_WindowBg] = color6;
-	colors[ImGuiCol_Border] = color2;
-	colors[ImGuiCol_BorderShadow] = color2;
-	colors[ImGuiCol_Button] = color3;
-	colors[ImGuiCol_ButtonHovered] = color1;
-	colors[ImGuiCol_ButtonActive] = color1;
-	colors[ImGuiCol_CheckMark] = ImVec4(1, 1, 1, 1);
-	colors[ImGuiCol_FrameBg] = color1;
-	colors[ImGuiCol_FrameBgHovered] = color3;
-	colors[ImGuiCol_FrameBgActive] = color3;
-	colors[ImGuiCol_Tab] = ImVec4(color5.x, color5.y, color5.z, color5.w - 0.2);
-	colors[ImGuiCol_TabHovered] = color3;
-	colors[ImGuiCol_TabActive] = color3;
-	colors[ImGuiCol_TitleBg] = color3;
-	colors[ImGuiCol_TitleBgActive] = color3;
-	colors[ImGuiCol_TitleBgCollapsed] = color3;
-	colors[ImGuiCol_SliderGrab] = color4;
-	colors[ImGuiCol_SliderGrabActive] = color4;
-	colors[ImGuiCol_TextSelectedBg] = color2;
-	colors[ImGuiCol_Header] = color1;
-	colors[ImGuiCol_HeaderHovered] = color1;
-	colors[ImGuiCol_HeaderActive] = color2;
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0);
+	colorSet();
 }
 
 void setup_imgui_menu() {
