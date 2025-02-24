@@ -77,6 +77,14 @@ CCArray* m_hideableUIElements;
 
 ObjectGroupInput* m_objectGroupInput = nullptr;
 
+void reorderObjectSection(gd::LevelEditorLayer* lel, gd::GameObject* obj) {
+	auto sObj = lel->m_levelSections->objectAtIndex(obj->m_sectionIdx);
+	lel->m_levelSections->removeObject((CCObject*)sObj, true);
+	lel->m_objectCount -= 1;
+	lel->addToSection(obj);
+	return;
+}
+
 class CircleToolPopup : public CCLayer { // FINALLY
 public:
 	static CircleToolPopup* create() {

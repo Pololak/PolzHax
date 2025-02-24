@@ -1,16 +1,36 @@
 #include "EditorObjectLayering.hpp"
 #include "utils.hpp"
 
-void reorderObjectSection(gd::LevelEditorLayer* lel, gd::GameObject* obj) {
-	auto sObj = lel->m_levelSections->objectAtIndex(obj->m_sectionIdx);
-	lel->m_levelSections->removeObject((CCObject*)sObj, true);
-	lel->m_objectCount -= 1;
-	lel->addToSection(obj);
-}
-
 void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, gd::GameObject* obj) {
 	switch (obj->m_objectID)
 	{
+	case 29:
+	case 30:
+	case 104:
+	case 105:
+	case 744:
+	case 221:
+	case 717:
+	case 718:
+	case 743:
+	case 31:
+	case 33:
+	case 32:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+	case 26:
+	case 27:
+	case 28:
+	case 55:
+	case 57:
+	case 58:
+	case 59:
+		if (obj && (obj->m_objectZ != 13)) {
+			obj->m_objectZ = 13;
+			//reorderObjectSection(editorLayer, obj);
+		} break;
 	case 10:
 	case 11:
 	case 12:
@@ -28,6 +48,19 @@ void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, 
 	case 472:
 	case 473:
 	case 474:
+		// outlines
+	case 467:
+	case 468:
+	case 469:
+	case 470:
+	case 471:
+	case 475:
+	case 661:
+	case 662:
+	case 663:
+	case 664:
+	case 665:
+	case 666:
 		if (obj && (obj->m_objectZ != 12)) {
 			obj->m_objectZ = 12;
 			//reorderObjectSection(editorLayer, obj);
@@ -105,18 +138,6 @@ void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, 
 	case 215:
 	case 220:
 	case 219:
-	case 467:
-	case 468:
-	case 469:
-	case 470:
-	case 471:
-	case 475:
-	case 661:
-	case 662:
-	case 663:
-	case 664:
-	case 665:
-	case 666:
 	case 146:
 	case 147:
 	case 206:
@@ -209,6 +230,11 @@ void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, 
 	case 243:
 	case 244:
 	case 135:
+		// unused slopes
+	case 371:
+	case 372:
+	case 373:
+	case 374:
 		if (obj && (obj->m_objectZ != 11)) {
 			obj->m_objectZ = 11;
 			//reorderObjectSection(editorLayer, obj);
@@ -251,6 +277,9 @@ void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, 
 	case 740:
 	case 741:
 	case 742:
+		// unused hazards
+	case 421:
+	case 422:
 		if (obj && (obj->m_objectZ != 10)) {
 			obj->m_objectZ = 10;
 			//reorderObjectSection(editorLayer, obj);
@@ -397,6 +426,9 @@ void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, 
 	case 148:
 	case 149:
 	case 405:
+		// unused hazards deco
+	case 419:
+	case 420:
 		if (obj && (obj->m_objectZ != 6)) {
 			obj->m_objectZ = 6;
 			//reorderObjectSection(editorLayer, obj);

@@ -325,10 +325,14 @@ void RenderMain() {
 		if (setting().onDontFade) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x90\x90", 2, NULL);
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\xeb\x11", 2, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe20), "\x90\x90", 2, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebdf6), "\x90\x90", 2, NULL);
 		}
 		else {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x74\x5d", 2, NULL);
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\x74\x11", 2, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe20), "\x75\x18", 2, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebdf6), "\x75\x42", 2, NULL);
 		}
 
 		if (setting().onDontEnter) {
@@ -834,6 +838,13 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xd772e), "\x76", 1, NULL);
 		}
 
+		if (setting().onDisableSongAlert) {
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9dd2b), "\xeb", 1, NULL);
+		}
+		else {
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9dd2b), "\x75", 1, NULL);
+		}
+
 		if (setting().onFastAlt) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x28DFE), "\x90\x90\x90\x90\x90\x90\x90", 7, NULL);
 		}
@@ -1124,11 +1135,13 @@ void RenderMain() {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x90\x90", 2, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\xeb\x11", 2, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe20), "\x90\x90", 2, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebdf6), "\x90\x90", 2, NULL);
 				}
 				else {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebddb), "\x74\x5d", 2, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe06), "\x74\x11", 2, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebe20), "\x75\x18", 2, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4ebdf6), "\x75\x42", 2, NULL);
 				}
 			}
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
@@ -2185,6 +2198,17 @@ void RenderMain() {
 			}
 
 			ImGui::Checkbox("Auto Safe Mode", &setting().onAutoSafe);
+
+			if (ImGui::Checkbox("Disable Song Alert", &setting().onDisableSongAlert)) {
+				if (setting().onDisableSongAlert) {
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9dd2b), "\xeb", 1, NULL);
+				}
+				else {
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9dd2b), "\x75", 1, NULL);
+				}
+			}
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Disables alert when trying to play a level without song downloaded.");
 
 			if (ImGui::Checkbox("Fast Alt-Tab", &setting().onFastAlt)) {
 				if (setting().onFastAlt) {

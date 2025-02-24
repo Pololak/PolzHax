@@ -155,7 +155,7 @@ struct SettingStruct {
     bool onSmartStartPos; //
     bool onRainbowIcon;
     bool onNoWaveTrailBehind;
-    bool onNoForceGlow;
+    bool onDisableSongAlert;
 
     float respawnTime = 1.f;
     float LevelGColor[3] = { 1, 1, 1 };
