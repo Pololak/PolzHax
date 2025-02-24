@@ -736,6 +736,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         noclipAccLabel->setOpacity(setting().labelsOpacity);
         noclipAccLabel->setTag(45079);
         noclipAccLabel->setPosition({ 2.f, size.height - 11.f * labelCount });
+        noclipAccLabel->setVisible(setting().onNoclip);
         labelsMenu->addChild(noclipAccLabel);
     }
 
@@ -749,6 +750,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         noclDeath->setOpacity(setting().labelsOpacity);
         noclDeath->setTag(45078);
         noclDeath->setPosition({ 2.f, size.height - 11.f * labelCount });
+        noclDeath->setVisible(setting().onNoclip);
         labelsMenu->addChild(noclDeath);
     }
 

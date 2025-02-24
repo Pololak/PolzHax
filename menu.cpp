@@ -1975,6 +1975,17 @@ void RenderMain() {
 				ImGui::SetTooltip("Allows you to jump in mid-air.");
 
 			if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
+				if (playLayer) {
+					auto labelsMenu = reinterpret_cast<CCMenu*>(playLayer->getChildByTag(7900));
+					auto noclDeath = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45078));
+					auto noclipAccLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45079));
+					if (setting().onNoclipAccuracy)
+						if (labelsMenu && noclipAccLabel)
+							noclipAccLabel->setVisible(setting().onNoclip);
+					if (setting().onNoclipDeaths)
+						if (labelsMenu && noclDeath)
+							noclDeath->setVisible(setting().onNoclip);
+				}
 				if (setting().onNoclip) {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xF04E9), "\xe9\xf0\x02\x00\x00\x90", 6, NULL);
 					cheatAdd();
