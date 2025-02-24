@@ -13,6 +13,17 @@ protected:
 		else {
 			m_parent->m_editorLayer->m_groupIDFilter = -1;
 		}
+		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(m_parent->getDeselectBtn(), 0xac)->getChildByTag(45028));
+		if (onBaseLayerBtn) {
+			if (m_parent->m_editorLayer->m_groupIDFilter > 0) {
+				onBaseLayerBtn->setVisible(1);
+				onBaseLayerBtn->setEnabled(true);
+			}
+			else {
+				onBaseLayerBtn->setVisible(0);
+				onBaseLayerBtn->setEnabled(false);
+			}
+		}
 	}
 public:
 	gd::CCTextInputNode* m_layerInput;

@@ -2539,6 +2539,10 @@ void __fastcall EditorUI::onGroupDownH(gd::EditorUI* self, void*, CCObject* obj)
 			onBaseLayerBtn->setVisible(0);
 			onBaseLayerBtn->setEnabled(false);
 		}
+		if (self->m_editorLayer->m_groupIDFilter > 0) {
+			onBaseLayerBtn->setVisible(1);
+			onBaseLayerBtn->setEnabled(true);
+		}
 	}
 	EditorUI::onGroupDown(self, obj);
 	if (m_editorLayerInput)
