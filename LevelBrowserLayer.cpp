@@ -68,7 +68,7 @@ public:
 			nullptr,
 			this,
 			menu_selector(GoToPagePopup::onClose));
-		closeBtn->setPosition({-100, 120});
+		closeBtn->setPosition({-105, 130});
 
 		menu->addChild(closeBtn);
 
