@@ -472,10 +472,6 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         //self->addChild(spswitchermenu);
     }
 
-    if (startPosArr->count() > 0) {
-        pressed = false;
-    }
-
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
     const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
 
