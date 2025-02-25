@@ -50,15 +50,11 @@ namespace PlayLayer {
 	inline void(__thiscall* removePlayer2)(gd::PlayLayer* self);
 	void __fastcall removePlayer2H(gd::PlayLayer* self);
 
-	inline void(__thiscall* markCheckpoint)(gd::PlayLayer*);
-	void __fastcall markCheckpointH(gd::PlayLayer* self);
+	//inline void(__thiscall* markCheckpoint)(gd::PlayLayer*);
+	//void __fastcall markCheckpointH(gd::PlayLayer* self);
 
 	void onNextStartPos();
 	void onPrevStartPos();
-
-	typedef void* (__thiscall* fCCApplication_toggleVerticalSync)(void* instance, bool on);
-
-	extern fCCApplication_toggleVerticalSync CCApplication_toggleVerticalSync;
 
 	class Callback {
 	public:
@@ -93,7 +89,7 @@ namespace PauseLayer {
 	class Callback {
 	public:
 		void PercentageToggler(CCObject*);
-		void onCopyLevel(CCObject*);
+		//void onCopyLevel(CCObject*);
 	};
 
 	void mem_init();
@@ -130,17 +126,17 @@ namespace PlayerObject {
 }
 
 namespace GameObject {
-	inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
-	void __fastcall setOpacityH(gd::GameObject* self, void* edx, GLubyte opacity);
+	//inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
+	//void __fastcall setOpacityH(gd::GameObject* self, void* edx, GLubyte opacity);
 
-	inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
-	void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
+	//inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
+	//void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
 
 	inline int*(__thiscall* getEditorColor)(gd::GameObject*, cocos2d::ccColor4B);
 	void __fastcall getEditorColorH(gd::GameObject* self, void* edx, cocos2d::ccColor4B color);
 
-	inline void(__thiscall* activateObject)(gd::GameObject*);
-	void __fastcall activateObjectH(gd::GameObject* self);
+	//inline void(__thiscall* activateObject)(gd::GameObject*);
+	//void __fastcall activateObjectH(gd::GameObject* self);
 
 	void mem_init();
 }
@@ -153,6 +149,6 @@ namespace CCCircleWave {
 }
 
 namespace RingObject {
-	inline void(__thiscall* spawnCircle)(CCObject*);
-	void __fastcall spawnCircleH(CCObject* effect);
+	//inline void(__thiscall* spawnCircle)(CCObject*);
+	//void __fastcall spawnCircleH(CCObject* effect);
 }

@@ -29,7 +29,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -42,13 +42,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -110,7 +110,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)libs\MinHook;$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)cappuccino-sdk\incl\cocos2dx;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\kazmath\include;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES;$(SolutionDir)cappuccino-sdk\incl\cocos2dx\platform\third_party\win32\OGLES\GL;$(SolutionDir)cappuccino-sdk\incl\extensions;$(SolutionDir)cappuccino-sdk\incl\extensions\AssetsManager;$(SolutionDir)cappuccino-sdk\incl\extensions\CCBReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Action;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\animation;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\datas;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\display;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\external_tool;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\physics;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Armature\utils;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Components;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\BaseClasses;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\Layouts;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\System;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets\Compatible;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json\rapidjson;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Json\rapidjson\internal;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ButtonReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\CheckBoxReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ImageViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelAtlasReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelBMFontReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LabelReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LayoutReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ListViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\LoadingBarReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\PageViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\ScrollViewReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\SliderReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Reader\WidgetReader\TextFieldReader;$(SolutionDir)cappuccino-sdk\incl\extensions\CocoStudio\Trigger;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCControlExtension;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCEditBox;$(SolutionDir)cappuccino-sdk\incl\extensions\GUI\CCScrollView;$(SolutionDir)cappuccino-sdk\incl\extensions\LocalStorage;$(SolutionDir)cappuccino-sdk\incl\extensions\network;$(SolutionDir)cappuccino-sdk\incl\extensions\physics_nodes;$(SolutionDir)cappuccino-sdk\incl\extensions\spine;$(SolutionDir)libs\imgui-hook;$(SolutionDir)libs\imgui-hook\imgui;$(SolutionDir)libs\imgui-hook\imgui\backends;$(SolutionDir)libs\imgui-hook\imgui\misc;$(SolutionDir)libs\mat-dash;$(SolutionDir)libs\mat-dash\include;$(SolutionDir)libs\mat-dash\include\matdash;$(SolutionDir)libs\mat-dash\include\matdash\detail;$(SolutionDir)libs\imgui-hook\imgui\misc\cpp;$(SolutionDir)libs\detours;$(SolutionDir)libs\nfd\src\include;$(SolutionDir)libs\nfd\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>-D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>

@@ -84,10 +84,6 @@ gd::CCMenuItemSpriteExtra* showEndLayerButton;
 
 CCMenu* pauseLayerTogglerMenu;
 
-PlayLayer::fCCApplication_toggleVerticalSync PlayLayer::CCApplication_toggleVerticalSync =
-(PlayLayer::fCCApplication_toggleVerticalSync)GetProcAddress(GetModuleHandleA("libcocos2d.dll"),
-    "?toggleVerticalSync@CCApplication@cocos2d@@QAEX_N@Z");
-
 ccColor3B getChromaColour() {
     return ColorUtility::hsvToRgb(cchsv((updateRgb * 180) / 10.f, 1.f, 1.f, true, true));
 }

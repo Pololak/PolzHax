@@ -867,13 +867,13 @@ public:
 		}
 		else {
 			auto trigger = triggers[bound - 1];
-				if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
+				if (trigger->triggerDuration() < 0) trigger->m_triggerDuration = 0;
 				GDColor color_to = trigger;
 				auto dist = time_between_pos(trigger->getPosition().x, pos) / (trigger->triggerDuration());
 				auto color_from = starting_color;
 				if (bound > 1) {
 					auto trigger = triggers[bound - 2];
-						if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
+						if (trigger->triggerDuration() < 0) trigger->m_triggerDuration = 0;
 						auto dist = time_between_pos(trigger->getPosition().x, pos) / trigger->triggerDuration();
 						color_from = trigger;
 						if (dist < 1.f)
