@@ -57,7 +57,7 @@ namespace gd {
                 return from<SliderThumb*>((this->getTouchLogic()), 0x13C);
             }
             float getValue() {
-                return from<float>((this->getThumb()), 0x2C);
+                return this->getTouchLogic()->getThumb()->getValue();
             }
             void setValue(float newVal) {
                 from<float>((this->getThumb()), 0x2C) = newVal;

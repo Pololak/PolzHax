@@ -449,10 +449,15 @@ public:
     }
 };
 
+CCArray* savedLevelsArray;
+CCObject* savedGameLevel;
+
 class MoveToTopProtocolLIL : public gd::FLAlertLayerProtocol {
 public:
     void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override {
         if (btn2) {
+            auto savedLevels = gd::GameLevelManager::sharedState()->getSavedLevels();
+            std::cout << savedLevels->count() << std::endl;
 
         }
     }
@@ -569,9 +574,6 @@ bool __fastcall EditLevelLayer_init_H(gd::EditLevelLayer* self, void*, gd::GJGam
 //    }
 //}
 
-CCArray* savedLevelsArray;
-CCObject* savedGameLevel;
-
 bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	if (!matdash::orig<&LevelInfoLayer_init>(self, level)) return false;
 
@@ -583,13 +585,13 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
 
+    auto rightMenu = static_cast<CCMenu*>(self->m_likeBtn->getParent());
     //savedGameLevel = (CCObject*)level;
 
-    //auto menu = CCMenu::create();
     //auto moveToTopSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
     //auto moveToTop = gd::CCMenuItemSpriteExtra::create(moveToTopSpr, nullptr, self, menu_selector(LevelInfoLayerCB::onMoveToTop));
-    //menu->addChild(moveToTop);
-    //self->addChild(menu);
+    //moveToTop->setPosition(rightMenu->convertToNodeSpace({ director->getScreenRight() - 75.f, director->getScreenBottom() + 55.f }));
+    //rightMenu->addChild(moveToTop);
 
     if (setting().onAutoDownloadSong) {
         auto songWidget = reinterpret_cast<gd::CustomSongWidget*>(self->getChildren()->objectAtIndex(26)); // FUCK YOU
@@ -604,7 +606,6 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
     //garageRope->setPosition(self->m_likeBtn->getParent()->convertToNodeSpace({ director->getScreenRight() - 84.f, director->getScreenTop() - 30.f}));
     //self->m_likeBtn->getParent()->addChild(garageRope);
 
-    auto rightMenu = static_cast<CCMenu*>(self->m_likeBtn->getParent());
     auto btn_spr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
     if (!btn_spr->initWithFile("BE_Export_File.png")) {
         btn_spr->initWithSpriteFrameName("GJ_downloadBtn_001.png");
