@@ -1407,6 +1407,16 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->player1()->waveTrail()->setVisible(1);
         self->player2()->waveTrail()->setVisible(1);
     }
+
+    //ccColor3B bgColor = ccc3(40, 125, 255);
+    //ccColor3B gColor = ccc3(0, 102, 255);
+    //if (setting().onShowLayout) {
+    //    self->m_backgroundSprite->setColor(bgColor);
+    //    self->m_bottomGround->groundSprite()->setColor(gColor);
+    //    self->m_topGround->groundSprite()->setColor(gColor);
+    //    self->m_bottomGround->lineSprite()->setColor(ccc3(255, 255, 255));
+    //    self->m_topGround->lineSprite()->setColor(ccc3(255, 255, 255));
+    //}
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {
@@ -1772,6 +1782,54 @@ void __fastcall GameObject::getEditorColorH(gd::GameObject* self, void* edx, coc
     if (self->isInvisible()) *a = 0x0A007FFF;
 }
 
+//bool m_realVisible;
+//_ccColor3B m_realColor;
+//
+//void __fastcall GameObject::setVisibleH(gd::GameObject* self, void*, bool visible) {
+//    if (setting().onShowLayout) {
+//        m_realVisible = visible;
+//
+//        if (self->m_objectType == gd::GameObjectType::kGameObjectTypeDecoration) {
+//            GameObject::setVisible(self, false);
+//        }
+//        else {
+//            GameObject::setVisible(self, visible);
+//            GameObject::setVisible(self, true);
+//        }
+//    }
+//    else GameObject::setVisible(self, visible);
+//}
+//
+//void __fastcall GameObject::setOpacityH(gd::GameObject* self, void*, GLubyte opacity) {
+//    GameObject::setOpacity(self, opacity);
+//
+//    //if (setting().onShowLayout && self->m_objectType != gd::GameObjectType::kGameObjectTypeDecoration) {
+//    //    self->setOpacity(255);
+//    //    if (self->m_glowSprite)
+//    //        self->m_glowSprite->setOpacity(255);
+//    //}
+//}
+//
+//void __fastcall GameObject::setGlowColorH(gd::GameObject* self, void*, _ccColor3B const& color) {
+//    if (setting().onShowLayout)
+//        GameObject::setGlowColor(self, ccc3(255, 255, 255));
+//    else
+//        GameObject::setGlowColor(self, color);
+//}
+//
+//void __fastcall GameObject::setObjectColorH(gd::GameObject* self, void*, _ccColor3B const& color) {
+//    if (setting().onShowLayout) {
+//        GameObject::setObjectColor(self, ccc3(255, 255, 255));
+//        if (self->m_glowSprite)
+//            self->m_glowSprite->setColor(ccc3(255, 255, 255));
+//    }
+//    else {
+//        GameObject::setObjectColor(self, color);
+//        if (self->m_glowSprite)
+//            self->m_glowSprite->setColor(color);
+//    }
+//}
+
 void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
     if (setting().onBallRotationFix) {
         self->stopActionByTag(1);
@@ -1864,6 +1922,10 @@ void PlayerObject::mem_init() {
 
 void GameObject::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72d20), GameObject::setVisibleH, reinterpret_cast<void**>(&GameObject::setVisible));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setOpacityH, reinterpret_cast<void**>(&GameObject::setOpacity));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x72a60), GameObject::setGlowColorH, reinterpret_cast<void**>(&GameObject::setGlowColor));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x75560), GameObject::setObjectColorH, reinterpret_cast<void**>(&GameObject::setObjectColor));
 }
 
 void CCCircleWave::mem_init() {

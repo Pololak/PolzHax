@@ -1073,6 +1073,7 @@ public:
 		(this->*m_current_color)[gd::CustomColorMode::Col2] = color2.blending;
 		(this->*m_current_color)[gd::CustomColorMode::Col3] = color3.blending;
 		(this->*m_current_color)[gd::CustomColorMode::Col4] = color4.blending;
+		(this->*m_current_color)[gd::CustomColorMode::DL] = dl_color.blending;
 
 		this->backgroundSprite()->setColor(bg_color);
 
