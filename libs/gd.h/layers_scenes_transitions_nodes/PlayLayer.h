@@ -313,6 +313,9 @@ namespace gd {
 		cocos2d::CCArray* getCheckpoints() {
 			return from<cocos2d::CCArray*>(this, 0x154);
 		}
+		void delayedResetLevel() {
+			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f10)(this);
+		}
 	};
 }
 

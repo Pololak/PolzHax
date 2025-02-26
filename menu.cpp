@@ -414,9 +414,11 @@ void RenderMain() {
 
 		if (setting().onNoDeathEffect) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\xe9\xe7\x01\x00\x00\x90", 6, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f05dc), "\xeb\x1b", 2, NULL);
 		}
 		else {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f05dc), "\x74\x1b", 2, NULL);
 		}
 
 		//if (setting().onNoForceGlow) {
@@ -1315,9 +1317,11 @@ void RenderMain() {
 			if (ImGui::Checkbox("No Death Effect", &setting().onNoDeathEffect)) {
 				if (setting().onNoDeathEffect) {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\xe9\xe7\x01\x00\x00\x90", 6, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f05dc), "\xeb\x1b", 2, NULL);
 				}
 				else {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4dde71), "\x0f\x84\xd5\x01\x00\x00", 6, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f05dc), "\x74\x1b", 2, NULL);
 				}
 			}
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
@@ -2118,7 +2122,6 @@ void RenderMain() {
 
 		if (ImGui::Begin("Shortcuts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
 			ImGui::SetWindowFontScale(setting().UISize);
-			ImGui::SetNextItemWidth(120 * setting().UISize);
 
 			float winWidth = ImGui::GetWindowSize().x;
 
@@ -2172,6 +2175,9 @@ void RenderMain() {
 					from<int>(level, 0x1dc) = 0;
 
 					gd::FLAlertLayer::create(nullptr, "Success", "Save & Load your data to apply the changes.", "OK", nullptr, 300.f, false, 120.f)->show();
+				}
+				else {
+					gd::FLAlertLayer::create(nullptr, "Error", "You need to enter the level first.", "OK", nullptr, 300.f, false, 120.f)->show();
 				}
 			}
 

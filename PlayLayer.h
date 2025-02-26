@@ -126,17 +126,17 @@ namespace PlayerObject {
 }
 
 namespace GameObject {
-	inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
-	void __fastcall setOpacityH(gd::GameObject* self, void* edx, GLubyte opacity);
+	//inline void(__thiscall* setOpacity)(gd::GameObject*, GLubyte);
+	//void __fastcall setOpacityH(gd::GameObject* self, void* edx, GLubyte opacity);
 
-	inline void(__thiscall* setVisible)(gd::GameObject*, bool);
-	void __fastcall setVisibleH(gd::GameObject*, void*, bool);
+	//inline void(__thiscall* setVisible)(gd::GameObject*, bool);
+	//void __fastcall setVisibleH(gd::GameObject*, void*, bool);
 
-	inline void(__thiscall* setGlowColor)(gd::GameObject*, _ccColor3B const&);
-	void __fastcall setGlowColorH(gd::GameObject*, void*, _ccColor3B const&);
+	//inline void(__thiscall* setGlowColor)(gd::GameObject*, _ccColor3B const&);
+	//void __fastcall setGlowColorH(gd::GameObject*, void*, _ccColor3B const&);
 
-	inline void(__thiscall* setObjectColor)(gd::GameObject*, _ccColor3B const&);
-	void __fastcall setObjectColorH(gd::GameObject*, void*, _ccColor3B const&);
+	//inline void(__thiscall* setObjectColor)(gd::GameObject*, _ccColor3B const&);
+	//void __fastcall setObjectColorH(gd::GameObject*, void*, _ccColor3B const&);
 
 	//inline void(__thiscall* shouldBlendColor)(gd::GameObject*);
 	//void __fastcall shouldBlendColor_H(gd::GameObject* self, void* edx);
