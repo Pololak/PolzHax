@@ -3074,10 +3074,13 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	//		switch (obj->getObjectID())
 	//		{
 	//		case 29:
+	//			glLineWidth(2);
+	//			ccDrawColor4B(0xFF, 0xFF, 0xFF, 0xFF);
+	//			ccDrawLine(obj->getPosition(), { (timeBetweenPosition(obj->getPosition().x, MyEditorLayer::s_instance->get_preview_pos()) / obj->m_triggerDuration), obj->getPosition().y });
 	//			break;
 	//		}
 	//	}
-	//}	
+	//}
 }
 
 //void __fastcall LevelEditorLayer::drawH(gd::LevelEditorLayer* self) {

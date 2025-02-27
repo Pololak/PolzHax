@@ -1927,7 +1927,14 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Fixes vehicles rotation on high fps (affects hitboxes).");
 
-			ImGui::Checkbox("Hitboxes", &setting().onHitboxes);
+			if (ImGui::Checkbox("Hitboxes", &setting().onHitboxes)) {
+				if (setting().onHitboxes) {
+					cheatAdd();
+				}
+				else {
+					cheatDec();
+				}
+			}
 			ImGui::SameLine();
 			if (ImGui::TreeNode("##hitboxesSettings")) {
 				ImGui::SetNextItemWidth(setting().UISize * 60);
