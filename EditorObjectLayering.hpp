@@ -2,5 +2,5 @@
 #include "pch.h"
 
 namespace EditorObjectLayering {
-	void updateObjLayering(gd::LevelEditorLayer*, gd::GameObject*);
+	void updateObjLayering(gd::GameObject*);
 }

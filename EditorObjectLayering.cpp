@@ -1,7 +1,7 @@
 #include "EditorObjectLayering.hpp"
 #include "utils.hpp"
 
-void EditorObjectLayering::updateObjLayering(gd::LevelEditorLayer* editorLayer, gd::GameObject* obj) {
+void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
 	switch (obj->m_objectID)
 	{
 	case 29:

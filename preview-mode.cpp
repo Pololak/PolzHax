@@ -1126,8 +1126,8 @@ public:
 					break; // bro
 				default:;
 				}
-				if (gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
-					EditorObjectLayering::updateObjLayering(this, object);
+				//if (gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
+				//	EditorObjectLayering::updateObjLayering(this, object);
 			}
 		}
 	}
@@ -3164,12 +3164,15 @@ void(__thiscall* GameObject_customSetup)(gd::GameObject*);
 void __fastcall GameObject_customSetupH(gd::GameObject* self) {
 	GameObject_customSetup(self);
 
-	if (editUI && setting().onHitboxBugFix) {
-		if (self->canRotateFree() && self->m_objectRadius == 0) {
-			self->m_isOriented = true;
-			self->updateOrientedBox();
-		}
-	}
+	//if (editUI && setting().onHitboxBugFix) {
+	//	if (self->canRotateFree() && self->m_objectRadius == 0) {
+	//		self->m_isOriented = true;
+	//		self->updateOrientedBox();
+	//	}
+	//}
+
+	if (editUI && gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
+		EditorObjectLayering::updateObjLayering(self);
 }
 
 //gd::CCMenuItemSpriteExtra* __fastcall EditorUI::getSpriteButtonH(gd::EditorUI* self, void*, const char* sprite, SEL_MenuHandler callback, CCMenu* menu, float scale, int buttonID, CCPoint idk) {
@@ -3272,7 +3275,7 @@ void EditorUI::mem_init() {
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8110), BoomScrollLayer_updateDotsH, reinterpret_cast<void**>(&BoomScrollLayer_updateDots));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x79b0), BoomScrollLayer_initH, reinterpret_cast<void**>(&BoomScrollLayer_init));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject_customSetupH, reinterpret_cast<void**>(&GameObject_customSetup));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject_customSetupH, reinterpret_cast<void**>(&GameObject_customSetup));
 }
 
 void EditorPauseLayer::mem_init() {
