@@ -8,7 +8,7 @@ namespace PlayLayer {
 	inline bool(__thiscall* init)(gd::PlayLayer* self, gd::GJGameLevel* level);
 	bool __fastcall init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level);
 
-	inline bool(__thiscall* update)(gd::PlayLayer* self, float dt);
+	inline void(__thiscall* update)(gd::PlayLayer* self, float dt);
 	void __fastcall update_H(gd::PlayLayer* self, void*, float dt);
 
 	inline bool(__thiscall* resume)(CCLayer* self);
@@ -121,6 +121,9 @@ namespace PlayerObject {
 
 	inline void(__thiscall* togglePlayerScale)(gd::PlayerObject*, bool);
 	void __fastcall togglePlayerScaleH(gd::PlayerObject*, void*, bool);
+
+	//inline bool(__thiscall* collidedWithObject)(gd::PlayerObject*, float, gd::GameObject*, CCRect);
+	//bool __fastcall collidedWithObjectH(gd::PlayerObject*, void*, float, gd::GameObject*, CCRect);
 
 	void mem_init();
 }

@@ -36,9 +36,6 @@ std::vector<time_t> m_clickFrames;
 int m_totalClicks = 0;
 bool m_isHolding = false;
 
-bool inTestmode;
-int smoothOut;
-
 std::set<int>pulseObjects = {
     50, 51, 52, 53, 54, 60, 148, 149, 405,
     37 // that pulse things on sticks
@@ -92,6 +89,10 @@ ccColor4F getChromaColour4() {
     auto color3b = ColorUtility::hsvToRgb(cchsv((updateRgb * 180) / 10.0f, 1.0f, 1.0f, true, true));
     return ccColor4F(color3b.r, color3b.g, color3b.b, 255);
 }
+
+int smoothOut;
+bool inPracticeF;
+bool inTestmodeF;
 
 void PlayLayer::onNextStartPos() {
     if (playLayer && !playLayer->hasCompletedLevel()) {
@@ -322,6 +323,10 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
         startPercent = (self->getPlayerStartPosition().x / self->levelLength()) * 100.f;
     }
 
+    if (inTestmodeF || inPracticeF) {
+        smoothOut = 2;
+    }
+
     PlayLayer::resetLevel(self);
 
     if (setting().onPracticeFix) {
@@ -377,6 +382,10 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
             }
         }
     }
+
+    inPracticeF = false;
+    inTestmodeF = self->m_testMode;
+    smoothOut = 0;
 
     std::cout << "Level Name: " << std::string(level->m_levelName).c_str() << std::endl;
 
@@ -904,6 +913,7 @@ void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void* edx, b
         inPractice = practice;
     }
     PlayLayer::togglePracticeMode(self, practice);
+    inPracticeF = practice;
 }
 
 void __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
@@ -935,6 +945,20 @@ void __fastcall PlayLayer::removeLastCheckpointH(gd::PlayLayer* self) {
 void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
     isPlayerDead = false;
+
+    //if (setting().onCheckpointLagFix) {
+    //    if (!smoothOut) {
+    //        return PlayLayer::update(self, dt);
+    //    }
+
+    //    float time = CCDirector::sharedDirector()->getAnimationInterval();
+    //    if (smoothOut != 0 && dt - time < 1) {
+    //        smoothOut--;
+    //    }
+
+    //    PlayLayer::update(self, time);
+    //}
+    //else
 
     PlayLayer::update(self, dt);
 

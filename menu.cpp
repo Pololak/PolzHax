@@ -1888,6 +1888,8 @@ void RenderMain() {
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Fixes that ball rotation bug when entering a portal mid ball animation.");
 
+			//ImGui::Checkbox("Checkpoint Lag Fix", &setting().onCheckpointLagFix);
+
 			if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
 				if (setting().onConfirmExit) {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4d7f80), "\x90\x90\x90\x90\x90", 5, NULL);

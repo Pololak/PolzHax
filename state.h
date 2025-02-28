@@ -196,7 +196,7 @@ struct SettingStruct {
     bool onAutoKill;
     int killPercent = 50;
 
-    bool onVSync;
+    bool onCheckpointLagFix;
     bool onHidePauseButton;
 
     bool onAutoDeafen;
