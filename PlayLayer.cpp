@@ -1319,12 +1319,12 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
 
     hasClicked = false;
 
-    auto hardStreak_p1 = from<gd::HardStreak*>(self->player1(), 0x394);
-    auto hardStreak_p2 = from<gd::HardStreak*>(self->player2(), 0x394);
-    if (setting().onNoWavePulse) {
-        hardStreak_p1->pulseSize() = setting().wavePulseSize;
-        hardStreak_p2->pulseSize() = setting().wavePulseSize;
-    }
+    //auto hardStreak_p1 = from<gd::HardStreak*>(self->player1(), 0x394);
+    //auto hardStreak_p2 = from<gd::HardStreak*>(self->player2(), 0x394);
+    //if (setting().onNoWavePulse) {
+    //    hardStreak_p1->pulseSize() = setting().wavePulseSize;
+    //    hardStreak_p2->pulseSize() = setting().wavePulseSize;
+    //}
 
     //if (setting().onShowLayout) {
     //    self->getBackgroundSprite()->setColor(

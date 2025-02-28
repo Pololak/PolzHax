@@ -719,6 +719,12 @@ void __fastcall LevelCell_loadCustomLevelCellH(gd::LevelCell* self) {
     from<CCLayer*>(self, 0x16c)->addChild(idLabel);
 }
 
+void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
+void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float dt) {
+    if (setting().onNoWavePulse) self->m_pulseSize = setting().wavePulseSize;
+    HardStreak_updateStroke(self, dt);
+}
+
 DWORD WINAPI my_thread(void* hModule) {
     //setting().loadState();
 
@@ -808,6 +814,7 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject::fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject::fadeOutStreak2));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x13e90), CCTextInputNode_updateLabelH, reinterpret_cast<void**>(&CCTextInputNode_updateLabel));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x30360), LevelCell_loadCustomLevelCellH, reinterpret_cast<void**>(&LevelCell_loadCustomLevelCell));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 
