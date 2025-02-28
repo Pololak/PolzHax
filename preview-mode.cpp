@@ -164,6 +164,10 @@ public:
 		angle_input->set_value(m_angle);
 		angle_input->setPosition(ccp(-60, 38) + offset);
 		angle_input->setZOrder(5);
+		angle_input->callback = [&](FloatInputNode& input) {
+			m_angle = input.get_value().value_or(m_angle);
+			this->update_labels();
+			};
 		this->addChild(angle_input);
 
 		auto stepLabel = CCLabelBMFont::create("Step:", "goldFont.fnt");
@@ -175,6 +179,11 @@ public:
 		step_input->set_value(m_step);
 		step_input->setPosition(ccp(60, 38) + offset);
 		step_input->setZOrder(5);
+		step_input->callback = [&](FloatInputNode& input) {
+			m_step = input.get_value().value_or(m_step);
+			if (m_step == 0.f) m_step = 1.f;
+			this->update_labels();
+			};
 		this->addChild(step_input);
 
 		m_circleToolLabel = CCLabelBMFont::create("copies: 69\nobjects: 69420", "chatFont.fnt", 0.f, kCCTextAlignmentLeft);
@@ -990,14 +999,14 @@ public:
 			}
 		}
 
-		if (circleToolPopup) {
-			m_angle = angle_input->get_value().value_or(m_angle);
-			m_step = step_input->get_value().value_or(m_step);
-			auto objs = editUI->getSelectedObjectsOfCCArray();
-			const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
-			const auto obj_count = amt * objs->count();
-			m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
-		}
+		//if (circleToolPopup) {
+		//	m_angle = angle_input->get_value().value_or(m_angle);
+		//	m_step = step_input->get_value().value_or(m_step);
+		//	auto objs = editUI->getSelectedObjectsOfCCArray();
+		//	const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
+		//	const auto obj_count = amt * objs->count();
+		//	m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
+		//}
 
 		if (is_editor_paused) return;
 		if (!setting().onEditorPreview) {
