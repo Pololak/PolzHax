@@ -272,7 +272,7 @@ bool __fastcall CustomSongWidget_initH(gd::CustomSongWidget* self, void* edx, gd
     auto menu = from<CCMenu*>(self, 0xf4);
 
     if (reinterpret_cast<CCSprite*>(from<CCLabelBMFont*>(self, 0x100)->getChildren()->objectAtIndex(0))->isVisible()) {
-        auto moreButtonPos = from<gd::CCMenuItemSpriteExtra*>(self, 0x11c)->getPosition();
+        auto& moreButtonPos = from<gd::CCMenuItemSpriteExtra*>(self, 0x11c)->getPosition();
 
         auto copyButton_spr = gd::ButtonSprite::create("Copy", 0x32, 0, 1.5f, true, "bigFont.fnt", "GJ_button_04.png", 25.f);
         auto copyButton_btn = gd::CCMenuItemSpriteExtra::create(copyButton_spr, copyButton_spr, self, menu_selector(CustomSongWidgetCallback::onCopy));
@@ -740,8 +740,8 @@ DWORD WINAPI my_thread(void* hModule) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
 
-    AllocConsole();
-    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    //AllocConsole();
+    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
     auto cocos_ext = GetModuleHandleA("libExtensions.dll");
