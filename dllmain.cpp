@@ -730,6 +730,8 @@ DWORD WINAPI my_thread(void* hModule) {
 
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x43A49B), "\xB8\x01\x00\x00\x00\x90\x90", 7, NULL); // Play Music Button
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x428bd5), "\x6a\x00", 2, NULL); // rgba8888 format (better texture quality and colors)
+    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x8fa56), "\x6c", 1, NULL); // LevelEditorLayer::checkCollisions fixes flipGravity
+    WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x90656), "\x6c", 2, NULL); // LevelEditorLayer::flipGravity fixes gravity for duals (ex. swingcopter)
 
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x54083C), &serverString, 8, 0);
