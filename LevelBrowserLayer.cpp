@@ -178,35 +178,37 @@ public:
 };
 
 void updateButtonLabel() {
-	auto currentPage = (from<int>(levelBrowserLayer, 0x140)) / 10 + 1;
-	m_moveToPageButtonSprite->getLabel()->setString(CCString::createWithFormat("%i", currentPage)->getCString());
+	if (m_moveToPageButtonSprite) {
+		auto currentPage = (from<int>(levelBrowserLayer, 0x140)) / 10 + 1;
+		m_moveToPageButtonSprite->getLabel()->setString(CCString::createWithFormat("%i", currentPage)->getCString());
+	}
 }
 
 void LevelBrowserLayer::Callback::onRefresh(CCObject*) {
-    if (from<gd::GJSearchObject*>(levelBrowserLayer, 0x134) != nullptr) {	
-        auto searchObject = from<gd::GJSearchObject*>(levelBrowserLayer, 0x134);
+    if (from<gd::GJSearchObject*>(this, 0x134) != nullptr) {	
+        auto searchObject = from<gd::GJSearchObject*>(this, 0x134);
         std::cout << searchObject->getKey() << " getKey" << std::endl;
 		gd::GameLevelManager::sharedState()->resetTimerForKey(searchObject->getKey());
-        levelBrowserLayer->loadPage(searchObject);
-        if (from<bool>(levelBrowserLayer, 0x9c) != 0)
-            from<bool>(levelBrowserLayer, 0x9c) = 0;
+        this->loadPage(searchObject);
+        if (from<bool>(this, 0x9c) != 0)
+            from<bool>(this, 0x9c) = 0;
     }
     return;
 }
 
 void LevelBrowserLayer::Callback::onLastPage(CCObject*) {
-    auto searchObject = from<gd::GJSearchObject*>(levelBrowserLayer, 0x134);
-    searchObject->m_page = from<int>(levelBrowserLayer, 0x13c) / 10;
-    levelBrowserLayer->loadPage(searchObject);
+    auto searchObject = from<gd::GJSearchObject*>(this, 0x134);
+    searchObject->m_page = from<int>(this, 0x13c) / 10;
+    this->loadPage(searchObject);
     updateButtonLabel();
 	m_moveToLast->setVisible(0);
 	m_moveToFirst->setVisible(1);
 }
 
 void LevelBrowserLayer::Callback::onFirstPage(CCObject*) {
-    auto searchObject = from<gd::GJSearchObject*>(levelBrowserLayer, 0x134);
+    auto searchObject = from<gd::GJSearchObject*>(this, 0x134);
     searchObject->m_page = 0;
-    levelBrowserLayer->loadPage(searchObject);
+    this->loadPage(searchObject);
     updateButtonLabel();
 	m_moveToFirst->setVisible(0);
 	m_moveToLast->setVisible(1);
@@ -314,7 +316,7 @@ void __fastcall LevelBrowserLayer::onNextPageH(gd::LevelBrowserLayer* self, void
 				m_moveToLast->setVisible(0);
 		}
 	}
-    std::cout << from<gd::GJSearchObject*>(levelBrowserLayer, 0x134)->m_page << std::endl;
+    std::cout << from<gd::GJSearchObject*>(self, 0x134)->m_page << std::endl;
 }
 
 void __fastcall LevelBrowserLayer::onPrevPageH(gd::LevelBrowserLayer* self, void*, CCObject* sender) {
@@ -333,11 +335,20 @@ void __fastcall LevelBrowserLayer::onPrevPageH(gd::LevelBrowserLayer* self, void
 			m_moveToLast->setVisible(1);
 		}
 	}
-    std::cout << from<gd::GJSearchObject*>(levelBrowserLayer, 0x134)->m_page << std::endl;
+    std::cout << from<gd::GJSearchObject*>(self, 0x134)->m_page << std::endl;
+}
+
+void __fastcall LevelBrowserLayer::dtorH(gd::LevelBrowserLayer* self) {
+	m_moveToPageButtonSprite = nullptr;
+	m_moveToFirst = nullptr;
+	m_moveToLast = nullptr;
+	LevelBrowserLayer::dtor(self);
+	std::cout << "LevelBrowserLayer::dtor" << std::endl;
 }
 
 void LevelBrowserLayer::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x89590), LevelBrowserLayer::initH, reinterpret_cast<void**>(&LevelBrowserLayer::init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ac70), LevelBrowserLayer::onNextPageH, reinterpret_cast<void**>(&LevelBrowserLayer::onNextPage));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ad10), LevelBrowserLayer::onPrevPageH, reinterpret_cast<void**>(&LevelBrowserLayer::onPrevPage));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x89330), LevelBrowserLayer::dtorH, reinterpret_cast<void**>(&LevelBrowserLayer::dtor));
 }

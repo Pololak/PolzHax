@@ -1201,12 +1201,23 @@ void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, flo
 			Hitboxes::drawPlayerHitbox(self->player2(), playerDrawNode);
 		}
 	}
+}
 
-	if (self->m_player) {
-		if (self->m_player->m_hardStreak) {
-			std::cout << self->m_player->m_hardStreak->m_pointArray << std::endl;
-		}
-	}
+void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* self, void*, gd::PlayerObject* player, bool idc, bool idc2) {
+	//if (self->m_dualMode && !self->m_levelSettings->m_twoPlayerMode) {
+	//	LevelEditorLayer::flipGravity(self, player, idc, idc2);
+	//}
+	//else if (self->m_dualMode && self->m_levelSettings->m_twoPlayerMode)
+	//		player->flipGravity(idc, idc2);
+	////if (player->m_gravityFlipped != idc) {
+	////	player->flipGravity(idc, idc2);
+	////	if (self->m_dualMode) {
+	////		if (!self->m_levelSettings->m_twoPlayerMode) {
+	////			LevelEditorLayer::flipGravity(self, player, idc, idc2);
+	////		}
+	////	}
+	////}
+	LevelEditorLayer::flipGravity(self, player, idc, idc2);
 }
 
 bool EditorPauseLayer_init(void* self, void* idc) {
@@ -3243,6 +3254,7 @@ void Scheduler::mem_init() {
 void LevelEditorLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8e180), LevelEditorLayer::removeObjectH, reinterpret_cast<void**>(&LevelEditorLayer::removeObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x91620), LevelEditorLayer::updateH, reinterpret_cast<void**>(&LevelEditorLayer::update));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x905b0), LevelEditorLayer::flipGravityH, reinterpret_cast<void**>(&LevelEditorLayer::flipGravity));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee5e0), LevelEditorLayer::drawH, reinterpret_cast<void**>(&LevelEditorLayer::draw));
 }
 

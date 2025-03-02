@@ -11,6 +11,9 @@ namespace LevelBrowserLayer {
 	inline void(__thiscall* onPrevPage)(gd::LevelBrowserLayer*, CCObject*);
 	void __fastcall onPrevPageH(gd::LevelBrowserLayer* self, void*, CCObject* sender);
 
+	inline void(__thiscall* dtor)(gd::LevelBrowserLayer*);
+	void __fastcall dtorH(gd::LevelBrowserLayer*);
+
 	class Callback : public gd::LevelBrowserLayer {
 	public:
 		void onRefresh(CCObject*);

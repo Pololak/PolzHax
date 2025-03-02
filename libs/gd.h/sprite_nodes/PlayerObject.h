@@ -315,6 +315,10 @@ namespace gd {
 		cocos2d::CCMotionStreak* motionStreak() {
 			return from<cocos2d::CCMotionStreak*>(this, 0x390);
 		}
+
+		void flipGravity(bool p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool, bool)>(base + 0xde660)(this, p0, p1);
+		}
 	};
 }
 

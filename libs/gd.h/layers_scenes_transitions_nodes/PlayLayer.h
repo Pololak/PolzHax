@@ -5,7 +5,6 @@
 
 namespace gd {
 
-	class GJBaseGameLayer;
 	class GJGameLevel;
 	class EndPortalObject {};
 

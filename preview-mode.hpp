@@ -25,6 +25,9 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
 	void __fastcall drawH(gd::LevelEditorLayer*);
 
+	inline void(__thiscall* flipGravity)(gd::LevelEditorLayer*, gd::PlayerObject*, bool, bool);
+	void __fastcall flipGravityH(gd::LevelEditorLayer*, void*, gd::PlayerObject*, bool, bool);
+
 	void mem_init();
 }
 
