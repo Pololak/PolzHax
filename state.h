@@ -175,7 +175,7 @@ struct SettingStruct {
 
     int selected_dart = 1;
 
-    std::string message = "Your Text";
+    char message[50] = "Your Text";
 
     bool managerView;
     int priority = 2;
@@ -190,7 +190,7 @@ struct SettingStruct {
     bool onAutoPractice;
     bool onZeroPracticeComplete;
     bool onInversedTrail;
-    bool onSwapWaveTrailColors;
+    bool onIncreaseMaxLevels;
     bool onFastMenu;
 
     bool onAutoKill;

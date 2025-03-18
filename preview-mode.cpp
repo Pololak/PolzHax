@@ -946,67 +946,26 @@ public:
 			EditorUI::updateObjectInfo();
 		}
 
-		auto secarr = this->getLevelSections();
-		auto arrcount = secarr->count();
 		auto objectDrawNode = reinterpret_cast<CCDrawNode*>(this->gameLayer()->getChildByTag(125));
 		objectDrawNode->clear();
-		//auto playerDrawNode = reinterpret_cast<CCDrawNode*>(this->gameLayer()->getChildByTag(124));
-		//playerDrawNode->clear();
 		if (setting().onHitboxes) {
-			//if (arrcount != 0) {
 			auto layer = this->gameLayer();
 			float xp = -layer->getPositionX() / layer->getScale();
-			if (setting().onSolidsHitbox) {
-				for (int i = this->sectionForPos(xp) - (5 / layer->getScale()); i < this->sectionForPos(xp) + (6 / layer->getScale()); i++) {
-					if (i < 0) continue;
-					if (i >= arrcount) break;
-					auto objAtInd = secarr->objectAtIndex(i);
-					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-					for (int j = 0; j < objarr->count(); j++) {
-						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+			for (int i = this->sectionForPos(xp) - (5 / layer->getScale()); i < this->sectionForPos(xp) + (6 / layer->getScale()); ++i) {
+				if (i < 0) continue;
+				if (i >= this->m_levelSections->count()) break;
+				auto section = static_cast<CCArray*>(this->m_levelSections->objectAtIndex(i));
+				for (int j = 0; j < section->count(); ++j) {
+					auto obj = reinterpret_cast<gd::GameObject*>(section->objectAtIndex(j));
+					if (setting().onSolidsHitbox)
 						Hitboxes::drawSolidsObjectHitbox(obj, objectDrawNode);
-					}
-				}
-			}
-
-			if (setting().onHazardsHitbox) {
-				for (int i = this->sectionForPos(xp) - (5 / layer->getScale()); i < this->sectionForPos(xp) + (6 / layer->getScale()); i++) {
-					if (i < 0) continue;
-					if (i >= arrcount) break;
-					auto objAtInd = secarr->objectAtIndex(i);
-					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-					for (int j = 0; j < objarr->count(); j++) {
-						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+					if (setting().onHazardsHitbox)
 						Hitboxes::drawHazardsObjectHitbox(obj, objectDrawNode);
-					}
-				}
-			}
-
-			if (setting().onSpecialsHitbox) {
-				for (int i = this->sectionForPos(xp) - (5 / layer->getScale()); i < this->sectionForPos(xp) + (6 / layer->getScale()); i++) {
-					if (i < 0) continue;
-					if (i >= arrcount) break;
-					auto objAtInd = secarr->objectAtIndex(i);
-					auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-					for (int j = 0; j < objarr->count(); j++) {
-						auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+					if (setting().onSpecialsHitbox)
 						Hitboxes::drawSpecialsObjectHitbox(obj, objectDrawNode);
-					}
 				}
 			}
 		}
-
-		//if (circleToolPopup) {
-		//	m_angle = angle_input->get_value().value_or(m_angle);
-		//	m_step = step_input->get_value().value_or(m_step);
-		//	auto objs = editUI->getSelectedObjectsOfCCArray();
-		//	const auto amt = static_cast<size_t>(std::ceilf(m_angle / m_step) - 1.f);
-		//	const auto obj_count = amt * objs->count();
-		//	m_circleToolLabel->setString(("Copies: " + std::to_string(amt) + "\nObjects: " + std::to_string(obj_count)).c_str());
-		//}
 
 		if (is_editor_paused) return;
 		if (!setting().onEditorPreview) {
@@ -1135,8 +1094,6 @@ public:
 					break; // bro
 				default:;
 				}
-				//if (gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
-				//	EditorObjectLayering::updateObjLayering(this, object);
 			}
 		}
 	}
@@ -2579,6 +2536,10 @@ void __fastcall EditorUI::moveObjectH(gd::EditorUI* self, void*, gd::GameObject*
 	updateLastObjectX(self->getLevelEditorLayer(), obj);
 }
 
+//CCPoint* __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, CCPoint* offset, int objKey) {
+//	return EditorUI::offsetForKey(self, 0, objKey);
+//}
+
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
 	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
@@ -2933,6 +2894,8 @@ void __fastcall SetGroupIDLayer::dtorH(gd::SetGroupIDLayer* self) {
 	SetGroupIDLayer::dtor(self);
 }
 
+//CCLabelBMFont* m_hsvLabel = nullptr;
+
 bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::GameObject* obj, int color_id, int idk, int idk2) {
 	setting().onShouldHue = true;
 	if (!ColorSelectPopup::init(self, obj, color_id, idk, idk2)) return false;
@@ -2980,6 +2943,13 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 
 	self->m_mainLayer->addChild(m_colorInputWidget);
 
+	//m_hsvLabel = CCLabelBMFont::create("", "chatFont.fnt");
+	//auto& color = self->m_colorPicker->getColorValue();
+	//auto jjj = color_utils::rgb_to_hsv({ color.r / 255.f, color.g / 255.f, color.b / 255.f });
+	//m_hsvLabel->setString(std::string("H: " + std::to_string(jjj.h) + " S: " + std::to_string(jjj.s) + " V: " + std::to_string(jjj.v)).c_str());
+	//m_hsvLabel->setPosition({ winSize.width / 2.f, winSize.height / 2.f + 142.f });
+	//self->m_mainLayer->addChild(m_hsvLabel);
+
 	return true;
 }
 
@@ -3005,6 +2975,7 @@ void __fastcall ColorSelectPopup::closeColorSelectH(gd::ColorSelectPopup* self, 
 	}
 	m_fadeTime_input = nullptr;
 	m_colorInputWidget = nullptr;
+	//m_hsvLabel = nullptr;
 	//m_customFadeTimeInput = nullptr;
 	ColorSelectPopup::closeColorSelect(self, sender);
 }
@@ -3012,8 +2983,13 @@ void __fastcall ColorSelectPopup::closeColorSelectH(gd::ColorSelectPopup* self, 
 void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* self, void*, ccColor3B color) {
 	ColorSelectPopup::colorValueChanged(self, color);
 	if (m_colorInputWidget != nullptr) {
-		m_colorInputWidget->update_labels(true, true);
+		m_colorInputWidget->update_labels(true, true, true);
 	}
+	//if (m_hsvLabel != nullptr) {
+	//	//auto& colorPicker = self->m_colorPicker->getColorValue();
+	//	auto jjj = color_utils::rgb_to_hsv({ color.r / 255.f, color.g / 255.f, color.b / 255.f });
+	//	m_hsvLabel->setString(std::string("H: " + std::to_string(jjj.h) + " S: " + std::to_string(jjj.s) + " V: " + std::to_string(jjj.v)).c_str());
+	//}
 }
 
 auto flipGravityToggle(CCSprite* toggleOn, CCSprite* toggleOff) {
@@ -3075,30 +3051,20 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 		ccDrawLine({ 0, 90 }, { 0, 1590 });
 	}
 
-	//glLineWidth(2);
-	//ccDrawColor4B(0x32, 0x32, 0x32, 0x32);
-	//ccDrawLine({ director->getWinSize().width / 2.f, director->getScreenTop() }, { director->getWinSize().width / 2.f, director->getScreenBottom() });
+	bool inPlaytest = self->m_levelEditorLayer->m_playerState == 1;
 
-	//auto secarr = lel->getLevelSections();
-	//auto arrcount = secarr->count();
-	//auto layer = lel->gameLayer();
-	//float xp = -layer->getPositionX() / layer->getScale();
-	//for (int i = lel->sectionForPos(xp) - (5 / layer->getScale()); i < lel->sectionForPos(xp) + (6 / layer->getScale()); i++) {
-	//	if (i < 0) continue;
-	//	if (i >= arrcount) break;
-	//	auto objAtInd = secarr->objectAtIndex(i);
-	//	auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+	bool drawDurationLines = true;
 
-	//	for (int j = 0; j < objarr->count(); j++) {
-	//		auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-	//		switch (obj->getObjectID())
-	//		{
-	//		case 29:
-	//			glLineWidth(2);
-	//			ccDrawColor4B(0xFF, 0xFF, 0xFF, 0xFF);
-	//			ccDrawLine(obj->getPosition(), { (timeBetweenPosition(obj->getPosition().x, MyEditorLayer::s_instance->get_preview_pos()) / obj->m_triggerDuration), obj->getPosition().y });
-	//			break;
-	//		}
+	//for (auto obj : CCArrayExt<gd::GameObject*>(self->m_effectObjects)) {
+	//	if (obj) {
+	//		//switch (obj->m_objectID)
+	//		//{
+	//		//case 29:
+	//			float calculatedThing = timeBetweenPosition(obj->getPositionX(), MyEditorLayer::s_instance->get_preview_pos()) / obj->triggerDuration();
+	//			glLineWidth(2.f);
+	//			ccDrawColor4B(255, 255, 255, 75);
+	//			ccDrawLine(obj->getPosition(), { calculatedThing, obj->getPosition().x });
+	//		//}
 	//	}
 	//}
 }
@@ -3183,13 +3149,6 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 void(__thiscall* GameObject_customSetup)(gd::GameObject*);
 void __fastcall GameObject_customSetupH(gd::GameObject* self) {
 	GameObject_customSetup(self);
-
-	//if (editUI && setting().onHitboxBugFix) {
-	//	if (self->canRotateFree() && self->m_objectRadius == 0) {
-	//		self->m_isOriented = true;
-	//		self->updateOrientedBox();
-	//	}
-	//}
 
 	if (editUI && gd::GameManager::sharedState()->getGameVariable(GameVariable::EXPERIMENTAL_LAYERING))
 		EditorObjectLayering::updateObjLayering(self);

@@ -28,13 +28,6 @@ class GameLevelManager : public cocos2d::CCNode {
         GJGameLevel* createNewLevel() {
             return reinterpret_cast<GJGameLevel * (__thiscall*)(GameLevelManager*)>(base + 0x56590)(this);
         }
-        //inline static GameLevelManager* sharedState() {
-        //    return reinterpret_cast<GameLevelManager*(__stdcall*)()>( gd::base + 0x55850)(); //1.91 55190
-        //}
-
-        //inline static gd::GJGameLevel* createNewLevel() {
-        //    return reinterpret_cast<gd::GJGameLevel*(__stdcall*)()>( gd::base + 0x56590)(); // 1.92
-        //}
 
         cocos2d::CCArray* getSavedLevels() {
             return reinterpret_cast<cocos2d::CCArray*(__thiscall*)(GameLevelManager*)>(gd::base + 0x57640)(this); //1.91 56f80
@@ -76,6 +69,22 @@ class GameLevelManager : public cocos2d::CCNode {
 
         std::string getLengthStr(bool ti, bool sh, bool me, bool lo) {
             return reinterpret_cast<std::string(__thiscall*)(GameLevelManager*, bool, bool, bool, bool)>(base + 0x599b0)(this, ti, sh, me, lo);
+        }
+
+        void setBoolForKey(bool b, char const* key) {
+            reinterpret_cast<void(__thiscall*)(GameLevelManager*, bool, char const*)>(base + 0x60ce0)(this, b, key);
+        }
+
+        bool getBoolForKey(char const* key) {
+            return reinterpret_cast<bool(__thiscall*)(GameLevelManager*, char const*)>(base + 0x60da0)(this, key);
+        }
+
+        void setLenVal(int key, bool bo) {
+            reinterpret_cast<void(__thiscall*)(GameLevelManager*, int, bool)>(base + 0x60a80)(this, key, bo);
+        }
+
+        bool getLenVal(int key) {
+            return reinterpret_cast<bool(__thiscall*)(GameLevelManager*, int)>(base + 0x609a0)(this, key);
         }
 };
 

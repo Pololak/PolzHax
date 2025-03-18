@@ -16,4 +16,5 @@ namespace GameVariable {
 	constexpr auto LINK_CONTROLS = "1348";
 	constexpr auto EXTRA_LONG = "1349";
 	constexpr auto HIDE_PREVIEW_LINE = "1350";
+	constexpr auto IGNORE_OFFSETS = "1351";
 }

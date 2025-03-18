@@ -884,6 +884,13 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4aec50), "\x55", 1, NULL);
 		}
 
+		if (setting().onIncreaseMaxLevels) {
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x45875b), "\x64", 1, NULL);
+		}
+		else {
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x45875b), "\x14", 1, NULL);
+		}
+
 		if (setting().onInstantGameWork) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc0", 1, NULL);
 		}
@@ -2307,6 +2314,17 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Makes icons in menu invincible.");
 
+			if (ImGui::Checkbox("Increase Max Levels", &setting().onIncreaseMaxLevels)) {
+				if (setting().onIncreaseMaxLevels) {
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x45875b), "\x64", 1, NULL);
+				}
+				else {
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x45875b), "\x14", 1, NULL);
+				}
+			}
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Increases the maximum saved levels from 20 to 100.");
+
 			if (ImGui::Checkbox("Instant Game Work", &setting().onInstantGameWork)) {
 				if (setting().onInstantGameWork) {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x88170), "\xc0", 1, NULL);
@@ -2507,7 +2525,7 @@ void RenderMain() {
 			ImGui::Checkbox("FPS Counter", &setting().onFPSLabel);
 			ImGui::Checkbox("Message", &setting().onMessageLabel);
 			ImGui::SetNextItemWidth(150 * setting().UISize);
-			ImGui::InputText("##message", &setting().message);
+			ImGui::InputText("##message", setting().message, IM_ARRAYSIZE(setting().message));
 			ImGui::Checkbox("Noclip Accuracy", &setting().onNoclipAccuracy);
 			ImGui::Checkbox("Noclip Deaths", &setting().onNoclipDeaths);
 			ImGui::Checkbox("Session Time", &setting().onSessionTime);
@@ -2640,7 +2658,7 @@ void RenderMain() {
 			ImGui::SetWindowFontScale(setting().UISize);
 			ImGui::SetNextItemWidth(120 * setting().UISize);
 
-			ImGui::Text("v1.2.0-alpha.2");
+			ImGui::Text("v1.2.0-alpha.3");
 
 			ImGui::Checkbox("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine();
@@ -2730,23 +2748,10 @@ void RenderMain() {
 }
 
 void imgui_init() {
-	auto file = fopen("Resources/polzsave.dat", "rb");
-	if (file) {
-		fseek(file, 0, SEEK_END);
-		auto size = ftell(file);
-
-		if (size == sizeof(setting())) {
-			fseek(file, 0, SEEK_SET);
-			fread(&setting(), sizeof(setting()), 1, file);
-			fclose(file);
-		}
-	}
-
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
 	io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
 	io.Fonts->Build();
-
 	colorSet();
 }
 

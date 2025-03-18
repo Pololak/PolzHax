@@ -57,7 +57,8 @@ namespace gd {
 
 	class PlayLayer : public cocos2d::CCLayer {
 	public:
-		PAD(12)
+		PAD(8)
+		bool m_drawDebug; // 0x120 // show hitboxes by RobTop
 		cocos2d::CCDrawNode* m_drawNode; // 0x124
 		PAD(32)
 		StartPosObject* m_startPosObject; // 0x148

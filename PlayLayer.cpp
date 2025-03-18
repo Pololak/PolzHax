@@ -523,57 +523,24 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     self->layer()->addChild(objDrawNode);
 
     if (setting().onHitboxes) {
+		for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
+		{
+			if (i < 0) continue;
+			if (i >= arrcount) break;
+			auto objAtInd = secarr->objectAtIndex(i);
+			auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
-        if (setting().onSolidsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-                    Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-
-        if (setting().onHazardsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+			for (int j = 0; j < objarr->count(); j++)
+			{
+				auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                if (setting().onSolidsHitbox)
+				    Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
+                if (setting().onHazardsHitbox)
                     Hitboxes::drawHazardsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-
-        if (setting().onSpecialsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                if (setting().onSpecialsHitbox)
                     Hitboxes::drawSpecialsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
+			}
+		}
 
         if (setting().onPlayerHitbox) {
             if (self->player1()) Hitboxes::drawPlayerHitbox(self->player1(), playerDrawNode);
@@ -1218,54 +1185,22 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     objDrawNode->clear();
 
     if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) || setting().onHitboxes) {
-        if (setting().onSolidsHitbox)
+        for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
         {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
+            if (i < 0) continue;
+            if (i >= arrcount) break;
+            auto objAtInd = secarr->objectAtIndex(i);
+            auto objarr = reinterpret_cast<CCArray*>(objAtInd);
 
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+            for (int j = 0; j < objarr->count(); j++)
+            {
+                auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                if (setting().onSolidsHitbox)
                     Hitboxes::drawSolidsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-
-        if (setting().onHazardsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                if (setting().onHazardsHitbox)
                     Hitboxes::drawHazardsObjectHitbox(obj, objDrawNode);
-                }
-            }
-        }
-
-        if (setting().onSpecialsHitbox)
-        {
-            for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
-            {
-                if (i < 0) continue;
-                if (i >= arrcount) break;
-                auto objAtInd = secarr->objectAtIndex(i);
-                auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-                for (int j = 0; j < objarr->count(); j++)
-                {
-                    auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
+                if (setting().onSpecialsHitbox)
                     Hitboxes::drawSpecialsObjectHitbox(obj, objDrawNode);
-                }
             }
         }
     }
@@ -1667,7 +1602,6 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
 gd::EndLevelLayer* endLevelLayer;
 
 void EndLevelLayer::Callback::onReset(CCObject* obj) {
-    from<bool>(playLayer, 0x2f9) = false;
     reinterpret_cast<gd::EndLevelLayer*>(reinterpret_cast<CCNode*>(obj))->getParent()->getParent()->getParent()->removeFromParent();
     playLayer->resetLevel();
 }
@@ -1714,40 +1648,45 @@ void __fastcall EndLevelLayer::customSetup_H(gd::EndLevelLayer* self) {
     menu->addChild(arrowButton);
     layerMain->addChild(menu);
 
-    if (setting().onLastCheckpoint) {
-        if (playLayer->getPracticeMode()) {
-            CCMenu* buttonsMenu = nullptr;
+    if (setting().onLastCheckpoint && playLayer->m_practiceMode) {
+		CCMenu* buttonsMenu = nullptr;
 
-            buttonsMenu = from<CCMenu*>(self, 0x1c0);
+		buttonsMenu = from<CCMenu*>(self, 0x1c0);
 
-            if (buttonsMenu != nullptr) {
-                auto practiceSprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png");
-                practiceSprite->setScale(1.f);
-                auto practiceButton = gd::CCMenuItemSpriteExtra::create(
-                    practiceSprite,
-                    nullptr,
-                    self,
-                    menu_selector(EndLevelLayer::Callback::onReset)
-                );
+		if (buttonsMenu) {
+			auto practiceSprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png");
+			practiceSprite->setScale(1.f);
+			auto practiceButton = gd::CCMenuItemSpriteExtra::create(
+				practiceSprite,
+				nullptr,
+				self,
+				menu_selector(EndLevelLayer::Callback::onReset)
+			);
 
-                if (buttonsMenu->getChildrenCount() == 2)
-                {
-                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
-                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
-                }
-                else
-                {
-                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-130.f);
-                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(130.f);
-                    reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(2))->setPositionX(-45.f);
-                    practiceButton->setPositionX(45.f);
-                }
+			if (buttonsMenu->getChildrenCount() == 2)
+			{
+				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
+				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
+			}
+			else
+			{
+				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-130.f);
+				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(130.f);
+				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(2))->setPositionX(-45.f);
+				practiceButton->setPositionX(45.f);
+			}
 
-                practiceButton->setPositionY(-125.f);
-                buttonsMenu->addChild(practiceButton);
-            }
-        }
+			practiceButton->setPositionY(-125.f);
+			buttonsMenu->addChild(practiceButton);
+		}
     }
+}
+
+void __fastcall EndLevelLayer::dtorH(gd::EndLevelLayer* self) {
+    showEndLayerButton = nullptr;
+    endLevelLayer = nullptr;
+    EndLevelLayer::dtor(self);
+    std::cout << "EndLevelLayer::dtor" << std::endl;
 }
 
 void __fastcall PlayerObject::updatePlayerFrame_H(gd::PlayerObject* self, void* edx, int frameID) {
@@ -1935,6 +1874,7 @@ void EndLevelLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0x50430),
         EndLevelLayer::customSetup_H,
         reinterpret_cast<void**>(&EndLevelLayer::customSetup));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x50380), EndLevelLayer::dtorH, reinterpret_cast<void**>(&EndLevelLayer::dtor));
 }
 
 void PlayerObject::mem_init() {

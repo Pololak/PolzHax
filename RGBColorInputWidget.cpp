@@ -1,4 +1,5 @@
 #include "RGBColorInputWidget.hpp"
+#include "hsv.hpp"
 
 inline std::string color_to_hex(ccColor3B color) {
     static constexpr auto digits = "0123456789ABCDEF";
@@ -65,12 +66,42 @@ bool RGBColorInputWidget::init(gd::ColorSelectPopup* parent) {
     hex_input->setPositionY(hex_y);
     hex_input->setDelegate(this);
 
+    //h_input = gd::CCTextInputNode::create("H", this, "bigFont.fnt", 30.f, 20.f);
+    //h_input->setAllowedChars("0123456789");
+    //h_input->setMaxLabelLength(3);
+    //h_input->setMaxLabelScale(0.6f);
+    //h_input->setLabelPlaceholderColor(placeholder_color);
+    //h_input->setLabelPlaceholerScale(0.5f);
+    //h_input->setPositionX(b_xpos);
+    //h_input->setDelegate(this);
+
+    //s_input = gd::CCTextInputNode::create("S", this, "bigFont.fnt", 30.f, 20.f);
+    //s_input->setAllowedChars("0123456789");
+    //s_input->setMaxLabelLength(3);
+    //s_input->setMaxLabelScale(0.6f);
+    //s_input->setLabelPlaceholderColor(placeholder_color);
+    //s_input->setLabelPlaceholerScale(0.5f);
+    //s_input->setPositionX(b_xpos);
+    //s_input->setDelegate(this);
+
+    //v_input = gd::CCTextInputNode::create("V", this, "bigFont.fnt", 30.f, 20.f);
+    //v_input->setAllowedChars("0123456789");
+    //v_input->setMaxLabelLength(3);
+    //v_input->setMaxLabelScale(0.6f);
+    //v_input->setLabelPlaceholderColor(placeholder_color);
+    //v_input->setLabelPlaceholerScale(0.5f);
+    //v_input->setPositionX(b_xpos);
+    //v_input->setDelegate(this);
+
     addChild(red_input);
     addChild(green_input);
     addChild(blue_input);
     addChild(hex_input);
+    //addChild(h_input);
+    //addChild(s_input);
+    //addChild(v_input);
 
-    update_labels(true, true);
+    update_labels(true, true, true);
 
     auto bg = extension::CCScale9Sprite::create("square02_small.png");
     bg->setContentSize({ total_w * bg_scale, hex_height * bg_scale });
@@ -164,7 +195,7 @@ void RGBColorInputWidget::textChanged(gd::CCTextInputNode* input) {
         parent->m_colorPicker->setColorValue(color);
         ignore = false;
 
-        update_labels(false, true);
+        update_labels(false, true, true);
 
     }
     else if (input == red_input || input == green_input || input == blue_input) {
@@ -186,16 +217,58 @@ void RGBColorInputWidget::textChanged(gd::CCTextInputNode* input) {
             ignore = true;
             parent->m_colorPicker->setColorValue(color);
             ignore = false;
-            update_labels(true, false);
+            update_labels(true, false, true);
         }
         catch (...) {}
     }
+    //else if (input == h_input || input == s_input || input == v_input) {
+    //    std::string value(input->getString());
+    //    try {
+    //        auto _num = value.empty() ? 0 : std::stoi(value);
+    //        if (_num > 255) {
+    //            _num = 255;
+    //            input->setString("255");
+    //        }
+    //        GLubyte num = static_cast<GLubyte>(_num);
+    //        auto color = parent->m_colorPicker->getColorValue();
+    //        auto hsv_value = color_utils::rgb_to_hsv({ color.r / 255., color.g / 255., color.b / 255. });
+    //        double h_value, s_value, v_value;
+    //        h_value = hsv_value.h;
+    //        s_value = hsv_value.s;
+    //        v_value = hsv_value.v;
+    //        if (h_input) {
+    //            h_value = (num * 360.) / 255;
+    //        }
+    //        else if (s_input) {
+    //            s_value = (num * 1.) / 255;
+    //        }
+    //        else if (v_input) {
+    //            v_value = (num * 1.) / 255;
+    //        }
+    //        auto finalValue = color_utils::hsv_to_rgb({ h_value, s_value, v_value });
+    //        ignore = true;
+    //        std::cout << h_value << std::endl;
+    //        std::cout << s_value << std::endl;
+    //        std::cout << v_value << std::endl;
+    //        //parent->m_colorPicker->setColorValue(color);
+    //        std::cout << finalValue.r << std::endl;
+    //        std::cout << finalValue.g << std::endl;
+    //        std::cout << finalValue.b << std::endl;
+    //        ignore = false;
+    //        update_labels(true, true, false);
+    //    }
+    //    catch (...) {}
+    //}
 }
 
-void RGBColorInputWidget::update_labels(bool hex, bool rgb) {
+void RGBColorInputWidget::update_labels(bool hex, bool rgb, bool hsv) {
     if (ignore) return;
     ignore = true;
     auto color = parent->m_colorPicker->getColorValue();
+    auto hsv_value = color_utils::rgb_to_hsv({ color.r / 255., color.g / 255., color.b / 255. });
+    auto h_value = (hsv_value.h * 255.) / 360;
+    auto s_value = (hsv_value.s * 255.) / 1;
+    auto v_value = (hsv_value.v * 255.) / 1;
     if (hex) {
         hex_input->setString(color_to_hex(color).c_str());
     }
@@ -204,6 +277,11 @@ void RGBColorInputWidget::update_labels(bool hex, bool rgb) {
         green_input->setString(std::to_string(color.g).c_str());
         blue_input->setString(std::to_string(color.b).c_str());
     }
+    //if (hsv) {
+    //    h_input->setString(CCString::createWithFormat("%.0f%", h_value)->getCString());
+    //    s_input->setString(CCString::createWithFormat("%.0f%", s_value)->getCString());
+    //    v_input->setString(CCString::createWithFormat("%.0f%", v_value)->getCString());
+    //}
     ignore = false;
 }
 

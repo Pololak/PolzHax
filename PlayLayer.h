@@ -90,6 +90,7 @@ namespace PauseLayer {
 	public:
 		void PercentageToggler(CCObject*);
 		//void onCopyLevel(CCObject*);
+		void drawDebug(CCObject*);
 	};
 
 	void mem_init();
@@ -98,6 +99,9 @@ namespace PauseLayer {
 namespace EndLevelLayer {
 	inline void(__thiscall* customSetup)(gd::EndLevelLayer*);
 	void __fastcall customSetup_H(gd::EndLevelLayer* self);
+
+	inline void(__thiscall* dtor)(gd::EndLevelLayer*);
+	void __fastcall dtorH(gd::EndLevelLayer* self);
 
 	class Callback {
 	public:
