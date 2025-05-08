@@ -1184,6 +1184,7 @@ bool EditorPauseLayer_init(void* self, void* idc) {
 
 void EditorPauseLayer_dtor(void* self) {
 	is_editor_paused = false;
+	editorPauseLayer = nullptr;
 	matdash::orig<&EditorPauseLayer_dtor>(self);
 }
 
@@ -1343,7 +1344,8 @@ bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
 	m_objectType = nullptr;
 	m_objectsSelected = nullptr;
 	m_editorLayerInput = nullptr;
-	levelSettingsLayer = nullptr;
+	m_gridSizeLabel = nullptr;
+	m_objectZ = nullptr;
 	MyEditorLayer::s_instance = nullptr;
 	EditorUI::dtor(self);
 }
@@ -2821,12 +2823,10 @@ void __fastcall EditorPauseLayer::onExitEditorH(gd::EditorPauseLayer* self, void
 }
 
 void __fastcall EditorPauseLayer::keyDown_H(gd::EditorPauseLayer* self, void* edx, enumKeyCodes key) {
-	if (key == KEY_Escape) {
-		self->onResume(nullptr);
-	}
-	else {
+	if (key == KEY_Escape)
+		reinterpret_cast<gd::EditorPauseLayer*>(reinterpret_cast<uintptr_t>(self) - 0xf4)->onResume(nullptr);
+	else
 		EditorPauseLayer::keyDown(self, key);
-	}
 }
 
 void __fastcall EditorPauseLayer::saveLevelH(gd::EditorPauseLayer* self) {
@@ -3022,6 +3022,11 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 	}
 
 	return true;
+}
+
+void __fastcall LevelSettingsLayer::dtorH(gd::LevelSettingsLayer* self) {
+	levelSettingsLayer = nullptr;
+	LevelSettingsLayer::dtor(self);
 }
 
 void __fastcall DrawGridLayer::addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject) {

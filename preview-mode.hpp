@@ -233,6 +233,9 @@ namespace ColorSelectPopup {
 namespace LevelSettingsLayer {
 	inline bool(__thiscall* init)(gd::LevelSettingsLayer*, gd::LevelSettingsObject*);
 	bool __fastcall initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject);
+
+	inline void(__thiscall* dtor)(gd::LevelSettingsLayer*);
+	void __fastcall dtorH(gd::LevelSettingsLayer*);
 }
 
 namespace DrawGridLayer {
