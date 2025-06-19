@@ -2629,7 +2629,7 @@ void RenderMain() {
 			ImGui::SetWindowFontScale(setting().UISize);
 			ImGui::SetNextItemWidth(120 * setting().UISize);
 
-			ImGui::Text("v1.2.0-alpha.3");
+			ImGui::Text("1.920 - v1.2.1");
 
 			ImGui::Checkbox("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine();

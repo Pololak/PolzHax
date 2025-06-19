@@ -949,7 +949,7 @@ public:
 			for (int i = this->m_firstVisibleSection + 1; i <= this->m_lastVisibleSection - 1; i++) {
 				if (i < 0) continue;
 				if (i >= this->m_levelSections->count()) break;
-				auto section = static_cast<CCArray*>(this->m_levelSections->objectAtIndex(i));
+				auto section = reinterpret_cast<CCArray*>(this->m_levelSections->objectAtIndex(i));
 				for (int j = 0; j < section->count(); ++j) {
 					auto obj = reinterpret_cast<gd::GameObject*>(section->objectAtIndex(j));
 					if (setting().onSolidsHitbox)

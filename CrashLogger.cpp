@@ -86,6 +86,8 @@ void printStackTrace(CONTEXT* context) {
 }
 
 LONG WINAPI exceptionHandler(EXCEPTION_POINTERS* exceptionInfo) {
+    crashInfo << "PolzHax 1.920 - v1.2.1" << "\n\n";
+
     crashInfo << "Exception code: " << std::hex << exceptionInfo->ExceptionRecord->ExceptionCode << "\n";
     crashInfo << "Exception address: " << exceptionInfo->ExceptionRecord->ExceptionAddress << "\n\n";
 
