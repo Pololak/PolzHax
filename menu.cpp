@@ -96,6 +96,15 @@ static std::string getResourcesFolder() {
 
 std::vector<std::string> dllNames;
 
+bool serverUtils = false;
+
+std::string url;
+int itemID;
+bool isLike;
+int isComment;
+std::string secret = "Wmfd2893gb7";
+bool activate_bot;
+
 void colorSet() {
 	auto* colors = ImGui::GetStyle().Colors;
 
@@ -1017,6 +1026,29 @@ void RenderMain() {
 			showManagerView(setting().managerView);
 		}
 
+		//if (serverUtils) {
+		//	if (ImGui::Begin("Like/Dislike Bot", &serverUtils)) {
+		//		ImGui::InputText("URL", &url);
+		//		ImGui::InputInt("ID", &itemID);
+		//		ImGui::Checkbox("Like", &isLike);
+		//		ImGui::InputInt("Type", &isComment);
+		//		ImGui::InputText("Secret", &secret);
+
+		//		ImGui::Checkbox("Activate", &activate_bot);
+
+		//		if (activate_bot) {
+		//			std::string amogus = "itemID=" + std::to_string(itemID) + "&like=" + std::to_string(isLike) + "&type=" + std::to_string(isComment) + "&secret=" + secret;
+		//			std::cout << "Sending: " << url << " \"" << amogus << "\"" << std::endl;
+		//			auto httpClient = extension::CCHttpClient::getInstance();
+		//			auto copyReq = new extension::CCHttpRequest();
+		//			copyReq->setUrl(url.c_str());
+		//			copyReq->setRequestType(extension::CCHttpRequest::HttpRequestType::kHttpPost);
+		//			copyReq->setRequestData(amogus.c_str(), amogus.size());
+		//			httpClient->send(copyReq);
+		//		}
+		//	}
+		//}
+
 		if (ImGui::Begin("Bypass", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {
 			ImGui::SetWindowFontScale(setting().UISize);
 			ImGui::SetNextItemWidth(120 * setting().UISize);
@@ -1492,14 +1524,7 @@ void RenderMain() {
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Disables the hard wave trail.");
 
-			if (ImGui::Checkbox("No Wave Trail Behind", &setting().onNoWaveTrailBehind)) {
-				if (playLayer) {
-					if (playLayer->m_player->m_dartMode)
-						from<bool>(playLayer->m_player->m_playerStreak, 0xfe) = !setting().onNoWaveTrailBehind;
-					if (playLayer->m_player2->m_dartMode)
-						from<bool>(playLayer->m_player2->m_playerStreak, 0xfe) = !setting().onNoWaveTrailBehind;
-				}
-			}
+			ImGui::Checkbox("No Wave Trail Behind", &setting().onNoWaveTrailBehind);
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Disables default player trail behind the wave trail.");
 
@@ -1895,7 +1920,7 @@ void RenderMain() {
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Fixes that ball rotation bug when entering a portal mid ball animation.");
 
-			//ImGui::Checkbox("Checkpoint Lag Fix", &setting().onCheckpointLagFix);
+			ImGui::Checkbox("Checkpoint Lag Fix", &setting().onCheckpointLagFix);
 
 			if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
 				if (setting().onConfirmExit) {
@@ -2695,6 +2720,10 @@ void RenderMain() {
 			if (ImGui::Button("Manager Viewer")) {
 				setting().managerView = !setting().managerView;
 			}
+
+			//if (ImGui::Button("Server Utils")) {
+			//	serverUtils = !serverUtils;
+			//}
 		}
 
 		if (ImGui::Begin("Display", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize)); {

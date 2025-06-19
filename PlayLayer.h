@@ -50,6 +50,9 @@ namespace PlayLayer {
 	inline void(__thiscall* removePlayer2)(gd::PlayLayer* self);
 	void __fastcall removePlayer2H(gd::PlayLayer* self);
 
+	inline void(__thiscall* updateVisibility)(gd::PlayLayer*);
+	void __fastcall updateVisibilityH(gd::PlayLayer*);
+
 	//inline void(__thiscall* markCheckpoint)(gd::PlayLayer*);
 	//void __fastcall markCheckpointH(gd::PlayLayer* self);
 
@@ -100,12 +103,9 @@ namespace EndLevelLayer {
 	inline void(__thiscall* customSetup)(gd::EndLevelLayer*);
 	void __fastcall customSetup_H(gd::EndLevelLayer* self);
 
-	inline void(__thiscall* dtor)(gd::EndLevelLayer*);
-	void __fastcall dtorH(gd::EndLevelLayer* self);
-
-	class Callback {
+	class Callback : public gd::EndLevelLayer {
 	public:
-		void onReset(CCObject*);
+		void onLastCheckpoint(CCObject*);
 		void onHideLayer(CCObject*);
 		void onShowLayer(CCObject*);
 	};
@@ -125,6 +125,9 @@ namespace PlayerObject {
 
 	inline void(__thiscall* togglePlayerScale)(gd::PlayerObject*, bool);
 	void __fastcall togglePlayerScaleH(gd::PlayerObject*, void*, bool);
+
+	inline void(__thiscall* toggleDartMode)(gd::PlayerObject*, bool);
+	void __fastcall toggleDartModeH(gd::PlayerObject*, void*, bool);
 
 	//inline bool(__thiscall* collidedWithObject)(gd::PlayerObject*, float, gd::GameObject*, CCRect);
 	//bool __fastcall collidedWithObjectH(gd::PlayerObject*, void*, float, gd::GameObject*, CCRect);

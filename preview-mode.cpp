@@ -77,14 +77,6 @@ CCArray* m_hideableUIElements;
 
 ObjectGroupInput* m_objectGroupInput = nullptr;
 
-void reorderObjectSection(gd::LevelEditorLayer* lel, gd::GameObject* obj) {
-	auto sObj = lel->m_levelSections->objectAtIndex(obj->m_sectionIdx);
-	lel->m_levelSections->removeObject((CCObject*)sObj, true);
-	lel->m_objectCount -= 1;
-	lel->addToSection(obj);
-	return;
-}
-
 class CircleToolPopup : public CCLayer { // FINALLY
 public:
 	static CircleToolPopup* create() {
@@ -942,8 +934,11 @@ public:
 	void updateVisibility(float dt) {
 		matdash::orig<&MyEditorLayer::updateVisibility, matdash::Thiscall>(this, dt);
 		bool showObjInfo_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::SHOW_OBJ_INFO);
-		if (showObjInfo_enabled) {
-			EditorUI::updateObjectInfo();
+		if (showObjInfo_enabled)
+			EditorUI::updateObjectInfo(this->m_uiLayer);
+		else {
+			auto objectInfo = static_cast<CCLabelBMFont*>(this->m_uiLayer->getChildByTag(3207));
+			if (objectInfo) objectInfo->setString("");
 		}
 
 		auto objectDrawNode = reinterpret_cast<CCDrawNode*>(this->gameLayer()->getChildByTag(125));
@@ -951,7 +946,7 @@ public:
 		if (setting().onHitboxes) {
 			auto layer = this->gameLayer();
 			float xp = -layer->getPositionX() / layer->getScale();
-			for (int i = this->sectionForPos(xp) - (5 / layer->getScale()); i < this->sectionForPos(xp) + (6 / layer->getScale()); ++i) {
+			for (int i = this->m_firstVisibleSection + 1; i <= this->m_lastVisibleSection - 1; i++) {
 				if (i < 0) continue;
 				if (i >= this->m_levelSections->count()) break;
 				auto section = static_cast<CCArray*>(this->m_levelSections->objectAtIndex(i));
@@ -1278,20 +1273,20 @@ void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
 }
 
 void EditorUI::Callback::onGoToBaseLayer(CCObject* sender) {
-	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = -1;
-	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString("All");
+	this->m_editorLayer->m_groupIDFilter = -1;
+	this->m_currentGroupLabel->setString("All");
 
-	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(from<gd::EditorUI*>(sender, 0xFC)->getDeselectBtn(), 0xac)->getChildByTag(45028));
+	auto onBaseLayerBtn = static_cast<gd::CCMenuItemSpriteExtra*>(this->m_deselectBtn->getParent()->getChildByTag(45028));
 	if (onBaseLayerBtn) {
 		onBaseLayerBtn->setVisible(0);
 		onBaseLayerBtn->setEnabled(false);
 	}
 	if (m_editorLayerInput)
-		m_editorLayerInput->m_layerInput->setString(from<gd::EditorUI*>(sender, 0xFC)->m_currentGroupLabel->getString());
+		m_editorLayerInput->m_layerInput->setString(this->m_currentGroupLabel->getString());
 }
 
 void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
-	auto leveleditor = from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer();
+	auto leveleditor = this->m_editorLayer;
 	bool foundClear = false;
 	bool nextCycle = false;
 	int currentLayer = 0;
@@ -1318,16 +1313,16 @@ void EditorUI::Callback::onGoToNextFreeLayer(CCObject* sender) {
 		if (leveleditor->getLayerGroup() == -1)
 			nextCycle = true;
 	}
-	from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = currentLayer;
-	from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(currentLayer).c_str());
+	leveleditor->m_groupIDFilter = currentLayer;
+	this->m_currentGroupLabel->setString(std::to_string(currentLayer).c_str());
 
-	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(from<gd::EditorUI*>(sender, 0xFC)->getDeselectBtn(), 0xac)->getChildByTag(45028));
+	auto onBaseLayerBtn = static_cast<gd::CCMenuItemSpriteExtra*>(this->m_deselectBtn->getParent()->getChildByTag(45028));
 	if (onBaseLayerBtn) {
 		onBaseLayerBtn->setVisible(1);
 		onBaseLayerBtn->setEnabled(true);
 	}
 	if (m_editorLayerInput)
-		m_editorLayerInput->m_layerInput->setString(leveleditor->m_uiLayer->m_currentGroupLabel->getString());
+		m_editorLayerInput->m_layerInput->setString(this->m_currentGroupLabel->getString());
 }
 
 bool __fastcall EditorUI::dtor_H(gd::EditorUI* self) {
@@ -1354,10 +1349,10 @@ void EditorUI::Callback::onGoToGroup(CCObject* sender) {
 	for (auto obj : CCArrayExt<gd::GameObject*>(this->getSelectedObjectsOfCCArray())) {
 		if (obj) {
 			int objectGroup = obj->m_editorGroup;
-			from<int>(from<gd::EditorUI*>(sender, 0xFC)->getLevelEditorLayer(), 0x12C) = objectGroup;
-			from<CCLabelBMFont*>(from<gd::EditorUI*>(sender, 0xFC), 0x20C)->setString(std::to_string(objectGroup).c_str());
+			this->m_editorLayer->m_groupIDFilter = objectGroup;
+			this->m_currentGroupLabel->setString(std::to_string(objectGroup).c_str());
 
-			auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(from<gd::EditorUI*>(sender, 0xFC)->getDeselectBtn(), 0xac)->getChildByTag(45028));
+			auto onBaseLayerBtn = static_cast<gd::CCMenuItemSpriteExtra*>(this->m_deselectBtn->getParent()->getChildByTag(45028));
 			if (onBaseLayerBtn) {
 				onBaseLayerBtn->setVisible(1);
 				onBaseLayerBtn->setEnabled(true);
@@ -1365,6 +1360,83 @@ void EditorUI::Callback::onGoToGroup(CCObject* sender) {
 			if (m_editorLayerInput)
 				m_editorLayerInput->m_layerInput->setString(this->m_currentGroupLabel->getString());
 		}
+	}
+}
+
+std::string colorToString(int id) {
+	switch (id) {
+	case 0: return "Default"; break;
+	case 1: return "P-Col 1"; break;
+	case 2: return "P-Col 2"; break;
+	case 3: return "Col1"; break;
+	case 4: return "Col2"; break;
+	case 5: return "LBG"; break;
+	case 6: return "Col3"; break;
+	case 7: return "Col4"; break;
+	case 8: return "3DL"; break;
+	case 9: return "White"; break;
+	default: return "Unknown"; break;
+	}
+}
+
+std::string typeToString(gd::GameObjectType type) {
+	switch (type) {
+	case gd::GameObjectType::kGameObjectTypeSolid: return "Solid"; break;
+	case gd::GameObjectType::kGameObjectTypeHazard: return "Hazard"; break;
+	case gd::GameObjectType::kGameObjectTypeInverseGravityPortal: return "Inverse Gravity Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeNormalGravityPortal: return "Normal Gravity Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeShipPortal: return "Ship Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeCubePortal: return "Cube Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeDecoration: return "Decoration"; break;
+	case gd::GameObjectType::kGameObjectTypePulseObjects: return "Pulse Object"; break;
+	case gd::GameObjectType::kGameObjectTypeYellowJumpPad: return "Yellow Jump Pad"; break;
+	case gd::GameObjectType::kGameObjectTypePinkJumpPad: return "Pink Jump Pad"; break;
+	case gd::GameObjectType::kGameObjectTypeGravityPad: return "Gravity Pad"; break;
+	case gd::GameObjectType::kGameObjectTypeYellowJumpRing: return "Yellow Jump Ring"; break;
+	case gd::GameObjectType::kGameObjectTypePinkJumpRing: return "Pink Jump Ring"; break;
+	case gd::GameObjectType::kGameObjectTypeGravityRing: return "Gravity Ring"; break;
+	case gd::GameObjectType::kGameObjectTypeInverseMirrorPortal: return "Inverse Mirror Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeNormalMirrorPortal: return "Normal Mirror Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeBallPortal: return "Ball Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeRegularSizePortal: return "Regular Size Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeMiniSizePortal: return "Mini Size Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeUfoPortal: return "UFO Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeModifier: return "Modifier"; break;
+	case gd::GameObjectType::kGameObjectTypeBreakable: return "Breakable"; break;
+	case gd::GameObjectType::kGameObjectTypeSecretCoin: return "Secret Coin"; break;
+	case gd::GameObjectType::kGameObjectTypeDualPortal: return "Dual Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeSoloPortal: return "Solo Portal"; break;
+	case gd::GameObjectType::kGameObjectTypeSlope: return "Slope"; break;
+	case gd::GameObjectType::kGameObjectTypeWavePortal: return "Wave Portal"; break;
+	default: return "Unknown"; break;
+	}
+}
+
+void EditorUI::updateObjectInfo(gd::EditorUI* self) {
+	auto objectInfo = static_cast<CCLabelBMFont*>(self->getChildByTag(3207));
+	if (objectInfo) {
+		std::stringstream ss;
+
+		if (self->m_selectedObject) {
+			ss << "C: " << colorToString((int)self->m_selectedObject->m_defaultColorMode) << " (" << (int)self->m_selectedObject->m_defaultColorMode << ")" << "\n";
+			ss << "G: " << self->m_selectedObject->m_editorGroup << "\n";
+			ss << "Rot: " << self->m_selectedObject->getRotation() << "\n";
+			ss << "X: " << self->m_selectedObject->getPositionX() << "\n";
+			ss << "Y: " << self->m_selectedObject->getPositionY() << "\n";
+			ss << "ID: " << self->m_selectedObject->m_objectID << "\n";
+			ss << "Type: " << typeToString(self->m_selectedObject->m_objectType) << "\n";
+			ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(self->m_selectedObject) << std::dec << "\n";
+
+			objectInfo->setString(ss.str().c_str());
+		}
+		else if (self->m_selectedObjects->count() > 1) {
+			std::stringstream ss;
+
+			ss << "Objects: " << self->m_selectedObjects->count() << "\n";
+
+			objectInfo->setString(ss.str().c_str());
+		}
+		else objectInfo->setString("");
 	}
 }
 
@@ -1379,80 +1451,15 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	gd::GameManager::sharedState()->setIntGameVariable(GameVariable::COLOR_FILTER, 0);
 	colorFilterLabel->setString("D");
 
-	auto leftInfoSide = director->getScreenLeft() + 50.f;
+	// Object info
 
-	m_objectsSelected = CCLabelBMFont::create("Objects:", "chatFont.fnt");
-	m_objectsSelected->setVisible(0);
-	m_objectsSelected->setAnchorPoint({ 0.f, 0.5f });
-	m_objectsSelected->setScale(0.66f);
-	m_objectsSelected->setPosition({ leftInfoSide, director->getScreenTop() - 50.f });
-	self->addChild(m_objectsSelected);
+	auto objectInfo = CCLabelBMFont::create("", "chatFont.fnt");
+	objectInfo->setScale(.6f);
+	objectInfo->setAnchorPoint({ 0.f, 1.f });
+	objectInfo->setPosition(director->getScreenLeft() + 50.f, director->getScreenTop() - 50.f);
+	self->addChild(objectInfo, 0, 3207);
 
-	m_objectColor = CCLabelBMFont::create("C:", "chatFont.fnt");
-	m_objectColor->setVisible(0);
-	m_objectColor->setAnchorPoint({ 0.f, 0.5f });
-	m_objectColor->setScale(0.66f);
-	m_objectColor->setPosition({ leftInfoSide, director->getScreenTop() - 60.f });
-	self->addChild(m_objectColor);
-
-	m_objectGroup = CCLabelBMFont::create("G:", "chatFont.fnt");
-	m_objectGroup->setVisible(0);
-	m_objectGroup->setAnchorPoint({ 0.f, 0.5f });
-	m_objectGroup->setScale(0.66f);
-	m_objectGroup->setPosition({ leftInfoSide, director->getScreenTop() - 70.f });
-	self->addChild(m_objectGroup);
-
-	m_objectRotation = CCLabelBMFont::create("Rot:", "chatFont.fnt");
-	m_objectRotation->setVisible(0);
-	m_objectRotation->setAnchorPoint({ 0.f, 0.5f });
-	m_objectRotation->setScale(0.66f);
-	m_objectRotation->setPosition({ leftInfoSide, director->getScreenTop() - 80.f });
-	self->addChild(m_objectRotation);
-
-	m_objectXPos = CCLabelBMFont::create("X:", "chatFont.fnt");
-	m_objectXPos->setVisible(0);
-	m_objectXPos->setAnchorPoint({ 0.f, 0.5f });
-	m_objectXPos->setScale(0.66f);
-	m_objectXPos->setPosition({ leftInfoSide, director->getScreenTop() - 90.f });
-	self->addChild(m_objectXPos);
-
-	m_objectYPos = CCLabelBMFont::create("Y:", "chatFont.fnt");
-	m_objectYPos->setVisible(0);
-	m_objectYPos->setAnchorPoint({ 0.f, 0.5f });
-	m_objectYPos->setScale(0.66f);
-	m_objectYPos->setPosition({ leftInfoSide, director->getScreenTop() - 100.f });
-	self->addChild(m_objectYPos);
-
-	m_objectKey = CCLabelBMFont::create("ObjID:", "chatFont.fnt");
-	m_objectKey->setVisible(0);
-	m_objectKey->setAnchorPoint({ 0.f, 0.5f });
-	m_objectKey->setScale(0.66f);
-	m_objectKey->setPosition({ leftInfoSide, director->getScreenTop() - 110.f });
-	self->addChild(m_objectKey);
-
-	m_objectAddress = CCLabelBMFont::create("Addr:", "chatFont.fnt");
-	m_objectAddress->setVisible(0);
-	m_objectAddress->setAnchorPoint({ 0.f, 0.5f });
-	m_objectAddress->setScale(0.66f);
-	m_objectAddress->setPosition({ leftInfoSide, director->getScreenTop() - 120.f });
-	self->addChild(m_objectAddress);
-
-	m_objectType = CCLabelBMFont::create("Type:", "chatFont.fnt");
-	m_objectType->setVisible(0);
-	m_objectType->setAnchorPoint({ 0.f, 0.5f });
-	m_objectType->setScale(0.66f);
-	m_objectType->setPosition({ leftInfoSide, director->getScreenTop() - 130.f });
-	self->addChild(m_objectType);
-
-	m_objectZ = CCLabelBMFont::create("Object Z:", "chatFont.fnt");
-	m_objectZ->setVisible(0);
-	m_objectZ->setAnchorPoint({ 0.f, 0.5f });
-	m_objectZ->setScale(0.66f);
-	m_objectZ->setPosition({ leftInfoSide, director->getScreenTop() - 140.f });
-	self->addChild(m_objectZ);
-
-	auto custommenu = CCMenu::create();
-	custommenu->setPosition({ director->getScreenLeft(), director->getScreenTop() });
+	//
 
 	auto leftMenu = from<CCMenu*>(self->getRedoBtn(), 0xac);
 	auto rightMenu = from<CCMenu*>(self->getDeselectBtn(), 0xac);
@@ -1496,9 +1503,7 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 	}
 	auto deletebtn = gd::CCMenuItemSpriteExtra::create(deletespr, nullptr, self, menu_selector(gd::EditorUI::onDeleteSelected));
 	deletespr->setScale(0.925f);
-	//deletebtn->setPosition({ -160 , 139.35 });
-	deletebtn->setPositionX(redoBtn->getPositionX() + 50);
-	deletebtn->setPositionY(redoBtn->getPositionY());
+	deletebtn->setPosition({ redoBtn->getPositionX() + 50, redoBtn->getPositionY() });
 	deletebtn->setTag(45030);
 	deletebtn->setOpacity(175);
 	deletebtn->setColor({ 166, 166, 166 });
@@ -1557,8 +1562,6 @@ bool __fastcall EditorUI::init_H(gd::EditorUI* self, void*, gd::LevelEditorLayer
 
 	gridSizeMenu->addChild(m_gridSizeLabel);
 	bool prevAnims_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::PREV_ANIMS);
-	if (prevAnims_enabled)
-		RotateSaws::beginRotations(self->getLevelEditorLayer());
 
 	updateLastObjectX(self->getLevelEditorLayer());
 
@@ -1704,10 +1707,10 @@ void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void* edx, gd::Ga
 			self->rotateObjects(selectedObjects, -(45.f / selectedObjCount), { 0,0 });
 			break;
 		case rotationForCommand::kEditCommandRotate265CW:
-			self->rotateObjects(selectedObjects, (26.5f / selectedObjCount), { 0,0 });
+			self->rotateObjects(selectedObjects, (26.f / selectedObjCount), { 0,0 });
 			break;
 		case rotationForCommand::kEditCommandRotate265CCW:
-			self->rotateObjects(selectedObjects, -(26.5f / selectedObjCount), { 0,0 });
+			self->rotateObjects(selectedObjects, -(26.f / selectedObjCount), { 0,0 });
 			break;
 		}
 	}
@@ -1715,100 +1718,14 @@ void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void* edx, gd::Ga
 	EditorUI::transformObject(self, obj, com, idk);
 }
 
-void EditorUI::Callback::moveObjectHalfUp(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandHalfUp);
+void EditorUI::Callback::onCustomMoveObject(CCObject* obj) {
+	auto buttonTag = static_cast<gd::CCMenuItemSpriteExtra*>(obj)->getTag();
+	this->moveObjectCall(static_cast<gd::EditCommand>(buttonTag));
 }
 
-void EditorUI::Callback::moveObjectHalfDown(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandHalfDown);
-}
-
-void EditorUI::Callback::moveObjectHalfLeft(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandHalfLeft);
-}
-
-void EditorUI::Callback::moveObjectHalfRight(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandHalfRight);
-}
-
-void EditorUI::Callback::moveObjectQuarterUp(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterUp);
-}
-
-void EditorUI::Callback::moveObjectQuarterDown(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterDown);
-}
-
-void EditorUI::Callback::moveObjectQuarterLeft(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterLeft);
-}
-
-void EditorUI::Callback::moveObjectQuarterRight(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQuarterRight);
-}
-
-void EditorUI::Callback::moveObjectEightUp(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandEightUp);
-}
-
-void EditorUI::Callback::moveObjectEightDown(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandEightDown);
-}
-
-void EditorUI::Callback::moveObjectEightLeft(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandEightLeft);
-}
-
-void EditorUI::Callback::moveObjectEightRight(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandEightRight);
-}
-
-void EditorUI::Callback::moveObjectSmallerUp(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerUp);
-}
-
-void EditorUI::Callback::moveObjectSmallerDown(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerDown);
-}
-
-void EditorUI::Callback::moveObjectSmallerLeft(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerLeft);
-}
-
-void EditorUI::Callback::moveObjectSmallerRight(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandSmallerRight);
-}
-
-void EditorUI::Callback::moveObjectQUnitUp(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitUp);
-}
-
-void EditorUI::Callback::moveObjectQUnitDown(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitDown);
-}
-
-void EditorUI::Callback::moveObjectQUnitLeft(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitLeft);
-}
-
-void EditorUI::Callback::moveObjectQUnitRight(CCObject*) {
-	editUI->moveObjectCall(moveForCommand::kEditCommandQUnitRight);
-}
-
-void EditorUI::Callback::rotate45CW(CCObject* sender) {
-	editUI->transformObjectCall(rotationForCommand::kEditCommandRotate45CW);
-}
-
-void EditorUI::Callback::rotate45CCW(CCObject* sender) {
-	editUI->transformObjectCall(rotationForCommand::kEditCommandRotate45CCW);
-}
-
-void EditorUI::Callback::rotate265CW(CCObject* sender) {
-	editUI->transformObjectCall(rotationForCommand::kEditCommandRotate265CW);
-}
-
-void EditorUI::Callback::rotate265CCW(CCObject* sender) {
-	editUI->transformObjectCall(rotationForCommand::kEditCommandRotate265CCW);
+void EditorUI::Callback::onCustomRotateObject(CCObject* obj) {
+	auto buttonTag = static_cast<gd::CCMenuItemSpriteExtra*>(obj)->getTag();
+	this->transformObjectCall(static_cast<gd::EditCommand>(buttonTag));
 }
 
 void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
@@ -1836,164 +1753,85 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	dotsArray->addObject(pageDot);
 	dotsNode->addChild(pageDot);
 
-	auto moveHalfUp_spr = CCSprite::create("GJ_button_01.png");
-	moveHalfUp_spr->setScale(0.9f);
-	auto moveHalfUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn2_001.png");
-	moveHalfUp_spr2->setPosition({ moveHalfUp_spr->getContentSize().width / 2, (moveHalfUp_spr->getContentSize().height / 2) + 2 });
-	auto moveHalfUp_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
-	moveHalfUp_lbl->setScale(0.5f);
-	moveHalfUp_lbl->setPosition({ moveHalfUp_spr->getContentSize().width / 2, (moveHalfUp_spr->getContentSize().height / 2) - 9 });
-	moveHalfUp_spr->addChild(moveHalfUp_spr2);
-	moveHalfUp_spr->addChild(moveHalfUp_lbl);
-	auto moveHalfUp_btn = gd::CCMenuItemSpriteExtra::create(moveHalfUp_spr, moveHalfUp_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfUp));
-	moveHalfUp_btn->setPosition({ -105, -(winSize.height / 2) + 68});
+	// Half
 
-	auto moveHalfDown_spr = CCSprite::create("GJ_button_01.png");
-	moveHalfDown_spr->setScale(0.9f);
-	auto moveHalfDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn2_001.png");
-	moveHalfDown_spr2->setPosition({ moveHalfDown_spr->getContentSize().width / 2, (moveHalfDown_spr->getContentSize().height / 2) + 2 });
-	auto moveHalfDown_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
-	moveHalfDown_lbl->setScale(0.5f);
-	moveHalfDown_lbl->setPosition({ moveHalfDown_spr->getContentSize().width / 2, (moveHalfDown_spr->getContentSize().height / 2) - 9 });
-	moveHalfDown_spr->addChild(moveHalfDown_spr2);
-	moveHalfDown_spr->addChild(moveHalfDown_lbl);
-	auto moveHalfDown_btn = gd::CCMenuItemSpriteExtra::create(moveHalfDown_spr, moveHalfDown_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfDown));
-	moveHalfDown_btn->setPosition({ -65, -(winSize.height / 2) + 68 });
+	auto halfLabel = CCLabelBMFont::create("1/2", "bigFont.fnt");
+	halfLabel->setScale(0.5f);
+	halfLabel->setPosition({ 20.f, 10.f });
 
-	auto moveHalfLeft_spr = CCSprite::create("GJ_button_01.png");
-	moveHalfLeft_spr->setScale(0.9f);
-	auto moveHalfLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
-	moveHalfLeft_spr2->setPosition({ moveHalfLeft_spr->getContentSize().width / 2, (moveHalfLeft_spr->getContentSize().height / 2) + 2 });
-	auto moveHalfLeft_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
-	moveHalfLeft_lbl->setScale(0.5f);
-	moveHalfLeft_lbl->setPosition({ moveHalfLeft_spr->getContentSize().width / 2, (moveHalfLeft_spr->getContentSize().height / 2) - 9 });
-	moveHalfLeft_spr->addChild(moveHalfLeft_spr2);
-	moveHalfLeft_spr->addChild(moveHalfLeft_lbl);
-	auto moveHalfLeft_btn = gd::CCMenuItemSpriteExtra::create(moveHalfLeft_spr, moveHalfLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfLeft));
-	moveHalfLeft_btn->setPosition({ -25, -(winSize.height / 2) + 68 });
+	auto halfUp = self->getSpriteButton("edit_upBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(halfUp->getChildren()->objectAtIndex(0))->addChild(halfLabel, 5);
+	halfUp->setPosition({ -105, -(winSize.height / 2) + 68 });
+	movePageMenu->addChild(halfUp, 0, (int)moveForCommand::kEditCommandHalfUp);
 
-	auto moveHalfRight_spr = CCSprite::create("GJ_button_01.png");
-	moveHalfRight_spr->setScale(0.9f);
-	auto moveHalfRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
-	moveHalfRight_spr2->setPosition({ moveHalfRight_spr->getContentSize().width / 2, (moveHalfRight_spr->getContentSize().height / 2) + 2 });
-	auto moveHalfRight_lbl = CCLabelBMFont::create("1/2", "bigFont.fnt");
-	moveHalfRight_lbl->setScale(0.5f);
-	moveHalfRight_lbl->setPosition({ moveHalfRight_spr->getContentSize().width / 2, (moveHalfRight_spr->getContentSize().height / 2) - 9 });
-	moveHalfRight_spr->addChild(moveHalfRight_spr2);
-	moveHalfRight_spr->addChild(moveHalfRight_lbl);
-	auto moveHalfRight_btn = gd::CCMenuItemSpriteExtra::create(moveHalfRight_spr, moveHalfRight_spr, self, menu_selector(EditorUI::Callback::moveObjectHalfRight));
-	moveHalfRight_btn->setPosition({ 15, -(winSize.height / 2) + 68 });
+	auto halfDown = self->getSpriteButton("edit_downBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(halfDown->getChildren()->objectAtIndex(0))->addChild(halfLabel, 5);
+	halfDown->setPosition({ -65, -(winSize.height / 2) + 68 });
+	movePageMenu->addChild(halfDown, 0, (int)moveForCommand::kEditCommandHalfDown);
 
-	auto moveQuarterUp_spr = CCSprite::create("GJ_button_01.png");
-	moveQuarterUp_spr->setScale(0.9f);
-	auto moveQuarterUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn2_001.png");
-	moveQuarterUp_spr2->setPosition({ moveQuarterUp_spr->getContentSize().width / 2, (moveQuarterUp_spr->getContentSize().height / 2) + 2 });
-	auto moveQuarterUp_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
-	moveQuarterUp_lbl->setScale(0.5f);
-	moveQuarterUp_lbl->setPosition({ moveQuarterUp_spr->getContentSize().width / 2, (moveQuarterUp_spr->getContentSize().height / 2) - 9 });
-	moveQuarterUp_spr->addChild(moveQuarterUp_spr2);
-	moveQuarterUp_spr->addChild(moveQuarterUp_lbl);
-	auto moveQuarterUp_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterUp_spr, moveQuarterUp_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterUp));
-	moveQuarterUp_btn->setPosition({ 55, -(winSize.height / 2) + 68 });
+	auto halfLeft = self->getSpriteButton("edit_leftBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(halfLeft->getChildren()->objectAtIndex(0))->addChild(halfLabel, 5);
+	halfLeft->setPosition({ -25, -(winSize.height / 2) + 68 });
+	movePageMenu->addChild(halfLeft, 0, (int)moveForCommand::kEditCommandHalfLeft);
 
-	auto moveQuarterDown_spr = CCSprite::create("GJ_button_01.png");
-	moveQuarterDown_spr->setScale(0.9f);
-	auto moveQuarterDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn2_001.png");
-	moveQuarterDown_spr2->setPosition({ moveQuarterDown_spr->getContentSize().width / 2, (moveQuarterDown_spr->getContentSize().height / 2) + 2 });
-	auto moveQuarterDown_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
-	moveQuarterDown_lbl->setScale(0.5f);
-	moveQuarterDown_lbl->setPosition({ moveQuarterDown_spr->getContentSize().width / 2, (moveQuarterDown_spr->getContentSize().height / 2) - 9 });
-	moveQuarterDown_spr->addChild(moveQuarterDown_spr2);
-	moveQuarterDown_spr->addChild(moveQuarterDown_lbl);
-	auto moveQuarterDown_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterDown_spr, moveQuarterDown_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterDown));
-	moveQuarterDown_btn->setPosition({ 95, -(winSize.height / 2) + 68 });
+	auto halfRight = self->getSpriteButton("edit_rightBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(halfRight->getChildren()->objectAtIndex(0))->addChild(halfLabel, 5);
+	halfRight->setPosition({ 15, -(winSize.height / 2) + 68 });
+	movePageMenu->addChild(halfRight, 0, (int)moveForCommand::kEditCommandHalfRight);
 
-	auto moveQuarterLeft_spr = CCSprite::create("GJ_button_01.png");
-	moveQuarterLeft_spr->setScale(0.9f);
-	auto moveQuarterLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
-	moveQuarterLeft_spr2->setPosition({ moveQuarterLeft_spr->getContentSize().width / 2, (moveQuarterLeft_spr->getContentSize().height / 2) + 2 });
-	auto moveQuarterLeft_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
-	moveQuarterLeft_lbl->setScale(0.5f);
-	moveQuarterLeft_lbl->setPosition({ moveQuarterLeft_spr->getContentSize().width / 2, (moveQuarterLeft_spr->getContentSize().height / 2) - 9 });
-	moveQuarterLeft_spr->addChild(moveQuarterLeft_spr2);
-	moveQuarterLeft_spr->addChild(moveQuarterLeft_lbl);
-	auto moveQuarterLeft_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterLeft_spr, moveQuarterLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterLeft));
-	moveQuarterLeft_btn->setPosition({ -105, -(winSize.height / 2) + 28 });
+	// Quarter
 
-	auto moveQuarterRight_spr = CCSprite::create("GJ_button_01.png");
-	moveQuarterRight_spr->setScale(0.9f);
-	auto moveQuarterRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
-	moveQuarterRight_spr2->setPosition({ moveQuarterRight_spr->getContentSize().width / 2, (moveQuarterRight_spr->getContentSize().height / 2) + 2 });
-	auto moveQuarterRight_lbl = CCLabelBMFont::create("1/4", "bigFont.fnt");
-	moveQuarterRight_lbl->setScale(0.5f);
-	moveQuarterRight_lbl->setPosition({ moveQuarterRight_spr->getContentSize().width / 2, (moveQuarterRight_spr->getContentSize().height / 2) - 9 });
-	moveQuarterRight_spr->addChild(moveQuarterRight_spr2);
-	moveQuarterRight_spr->addChild(moveQuarterRight_lbl);
-	auto moveQuarterRight_btn = gd::CCMenuItemSpriteExtra::create(moveQuarterRight_spr, moveQuarterRight_spr, self, menu_selector(EditorUI::Callback::moveObjectQuarterRight));
-	moveQuarterRight_btn->setPosition({ -65, -(winSize.height / 2) + 28 });
+	auto quarterLabel = CCLabelBMFont::create("1/4", "bigFont.fnt");
+	quarterLabel->setScale(0.5f);
+	quarterLabel->setPosition({ 20.f, 10.f });
 
-	auto moveEightUp_spr = CCSprite::create("GJ_button_01.png");
-	moveEightUp_spr->setScale(0.9f);
-	auto moveEightUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn2_001.png");
-	moveEightUp_spr2->setPosition({ moveEightUp_spr->getContentSize().width / 2, (moveEightUp_spr->getContentSize().height / 2) + 2 });
-	auto moveEightUp_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
-	moveEightUp_lbl->setScale(0.5f);
-	moveEightUp_lbl->setPosition({ moveEightUp_spr->getContentSize().width / 2, (moveEightUp_spr->getContentSize().height / 2) - 9 });
-	moveEightUp_spr->addChild(moveEightUp_spr2);
-	moveEightUp_spr->addChild(moveEightUp_lbl);
-	auto moveEightUp_btn = gd::CCMenuItemSpriteExtra::create(moveEightUp_spr, moveEightUp_spr, self, menu_selector(EditorUI::Callback::moveObjectEightUp));
-	moveEightUp_btn->setPosition({ -25, -(winSize.height / 2) + 28 });
+	auto quarterUp = self->getSpriteButton("edit_upBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(quarterUp->getChildren()->objectAtIndex(0))->addChild(quarterLabel, 5);
+	quarterUp->setPosition({ 55, -(winSize.height / 2) + 68 });
+	movePageMenu->addChild(quarterUp, 0, (int)moveForCommand::kEditCommandQuarterUp);
 
-	auto moveEightDown_spr = CCSprite::create("GJ_button_01.png");
-	moveEightDown_spr->setScale(0.9f);
-	auto moveEightDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn2_001.png");
-	moveEightDown_spr2->setPosition({ moveEightDown_spr->getContentSize().width / 2, (moveEightDown_spr->getContentSize().height / 2) + 2 });
-	auto moveEightDown_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
-	moveEightDown_lbl->setScale(0.5f);
-	moveEightDown_lbl->setPosition({ moveEightDown_spr->getContentSize().width / 2, (moveEightDown_spr->getContentSize().height / 2) - 9 });
-	moveEightDown_spr->addChild(moveEightDown_spr2);
-	moveEightDown_spr->addChild(moveEightDown_lbl);
-	auto moveEightDown_btn = gd::CCMenuItemSpriteExtra::create(moveEightDown_spr, moveEightDown_spr, self, menu_selector(EditorUI::Callback::moveObjectEightDown));
-	moveEightDown_btn->setPosition({ 15, -(winSize.height / 2) + 28 });
+	auto quarterDown = self->getSpriteButton("edit_downBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(quarterDown->getChildren()->objectAtIndex(0))->addChild(quarterLabel, 5);
+	quarterDown->setPosition({ 95, -(winSize.height / 2) + 68 });
+	movePageMenu->addChild(quarterDown, 0, (int)moveForCommand::kEditCommandQuarterDown);
 
-	auto moveEightLeft_spr = CCSprite::create("GJ_button_01.png");
-	moveEightLeft_spr->setScale(0.9f);
-	auto moveEightLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
-	moveEightLeft_spr2->setPosition({ moveEightLeft_spr->getContentSize().width / 2, (moveEightLeft_spr->getContentSize().height / 2) + 2 });
-	auto moveEightLeft_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
-	moveEightLeft_lbl->setScale(0.5f);
-	moveEightLeft_lbl->setPosition({ moveEightLeft_spr->getContentSize().width / 2, (moveEightLeft_spr->getContentSize().height / 2) - 9 });
-	moveEightLeft_spr->addChild(moveEightLeft_spr2);
-	moveEightLeft_spr->addChild(moveEightLeft_lbl);
-	auto moveEightLeft_btn = gd::CCMenuItemSpriteExtra::create(moveEightLeft_spr, moveEightLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectEightLeft));
-	moveEightLeft_btn->setPosition({ 55, -(winSize.height / 2) + 28 });
+	auto quarterLeft = self->getSpriteButton("edit_leftBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(quarterLeft->getChildren()->objectAtIndex(0))->addChild(quarterLabel, 5);
+	quarterLeft->setPosition({ -105, -(winSize.height / 2) + 28 });
+	movePageMenu->addChild(quarterLeft, 0, (int)moveForCommand::kEditCommandQuarterLeft);
 
-	auto moveEightRight_spr = CCSprite::create("GJ_button_01.png");
-	moveEightRight_spr->setScale(0.9f);
-	auto moveEightRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
-	moveEightRight_spr2->setPosition({ moveEightRight_spr->getContentSize().width / 2, (moveEightRight_spr->getContentSize().height / 2) + 2 });
-	auto moveEightRight_lbl = CCLabelBMFont::create("1/8", "bigFont.fnt");
-	moveEightRight_lbl->setScale(0.5f);
-	moveEightRight_lbl->setPosition({ moveEightRight_spr->getContentSize().width / 2, (moveEightRight_spr->getContentSize().height / 2) - 9 });
-	moveEightRight_spr->addChild(moveEightRight_spr2);
-	moveEightRight_spr->addChild(moveEightRight_lbl);
-	auto moveEightRight_btn = gd::CCMenuItemSpriteExtra::create(moveEightRight_spr, moveEightRight_spr, self, menu_selector(EditorUI::Callback::moveObjectEightRight));
-	moveEightRight_btn->setPosition({ 95, -(winSize.height / 2) + 28 });
+	auto quarterRight = self->getSpriteButton("edit_rightBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(quarterRight->getChildren()->objectAtIndex(0))->addChild(quarterLabel, 5);
+	quarterRight->setPosition({ -65, -(winSize.height / 2) + 28 });
+	movePageMenu->addChild(quarterRight, 0, (int)moveForCommand::kEditCommandQuarterRight);
 
-	movePageMenu->addChild(moveHalfUp_btn);
-	movePageMenu->addChild(moveHalfDown_btn);
-	movePageMenu->addChild(moveHalfLeft_btn);
-	movePageMenu->addChild(moveHalfRight_btn);
+	// Eight
 
-	movePageMenu->addChild(moveQuarterUp_btn);
-	movePageMenu->addChild(moveQuarterDown_btn);
-	movePageMenu->addChild(moveQuarterLeft_btn);
-	movePageMenu->addChild(moveQuarterRight_btn);
+	auto eightLabel = CCLabelBMFont::create("1/8", "bigFont.fnt");
+	eightLabel->setScale(0.5f);
+	eightLabel->setPosition({ 20.f, 10.f });
 
-	movePageMenu->addChild(moveEightUp_btn);
-	movePageMenu->addChild(moveEightDown_btn);
-	movePageMenu->addChild(moveEightLeft_btn);
-	movePageMenu->addChild(moveEightRight_btn);
+	auto eightUp = self->getSpriteButton("edit_upBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(eightUp->getChildren()->objectAtIndex(0))->addChild(eightLabel, 5);
+	eightUp->setPosition({ -25, -(winSize.height / 2) + 28 });
+	movePageMenu->addChild(eightUp, 0, (int)moveForCommand::kEditCommandEightUp);
+
+	auto eightDown = self->getSpriteButton("edit_downBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(eightDown->getChildren()->objectAtIndex(0))->addChild(eightLabel, 5);
+	eightDown->setPosition({ 15, -(winSize.height / 2) + 28 });
+	movePageMenu->addChild(eightDown, 0, (int)moveForCommand::kEditCommandEightDown);
+
+	auto eightLeft = self->getSpriteButton("edit_leftBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(eightLeft->getChildren()->objectAtIndex(0))->addChild(eightLabel, 5);
+	eightLeft->setPosition({ 55, -(winSize.height / 2) + 28 });
+	movePageMenu->addChild(eightLeft, 0, (int)moveForCommand::kEditCommandEightLeft);
+
+	auto eightRight = self->getSpriteButton("edit_rightBtn2_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(eightRight->getChildren()->objectAtIndex(0))->addChild(eightLabel, 5);
+	eightRight->setPosition({ 95, -(winSize.height / 2) + 28 });
+	movePageMenu->addChild(eightRight, 0, (int)moveForCommand::kEditCommandEightRight);
+
+	// 4th page
 
 	CCArray* movePage2CCArray = CCArray::create();
 	auto moveButtonPage2 = gd::ButtonPage::create(movePage2CCArray);
@@ -2006,182 +1844,100 @@ void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
 	dotsArray->addObject(pageDot2);
 	dotsNode->addChild(pageDot2);
 
-	auto moveSmallerUp_spr = CCSprite::create("GJ_button_01.png");
-	moveSmallerUp_spr->setScale(0.9f);
-	auto moveSmallerUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
-	moveSmallerUp_spr2->setPosition({ moveSmallerUp_spr->getContentSize().width / 2, (moveSmallerUp_spr->getContentSize().height / 2) + 2 });
-	auto moveSmallerUp_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
-	moveSmallerUp_lbl->setScale(0.5f);
-	moveSmallerUp_lbl->setPosition({ moveSmallerUp_spr->getContentSize().width / 2, (moveSmallerUp_spr->getContentSize().height / 2) - 9 });
-	moveSmallerUp_spr->addChild(moveSmallerUp_spr2);
-	moveSmallerUp_spr->addChild(moveSmallerUp_lbl);
-	auto moveSmallerUp_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerUp_spr, moveSmallerUp_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerUp));
-	moveSmallerUp_btn->setPosition({ -105, -(winSize.height / 2) + 68 });
+	// 0.5
 
-	auto moveSmallerDown_spr = CCSprite::create("GJ_button_01.png");
-	moveSmallerDown_spr->setScale(0.9f);
-	auto moveSmallerDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
-	moveSmallerDown_spr2->setPosition({ moveSmallerDown_spr->getContentSize().width / 2, (moveSmallerDown_spr->getContentSize().height / 2) + 2 });
-	auto moveSmallerDown_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
-	moveSmallerDown_lbl->setScale(0.5f);
-	moveSmallerDown_lbl->setPosition({ moveSmallerDown_spr->getContentSize().width / 2, (moveSmallerDown_spr->getContentSize().height / 2) - 9 });
-	moveSmallerDown_spr->addChild(moveSmallerDown_spr2);
-	moveSmallerDown_spr->addChild(moveSmallerDown_lbl);
-	auto moveSmallerDown_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerDown_spr, moveSmallerDown_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerDown));
-	moveSmallerDown_btn->setPosition({ -65, -(winSize.height / 2) + 68 });
+	auto smallerLabel = CCLabelBMFont::create("0.5", "bigFont.fnt");
+	smallerLabel->setScale(0.5f);
+	smallerLabel->setPosition({ 20.f, 10.f });
 
-	auto moveSmallerLeft_spr = CCSprite::create("GJ_button_01.png");
-	moveSmallerLeft_spr->setScale(0.9f);
-	auto moveSmallerLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
-	moveSmallerLeft_spr2->setPosition({ moveSmallerLeft_spr->getContentSize().width / 2, (moveSmallerLeft_spr->getContentSize().height / 2) + 2 });
-	auto moveSmallerLeft_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
-	moveSmallerLeft_lbl->setScale(0.5f);
-	moveSmallerLeft_lbl->setPosition({ moveSmallerLeft_spr->getContentSize().width / 2, (moveSmallerLeft_spr->getContentSize().height / 2) - 9 });
-	moveSmallerLeft_spr->addChild(moveSmallerLeft_spr2);
-	moveSmallerLeft_spr->addChild(moveSmallerLeft_lbl);
-	auto moveSmallerLeft_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerLeft_spr, moveSmallerLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerLeft));
-	moveSmallerLeft_btn->setPosition({ -25, -(winSize.height / 2) + 68 });
+	auto smallerUp = self->getSpriteButton("edit_upBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(smallerUp->getChildren()->objectAtIndex(0))->addChild(smallerLabel, 5);
+	smallerUp->setPosition({ -105, -(winSize.height / 2) + 68 });
+	movePageMenu2->addChild(smallerUp, 0, (int)moveForCommand::kEditCommandSmallerUp);
 
-	auto moveSmallerRight_spr = CCSprite::create("GJ_button_01.png");
-	moveSmallerRight_spr->setScale(0.9f);
-	auto moveSmallerRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
-	moveSmallerRight_spr2->setPosition({ moveSmallerRight_spr->getContentSize().width / 2, (moveSmallerRight_spr->getContentSize().height / 2) + 2 });
-	auto moveSmallerRight_lbl = CCLabelBMFont::create("0.5", "bigFont.fnt");
-	moveSmallerRight_lbl->setScale(0.5f);
-	moveSmallerRight_lbl->setPosition({ moveSmallerRight_spr->getContentSize().width / 2, (moveSmallerRight_spr->getContentSize().height / 2) - 9 });
-	moveSmallerRight_spr->addChild(moveSmallerRight_spr2);
-	moveSmallerRight_spr->addChild(moveSmallerRight_lbl);
-	auto moveSmallerRight_btn = gd::CCMenuItemSpriteExtra::create(moveSmallerRight_spr, moveSmallerRight_spr, self, menu_selector(EditorUI::Callback::moveObjectSmallerRight));
-	moveSmallerRight_btn->setPosition({ 15, -(winSize.height / 2) + 68 });
+	auto smallerDown = self->getSpriteButton("edit_downBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(smallerDown->getChildren()->objectAtIndex(0))->addChild(smallerLabel, 5);
+	smallerDown->setPosition({ -65, -(winSize.height / 2) + 68 });
+	movePageMenu2->addChild(smallerDown, 0, (int)moveForCommand::kEditCommandSmallerDown);
 
-	auto moveQUnitUp_spr = CCSprite::create("GJ_button_01.png");
-	moveQUnitUp_spr->setScale(0.9f);
-	auto moveQUnitUp_spr2 = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
-	moveQUnitUp_spr2->setPosition({ moveQUnitUp_spr->getContentSize().width / 2, (moveQUnitUp_spr->getContentSize().height / 2) + 2 });
-	auto moveQUnitUp_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
-	moveQUnitUp_lbl->setScale(0.5f);
-	moveQUnitUp_lbl->setPosition({ moveQUnitUp_spr->getContentSize().width / 2, (moveQUnitUp_spr->getContentSize().height / 2) - 9 });
-	moveQUnitUp_spr->addChild(moveQUnitUp_spr2);
-	moveQUnitUp_spr->addChild(moveQUnitUp_lbl);
-	auto moveQUnitUp_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitUp_spr, moveQUnitUp_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitUp));
-	moveQUnitUp_btn->setPosition({ 55, -(winSize.height / 2) + 68 });
+	auto smallerLeft = self->getSpriteButton("edit_leftBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(smallerLeft->getChildren()->objectAtIndex(0))->addChild(smallerLabel, 5);
+	smallerLeft->setPosition({ -25, -(winSize.height / 2) + 68 });
+	movePageMenu2->addChild(smallerLeft, 0, (int)moveForCommand::kEditCommandSmallerLeft);
 
-	auto moveQUnitDown_spr = CCSprite::create("GJ_button_01.png");
-	moveQUnitDown_spr->setScale(0.9f);
-	auto moveQUnitDown_spr2 = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
-	moveQUnitDown_spr2->setPosition({ moveQUnitDown_spr->getContentSize().width / 2, (moveQUnitDown_spr->getContentSize().height / 2) + 2 });
-	auto moveQUnitDown_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
-	moveQUnitDown_lbl->setScale(0.5f);
-	moveQUnitDown_lbl->setPosition({ moveQUnitDown_spr->getContentSize().width / 2, (moveQUnitDown_spr->getContentSize().height / 2) - 9 });
-	moveQUnitDown_spr->addChild(moveQUnitDown_spr2);
-	moveQUnitDown_spr->addChild(moveQUnitDown_lbl);
-	auto moveQUnitDown_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitDown_spr, moveQUnitDown_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitDown));
-	moveQUnitDown_btn->setPosition({ 95, -(winSize.height / 2) + 68 });
+	auto smallerRight = self->getSpriteButton("edit_rightBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(smallerRight->getChildren()->objectAtIndex(0))->addChild(smallerLabel, 5);
+	smallerRight->setPosition({ 15, -(winSize.height / 2) + 68 });
+	movePageMenu2->addChild(smallerRight, 0, (int)moveForCommand::kEditCommandSmallerRight);
 
-	auto moveQUnitLeft_spr = CCSprite::create("GJ_button_01.png");
-	moveQUnitLeft_spr->setScale(0.9f);
-	auto moveQUnitLeft_spr2 = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
-	moveQUnitLeft_spr2->setPosition({ moveQUnitLeft_spr->getContentSize().width / 2, (moveQUnitLeft_spr->getContentSize().height / 2) + 2 });
-	auto moveQUnitLeft_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
-	moveQUnitLeft_lbl->setScale(0.5f);
-	moveQUnitLeft_lbl->setPosition({ moveQUnitLeft_spr->getContentSize().width / 2, (moveQUnitLeft_spr->getContentSize().height / 2) - 9 });
-	moveQUnitLeft_spr->addChild(moveQUnitLeft_spr2);
-	moveQUnitLeft_spr->addChild(moveQUnitLeft_lbl);
-	auto moveQUnitLeft_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitLeft_spr, moveQUnitLeft_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitLeft));
-	moveQUnitLeft_btn->setPosition({ -105, -(winSize.height / 2) + 28 });
+	// Unit
 
-	auto moveQUnitRight_spr = CCSprite::create("GJ_button_01.png");
-	moveQUnitRight_spr->setScale(0.9f);
-	auto moveQUnitRight_spr2 = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
-	moveQUnitRight_spr2->setPosition({ moveQUnitRight_spr->getContentSize().width / 2, (moveQUnitRight_spr->getContentSize().height / 2) + 2 });
-	auto moveQUnitRight_lbl = CCLabelBMFont::create("Unit", "bigFont.fnt");
-	moveQUnitRight_lbl->setScale(0.5f);
-	moveQUnitRight_lbl->setPosition({ moveQUnitRight_spr->getContentSize().width / 2, (moveQUnitRight_spr->getContentSize().height / 2) - 9 });
-	moveQUnitRight_spr->addChild(moveQUnitRight_spr2);
-	moveQUnitRight_spr->addChild(moveQUnitRight_lbl);
-	auto moveQUnitRight_btn = gd::CCMenuItemSpriteExtra::create(moveQUnitRight_spr, moveQUnitRight_spr, self, menu_selector(EditorUI::Callback::moveObjectQUnitRight));
-	moveQUnitRight_btn->setPosition({ -65, -(winSize.height / 2) + 28 });
+	auto unitLabel = CCLabelBMFont::create("0.1", "bigFont.fnt");
+	unitLabel->setScale(0.5f);
+	unitLabel->setPosition({ 20.f, 10.f });
 
-	auto rotate45CW_base = CCSprite::create("GJ_button_01.png");
-	auto rotate45CW_second = CCLabelBMFont::create("45", "bigFont.fnt");
-	rotate45CW_second->setScale(0.45f); // 45 lol
-	rotate45CW_second->setPosition({ rotate45CW_base->getContentSize().width / 2, (rotate45CW_base->getContentSize().height / 2) + 2 });
-	rotate45CW_second->setZOrder(2);
-	auto rotate45CW_spr2 = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
-	rotate45CW_spr2->setPosition({ rotate45CW_base->getContentSize().width / 2, (rotate45CW_base->getContentSize().height / 2) + 2 });
-	rotate45CW_base->addChild(rotate45CW_second);
-	rotate45CW_base->addChild(rotate45CW_spr2);
-	rotate45CW_base->setScale(0.9f);
-	auto rotate45CW_btn = gd::CCMenuItemSpriteExtra::create(rotate45CW_base, rotate45CW_base, self, menu_selector(EditorUI::Callback::rotate45CW));
-	rotate45CW_btn->setPosition({ -25, -(winSize.height / 2) + 28 });
+	auto unitUp = self->getSpriteButton("edit_upBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(unitUp->getChildren()->objectAtIndex(0))->addChild(unitLabel, 5);
+	unitUp->setPosition({ 55, -(winSize.height / 2) + 68 });
+	movePageMenu2->addChild(unitUp, 0, (int)moveForCommand::kEditCommandQUnitUp);
 
-	auto rotate45CCW_base = CCSprite::create("GJ_button_01.png");
-	auto rotate45CCW_second = CCLabelBMFont::create("45", "bigFont.fnt");
-	rotate45CCW_second->setScale(0.45f); // 45 lol
-	rotate45CCW_second->setPosition({ rotate45CCW_base->getContentSize().width / 2, (rotate45CCW_base->getContentSize().height / 2) + 2 });
-	rotate45CCW_second->setZOrder(2);
-	auto rotate45CCW_spr2 = CCSprite::createWithSpriteFrameName("edit_ccwBtn_001.png");
-	rotate45CCW_spr2->setPosition({ rotate45CCW_base->getContentSize().width / 2, (rotate45CCW_base->getContentSize().height / 2) + 2 });
-	rotate45CCW_base->addChild(rotate45CCW_second);
-	rotate45CCW_base->addChild(rotate45CCW_spr2);
-	rotate45CCW_base->setScale(0.9f);
-	auto rotate45CCW_btn = gd::CCMenuItemSpriteExtra::create(rotate45CCW_base, rotate45CCW_base, self, menu_selector(EditorUI::Callback::rotate45CCW));
-	rotate45CCW_btn->setPosition({ 15, -(winSize.height / 2) + 28 });
+	auto unitDown = self->getSpriteButton("edit_downBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(unitDown->getChildren()->objectAtIndex(0))->addChild(unitLabel, 5);
+	unitDown->setPosition({ 95, -(winSize.height / 2) + 68 });
+	movePageMenu2->addChild(unitDown, 0, (int)moveForCommand::kEditCommandQUnitDown);
 
-	auto rotate265CW_base = CCSprite::create("GJ_button_01.png");
-	auto rotate265CW_second = CCLabelBMFont::create("26.5", "bigFont.fnt");
-	rotate265CW_second->setScale(0.45f);
-	rotate265CW_second->setPosition({ rotate265CW_base->getContentSize().width / 2, (rotate265CW_base->getContentSize().height / 2) + 2 });
-	rotate265CW_second->setZOrder(2);
-	auto rotate265CW_spr2 = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
-	rotate265CW_spr2->setPosition({ rotate265CW_base->getContentSize().width / 2, (rotate265CW_base->getContentSize().height / 2) + 2 });
-	rotate265CW_base->addChild(rotate265CW_second);
-	rotate265CW_base->addChild(rotate265CW_spr2);
-	rotate265CW_base->setScale(0.9f);
-	auto rotate265CW_btn = gd::CCMenuItemSpriteExtra::create(rotate265CW_base, rotate265CW_base, self, menu_selector(EditorUI::Callback::rotate265CW));
-	rotate265CW_btn->setPosition({ 55, -(winSize.height / 2) + 28 });
+	auto unitLeft = self->getSpriteButton("edit_leftBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(unitLeft->getChildren()->objectAtIndex(0))->addChild(unitLabel, 5);
+	unitLeft->setPosition({ -105, -(winSize.height / 2) + 28 });
+	movePageMenu2->addChild(unitLeft, 0, (int)moveForCommand::kEditCommandQUnitLeft);
 
-	auto rotate265CCW_base = CCSprite::create("GJ_button_01.png");
-	auto rotate265CCW_second = CCLabelBMFont::create("26.5", "bigFont.fnt");
-	rotate265CCW_second->setScale(0.45f);
-	rotate265CCW_second->setPosition({ rotate265CCW_base->getContentSize().width / 2, (rotate265CCW_base->getContentSize().height / 2) + 2 });
-	rotate265CCW_second->setZOrder(2);
-	auto rotate265CCW_spr2 = CCSprite::createWithSpriteFrameName("edit_ccwBtn_001.png");
-	rotate265CCW_spr2->setPosition({ rotate265CCW_base->getContentSize().width / 2, (rotate265CCW_base->getContentSize().height / 2) + 2 });
-	rotate265CCW_base->addChild(rotate265CCW_second);
-	rotate265CCW_base->addChild(rotate265CCW_spr2);
-	rotate265CCW_base->setScale(0.9f);
-	auto rotate265CCW_btn = gd::CCMenuItemSpriteExtra::create(rotate265CCW_base, rotate265CCW_base, self, menu_selector(EditorUI::Callback::rotate265CCW));
-	rotate265CCW_btn->setPosition({ 95, -(winSize.height / 2) + 28 });
+	auto unitRight = self->getSpriteButton("edit_rightBtn_001.png", menu_selector(EditorUI::Callback::onCustomMoveObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(unitRight->getChildren()->objectAtIndex(0))->addChild(unitLabel, 5);
+	unitRight->setPosition({ -65, -(winSize.height / 2) + 28 });
+	movePageMenu2->addChild(unitRight, 0, (int)moveForCommand::kEditCommandQUnitRight);
 
-	movePageMenu2->addChild(moveSmallerUp_btn);
-	movePageMenu2->addChild(moveSmallerDown_btn);
-	movePageMenu2->addChild(moveSmallerLeft_btn);
-	movePageMenu2->addChild(moveSmallerRight_btn);
+	// Rotate 45
 
-	movePageMenu2->addChild(moveQUnitUp_btn);
-	movePageMenu2->addChild(moveQUnitDown_btn);
-	movePageMenu2->addChild(moveQUnitLeft_btn);
-	movePageMenu2->addChild(moveQUnitRight_btn);
+	auto rotate45Label = CCLabelBMFont::create("45", "bigFont.fnt");
+	rotate45Label->setScale(.45f);
+	rotate45Label->setPosition({ 20.f, 22.f });
 
-	movePageMenu2->addChild(rotate45CW_btn);
-	movePageMenu2->addChild(rotate45CCW_btn);
-	movePageMenu2->addChild(rotate265CW_btn);
-	movePageMenu2->addChild(rotate265CCW_btn);
+	auto rotate45CW = self->getSpriteButton("edit_cwBtn_001.png", menu_selector(EditorUI::Callback::onCustomRotateObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(rotate45CW->getChildren()->objectAtIndex(0))->addChild(rotate45Label, 5);
+	rotate45CW->setPosition({ -25, -(winSize.height / 2) + 28 });
+	movePageMenu2->addChild(rotate45CW, 0, (int)rotationForCommand::kEditCommandRotate45CW);
 
-	auto circleToolBase_spr = CCSprite::create("GJ_button_01.png");
-	auto circleToolSecond_spr = CCSprite::createWithSpriteFrameName("edit_cwBtn_001.png");
-	auto circleToolLabel = CCLabelBMFont::create("Circle\ntool", "bigFont.fnt", 0.f, CCTextAlignment::kCCTextAlignmentCenter);
-	circleToolBase_spr->addChild(circleToolSecond_spr);
-	circleToolSecond_spr->setPosition({ (circleToolBase_spr->getContentSize().width) / 2, ((circleToolBase_spr->getContentSize().height) / 2) + 2 });
-	circleToolBase_spr->setScale(0.9f);
-	circleToolBase_spr->addChild(circleToolLabel);
-	circleToolLabel->setScale(0.35f);
-	circleToolLabel->setPosition({ (circleToolBase_spr->getContentSize().width) / 2, ((circleToolBase_spr->getContentSize().height) / 2) + 2 });
-	auto circleToolBtn = gd::CCMenuItemSpriteExtra::create(circleToolBase_spr, circleToolBase_spr, self, menu_selector(CircleToolPopup::showCallback));
-	circleToolBtn->setPosition({ -105, -(winSize.height / 2) + 28 });
+	auto rotate45CCW = self->getSpriteButton("edit_ccwBtn_001.png", menu_selector(EditorUI::Callback::onCustomRotateObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(rotate45CCW->getChildren()->objectAtIndex(0))->addChild(rotate45Label, 5);
+	rotate45CCW->setPosition({ 15, -(winSize.height / 2) + 28 });
+	movePageMenu2->addChild(rotate45CCW, 0, (int)rotationForCommand::kEditCommandRotate45CCW);
 
-	buttonPage2_menu->addChild(circleToolBtn);
+	// Rotate 26
+
+	auto rotate26Label = CCLabelBMFont::create("26", "bigFont.fnt");
+	rotate26Label->setScale(.45f);
+	rotate26Label->setPosition({ 20.f, 22.f });
+
+	auto rotate26CW = self->getSpriteButton("edit_cwBtn_001.png", menu_selector(EditorUI::Callback::onCustomRotateObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(rotate26CW->getChildren()->objectAtIndex(0))->addChild(rotate26Label, 5);
+	rotate26CW->setPosition({ 55, -(winSize.height / 2) + 28 });
+	movePageMenu2->addChild(rotate26CW, 0, (int)rotationForCommand::kEditCommandRotate265CW);
+
+	auto rotate26CCW = self->getSpriteButton("edit_ccwBtn_001.png", menu_selector(EditorUI::Callback::onCustomRotateObject), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(rotate26CCW->getChildren()->objectAtIndex(0))->addChild(rotate26Label, 5);
+	rotate26CCW->setPosition({ 95, -(winSize.height / 2) + 28 });
+	movePageMenu2->addChild(rotate26CCW, 0, (int)rotationForCommand::kEditCommandRotate265CCW);
+
+	// Circle Tool
+	
+	auto circleToolLabel = CCLabelBMFont::create("Circle\nTool", "bigFont.fnt", 0.f, CCTextAlignment::kCCTextAlignmentCenter);
+	circleToolLabel->setScale(.35f);
+	circleToolLabel->setPosition({ 20.f, 22.f });
+	auto circleTool = self->getSpriteButton("edit_ccwBtn_001.png", menu_selector(CircleToolPopup::showCallback), nullptr, .9f);
+	static_cast<gd::ButtonSprite*>(circleTool->getChildren()->objectAtIndex(0))->addChild(circleToolLabel, 5);
+	circleTool->setPosition({ -105, -(winSize.height / 2) + 28 });
+
+	buttonPage2_menu->addChild(circleTool);
 }
 
 void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void* edx, gd::GameObject* object) {
@@ -2263,195 +2019,6 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 	colorFilterSpr->addChild(colorFilterLabel);
 
 	deleteMenu->addChild(onColorFilter);
-}
-
-void EditorUI::updateObjectInfo() {
-	if (editUI) {
-		if (m_objectColor) {
-			if (editUI->m_selectedObject == 0) m_objectColor->setVisible(0);
-			else {
-				m_objectColor->setVisible(1);
-				auto colorID = static_cast<int>(editUI->m_selectedObject->m_customColorMode);
-				switch (colorID) {
-				case 0:
-					m_objectColor->setString(CCString::createWithFormat("C: Default (0)", colorID)->getCString());
-					break;
-				case 1:
-					m_objectColor->setString(CCString::createWithFormat("C: P-Col 1 (1)", colorID)->getCString());
-					break;
-				case 2:
-					m_objectColor->setString(CCString::createWithFormat("C: P-Col 2 (2)", colorID)->getCString());
-					break;
-				case 3:
-					m_objectColor->setString(CCString::createWithFormat("C: Col1 (3)", colorID)->getCString());
-					break;
-				case 4:
-					m_objectColor->setString(CCString::createWithFormat("C: Col2 (4)", colorID)->getCString());
-					break;
-				case 5:
-					m_objectColor->setString(CCString::createWithFormat("C: Light BG (5)", colorID)->getCString());
-					break;
-				case 6:
-					m_objectColor->setString(CCString::createWithFormat("C: Col3 (6)", colorID)->getCString());
-					break;
-				case 7:
-					m_objectColor->setString(CCString::createWithFormat("C: Col4 (7)", colorID)->getCString());
-					break;
-				case 8:
-					m_objectColor->setString(CCString::createWithFormat("C: 3D-Line (8)", colorID)->getCString());
-					break;
-				case 9:
-					m_objectColor->setString(CCString::createWithFormat("C: White (9)", colorID)->getCString());
-					break;
-				}
-			}
-		}
-		if (m_objectGroup) {
-			if (editUI->m_selectedObject == 0) m_objectGroup->setVisible(0);
-			else {
-				m_objectGroup->setVisible(1);
-				m_objectGroup->setString(CCString::createWithFormat("G: %i", editUI->m_selectedObject->m_editorGroup)->getCString());
-			}
-		}
-		if (m_objectRotation) {
-			if (editUI->m_selectedObject == 0) m_objectRotation->setVisible(0);
-			else {
-				m_objectRotation->setVisible(1);
-				m_objectRotation->setString(CCString::createWithFormat("Rot: %.01f%", editUI->m_selectedObject->getRotation())->getCString());
-			}
-		}
-		if (m_objectXPos) {
-			if (editUI->m_selectedObject == 0) m_objectXPos->setVisible(0);
-			else {
-				m_objectXPos->setVisible(1);
-				m_objectXPos->setString(CCString::createWithFormat("X: %.01f%", editUI->m_selectedObject->getPositionX())->getCString());
-			}
-		}
-		if (m_objectYPos) {
-			if (editUI->m_selectedObject == 0) m_objectYPos->setVisible(0);
-			else {
-				m_objectYPos->setVisible(1);
-				m_objectYPos->setString(CCString::createWithFormat("Y: %.01f%", editUI->m_selectedObject->getPositionY())->getCString());
-			}
-		}
-		if (m_objectKey) {
-			if (editUI->m_selectedObject == 0) m_objectKey->setVisible(0);
-			else {
-				m_objectKey->setVisible(1);
-				m_objectKey->setString(CCString::createWithFormat("ID: %i", editUI->m_selectedObject->m_objectID)->getCString());
-			}
-		}
-		if (m_objectAddress) {
-			if (editUI->m_selectedObject == 0) m_objectAddress->setVisible(0);
-			else {
-				m_objectAddress->setVisible(1);
-				m_objectAddress->setString(CCString::createWithFormat("Addr: 0x%p", editUI->m_selectedObject)->getCString());
-			}
-		}
-		if (m_objectType) {
-			if (editUI->m_selectedObject == 0) m_objectType->setVisible(0);
-			else {
-				m_objectType->setVisible(1);
-				auto objectType = editUI->m_selectedObject->m_objectType;
-				switch (objectType)
-				{
-				case gd::GameObjectType::kGameObjectTypeSolid:
-					m_objectType->setString("Type: Solid (0)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeHazard:
-					m_objectType->setString("Type: Hazard (2)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeInverseGravityPortal:
-					m_objectType->setString("Type: InverseGravityPortal (3)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeNormalGravityPortal:
-					m_objectType->setString("Type: NormalGravityPortal (4)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeShipPortal:
-					m_objectType->setString("Type: ShipPortal (5)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeCubePortal:
-					m_objectType->setString("Type: CubePortal (6)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeDecoration:
-					m_objectType->setString("Type: Decoration (7)");
-					break;
-				case gd::GameObjectType::kGameObjectTypePulseObjects:
-					m_objectType->setString("Type: PulseObjects (8)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeYellowJumpPad:
-					m_objectType->setString("Type: YellowJumpPad (9)");
-					break;
-				case gd::GameObjectType::kGameObjectTypePinkJumpPad:
-					m_objectType->setString("Type: PinkJumpPad (10)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeGravityPad:
-					m_objectType->setString("Type: GravityPad (11)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeYellowJumpRing:
-					m_objectType->setString("Type: YellowJumpRing (12)");
-					break;
-				case gd::GameObjectType::kGameObjectTypePinkJumpRing:
-					m_objectType->setString("Type: PinkJumpRing (13)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeGravityRing:
-					m_objectType->setString("Type: GravityRing (14)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeInverseMirrorPortal:
-					m_objectType->setString("Type: InverseMirrorPortal (15)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeNormalMirrorPortal:
-					m_objectType->setString("Type: NormalMirrorPortal (16)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeBallPortal:
-					m_objectType->setString("Type: BallPortal (17)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeRegularSizePortal:
-					m_objectType->setString("Type: RegularSizePortal (18)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeMiniSizePortal:
-					m_objectType->setString("Type: MiniSizePortal (19)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeUfoPortal:
-					m_objectType->setString("Type: UfoPortal (20)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeModifier:
-					m_objectType->setString("Type: Modifier (21)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeBreakable:
-					m_objectType->setString("Type: Breakable (22)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeSecretCoin:
-					m_objectType->setString("Type: SecretCoin (23)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeDualPortal:
-					m_objectType->setString("Type: DualPortal (24)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeSoloPortal:
-					m_objectType->setString("Type: SoloPortal (25)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeSlope:
-					m_objectType->setString("Type: Slope (26)");
-					break;
-				case gd::GameObjectType::kGameObjectTypeWavePortal:
-					m_objectType->setString("Type: WavePortal (27)");
-					break;
-				}
-			}
-		}
-		if (m_objectZ) {
-			if (editUI->m_selectedObject == 0) m_objectZ->setVisible(0);
-			else {
-				m_objectZ->setString(CCString::createWithFormat("Object Z: %i", editUI->m_selectedObject->m_objectZ)->getCString());
-				m_objectZ->setVisible(1);
-			}
-		}
-		if (m_objectsSelected) {
-			if (editUI->getSelectedObjectsOfCCArray()->count() == 0) m_objectsSelected->setVisible(0);
-			else m_objectsSelected->setVisible(1);
-			m_objectsSelected->setString(CCString::createWithFormat("Objects: %i", editUI->getSelectedObjectsOfCCArray()->count())->getCString());
-		}
-	}
 }
 
 //void __fastcall EditorUI::keyDownH(gd::EditorUI* self, void*, enumKeyCodes key) {
@@ -2544,7 +2111,7 @@ void __fastcall EditorUI::moveObjectH(gd::EditorUI* self, void*, gd::GameObject*
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
-	auto leveleditor = from<gd::LevelEditorLayer*>(editorPauseLayer, 0x1A8);
+	auto leveleditor = from<gd::LevelEditorLayer*>(this, 0x1A8);
 	auto editorUI = leveleditor->getEditorUI();
 
 	auto objs = CCArray::create();
@@ -2894,7 +2461,72 @@ void __fastcall SetGroupIDLayer::dtorH(gd::SetGroupIDLayer* self) {
 	SetGroupIDLayer::dtor(self);
 }
 
-//CCLabelBMFont* m_hsvLabel = nullptr;
+std::string triggerIDxToTexture(int id) {
+	switch (id)
+	{
+	case 29: return "edit_eTintBGBtn_001.png"; break;
+	case 30: return "edit_eTintGBtn_001.png"; break;
+	case 104: return "edit_eTintLBtn_001.png"; break;
+	case 105: return "edit_eTintObjBtn_001.png"; break;
+	case 744: return "edit_eTint3DLBtn_001.png"; break;
+	case 221: return "edit_eTintCol01Btn_001.png"; break;
+	case 717: return "edit_eTintCol02Btn_001.png"; break;
+	case 718: return "edit_eTintCol03Btn_001.png"; break;
+	case 743: return "edit_eTintCol04Btn_001.png"; break;
+	default: return "edit_eTintBGBtn_001.png"; break;
+	}
+}
+
+std::string colorIDToString(int id) {
+	switch (id)
+	{
+	case 29: return "BG"; break;
+	case 30: return "G"; break;
+	case 104: return "L"; break;
+	case 105: return "Obj"; break;
+	case 744: return "3DL"; break;
+	case 221: return "1"; break;
+	case 717: return "2"; break;
+	case 718: return "3"; break;
+	case 743: return "3"; break;
+	default: return "BG"; break;
+	}
+}
+
+static std::array<int, 9> trigger_ids {
+	29, 30, 104, 105, 744, 221, 717, 718, 743
+};
+
+int trigger_id_for_func = 0;
+
+void updateCTypeLabel(gd::ColorSelectPopup* target, int id) {
+	auto cTypeLabel = static_cast<CCLabelBMFont*>(target->getChildByTag(1703));
+	if (cTypeLabel) {
+
+	}
+}
+
+void updateTriggerTexture(gd::GameObject* obj, int id) {
+	if (obj) {
+		MyEditorLayer::s_instance->remove_trigger(obj);
+		obj->m_objectID = id;
+		auto newSpr = CCSprite::createWithSpriteFrameName(triggerIDxToTexture(obj->m_objectID).c_str());
+		obj->m_textureName.clear();
+		obj->m_textureName = triggerIDxToTexture(obj->m_objectID).c_str();
+		obj->setTexture(newSpr->getTexture());
+		obj->setTextureRect(newSpr->getTextureRect());
+		MyEditorLayer::s_instance->insert_trigger(obj);
+	}
+	return;
+}
+
+void ColorSelectPopup::Callback::onTypeUp(CCObject*) {
+	
+}
+
+void ColorSelectPopup::Callback::onTypeDown(CCObject*) {
+	
+}
 
 bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::GameObject* obj, int color_id, int idk, int idk2) {
 	setting().onShouldHue = true;
@@ -2912,29 +2544,30 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 		m_fadeTime_input = FloatInputNode::create(CCSize(70, 35), 2.f, "bigFont.fnt");
 		m_fadeTime_input->setScale(0.9f);
 		m_fadeTime_input->set_value(self->m_duration);
-		m_fadeTime_input->callback = [&](FloatInputNode& input) {
-			//std::cout << "Duration: " << input.get_value().value_or(self->m_duration) << std::endl;
-			//if (self->m_durationSlider) {
-			//	self->m_durationSlider->setValue(0.5f);
-			//	self->m_durationSlider->updateBar();
-			//}
-			//self->m_durationSlider->setValue(input.get_value().value_or(self->m_duration) * 10);
-			//self->m_durationSlider->updateBar();
-			//self->m_duration = input.get_value().value_or(self->m_duration);
-			//self->setFadeTime(m_fadeTime_input->get_value().value_or(m_fadeTime));
-			//m_fadeTime = input.get_value().value_or(m_fadeTime);
-			//self->setFadeTime(m_fadeTime_input->get_value().value_or(m_fadeTime));
-			};
 		self->m_mainLayer->addChild(m_fadeTime_input);
 		m_fadeTime_input->setPosition({ (winSize.width / 2) + 61, (winSize.height / 2) - 70 }); // 16:9: 346, 90
 
-		//self->m_durationSlider->setValue(1);
-		//self->m_durationSlider->updateBar();
-		//std::cout << self->m_durationSlider->getValue() << std::endl;
+		//auto cTypeBG = extension::CCScale9Sprite::create("square02_small.png");
+		//cTypeBG->setContentSize({ 40.f, 30.f });
+		//cTypeBG->setOpacity(150);
+		//cTypeBG->setPosition({ (winSize.width / 2.f) + 175.f, winSize.height / 2.f });
+		//self->m_mainLayer->addChild(cTypeBG);
 
-		//m_customFadeTimeInput = CustomFadeTimeInput::create(self);
+		//auto cTypeLabel = CCLabelBMFont::create("", "bigFont.fnt");
+		//cTypeLabel->setString(colorIDToString(obj->m_objectID).c_str());
+		//cTypeLabel->setScale(.6f);
+		//cTypeLabel->setPosition({ (winSize.width / 2.f) + 175.f, winSize.height / 2.f });
+		//self->m_mainLayer->addChild(cTypeLabel, 0, 1703);
 
-		//self->m_mainLayer->addChild(m_customFadeTimeInput);
+		//auto decCTypeSpr = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+		//auto decCType = gd::CCMenuItemSpriteExtra::create(decCTypeSpr, nullptr, self, menu_selector(ColorSelectPopup::Callback::onTypeDown));
+		//decCType->setPosition({ 175.f, 100.f });
+		//self->m_buttonMenu->addChild(decCType);
+
+		//auto incCTypeSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+		//auto incCType = gd::CCMenuItemSpriteExtra::create(incCTypeSpr, nullptr, self, menu_selector(ColorSelectPopup::Callback::onTypeUp));
+		//incCType->setPosition({ 175.f, 160.f });
+		//self->m_buttonMenu->addChild(incCType);
 	}
 
 	m_colorInputWidget = RGBColorInputWidget::create(self);
@@ -2942,13 +2575,6 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 	m_colorInputWidget->setPosition({ CCDirector::sharedDirector()->getScreenLeft() + 67.5f, (winSize.height / 2.f) + 20.f });
 
 	self->m_mainLayer->addChild(m_colorInputWidget);
-
-	//m_hsvLabel = CCLabelBMFont::create("", "chatFont.fnt");
-	//auto& color = self->m_colorPicker->getColorValue();
-	//auto jjj = color_utils::rgb_to_hsv({ color.r / 255.f, color.g / 255.f, color.b / 255.f });
-	//m_hsvLabel->setString(std::string("H: " + std::to_string(jjj.h) + " S: " + std::to_string(jjj.s) + " V: " + std::to_string(jjj.v)).c_str());
-	//m_hsvLabel->setPosition({ winSize.width / 2.f, winSize.height / 2.f + 142.f });
-	//self->m_mainLayer->addChild(m_hsvLabel);
 
 	return true;
 }
@@ -2963,9 +2589,6 @@ void __fastcall ColorSelectPopup::sliderChangedH(gd::ColorSelectPopup* self, voi
 	auto sliderValue = slider->getValue() * 10.f;
 	m_fadeTime_input->set_value(floor(sliderValue * 100) / 100);
 	std::cout << sliderValue << std::endl;
-	////if (m_customFadeTimeInput) {
-	////	m_customFadeTimeInput->updateInput();
-	////}
 	ColorSelectPopup::sliderChanged(self, sender);
 }
 
@@ -3060,18 +2683,30 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 
 	bool drawDurationLines = true;
 
-	//for (auto obj : CCArrayExt<gd::GameObject*>(self->m_effectObjects)) {
-	//	if (obj) {
-	//		//switch (obj->m_objectID)
-	//		//{
-	//		//case 29:
-	//			float calculatedThing = timeBetweenPosition(obj->getPositionX(), MyEditorLayer::s_instance->get_preview_pos()) / obj->triggerDuration();
-	//			glLineWidth(2.f);
-	//			ccDrawColor4B(255, 255, 255, 75);
-	//			ccDrawLine(obj->getPosition(), { calculatedThing, obj->getPosition().x });
-	//		//}
-	//	}
-	//}
+	for (int i = self->m_levelEditorLayer->m_firstVisibleSection + 1; i <= self->m_levelEditorLayer->m_lastVisibleSection - 1; i++) {
+		if (i < 0) continue;
+		if (i >= self->m_levelEditorLayer->m_levelSections->count()) break;
+
+		auto objectAtIndex = self->m_levelEditorLayer->m_levelSections->objectAtIndex(i);
+		auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+		for (int j = 0; j < objArr->count(); j++) {
+			auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+
+			switch (obj->m_objectID) {
+			case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
+				auto triggerTimePos = self->timeForXPos(obj->getPositionX());
+				auto triggerFadeEnd = self->xPosForTime(triggerTimePos + obj->m_triggerDuration);
+
+				if (obj->m_triggerDuration > 0) {
+					glLineWidth(2);
+					ccDrawColor4B(100, 100, 100, 75);
+					ccDrawLine(obj->getPosition(), { triggerFadeEnd, obj->getPositionY() });
+				}
+				break;
+			}
+		}
+	}
 }
 
 //void __fastcall LevelEditorLayer::drawH(gd::LevelEditorLayer* self) {

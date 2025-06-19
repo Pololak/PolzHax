@@ -131,7 +131,7 @@ namespace gd {
 		bool m_touchTriggered; // 0x271
 		PAD(2)
 		cocos2d::CCPoint m_startPosition; // 0x274
-		gd::string m_textureName; // 0x27c // m_frame
+		std::string m_textureName; // 0x27c // m_frame
 		bool m_isDisabled; // 0x294
 		bool m_useAudioScale; // 0x295
 		bool m_isSleeping; // 0x296

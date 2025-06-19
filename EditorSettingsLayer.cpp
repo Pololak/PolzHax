@@ -63,7 +63,6 @@ auto showObjectInfoToggle(CCSprite* toggleOn, CCSprite* toggleOff) {
 
 void EditorSettingsLayer::onShowObjInfo(CCObject*) {
 	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::SHOW_OBJ_INFO);
-	EditorUI::updateObjectInfo();
 }
 
 //void EditorSettingsLayer::onShowObjInfoInfo(CCObject*) {

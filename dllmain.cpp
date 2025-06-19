@@ -35,6 +35,8 @@
 #include "share.hpp"
 #include <nfd.h>
 
+#include <support/zip_support/ZipUtils.h>
+
 gd::MenuGameLayer* menuGameLayer;
 gd::EditLevelLayer* editLevelLayer;
 gd::LevelInfoLayer* levelInfoLayer;
@@ -72,8 +74,7 @@ public:
     }
 };
 
-void(__thiscall* fpMainLoop)(cocos2d::CCDirector* self);
-
+void(__thiscall* fpMainLoop)(cocos2d::CCDirector*);
 void __fastcall hkMainLoop(cocos2d::CCDirector* self)
 {
     ImGuiHook::poll(self->getOpenGLView());
@@ -617,6 +618,28 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
 
     std::cout << serverString << std::endl;
 
+    auto infoLabel = CCLabelBMFont::create("", "chatFont.fnt");
+    infoLabel->setString(CCString::createWithFormat("Level ID: %i\nUserID: %i\nDifficulty: %i\nRatings: %i\nRatingsSum: %i\nLikes: %i\nDislikes: %i\nFeatured: %i\nStar Ratings: %i\nStar RatingsSum: %i\nMax Star Ratings: %i\nMin Star Ratings: %i\nDemon Votes: %i\nRate Stars: %i\nRate User: %s", 
+        level->m_levelID,
+        level->m_userID,
+        level->m_difficulty,
+        level->m_ratings,
+        level->m_ratingsSum,
+        level->m_likes,
+        level->m_dislikes,
+        level->m_featured,
+        level->m_starRatings,
+        level->m_starRatingsSum,
+        level->m_maxStarRatings,
+        level->m_minStarRatings,
+        level->m_demonVotes,
+        level->m_rateStars,
+        level->m_rateUser.c_str())->getCString());
+    infoLabel->setPosition({ 80.f, 260.f });
+    infoLabel->setScale(.6f);
+    infoLabel->setAnchorPoint({ 0.f, 1.f });
+    self->addChild(infoLabel);
+
 	return true;
 }
 
@@ -719,12 +742,6 @@ void __fastcall LevelCell_loadCustomLevelCellH(gd::LevelCell* self) {
     from<CCLayer*>(self, 0x16c)->addChild(idLabel);
 }
 
-void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
-void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float dt) {
-    if (setting().onNoWavePulse) self->m_pulseSize = setting().wavePulseSize;
-    HardStreak_updateStroke(self, dt);
-}
-
 DWORD WINAPI my_thread(void* hModule) {
     //setting().loadState();
 
@@ -740,8 +757,8 @@ DWORD WINAPI my_thread(void* hModule) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
 
-    //AllocConsole();
-    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    AllocConsole();
+    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
     auto cocos_ext = GetModuleHandleA("libExtensions.dll");
@@ -817,7 +834,6 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject::fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject::fadeOutStreak2));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x13e90), CCTextInputNode_updateLabelH, reinterpret_cast<void**>(&CCTextInputNode_updateLabel));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x30360), LevelCell_loadCustomLevelCellH, reinterpret_cast<void**>(&LevelCell_loadCustomLevelCell));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

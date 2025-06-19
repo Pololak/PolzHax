@@ -72,7 +72,6 @@ bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
 		break;
 	}
 
-
 	return true;
 }
 

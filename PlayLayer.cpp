@@ -77,8 +77,6 @@ std::set<int>invisibleObjects = {
     146, 174, 204, 206, 673, 674, 144, 205, 145, 459, 740, 741, 742
 };
 
-gd::CCMenuItemSpriteExtra* showEndLayerButton;
-
 CCMenu* pauseLayerTogglerMenu;
 
 ccColor3B getChromaColour() {
@@ -91,12 +89,10 @@ ccColor4F getChromaColour4() {
 }
 
 int smoothOut;
-bool inPracticeF;
-bool inTestmodeF;
 
 void PlayLayer::onNextStartPos() {
     if (playLayer && !playLayer->hasCompletedLevel()) {
-        auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(playLayer->getChildByTag(45712));
+        auto spswitcherlbl = static_cast<CCLabelBMFont*>(playLayer->getChildByTag(45712));
         if (spswitcherlbl) {
             auto fadeout = CCSequence::create(CCDelayTime::create(2.f), CCFadeOut::create(0.5f), nullptr);
             if (!fadedoutflag)
@@ -133,7 +129,7 @@ void PlayLayer::onNextStartPos() {
 
 void PlayLayer::onPrevStartPos() {
     if (playLayer && !playLayer->hasCompletedLevel()) {
-        auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(playLayer->getChildByTag(45712));
+        auto spswitcherlbl = static_cast<CCLabelBMFont*>(playLayer->getChildByTag(45712));
         if (spswitcherlbl) {
             auto fadeout = CCSequence::create(CCDelayTime::create(2.f), CCFadeOut::create(0.5f), nullptr);
             if (!fadedoutflag)
@@ -323,9 +319,7 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
         startPercent = (self->getPlayerStartPosition().x / self->levelLength()) * 100.f;
     }
 
-    if (inTestmodeF || inPracticeF) {
-        smoothOut = 2;
-    }
+    if (setting().onCheckpointLagFix && (self->m_practiceMode || self->m_testMode)) smoothOut = 2;
 
     PlayLayer::resetLevel(self);
 
@@ -340,19 +334,14 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
             self->m_needsReorderColorDL = true;
         }
     }
-
-    std::cout << "Col1 Blending: " << self->m_customColor01Blend << std::endl;
-    std::cout << "Col2 Blending: " << self->m_customColor02Blend << std::endl;
-    std::cout << "Col3 Blending: " << self->m_customColor03Blend << std::endl;
-    std::cout << "Col4 Blending: " << self->m_customColor04Blend << std::endl;
-    std::cout << "3DL Blending: " << self->m_customColorDLBlend << std::endl;
 }
 
 bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
+    smoothOut = 0;
+    playLayer = self;
     if (!PlayLayer::init(self, level)) return false;
 
     setting().beforeRestartCheatsCount = setting().cheatsCount;
-    playLayer = self;
     isPlayerColorGot = false;
     fadedoutflag = 0;
     currentBest = 0;
@@ -382,12 +371,6 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
             }
         }
     }
-
-    inPracticeF = false;
-    inTestmodeF = self->m_testMode;
-    smoothOut = 0;
-
-    std::cout << "Level Name: " << std::string(level->m_levelName).c_str() << std::endl;
 
     auto director = CCDirector::sharedDirector();
     auto size = CCDirector::sharedDirector()->getWinSize();
@@ -465,16 +448,6 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
             spswitcher->setOpacity(255);
             spswitcher->runAction(fadeout);
         }
-        //auto spswitchermenu = CCMenu::create();
-        //spswitchermenu->setZOrder(5);
-        //spswitchermenu->setPosition({ size.width / 2.f, 20.f });
-        //auto switchNextSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
-        //switchNextSpr->setScale(0.65f);
-        //switchNextSpr->setFlipX(1);
-        //auto switchNext = gd::CCMenuItemSpriteExtra::create(switchNextSpr, nullptr, self, menu_selector(EndLevelLayer::Callback::onShowLayer));
-        //switchNext->setPositionX(35.f);
-        //spswitchermenu->addChild(switchNext);
-        //self->addChild(spswitchermenu);
     }
 
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
@@ -504,23 +477,14 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     percentLabel->setZOrder(5);
     percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
     percentLabel->setTag(4571);
-    if (setting().onShowPercentage) {
-        percentLabel->setVisible(1);
-    }
-    else {
-        percentLabel->setVisible(0);
-    }
+    percentLabel->setVisible(!setting().onShowPercentage);
     self->addChild(percentLabel);
 
     auto playerDrawNode = CCDrawNode::create();
-    playerDrawNode->setZOrder(1000);
-    playerDrawNode->setTag(124);
-    self->layer()->addChild(playerDrawNode);
+    self->layer()->addChild(playerDrawNode, 1000, 124);
 
     auto objDrawNode = CCDrawNode::create();
-    objDrawNode->setZOrder(1000);
-    objDrawNode->setTag(125);
-    self->layer()->addChild(objDrawNode);
+    self->layer()->addChild(objDrawNode, 1000, 125);
 
     if (setting().onHitboxes) {
 		for (int i = self->getFirstVisibleSection() + 1; i < self->getLastVisibleSection() - 1; i++)
@@ -560,12 +524,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     labelsMenu->setZOrder(5);
     labelsMenu->setAnchorPoint({ 0, 1 });
     labelsMenu->setScale(setting().labelsScale);
-    if (setting().onHideLabels) {
-        labelsMenu->setVisible(0);
-    }
-    else {
-        labelsMenu->setVisible(1);
-    }
+    labelsMenu->setVisible(!setting().onHideLabels);
     self->addChild(labelsMenu);
 
     int labelCount = 0;
@@ -777,73 +736,18 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
         size->setTag(69064);
         size->setPosition({ 2.f, 0 });
         self->addChild(size);
-
-        //auto speed = CCLabelBMFont::create("Speed: 0", "bigFont.fnt");
-        //speed->setString(CCString::createWithFormat("Speed: %.f")->getCString());
-        //speed->setScale(0.35f);
-        //speed->setZOrder(5);
-        //speed->setAnchorPoint({ 0.f, 0.f });
-        //speed->setOpacity(100);
-        //speed->setTag(69065);
-        //speed->setPosition({ 2.f, 0 });
-        //self->addChild(speed);
     }
-
-    //if (setting().onShowLayout) {
-    //    self->getBackgroundSprite()->setColor(
-    //        ccc3(
-    //            (setting().BGcolor[0] * 255.f),
-    //            (setting().BGcolor[1] * 255.f),
-    //            (setting().BGcolor[2] * 255.f)
-    //        ));
-    //    from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
-    //    from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
-    //    from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
-    //    from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
-
-
-    //    for (int i = self->getFirstVisibleSection() - 1; i < self->getLastVisibleSection() + 1; i++)
-    //    {
-    //        if (i < 0) continue;
-    //        if (i >= arrcount) break;
-    //        auto objAtInd = secarr->objectAtIndex(i);
-    //        auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-    //        for (int j = 0; j < objarr->count(); j++)
-    //        {
-    //            auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-    //            if (obj->getIsTintObject()) {
-    //                obj->setObjectColor(ccc3(255, 255, 255));
-    //            } // Setting OBJ to white.
-    //            if (cornerObjects.contains(obj->getObjectID())) {
-    //                obj->getGlowSprite()->setVisible(0);
-    //            }
-    //            if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
-    //                obj->removeMeAndCleanup();
-    //                if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
-    //            } // Hiding deco objects.
-    //            if (pulseObjects.contains(obj->getObjectID())) {
-    //                obj->removeMeAndCleanup();
-    //            } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
-    //            if (obj->getHasColor()) {
-    //                auto node = obj->getChildSprite();
-    //                node->setColor(ccc3(255, 255, 255));
-    //            } // Setting color to white and removing blending.
-
-    //        }
-    //    }
-    //}
 
     auto arrowMenu = CCMenu::create();
     arrowMenu->setZOrder(105);
     auto arrowSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
     arrowSprite->setRotation(-90.f);
     arrowSprite->setScale(0.6f);
-    showEndLayerButton = gd::CCMenuItemSpriteExtra::create(arrowSprite, nullptr, self, menu_selector(EndLevelLayer::Callback::onShowLayer));
+    auto showEndLayerButton = gd::CCMenuItemSpriteExtra::create(arrowSprite, nullptr, self, menu_selector(EndLevelLayer::Callback::onShowLayer));
     showEndLayerButton->setPosition(arrowMenu->convertToNodeSpace({ size.width / 2.f, director->getScreenTop() + 20.f }));
-    arrowMenu->addChild(showEndLayerButton);
+    arrowMenu->addChild(showEndLayerButton, 0, 5765);
     showEndLayerButton->setEnabled(false);
-    self->addChild(arrowMenu);
+    self->addChild(arrowMenu, 105, 18257);
     auto xdlabel = CCLabelBMFont::create("Good Job! Your game will crash :)", "bigFont.fnt");
     showEndLayerButton->addChild(xdlabel);
     xdlabel->setScale(0.5f);
@@ -851,21 +755,7 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
     xdlabel->setOpacity(50);
 
     if (gd::GameManager::sharedState()->getGameVariable("0024")) {
-        if (setting().onHidePauseButton) {
-            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(0);
-        }
-        else {
-            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(1);
-        }
-    }
-
-    if (self->m_practiceMode) {
-        if (setting().onHidePracticeBtn && (self->m_uiLayer->m_checkpointMenu != nullptr)) {
-            self->m_uiLayer->m_checkpointMenu->setVisible(0);
-        }
-        else {
-            self->m_uiLayer->m_checkpointMenu->setVisible(1);
-        }
+        from<gd::CCMenuItemSpriteExtra*>(self->m_uiLayer, 0x1a0)->setVisible(!setting().onHidePauseButton);
     }
 
     return true;
@@ -880,7 +770,9 @@ void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void* edx, b
         inPractice = practice;
     }
     PlayLayer::togglePracticeMode(self, practice);
-    inPracticeF = practice;
+    
+    if (setting().onHidePracticeBtn)
+        self->m_uiLayer->m_checkpointMenu->setVisible(!setting().onHidePracticeBtn);
 }
 
 void __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
@@ -913,19 +805,10 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     layers().PauseLayerObject = nullptr;
     isPlayerDead = false;
 
-    //if (setting().onCheckpointLagFix) {
-    //    if (!smoothOut) {
-    //        return PlayLayer::update(self, dt);
-    //    }
-
-    //    float time = CCDirector::sharedDirector()->getAnimationInterval();
-    //    if (smoothOut != 0 && dt - time < 1) {
-    //        smoothOut--;
-    //    }
-
-    //    PlayLayer::update(self, time);
-    //}
-    //else
+    if (0 < smoothOut) {
+        smoothOut--;
+        dt = 0.01666667;
+    }
 
     PlayLayer::update(self, dt);
 
@@ -934,7 +817,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     auto size = CCDirector::sharedDirector()->getWinSize();
 
     const auto value = self->player1()->getPositionX() / self->levelLength() * 100.f;
-    auto percentLabel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(4571));
+    auto percentLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(4571));
 
     if (percentLabel) {
         if (value < 100.0f) switch (setting().accuratePercentage)
@@ -983,51 +866,37 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
     }
 
-    if (self->m_practiceMode) {
-        if (setting().onHidePracticeBtn && (self->m_uiLayer->m_checkpointMenu != nullptr)) {
-            self->m_uiLayer->m_checkpointMenu->setVisible(0);
-        }
-        else {
-            self->m_uiLayer->m_checkpointMenu->setVisible(1);
-        }
-    }
-
     self->m_attemptsLabel->setVisible(!setting().onHideAttempts);
 
-    auto spswitcherlbl = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(45712));
+    auto spswitcherlbl = static_cast<CCLabelBMFont*>(self->getChildByTag(45712));
     float fps = ImGui::GetIO().Framerate;
 
     auto secarr = self->getSections();
     auto arrcount = secarr->count();
 
-    auto labelsMenu = reinterpret_cast<CCMenu*>(self->getChildByTag(7900));
-    auto FPSLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45076));
-    auto CPSLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45081));
-    auto BestRunLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45080));
-    auto SessionTimeLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45082));
-    auto AttemptsLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45073));
-    auto Clock = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45075));
-    auto MessageLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45077));
-    auto noclDeath = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45078));
-    auto noclipAccLabel = reinterpret_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45079));
-    auto xPos = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69060));
-    auto yPos = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69061));
-    auto vel = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69062));
-    auto rot = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69063));
-    auto psize = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69064));
-    auto clickindi = reinterpret_cast<CCSprite*>(self->getChildByTag(141207));
+    auto labelsMenu = static_cast<CCMenu*>(self->getChildByTag(7900));
+    auto FPSLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45076));
+    auto CPSLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45081));
+    auto BestRunLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45080));
+    auto SessionTimeLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45082));
+    auto AttemptsLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45073));
+    auto Clock = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45075));
+    auto MessageLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45077));
+    auto noclDeath = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45078));
+    auto noclipAccLabel = static_cast<CCLabelBMFont*>(labelsMenu->getChildByTag(45079));
+    auto xPos = static_cast<CCLabelBMFont*>(self->getChildByTag(69060));
+    auto yPos = static_cast<CCLabelBMFont*>(self->getChildByTag(69061));
+    auto vel = static_cast<CCLabelBMFont*>(self->getChildByTag(69062));
+    auto rot = static_cast<CCLabelBMFont*>(self->getChildByTag(69063));
+    auto psize = static_cast<CCLabelBMFont*>(self->getChildByTag(69064));
+    auto clickindi = static_cast<CCSprite*>(self->getChildByTag(141207));
     //auto speed = reinterpret_cast<CCLabelBMFont*>(self->getChildByTag(69065));
 
     if (setting().onAutoSafe && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
     else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
 
     if (labelsMenu) {
-        if (setting().onHideLabels) {
-            labelsMenu->setVisible(0);
-        }
-        else {
-            labelsMenu->setVisible(1);
-        }
+        labelsMenu->setVisible(!setting().onHideLabels);
         labelsMenu->setScale(setting().labelsScale);
     }
 
@@ -1089,7 +958,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     NoclipAcc = ((self->player1()->getPositionX() - deathDifference) / self->player1()->getPositionX()) * 100;
     if (noclipAccLabel)
     {
-        if (value < 100.0f) reinterpret_cast<CCLabelBMFont*>(noclipAccLabel)->setString(CCString::createWithFormat("%.2f%%", NoclipAcc)->getCString());
+        if (value < 100.0f) static_cast<CCLabelBMFont*>(noclipAccLabel)->setString(CCString::createWithFormat("%.2f%%", NoclipAcc)->getCString());
         noclipAccLabel->setOpacity(setting().labelsOpacity);
     }
 
@@ -1165,7 +1034,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
+    auto playerDrawNode = static_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
     playerDrawNode->clear();
     if (setting().onHitboxes || (self->player1()->getIsDead() && setting().onHitboxesOnDeath))
     {
@@ -1181,7 +1050,7 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }
     }
 
-    auto objDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
+    auto objDrawNode = static_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
     objDrawNode->clear();
 
     if ((self->player1()->getIsDead() && setting().onHitboxesOnDeath) || setting().onHitboxes) {
@@ -1234,15 +1103,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         self->player2()->motionStreak()->setColor(self->player1()->getFirstColor());
     }
 
-    //if (setting().onSwapWaveTrailColors) {
-    //    self->player1()->setWaveTrailColor(self->player1()->getSecondColor());
-    //    self->player2()->setWaveTrailColor(self->player1()->getFirstColor());
-    //}
-    //else {
-    //    self->player1()->setWaveTrailColor(self->player1()->getFirstColor());
-    //    self->player2()->setWaveTrailColor(self->player1()->getSecondColor());
-    //}
-
     if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->isDead()) {
         SetCursorPos(size.width / 2, size.height / 2);
     }
@@ -1253,59 +1113,6 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
         }), m_clickFrames.end());
 
     hasClicked = false;
-
-    //auto hardStreak_p1 = from<gd::HardStreak*>(self->player1(), 0x394);
-    //auto hardStreak_p2 = from<gd::HardStreak*>(self->player2(), 0x394);
-    //if (setting().onNoWavePulse) {
-    //    hardStreak_p1->pulseSize() = setting().wavePulseSize;
-    //    hardStreak_p2->pulseSize() = setting().wavePulseSize;
-    //}
-
-    //if (setting().onShowLayout) {
-    //    self->getBackgroundSprite()->setColor(
-    //        ccc3(
-    //            40, 125, 255
-    //        ));
-    //    from<CCSprite*>(self->getGroundBottom(), 0x118)->setColor(ccc3(0, 102, 255)); // Bottom G
-    //    from<CCSprite*>(self->getGroundTop(), 0x118)->setColor(ccc3(0, 102, 255)); // Top G
-    //    from<CCSprite*>(self->getGroundBottom(), 0x120)->setColor(ccc3(255, 255, 255)); // Bottom Line
-    //    from<CCSprite*>(self->getGroundTop(), 0x120)->setColor(ccc3(255, 255, 255)); // Top Line
-
-
-    //    for (int i = self->getFirstVisibleSection() - 2; i < self->getLastVisibleSection() + 2; i++)
-    //    {
-    //        if (arrcount != 0) {
-    //            if (i < 0) continue;
-    //            if (i >= arrcount) break;
-    //            auto objAtInd = secarr->objectAtIndex(i);
-    //            auto objarr = reinterpret_cast<CCArray*>(objAtInd);
-
-    //            for (int j = 0; j < objarr->count(); j++)
-    //            {
-    //                auto obj = reinterpret_cast<gd::GameObject*>(objarr->objectAtIndex(j));
-    //                if (obj->getIsTintObject()) {
-    //                    obj->setObjectColor(ccc3(255, 255, 255));
-    //                } // Setting OBJ to white.
-    //                if (cornerObjects.contains(obj->getObjectID())) {
-    //                    obj->getGlowSprite()->setVisible(0);
-    //                }
-    //                if (obj->getType() == gd::GameObjectType::kGameObjectTypeDecoration) {
-    //                    obj->removeMeAndCleanup();
-    //                    if (obj->getChildSprite()) obj->getChildSprite()->removeMeAndCleanup();
-    //                } // Hiding deco objects.
-    //                if (pulseObjects.contains(obj->getObjectID())) {
-    //                    obj->removeMeAndCleanup();
-    //                } // Hiding pulse objects (for some reason old pulse objs doesn't count as deco).
-    //                if (obj->getHasColor()) {
-    //                    auto node = obj->getChildSprite();
-    //                    node->setColor(ccc3(255, 255, 255));
-    //                    node->setBlendFunc({ GL_ONE, GL_SRC_ALPHA });
-    //                } // Setting color to white and removing blending.
-
-    //            }
-    //        }
-    //    }
-    //}
 
     if (setting().onRainbowIcon) {
         auto player1 = self->player1();
@@ -1337,45 +1144,11 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
     }
 
     if (gd::GameManager::sharedState()->getGameVariable("0024")) {
-        if (setting().onHidePauseButton) {
-            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(0);
-        }
-        else {
-            from<gd::CCMenuItemSpriteExtra*>(self->getUILayer(), 0x1a0)->setVisible(1);
-        }
+        from<gd::CCMenuItemSpriteExtra*>(self->m_uiLayer, 0x1a0)->setVisible(!setting().onHidePauseButton);
     }
 
-    if (setting().onNoWaveTrailBehind) {
-        if (self->player1()->isDart())
-            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = false;
-        if (self->player2()->isDart())
-            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = false;
-    }
-    else {
-        if (self->player1()->isDart())
-            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = true;
-        if (self->player2()->isDart())
-            from<bool>(from<CCMotionStreak*>(self->player1(), 0x390), 0xfe) = true;
-    }
-
-    if (setting().onNoWaveTrail) {
-        self->player1()->waveTrail()->setVisible(0);
-        self->player2()->waveTrail()->setVisible(0);
-    }
-    else {
-        self->player1()->waveTrail()->setVisible(1);
-        self->player2()->waveTrail()->setVisible(1);
-    }
-
-    //ccColor3B bgColor = ccc3(40, 125, 255);
-    //ccColor3B gColor = ccc3(0, 102, 255);
-    //if (setting().onShowLayout) {
-    //    self->m_backgroundSprite->setColor(bgColor);
-    //    self->m_bottomGround->groundSprite()->setColor(gColor);
-    //    self->m_topGround->groundSprite()->setColor(gColor);
-    //    self->m_bottomGround->lineSprite()->setColor(ccc3(255, 255, 255));
-    //    self->m_topGround->lineSprite()->setColor(ccc3(255, 255, 255));
-    //}
+    self->m_player->m_hardStreak->setVisible(!setting().onNoWaveTrail);
+    self->m_player2->m_hardStreak->setVisible(!setting().onNoWaveTrail);
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {
@@ -1399,8 +1172,8 @@ bool __fastcall PlayLayer::resume_H(CCLayer* self) {
 
 void __fastcall PlayLayer::onQuit_H(gd::PlayLayer* self, void* edx) {
     layers().PauseLayerObject = nullptr;
-    auto playerDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
-    auto objDrawNode = reinterpret_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
+    auto playerDrawNode = static_cast<CCDrawNode*>(self->layer()->getChildByTag(124));
+    auto objDrawNode = static_cast<CCDrawNode*>(self->layer()->getChildByTag(125));
 
     playerDrawNode->clear();
     objDrawNode->clear();
@@ -1455,17 +1228,11 @@ void PauseLayer::Callback::PercentageToggler(CCObject*) {
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
     auto size = CCDirector::sharedDirector()->getWinSize();
     if (gd::GameManager::sharedState()->getPlayLayer()) {
-        auto percentLabel = reinterpret_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
+        auto percentLabel = static_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
         if (percentLabel) {
             percentLabel->setAnchorPoint({ bar ? 0.f : 0.5f, 0.5f });
             percentLabel->setPosition({ size.width / 2.f + (bar ? 107.2f : 0.f), size.height - 8.f });
-
-            if (setting().onShowPercentage) {
-                percentLabel->setVisible(1);
-            }
-            else {
-                percentLabel->setVisible(0);
-            }
+            percentLabel->setVisible(!setting().onShowPercentage);
         }
     }
 }
@@ -1538,17 +1305,11 @@ void __fastcall PauseLayer::onProgressBarH(gd::PauseLayer* self, void*, CCObject
     const auto bar = gd::GameManager::sharedState()->getShowProgressBar();
     auto size = CCDirector::sharedDirector()->getWinSize();
     if (gd::GameManager::sharedState()->getPlayLayer()) {
-        auto percentLabel = reinterpret_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
+        auto percentLabel = static_cast<CCLabelBMFont*>(gd::GameManager::sharedState()->getPlayLayer()->getChildByTag(4571));
         if (percentLabel) {
             percentLabel->setAnchorPoint({ bar ? 0.5f : 0.f, 0.5f });
             percentLabel->setPosition({ size.width / 2.f + (bar ? 0.f : 107.2f), size.height - 8.f });
-
-            if (setting().onShowPercentage) {
-                percentLabel->setVisible(1);
-            }
-            else {
-                percentLabel->setVisible(0);
-            }
+            percentLabel->setVisible(!setting().onShowPercentage);
         }
     }
     PauseLayer::onProgressBar(self, obj);
@@ -1599,31 +1360,48 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
     }
 }
 
-gd::EndLevelLayer* endLevelLayer;
+void __fastcall PlayLayer::updateVisibilityH(gd::PlayLayer* self) {
+    PlayLayer::updateVisibility(self);
+    if (setting().onNoWavePulse) {
+        self->m_player->m_audioScale = 1.f;
+        self->m_player2->m_audioScale = 1.f;
+    }
+}
 
-void EndLevelLayer::Callback::onReset(CCObject* obj) {
-    reinterpret_cast<gd::EndLevelLayer*>(reinterpret_cast<CCNode*>(obj))->getParent()->getParent()->getParent()->removeFromParent();
-    playLayer->resetLevel();
+void EndLevelLayer::Callback::onLastCheckpoint(CCObject* sender) {
+    if (auto pl = gd::GameManager::sharedState()->getPlayLayer()) {
+        reinterpret_cast<gd::EndLevelLayer*>(reinterpret_cast<CCNode*>(sender))->getParent()->getParent()->getParent()->removeFromParent();
+        pl->resetLevel();
+        CCEGLView::sharedOpenGLView()->showCursor(gd::GameManager::sharedState()->getGameVariable("0024"));
+    }
 }
 
 void EndLevelLayer::Callback::onHideLayer(CCObject* obj) {
-    endLevelLayer->exitLayer(obj);
-    showEndLayerButton->setEnabled(true);
-    showEndLayerButton->runAction(CCEaseSineInOut::create(CCMoveTo::create(0.5f, { 0, showEndLayerButton->getPositionY() - 35.f})));
-    showEndLayerButton->runAction(CCSequence::create(CCDelayTime::create(0.5f), CCFadeTo::create(0.5f, 50), nullptr));
+    if (auto pl = gd::GameManager::sharedState()->getPlayLayer()) {
+        auto showEndLayerButton = static_cast<gd::CCMenuItemSpriteExtra*>(pl->getChildByTag(18257)->getChildByTag(5765));
+        if (showEndLayerButton) {
+            this->exitLayer(nullptr);
+            showEndLayerButton->setEnabled(true);
+            showEndLayerButton->runAction(CCEaseSineInOut::create(CCMoveTo::create(0.5f, { 0, showEndLayerButton->getPositionY() - 35.f })));
+            showEndLayerButton->runAction(CCSequence::create(CCDelayTime::create(0.5f), CCFadeTo::create(0.5f, 50), nullptr));
+        }
+    }
 }
 
 void EndLevelLayer::Callback::onShowLayer(CCObject* obj) {
-    playLayer->showEndLayer();
-    showEndLayerButton->setEnabled(false);
-    showEndLayerButton->runAction(CCEaseSineInOut::create(CCMoveTo::create(0.5f, { 0, showEndLayerButton->getPositionY() + 35.f })));
-    showEndLayerButton->runAction(CCSequence::create(CCDelayTime::create(0.5f), CCFadeTo::create(0.5f, 255), nullptr));
+    if (auto pl = gd::GameManager::sharedState()->getPlayLayer()) {
+        pl->showEndLayer();
+        auto showEndLayerButton = static_cast<gd::CCMenuItemSpriteExtra*>(pl->getChildByTag(18257)->getChildByTag(5765));
+        if (showEndLayerButton) {
+            showEndLayerButton->setEnabled(false);
+            showEndLayerButton->runAction(CCEaseSineInOut::create(CCMoveTo::create(0.5f, { 0, showEndLayerButton->getPositionY() + 35.f })));
+            showEndLayerButton->runAction(CCSequence::create(CCDelayTime::create(0.5f), CCFadeTo::create(0.5f, 255), nullptr));
+        }
+    }
 }
 
 void __fastcall EndLevelLayer::customSetup_H(gd::EndLevelLayer* self) {
     EndLevelLayer::customSetup(self);
-    endLevelLayer = self;
-    //if (!inPractice) return;
 
     auto layerMain = reinterpret_cast<CCLayer*>(self->getChildren()->objectAtIndex(0));
     auto director = CCDirector::sharedDirector();
@@ -1648,45 +1426,27 @@ void __fastcall EndLevelLayer::customSetup_H(gd::EndLevelLayer* self) {
     menu->addChild(arrowButton);
     layerMain->addChild(menu);
 
-    if (setting().onLastCheckpoint && playLayer->m_practiceMode) {
-		CCMenu* buttonsMenu = nullptr;
+    auto practiceButton = gd::CCMenuItemSpriteExtra::create(
+        CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png"),
+        nullptr, self,
+        menu_selector(EndLevelLayer::Callback::onLastCheckpoint));
+    practiceButton->setPositionY(-125.f);
 
-		buttonsMenu = from<CCMenu*>(self, 0x1c0);
+    auto bottomMenu = from<CCMenu*>(self, 0x1c0);
 
-		if (buttonsMenu) {
-			auto practiceSprite = cocos2d::CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png");
-			practiceSprite->setScale(1.f);
-			auto practiceButton = gd::CCMenuItemSpriteExtra::create(
-				practiceSprite,
-				nullptr,
-				self,
-				menu_selector(EndLevelLayer::Callback::onReset)
-			);
-
-			if (buttonsMenu->getChildrenCount() == 2)
-			{
-				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
-				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
-			}
-			else
-			{
-				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(0))->setPositionX(-130.f);
-				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(1))->setPositionX(130.f);
-				reinterpret_cast<gd::CCMenuItemSpriteExtra*>(buttonsMenu->getChildren()->objectAtIndex(2))->setPositionX(-45.f);
-				practiceButton->setPositionX(45.f);
-			}
-
-			practiceButton->setPositionY(-125.f);
-			buttonsMenu->addChild(practiceButton);
-		}
+    if (setting().onLastCheckpoint && bottomMenu && gd::GameManager::sharedState()->getPlayLayer()->m_practiceMode) {
+        if (bottomMenu->getChildrenCount() == 2) {
+            static_cast<gd::CCMenuItemSpriteExtra*>(bottomMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
+            static_cast<gd::CCMenuItemSpriteExtra*>(bottomMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
+        }
+        else {
+            static_cast<gd::CCMenuItemSpriteExtra*>(bottomMenu->getChildren()->objectAtIndex(0))->setPositionX(-130.f);
+            static_cast<gd::CCMenuItemSpriteExtra*>(bottomMenu->getChildren()->objectAtIndex(1))->setPositionX(130.f);
+            static_cast<gd::CCMenuItemSpriteExtra*>(bottomMenu->getChildren()->objectAtIndex(2))->setPositionX(-45.f);
+            practiceButton->setPositionX(45.f);
+        }
+        bottomMenu->addChild(practiceButton);
     }
-}
-
-void __fastcall EndLevelLayer::dtorH(gd::EndLevelLayer* self) {
-    showEndLayerButton = nullptr;
-    endLevelLayer = nullptr;
-    EndLevelLayer::dtor(self);
-    std::cout << "EndLevelLayer::dtor" << std::endl;
 }
 
 void __fastcall PlayerObject::updatePlayerFrame_H(gd::PlayerObject* self, void* edx, int frameID) {
@@ -1807,6 +1567,11 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
             from<float>(self->m_playerStreak, 0x114) = 14.f;
 }
 
+void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, bool p0) {
+    PlayerObject::toggleDartMode(self, p0);
+    if (setting().onNoWaveTrailBehind) from<bool>(self->m_playerStreak, 0xfe) = false;
+}
+
 void PauseLayer::mem_init() {
     MH_CreateHook(
         reinterpret_cast<void*>(gd::base + 0xd5f50),
@@ -1866,6 +1631,7 @@ void PlayLayer::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1d70), PlayLayer::removeLastCheckpointH, reinterpret_cast<void**>(&PlayLayer::removeLastCheckpoint));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe52e0), PlayLayer::levelCompleteH, reinterpret_cast<void**>(&PlayLayer::levelComplete));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2_H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb3f0), PlayLayer::updateVisibilityH, reinterpret_cast<void**>(&PlayLayer::updateVisibility));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef120), PlayLayer::removePlayer2H, reinterpret_cast<void**>(&PlayLayer::removePlayer2));
 }
 
@@ -1874,7 +1640,7 @@ void EndLevelLayer::mem_init() {
         reinterpret_cast<void*>(gd::base + 0x50430),
         EndLevelLayer::customSetup_H,
         reinterpret_cast<void**>(&EndLevelLayer::customSetup));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x50380), EndLevelLayer::dtorH, reinterpret_cast<void**>(&EndLevelLayer::dtor));
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x50380), EndLevelLayer::dtorH, reinterpret_cast<void**>(&EndLevelLayer::dtor));
 }
 
 void PlayerObject::mem_init() {
@@ -1882,6 +1648,7 @@ void PlayerObject::mem_init() {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrame_H, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdad10), PlayerObject::runBallRotation2H, reinterpret_cast<void**>(&PlayerObject::runBallRotation2));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe12e0), PlayerObject::togglePlayerScaleH, reinterpret_cast<void**>(&PlayerObject::togglePlayerScale));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdee80), PlayerObject::toggleDartModeH, reinterpret_cast<void**>(&PlayerObject::toggleDartMode));
 }
 
 void GameObject::mem_init() {

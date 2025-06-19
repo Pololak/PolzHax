@@ -5,7 +5,7 @@ namespace MenuLayer {
 	inline bool(__thiscall* init)(gd::MenuLayer* self);
 	bool __fastcall init_H(gd::MenuLayer* self, void* edx);
 
-	class Callback {
+	class Callback : public gd::MenuLayer {
 	public:
 		void onReload(CCObject*);
 		//void onSmallEditorStep(CCObject*);

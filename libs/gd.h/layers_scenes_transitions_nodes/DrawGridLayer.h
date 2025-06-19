@@ -40,6 +40,11 @@ namespace gd {
 		LevelEditorLayer* getEditorLayer() {
 			return from<LevelEditorLayer*>(this, 0x124);
 		}
+
+		float xPosForTime(float time) {
+			__asm movss xmm1, time
+			return reinterpret_cast<float(__vectorcall*)(DrawGridLayer*)>(base + 0x93350)(this);
+		}
 	};
 }
 

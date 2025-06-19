@@ -163,7 +163,7 @@ namespace cocos2d
             static std::string base64URLEncode(std::string string);
 
             static std::string compressString(std::string, bool, int);
-            static std::string decompressString(std::string, bool, int);
+            static std::string decompressString(std::string, bool);
             static void decompressString2(unsigned char*, bool, int, int);
 
             static void encryptDecrypt(std::string, int);

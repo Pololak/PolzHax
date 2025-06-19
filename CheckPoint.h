@@ -5,20 +5,12 @@
 struct CheckPointStorage {
     float rot;
     float rot_2;
-
-    float size;
-    float size_2;
-
     double velocity;
 
     static CheckPointStorage from(gd::PlayerObject* player) {
         return (CheckPointStorage({
             *(float*)((size_t)player + 0x18), // rot
             *(float*)((size_t)player + 0x1C), // rot
-
-            *(float*)((size_t)player + 0x25C), // size
-            *(float*)((size_t)player + 0x260), // size
-
             *(double*)((size_t)player + 0x458),
 
             }));
@@ -26,12 +18,8 @@ struct CheckPointStorage {
 
     void restore(gd::PlayerObject* player) {
         *(double*)((size_t)player + 0x458) = velocity;
-
         *(float*)((size_t)player + 0x018) = rot;
         *(float*)((size_t)player + 0x01c) = rot_2;
-
-        *(float*)((size_t)player + 0x25C) = size;
-        *(float*)((size_t)player + 0x260) = size_2;
     }
 };
 

@@ -74,38 +74,9 @@ namespace EditorUI {
 		void onGoToBaseLayer(CCObject*);
 		void onGoToNextFreeLayer(CCObject*);
 		void onGoToGroup(CCObject*);
-		void rotate45CW(CCObject*);
-		void rotate45CCW(CCObject*);
-		void rotate265CW(CCObject*);
-		void rotate265CCW(CCObject*);
 
-		void moveObjectHalfLeft(CCObject*);
-		void moveObjectHalfRight(CCObject*);
-		void moveObjectHalfUp(CCObject*);
-		void moveObjectHalfDown(CCObject*);
-
-		void moveObjectQuarterLeft(CCObject*);
-		void moveObjectQuarterRight(CCObject*);
-		void moveObjectQuarterUp(CCObject*);
-		void moveObjectQuarterDown(CCObject*);
-
-		void moveObjectEightLeft(CCObject*);
-		void moveObjectEightRight(CCObject*);
-		void moveObjectEightUp(CCObject*);
-		void moveObjectEightDown(CCObject*);
-
-		void moveObjectSmallerLeft(CCObject*);
-		void moveObjectSmallerRight(CCObject*);
-		void moveObjectSmallerUp(CCObject*);
-		void moveObjectSmallerDown(CCObject*);
-
-		void moveObjectQUnitLeft(CCObject*);
-		void moveObjectQUnitRight(CCObject*);
-		void moveObjectQUnitUp(CCObject*);
-		void moveObjectQUnitDown(CCObject*);
-
-		void onGroupSticky(CCObject*);
-		void onCircleTool(CCObject*);
+		void onCustomMoveObject(CCObject*);
+		void onCustomRotateObject(CCObject*);
 	};
 
 	inline void(__thiscall* onCopy)(gd::EditorUI*, CCObject*);
@@ -141,7 +112,7 @@ namespace EditorUI {
 	inline void(__thiscall* moveObject)(gd::EditorUI*, gd::GameObject*, CCPoint);
 	void __fastcall moveObjectH(gd::EditorUI*, void*, gd::GameObject*, CCPoint);
 
-	void updateObjectInfo();
+	void updateObjectInfo(gd::EditorUI*);
 
 	void mem_init();
 }
@@ -168,13 +139,11 @@ namespace EditorPauseLayer {
 	inline void(__thiscall* saveLevel)(gd::EditorPauseLayer*);
 	void __fastcall saveLevelH(gd::EditorPauseLayer* self);
 
-	class Callback {
+	class Callback : public gd::EditorPauseLayer {
 	public:
 		void SmallEditorStepToggler(CCObject*);
 		void PreviewModeToggler(CCObject*);
 		void VanillaSelectAllButton(CCObject*);
-		void extraFeaturesToggler(CCObject*);
-		void extraInfoPopup(CCObject*);
 		void selectFilterToggle(CCObject*);
 
 		void onSaveLevel(CCObject*);
@@ -226,6 +195,12 @@ namespace ColorSelectPopup {
 
 	inline void(__thiscall* colorValueChanged)(gd::ColorSelectPopup*, ccColor3B);
 	void __fastcall colorValueChangedH(gd::ColorSelectPopup* self, void*, ccColor3B color);
+
+	class Callback : public gd::ColorSelectPopup {
+	public:
+		void onTypeUp(CCObject*);
+		void onTypeDown(CCObject*);
+	};
 
 	void mem_init();
 }
