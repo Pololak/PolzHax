@@ -2,7 +2,6 @@
 #include "utils.hpp"
 
 CCLayer* extendedLevelInfo;
-gd::InfoLayer* infoLayer;
 CCLayer* copiedToClipboardPopup;
 extension::CCScale9Sprite* copiedLabel = nullptr;
 
@@ -129,12 +128,12 @@ void __fastcall InfoLayer::onLevelInfoH(gd::InfoLayer* self, void*, CCObject* ob
 void InfoLayer::Callback::onRefreshComments(CCObject*) {
 	auto glm = gd::GameLevelManager::sharedState();
 	glm->makeTimeStamp("upd_comments");
-	glm->resetTimerForKey(infoLayer->m_commentsKey.c_str());
-	infoLayer->loadPage(infoLayer->m_page);
+	glm->resetTimerForKey(this->m_commentsKey.c_str());
+	this->loadPage(this->m_page);
 }
 
 void InfoLayer::Callback::onCopyLevelID(CCObject*) {
-	clipboard::write(std::to_string(from<gd::GJGameLevel*>(infoLayer, 0x1c8)->m_levelID).c_str());
+	clipboard::write(std::to_string(from<gd::GJGameLevel*>(this, 0x1c8)->m_levelID).c_str());
 	copiedLabel->setOpacity(100);
 	copiedLabel->stopAllActions();
 	copiedLabel->runAction(
@@ -150,7 +149,6 @@ void InfoLayer::Callback::onCopyLevelID(CCObject*) {
 
 bool __fastcall InfoLayer::initH(gd::InfoLayer* self, void*, gd::GJGameLevel* gameLevel) {
 	if (!InfoLayer::init(self, gameLevel)) return false;
-	infoLayer = self;
 
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();

@@ -19,7 +19,7 @@ namespace FMOD {
 
 namespace gd {
 	class FMODAudioEngine : public cocos2d::CCNode {
-	protected:
+	public:
 		cocos2d::CCDictionary* m_pDictionary;
 		std::string m_sFilePath;
 		float m_fBackgroundMusicVolume;

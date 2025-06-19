@@ -120,6 +120,14 @@ void EditorSettingsLayer::onExperimentalLayering(CCObject*) {
 //	gd::FLAlertLayer::create(nullptr, "Link Controls", "Enables option to link objects together in the editor. Linked objects are always selected and deleted together.", "OK", nullptr, 320.f, false, 160.f)->show();
 //}
 
+auto dltog(CCSprite* on, CCSprite* off) {
+	return (gd::GameManager::sharedState()->getGameVariable(GameVariable::DURATION_LINES)) ? on : off;
+}
+
+void EditorSettingsLayer::onDurationLines(CCObject*) {
+	gd::GameManager::sharedState()->toggleGameVariable(GameVariable::DURATION_LINES);
+}
+
 bool EditorSettingsLayer::init() {
 	if (!CCLayer::init()) return false;
 	const float width = 360, height = 240;
@@ -260,18 +268,15 @@ bool EditorSettingsLayer::init() {
 	menu->addChild(SOILabel);
 	//menu->addChild(SOIInfo);
 
-	//auto HPLToggler = gd::CCMenuItemToggler::create(hidePreviewLineToggle(toggleOn, toggleOff), hidePreviewLineToggle(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onHidePreviewLine));
-	//auto HPLLabel = CCLabelBMFont::create("Hide Preview Line", "bigFont.fnt");
-	////auto HPLInfo = gd::CCMenuItemSpriteExtra::create(infoSprite, nullptr, this, menu_selector(EditorSettingsLayer::onHidePreviewLineInfo));
-	//HPLToggler->setScale(0.8f);
-	//HPLToggler->setPosition({ 20, -20 });
-	//HPLLabel->setAnchorPoint({ 0.f, 0.5f });
-	//HPLLabel->setScale(0.4f);
-	//HPLLabel->setPosition({ HPLToggler->getPosition().x + 20.f, HPLToggler->getPosition().y });
-	////HPLInfo->setPosition({ HPLToggler->getPosition().x - 17.5f, HPLToggler->getPosition().y + 15.f });
-	//menu->addChild(HPLToggler);
-	//menu->addChild(HPLLabel);
-	////menu->addChild(HPLInfo);
+	auto HPLToggler = gd::CCMenuItemToggler::create(dltog(toggleOn, toggleOff), dltog(toggleOff, toggleOn), this, menu_selector(EditorSettingsLayer::onDurationLines));
+	auto HPLLabel = CCLabelBMFont::create("Duration Lines", "bigFont.fnt");
+	HPLToggler->setScale(0.8f);
+	HPLToggler->setPosition({ 20, -20 });
+	HPLLabel->setAnchorPoint({ 0.f, 0.5f });
+	HPLLabel->setScale(0.4f);
+	HPLLabel->setPosition({ HPLToggler->getPosition().x + 20.f, HPLToggler->getPosition().y });
+	menu->addChild(HPLToggler);
+	menu->addChild(HPLLabel);
 
 	this->setScale(0.1f);
 	this->runAction(appearAction);

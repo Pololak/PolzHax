@@ -54,14 +54,11 @@ namespace EditorUI {
 	inline void(__thiscall* selectObjects)(gd::EditorUI*, CCArray*);
 	void __fastcall selectObjectsH(gd::EditorUI* self, void* edx, CCArray* objects);
 
-	inline bool(__thiscall* keyDown)(gd::EditorUI*, cocos2d::enumKeyCodes);
-	void __fastcall keyDownH(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
+	inline void(__thiscall* keyDown)(gd::EditorUI*, enumKeyCodes);
+	void __fastcall keyDownH(gd::EditorUI*, void*, enumKeyCodes);
 
-	//inline bool(__thiscall* keyDown)(gd::EditorUI*, cocos2d::enumKeyCodes);
-	//void __fastcall keyDown_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
-
-	//inline bool(__thiscall* keyUp)(gd::EditorUI*, cocos2d::enumKeyCodes);
-	//void __fastcall keyUp_H(gd::EditorUI* self, void* edx, cocos2d::enumKeyCodes key);
+	inline void(__thiscall* keyUp)(gd::EditorUI*, enumKeyCodes);
+	void __fastcall keyUpH(gd::EditorUI*, void*, enumKeyCodes);
 
 	inline CCPoint*(__thiscall* moveForCommand)(gd::EditorUI*, CCPoint*, gd::EditCommand);
 	CCPoint* __fastcall moveForCommandH(gd::EditorUI* self, void* edx, CCPoint* pos, gd::EditCommand com);
@@ -106,8 +103,8 @@ namespace EditorUI {
 	inline void(__thiscall* draw)(gd::EditorUI*);
 	void __fastcall drawH(gd::EditorUI* self);
 
-	inline CCPoint*(__thiscall* offsetForKey)(gd::EditorUI*, CCPoint*, int);
-	CCPoint* __fastcall offsetForKeyH(gd::EditorUI*, void*, CCPoint*, int);
+	inline CCPoint*(__thiscall* offsetForKey)(gd::EditorUI*, int);
+	CCPoint* __fastcall offsetForKeyH(gd::EditorUI*, void*, int);
 
 	inline void(__thiscall* moveObject)(gd::EditorUI*, gd::GameObject*, CCPoint);
 	void __fastcall moveObjectH(gd::EditorUI*, void*, gd::GameObject*, CCPoint);

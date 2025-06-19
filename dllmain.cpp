@@ -255,37 +255,36 @@ void __fastcall CCLabelBMFont_createH(CCLabelBMFont* self, void* edx, const char
     return CCLabelBMFont_create(self, "eeffoc", font);
 }
 
-class CustomSongWidgetCallback : public gd::FLAlertLayer, public cocos2d::CCTextFieldDelegate, public gd::FLAlertLayerProtocol {
+class CustomSongWidgetCB : public gd::CustomSongWidget {
 public:
-    void onCopy(CCObject*) {
-        std::string songInfo = dynamic_cast<CCLabelProtocol*>(this->getChildren()->objectAtIndex(4))->getString();
-        std::smatch matches;
-
-        std::regex_search(songInfo, matches, std::regex(R"(\w+: (\d+) .*)"));
-
-        ImGui::SetClipboardText(matches[1].str().c_str());
+    void onCopySongID(CCObject*) {
+        clipboard::write(std::to_string(this->m_songID));
     }
 };
 
-bool(__thiscall* CustomSongWidget_init)(gd::CustomSongWidget*, gd::SongInfoObject*, gd::LevelSettingsObject*, bool, bool, bool, bool, bool);
-bool __fastcall CustomSongWidget_initH(gd::CustomSongWidget* self, void* edx, gd::SongInfoObject* infoObject, gd::LevelSettingsObject* settingsObject, bool idk1, bool idk2, bool idk3, bool idk4, bool idk5) {
-    if (!CustomSongWidget_init(self, infoObject, settingsObject, idk1, idk2, idk3, idk4, idk5)) return false;
-    auto menu = from<CCMenu*>(self, 0xf4);
+inline bool(__thiscall* CustomSongWidget_init)(gd::CustomSongWidget*, gd::SongInfoObject*, gd::LevelSettingsObject*, bool, bool, bool, bool, bool);
+bool __fastcall CustomSongWidget_initH(gd::CustomSongWidget* self, void*, gd::SongInfoObject* songInfo, gd::LevelSettingsObject* levelSettings, bool p0, bool p1, bool p2, bool p3, bool p4) {
+    if (!CustomSongWidget_init(self, songInfo, levelSettings, p0, p1, p2, p3, p4)) return false;
 
-    if (reinterpret_cast<CCSprite*>(from<CCLabelBMFont*>(self, 0x100)->getChildren()->objectAtIndex(0))->isVisible()) {
-        auto& moreButtonPos = from<gd::CCMenuItemSpriteExtra*>(self, 0x11c)->getPosition();
-
-        auto copyButton_spr = gd::ButtonSprite::create("Copy", 0x32, 0, 1.5f, true, "bigFont.fnt", "GJ_button_04.png", 25.f);
-        auto copyButton_btn = gd::CCMenuItemSpriteExtra::create(copyButton_spr, copyButton_spr, self, menu_selector(CustomSongWidgetCallback::onCopy));
-        copyButton_spr->getLabel()->setScale(.65f);
-        copyButton_spr->setScale(0.7f);
-
-        copyButton_btn->setSizeMult(1.f);
-        copyButton_btn->setPosition({ moreButtonPos.x + 50.f, moreButtonPos.y });
-        menu->addChild(copyButton_btn);
+    if (!self->m_isRobtopSong && self->m_moreBtn->isVisible()) {
+        auto onCopySongIDSpr = gd::ButtonSprite::create("Copy", 0xdc, 0, .6f, false, "bigFont.fnt", "GJ_button_04.png", 25.f);
+        onCopySongIDSpr->setScale(.7f);
+        auto onCopySongID = gd::CCMenuItemSpriteExtra::create(onCopySongIDSpr, nullptr, self, menu_selector(CustomSongWidgetCB::onCopySongID));
+        onCopySongID->setPosition(self->m_moreBtn->getPositionX() + 50.f, self->m_moreBtn->getPositionY());
+        self->m_buttonMenu->addChild(onCopySongID, 0, 333);
     }
 
     return true;
+}
+
+inline void(__thiscall* CustomSongWidget_updateSongInfo)(gd::CustomSongWidget*);
+void __fastcall CustomSongWidget_updateSongInfoH(gd::CustomSongWidget* self) {
+    CustomSongWidget_updateSongInfo(self);
+    auto onCopySongID = static_cast<gd::CCMenuItemSpriteExtra*>(self->m_buttonMenu->getChildByTag(333));
+    std::cout << onCopySongID << std::endl;
+    if (onCopySongID) {
+        onCopySongID->setPosition(self->m_moreBtn->getPositionX() + 50.f, self->m_moreBtn->getPositionY());
+    }
 }
 
 gd::LevelSearchLayer* levelSearchLayer;
@@ -480,10 +479,10 @@ public:
 
 bool(__thiscall* EditLevelLayer_init_O)(gd::EditLevelLayer*, gd::GJGameLevel*);
 bool __fastcall EditLevelLayer_init_H(gd::EditLevelLayer* self, void*, gd::GJGameLevel* gameLevel) {
+    editLevelLayer = self;
     if (!EditLevelLayer_init_O(self, gameLevel)) return false;
     //gd::GameManager::sharedState()->m_lastScene2 = static_cast<gd::LastGameScene>(99);
     //gd::GameManager::sharedState()->m_premiumPopup = gameLevel;
-    editLevelLayer = self;
 
     localLevelArray = gd::LocalLevelManager::sharedState()->getLocalLevels();
 	levelObject = (cocos2d::CCObject*)gameLevel;
@@ -716,6 +715,24 @@ void __fastcall CCTextInputNode_updateLabelH(gd::CCTextInputNode* self, void*, s
     }
 }
 
+inline void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
+void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float dt) {
+    if (setting().onNoWavePulse) self->m_pulseSize = setting().wavePulseSize;
+    HardStreak_updateStroke(self, dt);
+}
+
+inline void(__thiscall* AudioEffectsLayer_updateTweenAction)(gd::AudioEffectsLayer*, float, char const*);
+void __fastcall AudioEffectsLayer_updateTweenActionH(gd::AudioEffectsLayer* self, void*, float idk, char const* idk2) {
+    AudioEffectsLayer_updateTweenAction(self, idk, idk2);
+    if (setting().onNoPulse) from<float>(self, 0x1ac) = 1.f;
+}
+
+inline void(__thiscall* FMODAudioEngine_update)(gd::FMODAudioEngine*, float);
+void __fastcall FMODAudioEngine_updateH(gd::FMODAudioEngine* self, void*, float dt) {
+    FMODAudioEngine_update(self, dt);
+    if (setting().onNoPulse) self->m_fPulse1 = 1.f;
+}
+
 void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate* self);
 void __fastcall AppDelegate_trySaveGame_H(gd::AppDelegate* self) {
     if (setting().onAutoSave)
@@ -749,6 +766,7 @@ DWORD WINAPI my_thread(void* hModule) {
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x428bd5), "\x6a\x00", 2, NULL); // rgba8888 format (better texture quality and colors)
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x8fa52), "\x6c", 1, NULL); // LevelEditorLayer::checkCollisions fixes flipGravity
     WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x90656), "\x6c", 1, NULL); // LevelEditorLayer::flipGravity fixes gravity for duals (ex. swingcopter)
+    patch((uint32_t)gd::base + 0x3a669, { 0x00, 0x00, 0x00, 0x43 }); // CustomSongWidget m_artistLabel limitLabelWidth
 
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4F04E9), &setting().NoclipByte, 1, 0);
     ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x54083C), &serverString, 8, 0);
@@ -795,8 +813,6 @@ DWORD WINAPI my_thread(void* hModule) {
         reinterpret_cast<void**>(&GameManager_isIconUnlockedH),
         reinterpret_cast<void**>(&GameManager_isIconUnlocked));
 
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x38bd0), CustomSongWidget_initH, reinterpret_cast<void**>(&CustomSongWidget_init));
-
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xad430), MenuGameLayer_createH, reinterpret_cast<void**>(&MenuGameLayer_create));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xfd420), SupportLayer_customSetupH, reinterpret_cast<void**>(&SupportLayer_customSetup));
 
@@ -834,6 +850,13 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0de0), PlayerObject::fadeOutStreak2H, reinterpret_cast<void**>(&PlayerObject::fadeOutStreak2));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x13e90), CCTextInputNode_updateLabelH, reinterpret_cast<void**>(&CCTextInputNode_updateLabel));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x30360), LevelCell_loadCustomLevelCellH, reinterpret_cast<void**>(&LevelCell_loadCustomLevelCell));
+
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29ac0), AudioEffectsLayer_updateTweenActionH, reinterpret_cast<void**>(&AudioEffectsLayer_updateTweenAction));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x165f0), FMODAudioEngine_updateH, reinterpret_cast<void**>(&FMODAudioEngine_update));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
+
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x38bd0), CustomSongWidget_initH, reinterpret_cast<void**>(&CustomSongWidget_init));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3a150), CustomSongWidget_updateSongInfoH, reinterpret_cast<void**>(&CustomSongWidget_updateSongInfo));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

@@ -488,13 +488,6 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0xe6c19), "\x75", 1, NULL);
 		}
 
-		if (setting().onNoPulse) {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\x90\x90\x90\x90\x90\x90\x90\x90", 8, NULL);
-		}
-		else {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\xf3\x0f\x11\x87\xac\x01\x00\x00", 8, NULL);
-		}
-
 		if (setting().onNoRespawnFlash) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4DD62F), "\xE9\x99\x00\x00\x00\x90", 6, NULL);
 		}
@@ -636,15 +629,6 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44Ca8c), "\x77", 1, NULL);
 		}
 
-		if (setting().onHideGrid) {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
-		}
-		else {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\x0f\x86\x59\x01\x00\x00", 6, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\x0f\x86\x53\x01\x00\x00", 6, NULL);
-		}
-
 		if (setting().onHideTrigLine) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493e08), "\xE9\xce\x00\x00\x00\x90", 6, NULL);
 		}
@@ -708,15 +692,6 @@ void RenderMain() {
 		}
 		else {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x491a34), "\x72\x79", 2, NULL);
-		}
-
-		if (setting().onSwitchToUpArrow) {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x26", 1, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x26", 1, NULL);
-		}
-		else {
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x20", 1, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x20", 1, NULL);
 		}
 
 		if (setting().onVerifyHack) {
@@ -1470,14 +1445,7 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Disables portal lightning from size-changing portals.");
 
-			if (ImGui::Checkbox("No Pulse", &setting().onNoPulse)) {
-				if (setting().onNoPulse) {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\x90\x90\x90\x90\x90\x90\x90\x90", 8, NULL);
-				}
-				else {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x429b6a), "\xf3\x0f\x11\x87\xac\x01\x00\x00", 8, NULL);
-				}
-			}
+			ImGui::Checkbox("No Pulse", &setting().onNoPulse);
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Disables pulsing on objects.");
 
@@ -1718,16 +1686,7 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Allows you to scroll out the editor.");
 
-			if (ImGui::Checkbox("Hide Grid", &setting().onHideGrid)) {
-				if (setting().onHideGrid) {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\xE9\x5A\x01\x00\x00\x90", 6, NULL);
-				}
-				else {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4938a0), "\x0f\x86\x59\x01\x00\x00", 6, NULL);
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493a4a), "\x0f\x86\x53\x01\x00\x00", 6, NULL);
-				}
-			}
+			ImGui::Checkbox("Hide Grid", &setting().onHideGrid);
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Hides editor grid.");
 
@@ -1835,19 +1794,6 @@ void RenderMain() {
 			}
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Makes the editor trail smoother.");
-
-			if (ImGui::Checkbox("Up Arrow Jump", &setting().onSwitchToUpArrow)) {
-				if (setting().onSwitchToUpArrow) {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x26", 1, NULL);
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x26", 1, NULL);
-				}
-				else {
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44ee5e), "\x20", 1, NULL);
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44e5f0), "\x20", 1, NULL);
-				}
-			}
-			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-				ImGui::SetTooltip("Rebinds jump to up arrow.");
 
 			if (ImGui::Checkbox("Verify Hack", &setting().onVerifyHack)) {
 				if (setting().onVerifyHack) {

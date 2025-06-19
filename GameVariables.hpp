@@ -17,4 +17,5 @@ namespace GameVariable {
 	constexpr auto EXTRA_LONG = "1349";
 	constexpr auto HIDE_PREVIEW_LINE = "1350";
 	constexpr auto IGNORE_OFFSETS = "1351";
+	constexpr auto DURATION_LINES = "1352";
 }

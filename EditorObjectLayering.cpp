@@ -2,6 +2,7 @@
 #include "utils.hpp"
 
 void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
+	if (!obj) return;
 	switch (obj->m_objectID)
 	{
 	case 29:

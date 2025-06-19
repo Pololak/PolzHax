@@ -29,6 +29,8 @@ public:
 	void onLinkControls(CCObject*);
 	void onLinkControlsInfo(CCObject*);
 
+	void onDurationLines(CCObject*);
+
 	void onHidePreviewLine(CCObject*);
 
 	void onExperimentalLayering(CCObject*);
