@@ -7,6 +7,7 @@ protected:
 	gd::EditorUI* m_parent;
 	bool init(gd::EditorUI*);
 	virtual void textChanged(gd::CCTextInputNode* input) override {
+		if (!m_parent) return;
 		if (input->getString() && strlen(input->getString())) {
 			m_parent->m_editorLayer->m_groupIDFilter = strToInt(input->getString());
 		}
@@ -15,13 +16,13 @@ protected:
 		}
 		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(m_parent->getDeselectBtn(), 0xac)->getChildByTag(45028));
 		if (onBaseLayerBtn) {
-			if (m_parent->m_editorLayer->m_groupIDFilter > 0) {
-				onBaseLayerBtn->setVisible(1);
-				onBaseLayerBtn->setEnabled(true);
+			if (m_parent->m_editorLayer->m_groupIDFilter == -1) {
+				onBaseLayerBtn->setVisible(false);
+				onBaseLayerBtn->setEnabled(false);
 			}
 			else {
-				onBaseLayerBtn->setVisible(0);
-				onBaseLayerBtn->setEnabled(false);
+				onBaseLayerBtn->setVisible(true);
+				onBaseLayerBtn->setEnabled(true);
 			}
 		}
 	}

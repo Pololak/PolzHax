@@ -741,6 +741,27 @@ public:
 		s_instance = this;
 		//gd::GameManager::sharedState()->m_levelEditorLayer = this;
 
+		if (setting().onHitboxBugFix) {
+			if (this->m_levelSections) {
+				for (int i = 0; i <= this->m_levelSections->count(); i++) {
+					if (i < 0) continue;
+					if (i >= this->m_levelSections->count()) break;
+
+					auto objectAtIndex = this->m_levelSections->objectAtIndex(i);
+					auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+					for (int j = 0; j < objArr->count(); j++) {
+						auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+						if (obj && obj->canRotateFree()) {
+							if ((obj->getRotation() / 90.f) != 0.f) {
+								obj->calculateOrientedBox();
+							}
+						}
+					}
+				}
+			}
+		}
+
 		auto& triggers = this->*m_color_triggers;
 		triggers[ColorTriggers::BG];
 		triggers[ColorTriggers::Obj];
@@ -874,13 +895,16 @@ public:
 				auto color_from = starting_color;
 				if (bound > 1) {
 					auto trigger = triggers[bound - 2];
-						if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
-						auto dist = time_between_pos(trigger->getPosition().x, pos) / trigger->triggerDuration();
-						color_from = trigger;
-						if (dist < 1.f)
-							color_from = mix_color(dist, bound > 2 ? triggers[bound - 3] : starting_color, color_from);
+					if (trigger->triggerDuration() < 0) trigger->triggerDuration() = 0;
+					auto dist = time_between_pos(trigger->getPosition().x, pos) / trigger->triggerDuration();
+					color_from = trigger;
+					if (dist < 1.f)
+						color_from = mix_color(dist, bound > 2 ? triggers[bound - 3] : starting_color, color_from);
 				}
-				return mix_color(std::min(dist, 1.f), color_from, color_to);
+				if (trigger->m_touchTriggered) return color_from;
+				if (trigger->m_copyPlayerColor1) return mix_color(std::min(dist, 1.f), color_from, gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor));
+				else if (trigger->m_copyPlayerColor2) return mix_color(std::min(dist, 1.f), color_from, gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor2));
+				else return mix_color(std::min(dist, 1.f), color_from, color_to);
 		}
 	}
 
@@ -934,7 +958,7 @@ public:
 	void updateVisibility(float dt) {
 		matdash::orig<&MyEditorLayer::updateVisibility, matdash::Thiscall>(this, dt);
 		bool showObjInfo_enabled = gd::GameManager::sharedState()->getGameVariable(GameVariable::SHOW_OBJ_INFO);
-		if (showObjInfo_enabled)
+		if (showObjInfo_enabled && editUI)
 			EditorUI::updateObjectInfo(this->m_uiLayer);
 		else {
 			auto objectInfo = static_cast<CCLabelBMFont*>(this->m_uiLayer->getChildByTag(3207));
@@ -944,8 +968,6 @@ public:
 		auto objectDrawNode = static_cast<CCDrawNode*>(this->gameLayer()->getChildByTag(125));
 		objectDrawNode->clear();
 		if (setting().onHitboxes) {
-			auto layer = this->gameLayer();
-			float xp = -layer->getPositionX() / layer->getScale();
 			for (int i = this->m_firstVisibleSection + 1; i <= this->m_lastVisibleSection - 1; i++) {
 				if (i < 0) continue;
 				if (i >= this->m_levelSections->count()) break;
@@ -1202,6 +1224,26 @@ bool GameObject_shouldBlendColor(gd::GameObject* self) {
 		default:;
 		}
 		return false;
+	}
+}
+
+void EditorUI::updateObjectHitbox(gd::EditorUI* eui) {
+	gd::LevelEditorLayer* self = eui->m_editorLayer;
+	for (int i = self->m_firstVisibleSection + 1; i <= self->m_lastVisibleSection - 1; i++) {
+		if (i < 0) continue;
+		if (i >= self->m_levelSections->count()) break;
+
+		auto objectAtIndex = self->m_levelSections->objectAtIndex(i);
+		auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+		for (int j = 0; j < objArr->count(); j++) {
+			auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+			if (obj && obj->canRotateFree()) {
+				if ((obj->getRotation() / 90.f) != 0.f) {
+					obj->calculateOrientedBox();
+				}
+			}
+		}
 	}
 }
 
@@ -1714,12 +1756,12 @@ void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void* edx, gd::Ga
 
 void EditorUI::Callback::onCustomMoveObject(CCObject* obj) {
 	auto buttonTag = static_cast<gd::CCMenuItemSpriteExtra*>(obj)->getTag();
-	this->moveObjectCall(static_cast<gd::EditCommand>(buttonTag));
+	this->moveObjectCall((gd::EditCommand)buttonTag);
 }
 
 void EditorUI::Callback::onCustomRotateObject(CCObject* obj) {
 	auto buttonTag = static_cast<gd::CCMenuItemSpriteExtra*>(obj)->getTag();
-	this->transformObjectCall(static_cast<gd::EditCommand>(buttonTag));
+	this->transformObjectCall((gd::EditCommand)buttonTag);
 }
 
 void __fastcall EditorUI::createMoveMenuH(gd::EditorUI* self) {
@@ -2065,18 +2107,22 @@ void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self) {
 			onGoToGroup->setEnabled(false);
 		}
 	}
+
+	auto btn = static_cast<gd::CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(self->m_copyBtn->getParent())->getChildByTag(45028));
+	if (btn) {
+		if (self->m_editorLayer->m_groupIDFilter == -1) {
+			btn->setVisible(false);
+			btn->setEnabled(false);
+		}
+	}
 }
 
 void __fastcall EditorUI::onGroupDownH(gd::EditorUI* self, void*, CCObject* obj) {
 	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(self->getDeselectBtn(), 0xac)->getChildByTag(45028));
 	if (onBaseLayerBtn) {
-		if (from<int>(self->getLevelEditorLayer(), 0x12c) == 0) {
-			onBaseLayerBtn->setVisible(0);
+		if (self->m_editorLayer->m_groupIDFilter == -1) {
+			onBaseLayerBtn->setVisible(false);
 			onBaseLayerBtn->setEnabled(false);
-		}
-		if (self->m_editorLayer->m_groupIDFilter > 0) {
-			onBaseLayerBtn->setVisible(1);
-			onBaseLayerBtn->setEnabled(true);
 		}
 	}
 	EditorUI::onGroupDown(self, obj);
@@ -2087,7 +2133,7 @@ void __fastcall EditorUI::onGroupDownH(gd::EditorUI* self, void*, CCObject* obj)
 void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* obj) {
 	auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(self->getDeselectBtn(), 0xac)->getChildByTag(45028));
 	if (onBaseLayerBtn) {
-		onBaseLayerBtn->setVisible(1);
+		onBaseLayerBtn->setVisible(true);
 		onBaseLayerBtn->setEnabled(true);
 	}
 	EditorUI::onGroupUp(self, obj);
@@ -2102,9 +2148,31 @@ void __fastcall EditorUI::moveObjectH(gd::EditorUI* self, void*, gd::GameObject*
 	updateLastObjectX(self->getLevelEditorLayer(), obj);
 }
 
-//CCPoint* __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, CCPoint* offset, int objKey) {
-//	return EditorUI::offsetForKey(self, 0, objKey);
-//}
+void __fastcall EditorUI::onCreateObjectH(gd::EditorUI* self, void*, int id) {
+	EditorUI::onCreateObject(self, id);
+	if (setting().onHitboxBugFix) updateObjectHitbox(self);
+}
+
+void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* sender) {
+	EditorUI::onDuplicate(self, sender);
+	if (setting().onHitboxBugFix) updateObjectHitbox(self);
+}
+
+void __fastcall EditorUI::onPasteH(gd::EditorUI* self, void*, CCObject* sender) {
+	EditorUI::onPaste(self, sender);
+	if (setting().onHitboxBugFix) updateObjectHitbox(self);
+}
+
+void __fastcall EditorUI::angleChangedH(gd::EditorUI* _self, void*, float angle) {
+	EditorUI::angleChanged(_self, angle);
+	gd::EditorUI* self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0x120);
+	if (setting().onHitboxBugFix) updateObjectHitbox(self);
+}
+
+void __fastcall EditorUI::transformObjectCallH(gd::EditorUI* self, void*, gd::EditCommand command) {
+	EditorUI::transformObjectCall(self, command);
+	if (setting().onHitboxBugFix) updateObjectHitbox(self);
+}
 
 void EditorPauseLayer::Callback::VanillaSelectAllButton(CCObject*)
 {
@@ -2664,23 +2732,17 @@ float timeBetweenPosition(float a, float b) {
 void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	DrawGridLayer::draw(self);
 
-	if (setting().onEditorExtension) {
-		glLineWidth(1);
-		ccDrawColor4B(0xff, 0xff, 0xff, 0x96);
-		ccDrawLine({ 0, 90 }, { 0, 1590 });
-	}
+	for (int i = self->m_levelEditorLayer->m_firstVisibleSection + 1; i <= self->m_levelEditorLayer->m_lastVisibleSection - 1; i++) {
+		if (i < 0) continue;
+		if (i >= self->m_levelEditorLayer->m_levelSections->count()) break;
 
-	if (gd::GameManager::sharedState()->getGameVariable(GameVariable::DURATION_LINES)) {
-		for (int i = self->m_levelEditorLayer->m_firstVisibleSection + 1; i <= self->m_levelEditorLayer->m_lastVisibleSection - 1; i++) {
-			if (i < 0) continue;
-			if (i >= self->m_levelEditorLayer->m_levelSections->count()) break;
+		auto objectAtIndex = self->m_levelEditorLayer->m_levelSections->objectAtIndex(i);
+		auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
 
-			auto objectAtIndex = self->m_levelEditorLayer->m_levelSections->objectAtIndex(i);
-			auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+		for (int j = 0; j < objArr->count(); j++) {
+			auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
 
-			for (int j = 0; j < objArr->count(); j++) {
-				auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
-
+			if (gd::GameManager::sharedState()->getGameVariable(GameVariable::DURATION_LINES)) {
 				switch (obj->m_objectID) {
 				case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
 					auto triggerTimePos = self->timeForXPos(obj->getPositionX());
@@ -2688,7 +2750,7 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 
 					if (obj->m_triggerDuration > 0) {
 						glLineWidth(2);
-						ccDrawColor4B(100, 100, 100, 75);
+						ccDrawColor4B(255, 255, 255, 75);
 						ccDrawLine(obj->getPosition(), { triggerFadeEnd, obj->getPositionY() });
 					}
 					break;
@@ -2808,7 +2870,6 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b410), EditorUI::moveObjectH, reinterpret_cast<void**>(&EditorUI::moveObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4efe0), EditorUI::offsetForKeyH, reinterpret_cast<void**>(&EditorUI::offsetForKey));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41790), EditorUI::getSpriteButtonH, reinterpret_cast<void**>(&EditorUI::getSpriteButton));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4cbb0), EditorUI::drawH, reinterpret_cast<void**>(&EditorUI::draw));
 	matdash::add_hook<&EditorUI_onPlaytest>(gd::base + 0x489c0);
@@ -2821,6 +2882,12 @@ void EditorUI::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));
+
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47730), EditorUI::onCreateObjectH, reinterpret_cast<void**>(&EditorUI::onCreateObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x491a0), EditorUI::onPasteH, reinterpret_cast<void**>(&EditorUI::onPaste));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4cfb0), EditorUI::angleChangedH, reinterpret_cast<void**>(&EditorUI::angleChanged));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4b5a0), EditorUI::transformObjectCallH, reinterpret_cast<void**>(&EditorUI::transformObjectCall));
 }
 
 void EditorPauseLayer::mem_init() {

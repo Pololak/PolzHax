@@ -593,13 +593,16 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\xEB", 1, NULL); // Placing Objects Top
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\xEB", 1, NULL); // Placing Objects Bottom
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\xEB\x44", 2, NULL); // Moving Objects
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\x00\x20\x90", 3, NULL); // Grid V1
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\x00\x20\x90", 3, NULL); // Grid V2
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\x00\x20\x90", 3, NULL); // Grid V3
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\x00\x20\x90", 3, NULL); // Grid H
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\x00\x20\x90", 3, NULL); // Portal Lines (Top)
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\x00\x20\x90", 3, NULL); // Portal Lines (Bottom)
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\x00\x20\x90", 3, NULL); // Music Lines
+			patch(gd::base + 0x14a74c, { 0x00,0x60,0xea,0x4a });
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93861), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9399b), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x939d3), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93aed), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93c72), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94073), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94112), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94667), "\x24\xa3\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x946f3), "\x24\xa3\x54\x00", 4, NULL);
 		}
 		else {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44779c), "\x77", 1, NULL);
@@ -607,13 +610,16 @@ void RenderMain() {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\x76", 1, NULL);
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\x77", 1, NULL);
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\x76\x09", 2, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\xb8\xa6\x54", 3, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\xb8\xa6\x54", 3, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\xb8\xa6\x54", 3, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\xb8\xa6\x54", 3, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\xb8\xa6\x54", 3, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\xb8\xa6\x54", 3, NULL);
-			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\xb8\xa6\x54", 3, NULL);
+			patch(gd::base + 0x14a74c, { 0x00,0x60,0x6a,0x47 });
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93861), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9399b), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x939d3), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93aed), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93c72), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94073), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94112), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94667), "\xb8\xa6\x54\x00", 4, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x946f3), "\xb8\xa6\x54\x00", 4, NULL);
 		}
 
 		if (setting().onFreeScroll) {
@@ -1639,27 +1645,33 @@ void RenderMain() {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\xEB", 1, NULL); // Placing Objects Top
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\xEB", 1, NULL); // Placing Objects Bottom
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\xEB\x44", 2, NULL); // Moving Objects
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\x00\x20\x90", 3, NULL); // Grid V1
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\x00\x20\x90", 3, NULL); // Grid V2
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\x00\x20\x90", 3, NULL); // Grid V3
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\x00\x20\x90", 3, NULL); // Grid H
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\x00\x20\x90", 3, NULL); // Portal Lines (Top)
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\x00\x20\x90", 3, NULL); // Portal Lines (Bottom)
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\x00\x20\x90", 3, NULL); // Music Lines
+					patch(gd::base + 0x14a74c, { 0x00,0x60,0xea,0x4a });
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93861), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9399b), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x939d3), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93aed), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93c72), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94073), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94112), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94667), "\x24\xa3\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x946f3), "\x24\xa3\x54\x00", 4, NULL);
 				}
 				else {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44779c), "\x77", 1, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477d2), "\x76", 1, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477e8), "\x76", 1, NULL);
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4477b9), "\x77", 1, NULL);
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\x76\x09", 2, NULL); // Moving Objects
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493861), "\xb8\xa6\x54", 3, NULL); // Grid V1
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x49399B), "\xb8\xa6\x54", 3, NULL); // Grid V2
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4939D3), "\xb8\xa6\x54", 3, NULL); // Grid V3
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493AED), "\xb8\xa6\x54", 3, NULL); // Grid H
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494112), "\xb8\xa6\x54", 3, NULL); // Portal Lines (Top)
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x494073), "\xb8\xa6\x54", 3, NULL); // Portal Lines (Bottom)
-					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x493C72), "\xb8\xa6\x54", 3, NULL); // Music Lines
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x44b445), "\x76\x09", 2, NULL);
+					patch(gd::base + 0x14a74c, { 0x00,0x60,0x6a,0x47 });
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93861), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x9399b), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x939d3), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93aed), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x93c72), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94073), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94112), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x94667), "\xb8\xa6\x54\x00", 4, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x946f3), "\xb8\xa6\x54\x00", 4, NULL);
 				}
 			}
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1701,9 +1713,9 @@ void RenderMain() {
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Hides trigger lines.");
 
-			//ImGui::Checkbox("Hitbox Bug Fix", &setting().onHitboxBugFix);
-			//if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-			//	ImGui::SetTooltip("Fixes oriented hitboxes in the editor.");
+			ImGui::Checkbox("Hitbox Bug Fix", &setting().onHitboxBugFix);
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Fixes oriented hitboxes in the editor.");
 
 			if (ImGui::Checkbox("Level Edit", &setting().onLevelEdit)) {
 				if (setting().onLevelEdit) {
@@ -2057,15 +2069,12 @@ void RenderMain() {
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Respawn from your last practice mode checkpoint after completing a level.");
 
-			//ImGui::Checkbox("Show Layout", &setting().onShowLayout);
-			//if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-			//    ImGui::SetTooltip("Removes all decoration and colour from levels.");
-			//ImGui::SameLine();
-			//if (ImGui::TreeNode("")) {
-			//    ImGui::ColorEdit3("Background Color", setting().BackGroundColor, ImGuiColorEditFlags_NoInputs);
-			//    ImGui::ColorEdit3("Ground Color", setting().GroundColor, ImGuiColorEditFlags_NoInputs);
-			//    ImGui::TreePop();
-			//}
+			if (ImGui::Checkbox("Show Layout", &setting().onShowLayout)) {
+				if (setting().onShowLayout) cheatAdd();
+				else cheatDec();
+			}
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+			    ImGui::SetTooltip("Removes all decoration and colour from levels.");
 
 			ImGui::SetNextItemWidth(60.f);
 			if (ImGui::DragFloat("Respawn Time", &setting().respawnTime, 0.1f, 0.1f, 10.f))
@@ -2704,6 +2713,8 @@ void RenderMain() {
 			ImGui::SameLine();
 			if (ImGui::Checkbox("Speedhack", &setting().onSpeedhack)) {
 				update_speed_hack();
+				if (setting().onSpeedhack) cheatAdd();
+				else cheatDec();
 			}
 			ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackMusic);
 			if (ImGui::Checkbox("Classic Mode", &setting().onClassicMode)) {

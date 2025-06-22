@@ -759,6 +759,18 @@ void __fastcall LevelCell_loadCustomLevelCellH(gd::LevelCell* self) {
     from<CCLayer*>(self, 0x16c)->addChild(idLabel);
 }
 
+inline void(__thiscall* GameObject_triggerObject)(gd::GameObject*);
+void __fastcall GameObject_triggerObjectH(gd::GameObject* self) {
+    if (setting().onShowLayout) {
+        switch (self->m_objectID)
+        {
+        case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
+            return; break;
+        }
+    }
+    GameObject_triggerObject(self);
+}
+
 DWORD WINAPI my_thread(void* hModule) {
     //setting().loadState();
 
@@ -857,6 +869,8 @@ DWORD WINAPI my_thread(void* hModule) {
 
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x38bd0), CustomSongWidget_initH, reinterpret_cast<void**>(&CustomSongWidget_init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3a150), CustomSongWidget_updateSongInfoH, reinterpret_cast<void**>(&CustomSongWidget_updateSongInfo));
+
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6e230), GameObject_triggerObjectH, reinterpret_cast<void**>(&GameObject_triggerObject));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

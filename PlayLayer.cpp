@@ -255,6 +255,39 @@ void setupStartPos(gd::StartPosObject* startPos) {
     }
 }
 
+void updateShowLayout(gd::PlayLayer* self) {
+    if (setting().onShowLayout) {
+        ccColor3B bgColor = ccc3(40, 125, 255);
+        ccColor3B gColor = ccc3(0, 102, 255);
+
+        self->m_backgroundSprite->setColor(bgColor);
+        self->m_bottomGround->groundSprite()->setColor(gColor);
+        self->m_bottomGround->lineSprite()->setColor(ccc3(255, 255, 255));
+        self->m_topGround->groundSprite()->setColor(gColor);
+        self->m_topGround->lineSprite()->setColor(ccc3(255, 255, 255));
+
+        self->m_backgroundFlash->setVisible(false);
+
+        for (int i = self->m_firstVisibleSection - 1; i <= self->m_lastVisibleSection + 1; i++) {
+            if (i < 0) continue;
+            if (i >= self->m_levelSections->count()) break;
+
+            auto objectAtIndex = self->m_levelSections->objectAtIndex(i);
+            auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+            for (int j = 0; j < objArr->count(); j++) {
+                auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+                if (obj->m_objectType == gd::kGameObjectTypeDecoration && obj->isVisible()/* && (obj->m_objectID == 50 && obj->m_objectID == 51 && obj->m_objectID == 52 && obj->m_objectID == 53 && obj->m_objectID == 54 && obj->m_objectID == 60 && obj->m_objectID == 148 && obj->m_objectID == 149 && obj->m_objectID == 405) */&& (obj->m_objectID != 10 && obj->m_objectID != 11 && obj->m_objectID != 12 && obj->m_objectID != 13 && obj->m_objectID != 38 && obj->m_objectID != 44 && obj->m_objectID != 45 && obj->m_objectID != 46 && obj->m_objectID != 47 && obj->m_objectID != 99 && obj->m_objectID != 101 && obj->m_objectID != 111 && obj->m_objectID != 286 && obj->m_objectID != 287 && obj->m_objectID != 660 && obj->m_objectID != 745 && obj->m_objectID != 749) && obj != (gd::GameObject*)self->m_endPortalObject)
+                    obj->setVisible(false);
+
+                obj->setObjectColor({ 255, 255, 255 });
+                if (obj->m_colorSprite) obj->m_colorSprite->setColor({ 255, 255, 255 });
+                obj->m_customColorMode = (gd::CustomColorMode)9;
+            }
+        }
+    }
+}
+
 void __fastcall PlayLayer::destroyPlayer_H(gd::PlayLayer* self, void* edx, gd::PlayerObject* player)
 {
     isPlayerDead = true;
@@ -371,6 +404,8 @@ bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLeve
             }
         }
     }
+
+    if (setting().onShowLayout) updateShowLayout(self);
 
     auto director = CCDirector::sharedDirector();
     auto size = CCDirector::sharedDirector()->getWinSize();
@@ -1149,6 +1184,8 @@ void __fastcall PlayLayer::update_H(gd::PlayLayer* self, void*, float dt) {
 
     self->m_player->m_hardStreak->setVisible(!setting().onNoWaveTrail);
     self->m_player2->m_hardStreak->setVisible(!setting().onNoWaveTrail);
+
+    if (setting().onShowLayout) updateShowLayout(self);
 }
 
 void __fastcall PlayLayer::spawnPlayer2_H(gd::PlayLayer* self) {

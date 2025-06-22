@@ -109,7 +109,20 @@ namespace EditorUI {
 	inline void(__thiscall* moveObject)(gd::EditorUI*, gd::GameObject*, CCPoint);
 	void __fastcall moveObjectH(gd::EditorUI*, void*, gd::GameObject*, CCPoint);
 
+	inline void(__thiscall* onCreateObject)(gd::EditorUI*, int);
+	void __fastcall onCreateObjectH(gd::EditorUI*, void*, int);
+
+	inline void(__thiscall* transformObjectCall)(gd::EditorUI*, gd::EditCommand);
+	void __fastcall transformObjectCallH(gd::EditorUI*, void*, gd::EditCommand);
+
+	inline void(__thiscall* angleChanged)(gd::EditorUI*, float);
+	void __fastcall angleChangedH(gd::EditorUI*, void*, float);
+
+	inline void(__thiscall* onPaste)(gd::EditorUI*, CCObject*);
+	void __fastcall onPasteH(gd::EditorUI*, void*, CCObject*);
+
 	void updateObjectInfo(gd::EditorUI*);
+	void updateObjectHitbox(gd::EditorUI*);
 
 	void mem_init();
 }
