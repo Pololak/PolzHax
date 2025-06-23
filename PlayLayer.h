@@ -56,6 +56,8 @@ namespace PlayLayer {
 	//inline void(__thiscall* markCheckpoint)(gd::PlayLayer*);
 	//void __fastcall markCheckpointH(gd::PlayLayer* self);
 
+	void updateShowHitboxes(gd::PlayLayer*);
+
 	void onNextStartPos();
 	void onPrevStartPos();
 

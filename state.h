@@ -23,7 +23,7 @@ struct SettingStruct {
     int hitboxOpacity = 255;
 
     bool show;
-    bool onAutoSave;
+    bool onAutoSave = true;
     bool onExplorer;
 
     bool onCharFilter;

@@ -1778,6 +1778,9 @@
     <ClCompile Include="ObjectIDEnterPopup.cpp">
       <Filter>Source Files\Polz2</Filter>
     </ClCompile>
+    <ClCompile Include="LevelSettingsLayer.cpp">
+      <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\MinHook\libMinHook-x86-v141-mtd.lib">

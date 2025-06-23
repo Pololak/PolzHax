@@ -2678,43 +2678,6 @@ void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* self,
 	//}
 }
 
-auto flipGravityToggle(CCSprite* toggleOn, CCSprite* toggleOff) {
-	auto flipGravity_enabled = levelSettingsLayer->m_settingsObject->m_isFlipped;
-	return (flipGravity_enabled) ? toggleOn : toggleOff;
-}
-
-bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject) {
-	levelSettingsLayer = self;
-	if (!LevelSettingsLayer::init(self, settingsObject)) return false;
-
-	auto director = CCDirector::sharedDirector();
-	auto winSize = CCDirector::sharedDirector()->getWinSize();
-
-	if (from<gd::CustomSongWidget*>(self, 0x230) != nullptr) {
-		auto flipGravityLabel = CCLabelBMFont::create("Start Flipped", "goldFont.fnt");
-		flipGravityLabel->setScale(0.5f);
-		flipGravityLabel->setAnchorPoint({ 0.f, 0.5f });
-		flipGravityLabel->setPosition({ (winSize.width / 2.f) - 120.f, (winSize.height / 2.f) - 134.f });
-		self->m_mainLayer->addChild(flipGravityLabel);
-
-		auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
-		auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
-
-		auto menu = self->m_buttonMenu;
-		auto flipGravityToggler = gd::CCMenuItemToggler::create(flipGravityToggle(toggleOn, toggleOff), flipGravityToggle(toggleOff, toggleOn), self, menu_selector(gd::LevelSettingsLayer::onGravityFlipped));
-		flipGravityToggler->setScale(0.7f);
-		flipGravityToggler->setPosition(menu->convertToNodeSpace({(winSize.width / 2.f) - 135.f, (winSize.height / 2.f) - 135.f}));
-		menu->addChild(flipGravityToggler);
-	}
-
-	return true;
-}
-
-void __fastcall LevelSettingsLayer::dtorH(gd::LevelSettingsLayer* self) {
-	levelSettingsLayer = nullptr;
-	LevelSettingsLayer::dtor(self);
-}
-
 void __fastcall DrawGridLayer::addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject) {
 	cocos2d::CCArray* speedObjects = from<CCArray*>(self, 0x150);
 	bool bVar1 = speedObjects->containsObject(gameObject);

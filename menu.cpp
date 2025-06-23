@@ -855,9 +855,12 @@ void RenderMain() {
 
 		if (setting().onFreeWinReSize) {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\x90\x90\x90\x90\x90", 5, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10ee81), "\xe9\x2f\xff\xff\xff\x90", 6, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10e143), "\x90\x90\x90\x90\x90\x90", 6, NULL);
 		}
 		else {
 			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\xe8\xb0\xf3\xff\xff", 5, NULL);
+			WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10ee81), "\x0f\x85\x2e\xff\xff\xff", 6, NULL);
 		}
 
 		if (setting().onIgnoreSlider) {
@@ -1674,8 +1677,8 @@ void RenderMain() {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x946f3), "\xb8\xa6\x54\x00", 4, NULL);
 				}
 			}
-			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
-				ImGui::SetTooltip("Allows you to build out of bounds.");
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Increases the editor length by a factor of 128.");
 
 			ImGui::Checkbox("Editor Preview Mode", &setting().onEditorPreview);
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)
@@ -1926,6 +1929,8 @@ void RenderMain() {
 				else {
 					cheatDec();
 				}
+				if (auto pl = gd::GameManager::sharedState()->getPlayLayer())
+					PlayLayer::updateShowHitboxes(pl);
 			}
 			ImGui::SameLine();
 			if (ImGui::TreeNode("##hitboxesSettings")) {
@@ -2260,9 +2265,12 @@ void RenderMain() {
 			if (ImGui::Checkbox("Free Window Resize", &setting().onFreeWinReSize)) {
 				if (setting().onFreeWinReSize) {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\x90\x90\x90\x90\x90", 5, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10ee81), "\xe9\x2f\xff\xff\xff\x90", 6, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10e143), "\x90\x90\x90\x90\x90\x90", 6, NULL);
 				}
 				else {
 					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10f48b), "\xe8\xb0\xf3\xff\xff", 5, NULL);
+					WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(libcocosbase + 0x10ee81), "\x0f\x85\x2e\xff\xff\xff", 6, NULL);
 				}
 			}
 			if (ImGui::IsItemHovered()  && GImGui->HoveredIdTimer > 0.5f)

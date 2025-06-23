@@ -787,8 +787,8 @@ DWORD WINAPI my_thread(void* hModule) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
 
-    //AllocConsole();
-    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    AllocConsole();
+    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     auto cocos = GetModuleHandleA("libcocos2d.dll");
     auto cocos_ext = GetModuleHandleA("libExtensions.dll");
@@ -810,6 +810,7 @@ DWORD WINAPI my_thread(void* hModule) {
     SetGroupIDLayer::mem_init();
     ColorSelectPopup::mem_init();
     LevelBrowserLayer::mem_init();
+    LevelSettingsLayer::mem_init();
 
     MH_CreateHook(
         reinterpret_cast<void*>(GetProcAddress(cocos, "?dispatchKeyboardMSG@CCKeyboardDispatcher@cocos2d@@QAE_NW4enumKeyCodes@2@_N@Z")),
@@ -835,8 +836,6 @@ DWORD WINAPI my_thread(void* hModule) {
     //MH_CreateHook(reinterpret_cast<void*>(GetProcAddress(cocos, "?create@CCLabelBMFont@cocos2d@@SAPAV12@PBD0@Z")), CCLabelBMFont_createH, reinterpret_cast<void**>(&CCLabelBMFont_create));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer_onCloneH, reinterpret_cast<void**>(&LevelInfoLayer_onClone));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3da30), EditLevelLayer_onCloneH, reinterpret_cast<void**>(&EditLevelLayer_onClone));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x97050), LevelSettingsLayer::initH, reinterpret_cast<void**>(&LevelSettingsLayer::init));
-    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x96e90), LevelSettingsLayer::dtorH, reinterpret_cast<void**>(&LevelSettingsLayer::dtor));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9f830), LevelSearchLayer_initH, reinterpret_cast<void**>(&LevelSearchLayer_init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x84080), InfoLayer::initH, reinterpret_cast<void**>(&InfoLayer::init));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x87fc0), LeaderboardsLayer_initH, reinterpret_cast<void**>(&LeaderboardsLayer_init));

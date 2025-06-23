@@ -711,6 +711,7 @@
     <ClCompile Include="InfoLayer.cpp" />
     <ClCompile Include="Labels.cpp" />
     <ClCompile Include="LevelBrowserLayer.cpp" />
+    <ClCompile Include="LevelSettingsLayer.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp" />
