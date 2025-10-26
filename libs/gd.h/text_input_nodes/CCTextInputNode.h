@@ -57,7 +57,7 @@ namespace gd {
 			from<cocos2d::ccColor3B>(this, 0x164) = color;
 			this->refreshLabel();
 		}
-		void setLabelPlaceholerScale(float scale) {
+		void setLabelPlaceholderScale(float scale) {
 			from<float>(this, 0x160) = scale;
 			this->refreshLabel();
 		}

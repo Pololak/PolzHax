@@ -1635,6 +1635,9 @@
     <ClInclude Include="ObjectIDEnterPopup.h">
       <Filter>Header Files\Polz2</Filter>
     </ClInclude>
+    <ClInclude Include="PulseHelperPopup.h">
+      <Filter>Header Files\Polz2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1780,6 +1783,9 @@
     </ClCompile>
     <ClCompile Include="LevelSettingsLayer.cpp">
       <Filter>Source Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PulseHelperPopup.cpp">
+      <Filter>Source Files\Polz2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

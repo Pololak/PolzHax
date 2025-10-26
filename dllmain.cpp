@@ -447,6 +447,10 @@ public:
     void onLevelID(CCObject*) {
         gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(gd::SearchType::Search, std::to_string(editLevelLayer->m_level->m_levelID)));
     }
+    void onGarage(CCObject*) {
+        CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(.5f, gd::GJGarageLayer::scene()));
+        gd::GameManager::sharedState()->setGameVariable(GameVariable::GARAGE_ROPE, true);
+    }
 };
 
 CCArray* savedLevelsArray;
@@ -471,9 +475,8 @@ public:
         gd::FLAlertLayer::create(&moveToTopProtocolLIL, "Move To Top", "Move this level to the top of the created levels list?", "NO", "YES", 300.f, false, 140.f)->show();
     }
     void onGarage(CCObject*) {
-        auto garageScene = gd::GJGarageLayer::scene();
-        CCScene* scene = CCTransitionMoveInT::create(0.5f, garageScene);
-        CCDirector::sharedDirector()->pushScene(scene);
+        CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(.5f, gd::GJGarageLayer::scene()));
+        gd::GameManager::sharedState()->setGameVariable(GameVariable::GARAGE_ROPE, true);
     }
 };
 
@@ -637,7 +640,7 @@ bool LevelInfoLayer_init(gd::LevelInfoLayer* self, gd::GJGameLevel* level) {
     infoLabel->setPosition({ 80.f, 260.f });
     infoLabel->setScale(.6f);
     infoLabel->setAnchorPoint({ 0.f, 1.f });
-    self->addChild(infoLabel);
+    //self->addChild(infoLabel);
 
 	return true;
 }
@@ -771,6 +774,26 @@ void __fastcall GameObject_triggerObjectH(gd::GameObject* self) {
     GameObject_triggerObject(self);
 }
 
+inline void(__thiscall* LevelEditorLayer_draw)(gd::LevelEditorLayer*);
+void __fastcall LevelEditorLayer_drawH(gd::LevelEditorLayer* self) {
+    LevelEditorLayer_draw(self);
+
+    std::cout << "hkhgkljqhw" << std::endl;
+
+    ccDrawLine({ 0, 100 }, { 100, 100 });
+
+    for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
+        if (section) {
+            for (auto obj : CCArrayExt<gd::GameObject*>(section)) {
+                if (obj) {
+                    std::cout << obj << "\n";
+                    std::cout << obj->m_objectTextureRect.getMinX() << " " << obj->m_objectTextureRect.getMinY() << " " << obj->m_objectTextureRect.getMaxX() << " " << obj->m_objectTextureRect.getMaxY() << std::endl;
+                }
+            }
+        }
+    }
+}
+
 DWORD WINAPI my_thread(void* hModule) {
     //setting().loadState();
 
@@ -855,6 +878,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x7bf20), GJDropDownLayer_showLayerH, reinterpret_cast<void**>(&GJDropDownLayer_showLayer));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92f20), DrawGridLayer::addToSpeedObjectsH, reinterpret_cast<void**>(&DrawGridLayer::addToSpeedObjects));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93030), DrawGridLayer::loadTimeMarkersH, reinterpret_cast<void**>(&DrawGridLayer::loadTimeMarkers));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe1270), PlayerObject::placeStreakPointH, reinterpret_cast<void**>(&PlayerObject::placeStreakPoint));
     //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9b50), PlayerObject::updateH, reinterpret_cast<void**>(&PlayerObject::update));
@@ -870,6 +894,8 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3a150), CustomSongWidget_updateSongInfoH, reinterpret_cast<void**>(&CustomSongWidget_updateSongInfo));
 
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6e230), GameObject_triggerObjectH, reinterpret_cast<void**>(&GameObject_triggerObject));
+
+    //MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x926b0), LevelEditorLayer_drawH, reinterpret_cast<void**>(&LevelEditorLayer_draw));
 
     matdash::add_hook<&cocos_hsv2rgb>(GetProcAddress(cocos_ext, "?RGBfromHSV@CCControlUtils@extension@cocos2d@@SA?AURGBA@23@UHSV@23@@Z"));
 

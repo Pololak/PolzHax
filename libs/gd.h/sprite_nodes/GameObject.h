@@ -248,12 +248,11 @@ namespace gd {
 		}
 
 		auto getColorMode() {
-			auto active = from<CustomColorMode>(this, 0x308);
-			auto default_color = from<CustomColorMode>(this, 0x30c);
-			// TODO: gd checks some boolean
-			if (active == CustomColorMode::Default)
-				active = default_color;
-			return active;
+			auto customColor = this->m_customColorMode;
+			if ((this->m_defaultColorMode == customColor) || this->m_canChangeCustomColor || (customColor == CustomColorMode::Default)) {
+				customColor = this->m_defaultColorMode;
+			}
+			return customColor;
 		}
 
 		cocos2d::CCRepeatForever* createRotateAction(float f) {

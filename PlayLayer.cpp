@@ -401,11 +401,11 @@ void __fastcall PlayLayer::resetLevel_H(gd::PlayLayer* self) {
     }
 }
 
-bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void* edx, gd::GJGameLevel* level) {
-    smoothOut = 0;
+bool __fastcall PlayLayer::init_H(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
     playLayer = self;
     if (!PlayLayer::init(self, level)) return false;
 
+    smoothOut = 0;
     setting().beforeRestartCheatsCount = setting().cheatsCount;
     isPlayerColorGot = false;
     fadedoutflag = 0;

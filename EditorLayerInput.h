@@ -4,39 +4,14 @@
 
 class EditorLayerInput : public CCLayer, gd::TextInputDelegate {
 protected:
-	gd::EditorUI* m_parent;
-	bool init(gd::EditorUI*);
-	virtual void textChanged(gd::CCTextInputNode* input) override {
-		if (!m_parent) return;
-		if (input->getString() && strlen(input->getString())) {
-			m_parent->m_editorLayer->m_groupIDFilter = strToInt(input->getString());
-		}
-		else {
-			m_parent->m_editorLayer->m_groupIDFilter = -1;
-		}
-		auto onBaseLayerBtn = reinterpret_cast<gd::CCMenuItemSpriteExtra*>(from<CCMenu*>(m_parent->getDeselectBtn(), 0xac)->getChildByTag(45028));
-		if (onBaseLayerBtn) {
-			if (m_parent->m_editorLayer->m_groupIDFilter == -1) {
-				onBaseLayerBtn->setVisible(false);
-				onBaseLayerBtn->setEnabled(false);
-			}
-			else {
-				onBaseLayerBtn->setVisible(true);
-				onBaseLayerBtn->setEnabled(true);
-			}
-		}
-	}
+    gd::EditorUI* m_editorUI;
+
+    bool init(gd::EditorUI*);
+    virtual void textChanged(gd::CCTextInputNode*);
 public:
-	gd::CCTextInputNode* m_layerInput;
-	static EditorLayerInput* create(gd::EditorUI* editor) {
-		EditorLayerInput* ret = new EditorLayerInput();
-		if (ret && ret->init(editor)) {
-			ret->autorelease();
-			return ret;
-		}
-		CC_SAFE_DELETE(ret);
-		return nullptr;
-	}
+    gd::CCTextInputNode* m_input;
+
+    static EditorLayerInput* create(gd::EditorUI*);
 };
 
 class ObjectGroupInput : public CCLayer, gd::TextInputDelegate {

@@ -16,6 +16,9 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* onPlaytest)(gd::LevelEditorLayer*);
 	void __fastcall onPlaytestH(gd::LevelEditorLayer* self);
 
+	inline void(__thiscall* onResumePlaytest)(gd::LevelEditorLayer*);
+	void __fastcall onResumePlaytestH(gd::LevelEditorLayer* self);
+
 	inline void(__thiscall* removeObject)(gd::LevelEditorLayer*, gd::GameObject*, bool);
 	void __fastcall removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* obj, bool idk);
 
@@ -27,6 +30,12 @@ namespace LevelEditorLayer {
 
 	inline void(__thiscall* flipGravity)(gd::LevelEditorLayer*, gd::PlayerObject*, bool, bool);
 	void __fastcall flipGravityH(gd::LevelEditorLayer*, void*, gd::PlayerObject*, bool, bool);
+
+	inline gd::GameObject* (__thiscall* addObjectFromString)(gd::LevelEditorLayer*, std::string);
+	gd::GameObject* __fastcall addObjectFromStringH(gd::LevelEditorLayer*, void*, std::string);
+
+	inline gd::GameObject* (__thiscall* createObject)(gd::LevelEditorLayer*, int, CCPoint);
+	gd::GameObject* __fastcall createObjectH(gd::LevelEditorLayer*, void*, int, CCPoint);
 
 	void mem_init();
 }
@@ -158,6 +167,8 @@ namespace EditorPauseLayer {
 
 		void onSaveLevel(CCObject*);
 		void onCreateTriggers(CCObject*);
+
+		void onSelectAllWithDirection(CCObject*);
 	};
 
 	void mem_init();
@@ -232,13 +243,16 @@ namespace DrawGridLayer {
 	inline void(__thiscall* addToSpeedObjects)(gd::DrawGridLayer*, gd::GameObject*);
 	void __fastcall addToSpeedObjectsH(gd::DrawGridLayer* self, void*, gd::GameObject* gameObject);
 
+	inline void(__thiscall* loadTimeMarkers)(gd::DrawGridLayer*, std::string);
+	void __fastcall loadTimeMarkersH(gd::DrawGridLayer*, void*, std::string);
+
 	inline void(__thiscall* draw)(gd::DrawGridLayer*);
 	void __fastcall drawH(gd::DrawGridLayer*);
 }
 
 namespace Scheduler {
-	inline bool(__thiscall* update)(CCScheduler* self, float dt);
-	void __fastcall update_H(CCScheduler* self, void* edx, float dt);
+	inline bool(__thiscall* update)(CCScheduler*, float);
+	void __fastcall update_H(CCScheduler*, void*, float);
 
 	void mem_init();
 }

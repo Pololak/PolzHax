@@ -680,6 +680,7 @@
     <ClInclude Include="PlayLayer.h" />
     <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="preview-mode.hpp" />
+    <ClInclude Include="PulseHelperPopup.h" />
     <ClInclude Include="RGBColorInputWidget.hpp" />
     <ClInclude Include="RotatingSaws.hpp" />
     <ClInclude Include="schema.hpp" />
@@ -734,6 +735,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="preview-mode.cpp" />
+    <ClCompile Include="PulseHelperPopup.cpp" />
     <ClCompile Include="RGBColorInputWidget.cpp" />
     <ClCompile Include="RotatingSaws.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />

@@ -18,4 +18,5 @@ namespace GameVariable {
 	constexpr auto HIDE_PREVIEW_LINE = "1350";
 	constexpr auto IGNORE_OFFSETS = "1351";
 	constexpr auto DURATION_LINES = "1352";
+	constexpr auto GARAGE_ROPE = "1353";
 }

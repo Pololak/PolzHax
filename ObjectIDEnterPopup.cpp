@@ -32,6 +32,8 @@ bool ObjectIDEnterPopup::init(gd::EditorUI* editUI) {
 	setTouchEnabled(true);
 	setKeypadEnabled(true);
 
+	this->addChild(CCLabelBMFont::create("Pololak", "bigFont.fnt"));
+
 	return true;
 }
 

@@ -173,9 +173,9 @@ public:
     /**
      * @lua NA
      */
-    void touches(CCSet* pTouches, CCEvent* pEvent, unsigned int uIndex) {
+    void touches(CCSet* pTouches, CCEvent* pEvent, unsigned int uIndex); /*{
         reinterpret_cast<void(__thiscall*)(CCTouchDispatcher*, CCSet*, CCEvent*, unsigned int)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?touches@CCTouchDispatcher@cocos2d@@QAEXPAVCCSet@2@PAVCCEvent@2@I@Z"))(this, pTouches, pEvent, uIndex);
-    }
+    }*/
     /**
      * @lua NA
      */
@@ -193,18 +193,28 @@ public:
      */
     virtual void touchesCancelled(CCSet* touches, CCEvent* pEvent);
 
+    bool getForcePrio() const;
+
+    void setForcePrio(bool);
+
+    int getTargetPrio() const;
+
+    void setTargetPrio(int);
+
+    void incrementForcePrio();
+
+
+    //void incrementForcePrio() {
+    //    return reinterpret_cast<void(__thiscall*)(CCTouchDispatcher*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?incrementForcePrio@CCTouchDispatcher@cocos2d@@QAEXXZ"))(this);
+    //}
+
+    void decrementForcePrio();
+
 public:
     /**
      * @lua NA
      */
     CCTouchHandler* findHandler(CCTouchDelegate *pDelegate);
-
-    void incrementForcePrio() {
-        return reinterpret_cast<void(__thiscall*)(CCTouchDispatcher*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?incrementForcePrio@CCTouchDispatcher@cocos2d@@QAEXXZ"))(this);
-    }
-
-    void decrementForcePrio(int priority);
-
 protected:
     void forceRemoveDelegate(CCTouchDelegate *pDelegate);
     void forceAddHandler(CCTouchHandler *pHandler, CCArray* pArray);
@@ -213,24 +223,22 @@ protected:
     CCTouchHandler* findHandler(CCArray* pArray, CCTouchDelegate *pDelegate);
 
 protected:
-     CCArray* m_pTargetedHandlers;
-     CCArray* m_pStandardHandlers;
+    CCArray* m_pTargetedHandlers;
+    CCArray* m_pStandardHandlers;
 
     bool m_bLocked;
     bool m_bToAdd;
     bool m_bToRemove;
-     CCArray* m_pHandlersToAdd;
-    struct _ccCArray *m_pHandlersToRemove;
+    CCArray* m_pHandlersToAdd;
+    struct _ccCArray* m_pHandlersToRemove;
     bool m_bToQuit;
     bool m_bDispatchEvents;
 
+    bool forcePrio;
+    int targetPrio;
+
     // 4, 1 for each type of event
     struct ccTouchHandlerHelperData m_sHandlerHelperData[ccTouchMax];
-
-    RT_ADD(
-        CC_SYNTHESIZE_NV(bool, m_bForcePrio, ForcePrio);
-        CC_SYNTHESIZE_NV(int, m_nTargetPrio, TargetPrio);
-    )
 };
 
 // end of input group

@@ -4,7 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-
 	class FLAlertLayerProtocol;
 	class ButtonSprite;
 	class ScrollingLayer;
@@ -23,31 +22,47 @@ namespace gd {
 		bool m_containsBorder; // 0x1b8
 		bool m_noAction; // 0x1bc
 
+		virtual ~FLAlertLayer() {
+			m_buttonMenu = nullptr;
+			m_controlConnected = -1;
+			m_ZOrder = 0;
+			m_alertProtocol = nullptr;
+			m_scene = nullptr;
+			m_reverseKeyBack = false;
+			m_mainLayer = nullptr;
+			m_scrollingLayer = nullptr;
+			m_scrollAction = -1;
+			m_containsBorder = false;
+			m_noAction = false;
+		}
+
 		virtual void registerWithTouchDispatcher() {
 			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
 				base + 0x161c0 //16110 //0x236F0
 				)(this);
 		}
 
-		virtual bool ccTouchBegan(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) { 
-			return reinterpret_cast<bool(__thiscall*)(char*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
+		//reinterpret_cast<char*>(this) + 0xE8
+
+		virtual bool ccTouchBegan(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
+			return reinterpret_cast<bool(__thiscall*)(FLAlertLayer*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
 				base + 0x15f00 //15e50 //0x233C0
-				)(reinterpret_cast<char*>(this) + 0xEC, pTouch, pEvent);
+				)(reinterpret_cast<FLAlertLayer*>(reinterpret_cast<uintptr_t>(this) + 0xe8), pTouch, pEvent);
 		}
 		virtual void ccTouchMoved(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
-			return reinterpret_cast<void(__thiscall*)(char*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
+			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
 				base + 0x16050 //15fa0 //0x23510
-				)(reinterpret_cast<char*>(this) + 0xEC, pTouch, pEvent);
+				)(reinterpret_cast<FLAlertLayer*>(reinterpret_cast<uintptr_t>(this) + 0xe8), pTouch, pEvent);
 		}
 		virtual void ccTouchEnded(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
-			return reinterpret_cast<void(__thiscall*)(char*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
+			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
 				base + 0x15f90 //15ee0 //0x23450
-				)(reinterpret_cast<char*>(this) + 0xEC, pTouch, pEvent);
+				)(reinterpret_cast<FLAlertLayer*>(reinterpret_cast<uintptr_t>(this) + 0xe8), pTouch, pEvent);
 		}
 		virtual void ccTouchCancelled(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
-			return reinterpret_cast<void(__thiscall*)(char*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
+			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(
 				base + 0x16000 //15f50 //0x234C0
-				)(reinterpret_cast<char*>(this) + 0xEC, pTouch, pEvent);
+				)(reinterpret_cast<FLAlertLayer*>(reinterpret_cast<uintptr_t>(this) + 0xe8), pTouch, pEvent);
 		}
 
 		virtual void keyDown(cocos2d::enumKeyCodes key) {
@@ -57,9 +72,9 @@ namespace gd {
 		}
 
 		virtual void keyBackClicked() {
-			return reinterpret_cast<void(__thiscall*)(char*)>(
-				base + 0x15de0 //15d30 //0x232C0 2.1
-				)(reinterpret_cast<char*>(this) + 0xF4);
+			return reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(
+				base + 0x15de0
+				)(reinterpret_cast<FLAlertLayer*>(reinterpret_cast<uintptr_t>(this) + 0xf0));
 		}
 
 		virtual void show() {
@@ -86,7 +101,7 @@ namespace gd {
 			auto ret = reinterpret_cast<FLAlertLayer * (__fastcall*)(FLAlertLayerProtocol*, const char*, const char*,
 				const char*, const char*, float, bool, float)>(base + 0x15360)(protocol, title,
 					caption, button1, button2, width, absolute, height);
-			__asm add esp, 24
+			__asm add esp, 0x18
 			return ret;
 		}
 	};

@@ -19,6 +19,9 @@ namespace GJGarageLayer {
 		void onDartIcon(CCObject*);
 		void onNext(CCObject*);
 		void onPrev(CCObject*);
+	};
+
+	class RopeCallback : public gd::GJGarageLayer {
 		void onGarageRopeBack(CCObject*);
 	};
 

@@ -21,6 +21,10 @@ namespace gd {
 		float m_duration; // 0x1ec
 		int m_custom; // 0x1f0 // player color
 		int m_custom2; // 0x1f4 // blending
+
+		void closeColorSelect(CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(ColorSelectPopup*, CCObject*)>(base + 0x2aec0)(this, sender);
+		}
     };
 }
 

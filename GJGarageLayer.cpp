@@ -160,18 +160,23 @@ public:
 	}
 };
 
-void GJGarageLayer::Callback::onGarageRopeBack(CCObject*) {
-	auto lastScene = static_cast<int>(gd::GameManager::sharedState()->m_lastScene2);
-	gd::GJGameLevel* level = static_cast<gd::GJGameLevel*>(gd::GameManager::sharedState()->m_premiumPopup);
-	if (lastScene == 99) {
-		auto ellScene = gd::EditLevelLayer::scene(level);
-		CCScene* scene = CCTransitionMoveInB::create(0.5, ellScene);
-		CCDirector::sharedDirector()->pushScene(scene);
+void GJGarageLayer::RopeCallback::onGarageRopeBack(CCObject*) {
+	if (!gd::GameManager::sharedState()->getGameVariable(GameVariable::GARAGE_ROPE)) {
+		CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::MenuLayer::scene(false)));
 	}
-	else if (lastScene == 98) {
-		auto lilScene = gd::LevelInfoLayer::scene(level);
-		CCScene* scene = CCTransitionMoveInB::create(0.5, lilScene);
-		CCDirector::sharedDirector()->pushScene(scene);
+	else {
+		gd::GameManager::sharedState()->setGameVariable(GameVariable::GARAGE_ROPE, false);
+		this->retain();
+		CCDirector::sharedDirector()->popScene();
+		if (from<bool>(CCDirector::sharedDirector(), 0xac)) {
+			this->setZOrder(1000);
+			this->release();
+
+			auto moveTo = CCMoveTo::create(.3f, this->getPosition() + this->getPosition());
+			auto easeIn = CCEaseIn::create(moveTo, 2.f);
+
+			this->runAction(easeIn);
+		}
 	}
 }
 
@@ -231,15 +236,6 @@ bool __fastcall GJGarageLayer::init_H(gd::GJGarageLayer* self) {
 	//hammerCount->setAnchorPoint({ 1.f, 0.5f });
 	//hammerCount->setPosition({ director->getScreenRight() - 58.f, director->getScreenTop() - 124.f });
 	//self->addChild(hammerCount);
-
-	auto lastScene = static_cast<int>(gd::GameManager::sharedState()->m_lastScene2);
-
-	if (lastScene >= 98) {
-		auto garageRopeBackSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png");
-		auto garageRopeBackBtn = gd::CCMenuItemSpriteExtra::create(garageRopeBackSpr, nullptr, self, menu_selector(GJGarageLayer::Callback::onGarageRopeBack));
-		static_cast<gd::CCMenuItemSpriteExtra*>(m_backButtonMenu->getChildren()->objectAtIndex(0))->setVisible(0);
-		m_backButtonMenu->addChild(garageRopeBackBtn);
-	}
 
 	return true;
 }
