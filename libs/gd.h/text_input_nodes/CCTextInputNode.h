@@ -4,92 +4,83 @@
 #include <gd.h>
 
 namespace gd {
-	class TextInputDelegate;
-
 	#pragma runtime_checks("s", off)
 	class CCTextInputNode : public cocos2d::CCLayer, public cocos2d::CCIMEDelegate, public cocos2d::CCTextFieldDelegate {
-	protected:
-		PAD(0x4);
-		std::string m_sCaption;
-		PAD(0x8);
-		std::string m_sFilter;
-		float m_fWidth;
-		float m_fMaxLabelScale;
-		float m_fPlaceholderScale;
-		cocos2d::ccColor3B m_cPlaceholderColor;
-		cocos2d::ccColor3B m_cNormalColor;
-		cocos2d::CCLabelBMFont* m_pCursor;
-		cocos2d::CCTextFieldTTF* m_textField;
-		TextInputDelegate* m_delegate;
-		int m_nMaxLabelLength;
-		cocos2d::CCLabelBMFont* m_pPlaceholderLabel;
-		bool m_bUnknown;
-		bool m_bUnknown2;
-		bool m_bForceOffset;
-
 	public:
-		//own vtable
-		void onClickTrackNode(bool) {}
+		std::string m_caption; // 0x120
+		PAD(0x4)
+		bool m_selected; // 0x13c
+		bool m_keyboardPresent; // 0x13d
+		std::string m_allowedChars; // 0x140
+		float m_maxLabelWidth; // 0x158
+		float m_maxLabelScale; // 0x15ñ
+		float m_placeholderScale; // 0x160
+		cocos2d::ccColor3B m_placeholderColor; // 0x164
+		cocos2d::ccColor3B m_textColor; // 0x168
+		cocos2d::CCLabelBMFont* m_cursor; // 0x16c
+		cocos2d::CCTextFieldTTF* m_textField; // 0x170
+		TextInputDelegate* m_delegate; // 0x174
+		int m_maxLabelLength; // 0x178
+		cocos2d::CCLabelBMFont* m_textLabel; // 0x17c
+		bool m_filterSwearWords; // 0x180
+		bool m_usePasswordChar; // 0x181
+		bool m_forceOffset; // 0x182
 
-		//static CCTextInputNode* create(const char* caption, cocos2d::CCObject* target, const char* font) {
-		//	auto pRet = reinterpret_cast<CCTextInputNode * (__thiscall*)(const char*, cocos2d::CCObject*, const char*)>(
-		//		base + 0x13a90)(
-		//			caption, target, font);
-		//	__asm add esp, 0x8
-		//	return pRet;
-		//}
-
-		static CCTextInputNode* create(const char* caption, cocos2d::CCObject* target, 
-			const char* fntFile, float width, float height) {
+		static CCTextInputNode* create(float width, float height, char const* caption, cocos2d::CCObject* target, char const* fntFile) {
 			__asm {
 				movss xmm0, width
 				movss xmm1, height
 			}
-			auto pRet = reinterpret_cast<CCTextInputNode* (__thiscall*)
-				(const char*, cocos2d::CCObject*, const char*)>(
-				base + 0x13a90
-			)(caption, target, fntFile);
+
+			auto ret = reinterpret_cast<CCTextInputNode * (__thiscall*)(char const*, cocos2d::CCObject*, char const*)>(base + 0x13a90)(caption, target, fntFile);
+
 			__asm add esp, 0x8
-			return pRet;
+
+			return ret;
+		}
+
+		std::string getString() {
+			return m_textField->getString();
+		}
+
+		void setAllowedChars(std::string filter) {
+			m_allowedChars = filter;
 		}
 
 		void setLabelPlaceholderColor(cocos2d::ccColor3B color) {
-			from<cocos2d::ccColor3B>(this, 0x164) = color;
+			m_placeholderColor = color;
 			this->refreshLabel();
 		}
+
 		void setLabelPlaceholderScale(float scale) {
-			from<float>(this, 0x160) = scale;
+			m_placeholderScale = scale;
 			this->refreshLabel();
 		}
+
 		void setMaxLabelScale(float scale) {
-			from<float>(this, 0x15c) = scale;
+			m_maxLabelScale = scale;
 			this->refreshLabel();
 		}
+
 		void setMaxLabelWidth(float width) {
-			from<float>(this, 0x158) = width;
+			m_maxLabelWidth = width;
+			this->refreshLabel();
 		}
-		void setMaxLabelLength(int length) { 
-			from<int>(this, 0x178) = length;
+
+		void setDelegate(TextInputDelegate* delegate) {
+			m_delegate = delegate;
 		}
-		void setAllowedChars(std::string filter) {
-			from<std::string>(this, 0x140) = filter;
+
+		void setCharLimit(int limit) {
+			m_maxLabelLength = limit;
 		}
+
+		void setString(std::string string) {
+			reinterpret_cast<void(__thiscall*)(CCTextInputNode*, std::string)>(base + 0x13d70)(this, string);
+		}
+
 		void refreshLabel() {
-			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*)>(
-				base + 0x14030
-				)(this);
-		}
-		void setString(std::string text) {
-			return reinterpret_cast<void(__thiscall*)(CCTextInputNode*, std::string)>(base + 0x13d70)(this, text);
-		}
-		cocos2d::CCTextFieldTTF* getTextField() {
-			return from<cocos2d::CCTextFieldTTF*>(this, 0x170);
-		}
-		const char* getString() {
-			return getTextField()->getString();
-		}
-		void setDelegate(TextInputDelegate* delegate) { 
-			from<TextInputDelegate*>(this, 0x174) = delegate;
+			reinterpret_cast<void(__thiscall*)(CCTextInputNode*)>(base + 0x14030)(this);
 		}
 	};
 	#pragma runtime_checks("s", restore)

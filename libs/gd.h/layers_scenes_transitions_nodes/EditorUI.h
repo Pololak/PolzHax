@@ -2,122 +2,60 @@
 #define __EDITORUI_H__
 
 #include <gd.h>
-#include "cocos2d.h"
-#include "cocos-ext.h"
 
 namespace gd {
-
-	class CustomSongWidget;
-	class CCMenuItemSpriteExtra;
-	class CCMenuItemToggler;
+	class UndoObject;
+	class LevelEditorLayer;
+	class BoomScrollLayer;
 	class Slider;
+	class CCMenuItemSpriteExtra;
 	class GameObject;
-	class LevelSettingsObject;
+	class CCMenuItemToggler;
+	class CreateMenuItem;
 
-	enum EditCommand {
-		kEditCommandSmallLeft = 1,
-		kEditCommandSmallRight = 2,
-		kEditCommandSmallUp = 3,
-		kEditCommandSmallDown = 4,
+	enum class EditCommand {
+		SmallLeft = 1,
+		SmallRight = 2,
+		SmallUp = 3,
+		SmallDown = 4,
 
-		kEditCommandLeft = 5,
-		kEditCommandRight = 6,
-		kEditCommandUp = 7,
-		kEditCommandDown = 8,
+		Left = 5,
+		Right = 6,
+		Up = 7,
+		Down = 8,
 
-		kEditCommandBigLeft = 9,
-		kEditCommandBigRight = 10,
-		kEditCommandBigUp = 11,
-		kEditCommandBigDown = 12,
+		BigLeft = 9,
+		BigRight = 10,
+		BigUp = 11,
+		BigDown = 12,
 
-		kEditCommandTinyLeft = 13,
-		kEditCommandTinyRight = 14,
-		kEditCommandTinyUp = 15,
-		kEditCommandTinyDown = 16,
-
-		kEditCommandFlipX = 17,
-		kEditCommandFlipY = 18,
-		kEditCommandRotateCW = 19,
-		kEditCommandRotateCCW = 20,
-		kEditCommandRotateCW45 = 21,
-		kEditCommandRotateCCW45 = 22,
-		kEditCommandRotateFree = 23,
-		kEditCommandRotateSnap = 24,
-
-		kEditCommandScale = 25,
+		FlipX = 21,
+		FlipY = 22
 	};
 
-	class ExtendedLayer : public cocos2d::CCLayer {};
-
-	class ButtonPage : public cocos2d::CCLayer {
+	class GJRotationControl : public cocos2d::CCLayer {
 	public:
-		static ButtonPage* create(cocos2d::CCArray* array) {
-			return reinterpret_cast<ButtonPage * (__thiscall*)(cocos2d::CCArray*)>(base + 0x3b060)(array);
+		cocos2d::CCPoint m_cursorDifference;
+		cocos2d::CCPoint m_controlPosition;
+		cocos2d::CCSprite* m_controlSprite;
+		float m_startingRotation;
+		float m_currentRotation;
+		int m_touchID;
+		GJRotationControlDelegate* m_delegate;
+
+		void finishTouch() {
+			reinterpret_cast<void(__fastcall*)(GJRotationControl*)>(base + 0x4ff70)(this);
 		}
 	};
 
-	class BoomScrollLayer : public cocos2d::CCLayer {
+	class EditButtonBar : cocos2d::CCNode {
 	public:
-		cocos2d::CCArray* m_dotsArray; // 0x118
-		int m_animatingToPage; // 0x11c
-		float m_touchX; // 0x120
-		float m_animateSpeed; // 0x124
-		PAD(4)
-		DynamicScrollDelegate* m_dynamicScrollDelegate; // 0x12c
-		cocos2d::CCArray* m_dynamicScrollPages; // 0x130
-		bool m_dynamic; // 0x134
-		int m_touchHasMoved; // 0x138
-		PAD(4)
-		cocos2d::CCTouch* m_currentTouch; // 0x140
-		cocos2d::CCArray* m_pages; // 0x144
-		double m_touchTimer; // 0x148
-		PAD(8)
-		ExtendedLayer* m_mainLayer; // 0x158
-		cocos2d::CCRect m_scrollArea; // 0x15c
-		float m_minTouchSpeed; // 0x16c
-		float m_touchSpeedFast; // 0x170
-		float m_touchSpeedMid; // 0x174
-		BoomScrollLayerDelegate* m_delegate; // 0x178
-		bool m_movingToPage; // 0x17c
-		float m_minimumTouchLengthToSlide; // 0x180
-		float m_minimumTouchLengthToChangePage; // 0x184
-		float m_marginOffset; // 0x18c
-		bool m_stealTouches; // 0x190
-		bool m_showPagesIndicator; // 0x191
-		cocos2d::CCPoint m_pagesIndicatorPosition; // 0x194
-		cocos2d::ccColor4B m_pagesIndicatorSelectedColor; // 0x19c
-		cocos2d::ccColor4B m_pagesIndicatorNormalColor; // 0x1a0
-		int m_currentScreen; // 0x1a4
-		float m_pagesWidthOffset; // 0x1a8
-		void* m_unusedPages; // 0x1ac
-		
-		void instantMoveToPage(int page) {
-			reinterpret_cast<void(__thiscall*)(BoomScrollLayer*, int)>(
-				base + 0x8430
-				)(this, page);
-		}
-
-		void moveToPage(int page) {
-			reinterpret_cast<void(__thiscall*)(BoomScrollLayer*, int)>(
-				base + 0x8500
-				)(this, page);
-		}
+		BoomScrollLayer* m_scrollLayer;
+		cocos2d::CCArray* m_pagesArray;
 	};
 
-	class EditButtonBar : public cocos2d::CCNode {
+	class EditorUI : public cocos2d::CCLayer, FLAlertLayerProtocol, ColorSelectDelegate, GJRotationControlDelegate, MusicDownloadDelegate {
 	public:
-		BoomScrollLayer* m_scrollLayer; // 0x1e0
-		cocos2d::CCArray* m_pagesArray; // 0x1e4
-	};
-
-	class GJRotationControl : public cocos2d::CCLayer {};
-	class GJScaleControl : public cocos2d::CCLayer {};
-
-	class SetGroupIDLayer : public FLAlertLayer {};
-
-	class EditorUI : public cocos2d::CCLayer {
-	public:
-		PAD(0x10)
 		float m_gridSize; // 0x128
 		int m_playerTouchID; // 0x12c
 		int m_player2TouchID; // 0x130
@@ -191,244 +129,86 @@ namespace gd {
 		int m_selectedTab; // 0x280
 		int m_timesSelected; // 0x284
 
-		auto pasteObjects(const std::string& str) {
-			return reinterpret_cast<cocos2d::CCArray * (__thiscall*)(EditorUI*, gd::string)>(base + 0x492a0)(this, str);
+		cocos2d::CCArray* getSelectedObjects() {
+			return reinterpret_cast<cocos2d::CCArray*(__fastcall*)(EditorUI*)>(base + 0x48200)(this);
 		}
 
-		void moveForCommand(cocos2d::CCPoint* pos, EditCommand* command) {
-			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCPoint*, EditCommand*)>(base + 0x4b040)(this, pos, command);
+		void onDeleteSelected(CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x42bc0)(this, sender);
 		}
 
-		void rotateObjects(cocos2d::CCArray* objects, float angle, cocos2d::CCPoint center) {
-			__asm movss xmm2, angle;
-			reinterpret_cast<void(__thiscall*)(
-				EditorUI*, cocos2d::CCArray*, cocos2d::CCPoint
-				)>(base + 0x4c280)(this, objects, center);
-		}
-
-		CCMenuItemSpriteExtra* getSpriteButton(
-			cocos2d::CCNode* sprite,
-			cocos2d::SEL_MenuHandler callback,
-			cocos2d::CCMenu* menu,
-			float scale,
-			int buttonID,
-			cocos2d::CCPoint point
-		) {
-			return reinterpret_cast<CCMenuItemSpriteExtra * (__thiscall*)(
-				EditorUI*, cocos2d::CCNode*, cocos2d::SEL_MenuHandler,
-				cocos2d::CCMenu*, float, int, cocos2d::CCPoint
-				)>(
-					base + 0x41790
-					)(
-						this, sprite, callback, menu, scale, buttonID, point
-						);
+		CCMenuItemSpriteExtra* getSpriteButton(cocos2d::CCNode* sprite, cocos2d::SEL_MenuHandler callback, cocos2d::CCMenu* menu, float scale, int buttonID, cocos2d::CCPoint point) {
+			return reinterpret_cast<CCMenuItemSpriteExtra*(__thiscall*)(EditorUI*, cocos2d::CCNode*, cocos2d::SEL_MenuHandler, cocos2d::CCMenu*, float, int, cocos2d::CCPoint)>(base + 0x41790)(this, sprite, callback, menu, scale, buttonID, point);
 		}
 
 		CCMenuItemSpriteExtra* getSpriteButton(const char* sprite, cocos2d::SEL_MenuHandler callback, cocos2d::CCMenu* menu, float scale) {
 			return getSpriteButton(cocos2d::CCSprite::createWithSpriteFrameName(sprite), callback, menu, scale, 1, { 0.f, 0.f });
 		}
 
-		void moveObjectCall(cocos2d::CCObject* pSender) {
-			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(
-				base + 0x4b2a0
-				)(this, pSender);
+		CreateMenuItem* getCreateBtn(int id, int bg, bool p0) {
+			return reinterpret_cast<CreateMenuItem*(__thiscall*)(EditorUI*, int, int, bool)>(base + 0x47200)(this, id, bg, p0);
+		}
+
+		CreateMenuItem* getCreateBtn(int id, int bg) {
+			return EditorUI::getCreateBtn(id, bg, false);
+		}
+
+		void rotateObjects(cocos2d::CCArray* objects, float angle, cocos2d::CCPoint center) {
+			__asm movss xmm2, angle;
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*, cocos2d::CCPoint)>(base + 0x4c280)(this, objects, center);
+		}
+
+		void moveObjectCall(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x4b2a0)(this, sender);
 		}
 
 		void moveObjectCall(EditCommand command) {
-			reinterpret_cast<void(__thiscall*)(EditorUI*, EditCommand)>(
-				base + 0x4b2c0
-				)(this, command);
+			reinterpret_cast<void(__thiscall*)(EditorUI*, EditCommand)>(base + 0x4b2c0)(this, command);
+		}
+
+		void transformObjectCall(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x4b580)(this, sender);
 		}
 
 		void transformObjectCall(EditCommand command) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, EditCommand)>(base + 0x4b5a0)(this, command);
 		}
 
-		auto& clipboard() {
-			return from<gd::string>(this, 0x264);
-		}
-
-		auto selectedObjectToolboxID() {
-			return from<int>(this, 0x220);
+		void selectObjects(cocos2d::CCArray* objects) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*)>(base + 0x47fa0)(this, objects);
 		}
 
 		void updateButtons() {
 			reinterpret_cast<void(__thiscall*)(EditorUI*)>(base + 0x41450)(this);
 		}
 
-		bool isPlayback() {
-			return from<bool>(this, 0x134);
+		void deactivateRotationControl() {
+			m_rotationTouchID = -1;
+			if (m_rotationControl->isVisible()) {
+				m_rotationControl->setVisible(false);
+				m_rotationControl->finishTouch();
+			}
+		}
+
+		cocos2d::CCArray* pasteObjects(std::string objString) {
+			return reinterpret_cast<cocos2d::CCArray*(__thiscall*)(EditorUI*, std::string)>(base + 0x492a0)(this, objString);
 		}
 
 		void updateZoom(float amt) {
 			reinterpret_cast<void(__vectorcall*)(float, float, EditorUI*)>(base + 0x48c30)(0.f, amt, this);
 		}
 
-		LevelEditorLayer* getLevelEditorLayer() {
-			return from<LevelEditorLayer*>(this, 0x22C);
-		}
-
-		void selectObjects(cocos2d::CCArray* arr) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCArray*)>(base + 0x47fa0)(this, arr); //0xf1f20 - GHS 1.92 // - Taswert: wtf is this??? Why did I put it here??? // - Polz: maybe for select all?
-		}
-
-		EditButtonBar* editButtonBar() {
-			return from<EditButtonBar*>(this, 0x160);
-		}
-
-		cocos2d::CCArray* getSomeObjects() {
-			return from<cocos2d::CCArray*>(this, 0x1E8);
-		}
-
-		CCMenuItemSpriteExtra* getRedoBtn() {
-			return from<CCMenuItemSpriteExtra*>(this, 0x1c4);
-		}
-
-		CCMenuItemSpriteExtra* getDeselectBtn() {
-			return from<CCMenuItemSpriteExtra*>(this, 0x1a8);
-		}
-
-		cocos2d::CCArray* getSelectedObjectsOfCCArray() {
-			auto output = cocos2d::CCArray::create();
-			gd::GameObject* single = from<gd::GameObject*>(this, 0x258);
-			if (single)
-			{
-				output->addObject(reinterpret_cast<cocos2d::CCObject*>(single));
-				return output;
+		void constrainGameLayerPosition(float x, float y) {
+			__asm {
+				movss xmm1, x
+				movss xmm2, y
 			}
-			return from<cocos2d::CCArray*>(this, 0x18c);
+
+			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x4c8c0)(this);
 		}
 
-		cocos2d::CCArray* getAllObjects() {
-			return from<cocos2d::CCArray*>(this, 0x224); //no
-		}
-
-		std::vector<GameObject*> getSelectedObjects() {
-			const auto single = from<GameObject*>(this, 0x258);
-			if (single) return { single };
-			const auto selectedArr = from<cocos2d::CCArray*>(this, 0x18c);
-			if (!selectedArr) return {};
-			std::vector<GameObject*> output;
-			for (size_t i = 0; i < selectedArr->count(); ++i)
-				output.push_back(reinterpret_cast<GameObject*>(selectedArr->objectAtIndex(i)));
-			return output;
-		}
-
-
-
-		gd::GameObject* getSingleSelectedObj() {
-			return from<gd::GameObject*>(this, 0x258);
-		}
-
-		gd::EditorUI* selectedObjectID() {
-			return from<gd::EditorUI*>(this, 0x220);
-		}
-
-		void onDeleteSelected(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x42bc0)(this, sender);
-		}
-
-		void onSettings(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x41190)(this, sender);
-		}
-
-		void onDeselectAll(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x48340)(this, sender);
-		}
-
-		void getCreateBtn() {
-			return reinterpret_cast<void(__fastcall*)()>(base + 0x47200)();
-		}
-
-		int selectedMode() {
-			return from<int>(this, 0x228);
-		}
-
-		float getGridSize() {
-			return from<float>(this, 0x128);
-		}
-
-		static constexpr const int Mode_Create = 2;
-		static constexpr const int Mode_Delete = 1;
-		static constexpr const int Mode_Edit = 3;
-
-		void onPause(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x411f0)(this, sender);
-		}
-
-		void editObject(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x4ae20)(this, sender);
-		}
-		void onDuplicate(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(EditorUI*, CCObject*)>(base + 0x48e70)(this, sender);
-		}
-		void updateGridNodeSize() {
-			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41ae0)(this);
-		}
-	};
-
-	class EditorPauseLayer : public gd::CCBlockLayer, FLAlertLayerProtocol {
-	public:
-		PAD(0x4)
-		CCMenuItemSpriteExtra* m_audioOnBtn;
-		CCMenuItemSpriteExtra* m_audioOffBtn;
-		LevelEditorLayer* m_editorLayer;
-
-		void onResume(cocos2d::CCObject* pSender) {
-			reinterpret_cast<void(__thiscall*)(EditorPauseLayer*, cocos2d::CCObject*)>(
-				base + 0x3eea0
-				)(this, pSender);
-		}
-
-		void saveLevel() {
-			reinterpret_cast<void(__thiscall*)(EditorPauseLayer*)>(
-				base + 0x3eec0
-				)(this);
-		}
-
-		CCMenuItemSpriteExtra* bpmButton() {
-			return from<CCMenuItemSpriteExtra*>(this, 0x1a4);
-		}
-
-		LevelEditorLayer* getEditorLayer() {
-			return from<LevelEditorLayer*>(this, 0xac);
-		}
-	};
-
-	class LevelSettingsLayer : public gd::FLAlertLayer {
-	public:
-		PAD(0x18)
-		cocos2d::CCSprite* m_bgBtnSpr; // 0x1d4
-		cocos2d::CCSprite* m_gBtnSpr; // 0x1d8
-		cocos2d::CCSprite* m_lBtnSpr; // 0x1dc
-		cocos2d::CCSprite* m_objBtnSpr; // 0x1e0
-		cocos2d::CCSprite* m_dlBtnSpr; // 0x1e4
-		cocos2d::CCSprite* m_col1BtnSpr; // 0x1e8
-		cocos2d::CCSprite* m_col2BtnSpr; // 0x1ec
-		cocos2d::CCSprite* m_col3BtnSpr; // 0x1f0
-		cocos2d::CCSprite* m_col4BtnSpr; // 0x1f4
-		cocos2d::CCSprite* m_bgIcon; // 0x1f8
-		cocos2d::CCSprite* m_gIcon; // 0x1fc
-		LevelSettingsObject* m_settingsObject; // 0x200
-		cocos2d::CCLabelBMFont* m_selectedSong; // 0x204
-		cocos2d::CCArray* m_unkArray208; // 0x208
-		cocos2d::CCArray* m_unkArray20c; // 0x20c
-		LevelSettingsDelegate* m_delegate; // 0x210
-		LevelEditorLayer* m_editorLayer; // 0x214
-		cocos2d::CCArray* m_unkArray218; // 0x218
-		cocos2d::CCArray* m_unkArray21c; // 0x21c
-		CCMenuItemSpriteExtra* m_normalBtn; // 0x220
-		CCMenuItemSpriteExtra* m_customBtn; // 0x224
-		CCMenuItemSpriteExtra* m_selectCustomSongBtn; // 0x228
-		CCMenuItemSpriteExtra* m_changeSongBtn; // 0x22c
-		CustomSongWidget* m_customSongWidget; // 0x230
-
-		void onGravityFlipped(CCObject* sender) {
-			return reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, CCObject*)>(base + 0x99b10)(this, sender);
-		}
-		static CCMenuItemToggler* createToggleButton(cocos2d::SEL_MenuHandler callback, bool toggled, cocos2d::CCMenu* menu, cocos2d::CCPoint point) {
-			auto pRet = reinterpret_cast<CCMenuItemToggler * (__fastcall*)(cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, cocos2d::CCPoint)>(base + 0x99830)(callback, toggled, menu, point);
-			return pRet;
+		void constrainGameLayerPosition() {
+			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41e60)(this);
 		}
 	};
 }

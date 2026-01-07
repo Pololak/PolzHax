@@ -119,7 +119,8 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
                 case WM_SYSKEYUP:
                     blockInput = true;
             }
-        } else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F1 || msg.wParam == VK_OEM_3 ||msg.wParam == VK_TAB)) {
+        }
+        else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F1 || msg.wParam == VK_OEM_3 || msg.wParam == VK_TAB)) {
             // std::cout << "key is " << std::hex << static_cast<unsigned>(msg.wParam) << std::endl;
             g_toggleCallback();
         }
@@ -147,7 +148,7 @@ void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bo
 
     g_inited = false;
     // ImGui::CreateContext();
-    //ImGui::GetIO();
+    // ImGui::GetIO();
     // auto hwnd = windowToHWND(self->getWindow());
     // ImGui_ImplWin32_Init(hwnd);
     // ImGui_ImplOpenGL3_Init();

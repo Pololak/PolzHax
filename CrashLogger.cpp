@@ -55,7 +55,6 @@ void printStackTrace(CONTEXT* context) {
 
         crashInfo << "Address: " << std::hex << address;
 
-        // Получение информации о символе
         char symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
         SYMBOL_INFO* symbol = reinterpret_cast<SYMBOL_INFO*>(symbolBuffer);
         symbol->MaxNameLen = MAX_SYM_NAME;
@@ -69,7 +68,6 @@ void printStackTrace(CONTEXT* context) {
             crashInfo << " (No symbol)";
         }
 
-        // Получение информации о модуле
         if (moduleBase) {
             IMAGEHLP_MODULE64 moduleInfo;
             memset(&moduleInfo, 0, sizeof(IMAGEHLP_MODULE64));
@@ -86,7 +84,7 @@ void printStackTrace(CONTEXT* context) {
 }
 
 LONG WINAPI exceptionHandler(EXCEPTION_POINTERS* exceptionInfo) {
-    crashInfo << "PolzHax 1.920 - v1.2.2" << "\n\n";
+    crashInfo << "PolzHax 1.920 - 1.3.0" << "\n\n";
 
     crashInfo << "Exception code: " << std::hex << exceptionInfo->ExceptionRecord->ExceptionCode << "\n";
     crashInfo << "Exception address: " << exceptionInfo->ExceptionRecord->ExceptionAddress << "\n\n";

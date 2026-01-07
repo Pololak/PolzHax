@@ -1,27 +1,26 @@
-#include "preview-mode.hpp"
+#include "LevelSettingsLayer.hpp"
 
 bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject) {
 	if (!LevelSettingsLayer::init(self, settingsObject)) return false;
 
 	auto director = CCDirector::sharedDirector();
-	auto winSize = CCDirector::sharedDirector()->getWinSize();
+	auto winSize = director->getWinSize();
 
 	if (self->m_customSongWidget) {
-		auto flipGravityLabel = CCLabelBMFont::create("Start Flipped", "goldFont.fnt");
-		flipGravityLabel->setScale(0.5f);
-		flipGravityLabel->setAnchorPoint({ 0.f, 0.5f });
-		flipGravityLabel->setPosition({ (winSize.width / 2.f) - 120.f, (winSize.height / 2.f) - 134.f });
-		self->m_mainLayer->addChild(flipGravityLabel);
+		CCSprite* toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+		toggleOff->setScale(.7f);
+		CCSprite* toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+		toggleOn->setScale(.7f);
 
-		auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
-		auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
-
-		auto menu = self->m_buttonMenu;
-		auto flipGravityToggler = gd::CCMenuItemToggler::create(toggleOff, toggleOn, self, menu_selector(gd::LevelSettingsLayer::onGravityFlipped));
-		flipGravityToggler->toggle(self->m_settingsObject->m_isFlipped);
-		flipGravityToggler->setScale(0.7f);
-		flipGravityToggler->setPosition(menu->convertToNodeSpace({ (winSize.width / 2.f) - 135.f, (winSize.height / 2.f) - 135.f }));
-		menu->addChild(flipGravityToggler);
+		auto onStartFlipped = gd::CCMenuItemToggler::create(toggleOff, toggleOn, self, menu_selector(gd::LevelSettingsLayer::onGravityFlipped));
+		onStartFlipped->toggle(settingsObject->m_isFlipped);
+		onStartFlipped->setPosition(self->m_buttonMenu->convertToNodeSpace({ winSize.width / 2.f - 135.f, winSize.height / 2.f - 135.f }));
+		self->m_buttonMenu->addChild(onStartFlipped);
+		auto onStartFlippedLabel = CCLabelBMFont::create("Start Flipped", "goldFont.fnt");
+		onStartFlippedLabel->setAnchorPoint({ 0.f, .5f });
+		onStartFlippedLabel->setScale(.5f);
+		onStartFlippedLabel->setPosition(winSize.width / 2.f - 120.f, winSize.height / 2.f - 135.f);
+		self->m_mainLayer->addChild(onStartFlippedLabel);
 
 		// Blending dots
 
@@ -57,11 +56,11 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 		col4_blending->setPosition(dotOffset);
 		self->m_col4BtnSpr->addChild(col4_blending);
 
-		dl_blending->setVisible(self->m_settingsObject->m_dlColor->m_blending);
-		col1_blending->setVisible(self->m_settingsObject->m_customColor1->m_blending);
-		col2_blending->setVisible(self->m_settingsObject->m_customColor2->m_blending);
-		col3_blending->setVisible(self->m_settingsObject->m_customColor3->m_blending);
-		col4_blending->setVisible(self->m_settingsObject->m_customColor4->m_blending);
+		dl_blending->setVisible(self->m_settingsObject->m_3DLineColor->m_blending);
+		col1_blending->setVisible(self->m_settingsObject->m_customColor01->m_blending);
+		col2_blending->setVisible(self->m_settingsObject->m_customColor02->m_blending);
+		col3_blending->setVisible(self->m_settingsObject->m_customColor03->m_blending);
+		col4_blending->setVisible(self->m_settingsObject->m_customColor04->m_blending);
 	}
 
 	return true;
@@ -69,7 +68,7 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 
 void __fastcall LevelSettingsLayer::colorSelectClosedH(gd::LevelSettingsLayer* _self, void*, gd::ColorSelectPopup* colorSelect) {
 	LevelSettingsLayer::colorSelectClosed(_self, colorSelect);
-	gd::LevelSettingsLayer* self = reinterpret_cast<gd::LevelSettingsLayer*>(reinterpret_cast<uintptr_t>(_self) - 0x1bc);
+	auto self = reinterpret_cast<gd::LevelSettingsLayer*>(reinterpret_cast<uintptr_t>(_self) - 0x1bc);
 
 	auto dl_blending = static_cast<CCLabelBMFont*>(self->m_dlBtnSpr->getChildren()->objectAtIndex(0));
 	auto col1_blending = static_cast<CCLabelBMFont*>(self->m_col1BtnSpr->getChildren()->objectAtIndex(0));
@@ -78,11 +77,11 @@ void __fastcall LevelSettingsLayer::colorSelectClosedH(gd::LevelSettingsLayer* _
 	auto col4_blending = static_cast<CCLabelBMFont*>(self->m_col4BtnSpr->getChildren()->objectAtIndex(0));
 
 	if (dl_blending && col1_blending && col2_blending && col3_blending && col4_blending) {
-		dl_blending->setVisible(self->m_settingsObject->m_dlColor->m_blending);
-		col1_blending->setVisible(self->m_settingsObject->m_customColor1->m_blending);
-		col2_blending->setVisible(self->m_settingsObject->m_customColor2->m_blending);
-		col3_blending->setVisible(self->m_settingsObject->m_customColor3->m_blending);
-		col4_blending->setVisible(self->m_settingsObject->m_customColor4->m_blending);
+		dl_blending->setVisible(self->m_settingsObject->m_3DLineColor->m_blending);
+		col1_blending->setVisible(self->m_settingsObject->m_customColor01->m_blending);
+		col2_blending->setVisible(self->m_settingsObject->m_customColor02->m_blending);
+		col3_blending->setVisible(self->m_settingsObject->m_customColor03->m_blending);
+		col4_blending->setVisible(self->m_settingsObject->m_customColor04->m_blending);
 	}
 }
 

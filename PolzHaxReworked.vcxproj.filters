@@ -1,0 +1,1642 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Исходные файлы\Hooks">
+      <UniqueIdentifier>{c6f46a25-a439-4c27-a5f4-936b676f82e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Hooks">
+      <UniqueIdentifier>{0f3f96c2-22a3-4563-8263-e537d80efe30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Menu">
+      <UniqueIdentifier>{55dc9ee0-1af6-4d4b-a6bb-5b87d7a952fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Menu">
+      <UniqueIdentifier>{c193b6fa-6a24-4a2a-860d-99e2b2153f31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Utils">
+      <UniqueIdentifier>{d4d3569d-0ddd-4fe5-8f52-400c6c194191}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Utils">
+      <UniqueIdentifier>{97e06925-292b-46ac-a4de-d82e56480630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries">
+      <UniqueIdentifier>{9f026442-583e-4852-9441-fa13f052ea9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries\MinHook">
+      <UniqueIdentifier>{fb138e89-625f-46a3-bde5-a6004ab222c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries\gd.h">
+      <UniqueIdentifier>{7e0abfdc-760c-4fff-99a4-8c30fefc35fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries\cocos2dx">
+      <UniqueIdentifier>{200a547b-5ae3-4e53-925d-320502c128f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries\imgui">
+      <UniqueIdentifier>{9387ea2b-ff24-4315-9479-2c6e3450ad12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCAction.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionCamera.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionCatmullRom.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionEase.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionGrid.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionGrid3D.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionInstant.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionInterval.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionManager.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionPageTurn3D.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionProgressTimer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionTiledGrid.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionTween.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\base_nodes\CCAtlasNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\base_nodes\CCGLBufferedNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\base_nodes\CCNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\CCCamera.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\CCConfiguration.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\CCDirector.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\ccFPSImages.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\CCScheduler.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCAffineTransform.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCArray.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCAutoreleasePool.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCBool.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCDataVisitor.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCDictionary.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCDouble.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCFloat.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCGeometry.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCInteger.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCNS.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCObject.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCSet.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCString.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\cocoa\CCZone.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\draw_nodes\CCDrawingPrimitives.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\draw_nodes\CCDrawNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\effects\CCGrabber.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\effects\CCGrid.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\ccConfig.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\CCEventType.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\ccMacros.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\CCProtocols.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\ccTypeInfo.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\ccTypes.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\include\cocos2d.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\aabb.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\GL\mat4stack.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\GL\matrix.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\kazmath.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\mat3.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\mat4.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\neon_matrix_impl.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\plane.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\quaternion.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\ray2.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\utility.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\vec2.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\vec3.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\kazmath\include\kazmath\vec4.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\keypad_dispatcher\CCKeypadDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\keypad_dispatcher\CCKeypadDispatcher.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\label_nodes\CCLabelAtlas.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\label_nodes\CCLabelBMFont.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\label_nodes\CCLabelTTF.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\layers_scenes_transitions_nodes\CCLayer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\layers_scenes_transitions_nodes\CCScene.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\layers_scenes_transitions_nodes\CCTransition.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\layers_scenes_transitions_nodes\CCTransitionPageTurn.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\layers_scenes_transitions_nodes\CCTransitionProgress.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\menu_nodes\CCMenu.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\menu_nodes\CCMenuItem.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\misc_nodes\CCClippingNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\misc_nodes\CCMotionStreak.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\misc_nodes\CCProgressTimer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\misc_nodes\CCRenderTexture.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\particle_nodes\CCParticleBatchNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\particle_nodes\CCParticleExamples.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\particle_nodes\CCParticleSystem.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\particle_nodes\CCParticleSystemQuad.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\particle_nodes\firePngData.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCAccelerometerDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCApplicationProtocol.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCCommon.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCDevice.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCEGLViewProtocol.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCFileUtils.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCImage.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCImageCommon_cpp.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCPlatformConfig.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCPlatformMacros.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCSAXParser.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\CCThread.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\platform.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\curl.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\curlbuild.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\curlrules.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\curlver.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\easy.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\mprintf.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\multi.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\stdcheaders.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\curl\typecheck-gcc.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\iconv\iconv.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libjpeg\jconfig.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libjpeg\jconfig_linux.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libjpeg\jconfig_win.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libjpeg\jerror.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libjpeg\jmorecfg.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libjpeg\jpeglib.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libpng\pngconf.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libtiff\tiff.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libtiff\tiffconf.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libtiff\tiffio.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libtiff\tiffvers.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libwebp\decode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libwebp\encode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\libwebp\types.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\OGLES\GL\glew.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\OGLES\GL\glxew.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\OGLES\GL\wglew.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\pthread\pthread.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\pthread\sched.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\pthread\semaphore.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\zlib\zconf.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\third_party\win32\zlib\zlib.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCAccelerometer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCApplication.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCEGLView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCFileUtilsWin32.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCGL.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCPlatformDefine.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\CCStdC.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\platform\win32\compat\stdint.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\glfw\glfw3.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\glfw\glfw3native.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\keyboard_dispatcher\CCKeyboardDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\keyboard_dispatcher\CCKeyboardDispatcher.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\mouse_dispatcher\CCMouseDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\mouse_dispatcher\CCMouseDispatcher.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\scene_nodes\CCSceneTransitionDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\xml\DS_Dictionary.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\xml\pugiconfig.hpp">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\robtop\xml\pugixml.hpp">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\script_support\CCScriptSupport.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\CCGLProgram.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccGLStateCache.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\CCShaderCache.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShaderEx_SwitchMask_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShaders.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionColorLengthTexture_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionColorLengthTexture_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionColor_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionColor_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTextureA8Color_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTextureA8Color_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTextureColorAlphaTest_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTextureColor_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTextureColor_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTexture_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTexture_uColor_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTexture_uColor_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_PositionTexture_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_Position_uColor_frag.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\shaders\ccShader_Position_uColor_vert.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\sprite_nodes\CCAnimation.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\sprite_nodes\CCAnimationCache.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\sprite_nodes\CCSprite.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\sprite_nodes\CCSpriteBatchNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\sprite_nodes\CCSpriteFrame.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\sprite_nodes\CCSpriteFrameCache.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\base64.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\CCNotificationCenter.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\CCPointExtension.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\CCProfiling.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\ccUTF8.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\ccUtils.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\CCVertex.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\component\CCComponent.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\component\CCComponentContainer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\data_support\ccCArray.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\data_support\uthash.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\data_support\utlist.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\image_support\TGAlib.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\tinyxml2\tinyxml2.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\TransformUtils.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\user_default\CCUserDefault.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\zip_support\ioapi.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\zip_support\unzip.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\support\zip_support\ZipUtils.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\textures\CCTexture2D.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\textures\CCTextureAtlas.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\textures\CCTextureCache.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\textures\CCTextureETC.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\textures\CCTexturePVR.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\text_input_node\CCIMEDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\text_input_node\CCIMEDispatcher.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\text_input_node\CCTextFieldTTF.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\tilemap_parallax_nodes\CCParallaxNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\tilemap_parallax_nodes\CCTileMapAtlas.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\tilemap_parallax_nodes\CCTMXLayer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\tilemap_parallax_nodes\CCTMXObjectGroup.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\tilemap_parallax_nodes\CCTMXTiledMap.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\tilemap_parallax_nodes\CCTMXXMLParser.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\touch_dispatcher\CCTouch.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\touch_dispatcher\CCTouchDelegateProtocol.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\touch_dispatcher\CCTouchDispatcher.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\cocos2dx\touch_dispatcher\CCTouchHandler.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\AssetsManager\AssetsManager.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBAnimationManager.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBFileLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBKeyframe.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBMemberVariableAssigner.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBSelectorResolver.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBSequence.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBSequenceProperty.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCBValue.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCControlButtonLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCControlLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCData.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCLabelBMFontLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCLabelTTFLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCLayerColorLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCLayerGradientLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCLayerLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCMenuItemImageLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCMenuItemLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCMenuLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCNode+CCBRelativePositioning.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCNodeLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCNodeLoaderLibrary.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCNodeLoaderListener.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCParticleSystemQuadLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCScale9SpriteLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCScrollViewLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CCBReader\CCSpriteLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\cocos-ext.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Action\CCActionEaseEx.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Action\CCActionFrame.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Action\CCActionFrameEasing.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Action\CCActionManager.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Action\CCActionNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Action\CCActionObject.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\animation\CCArmatureAnimation.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\animation\CCProcessBase.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\animation\CCTween.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\CCArmature.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\CCBone.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\datas\CCDatas.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\display\CCBatchNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\display\CCDecorativeDisplay.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\display\CCDisplayFactory.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\display\CCDisplayManager.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\display\CCSkin.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\external_tool\sigslot.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\physics\CCColliderDetector.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCArmatureDataManager.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCArmatureDefine.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCDataReaderHelper.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCSpriteFrameCacheHelper.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCTransformHelp.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCTweenFunction.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Armature\utils\CCUtilMath.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Components\CCComAttribute.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Components\CCComAudio.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Components\CCComBase.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Components\CCComController.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Components\CCComRender.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Components\CCInputDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\BaseClasses\UIWidget.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\Layouts\UILayout.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\Layouts\UILayoutDefine.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\Layouts\UILayoutParameter.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\System\CocosGUI.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\System\GUIDefine.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\System\UIHelper.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\System\UITouchGroup.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\Compatible\CompatibleClasses.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget\UIListView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget\UIPageView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget\UIScrollInterface.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\ScrollWidget\UIScrollView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UIButton.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UICheckBox.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UIImageView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UILabel.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UILabelAtlas.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UILabelBMFont.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UILoadingBar.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UIRichText.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UISlider.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\GUI\UIWidgets\UITextField.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\DictionaryHelper.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\document.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\filestream.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\internal\pow10.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\internal\stack.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\internal\strfunc.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\prettywriter.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\rapidjson.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\reader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\stringbuffer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Json\rapidjson\writer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\GUIReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\SceneReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\ButtonReader\ButtonReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\CheckBoxReader\CheckBoxReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\ImageViewReader\ImageViewReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\LabelAtlasReader\LabelAtlasReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\LabelBMFontReader\LabelBMFontReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\LabelReader\LabelReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\LayoutReader\LayoutReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\ListViewReader\ListViewReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\LoadingBarReader\LoadingBarReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\PageViewReader\PageViewReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\ScrollViewReader\ScrollViewReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\SliderReader\SliderReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\TextFieldReader\TextFieldReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\WidgetReader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Reader\WidgetReader\WidgetReaderProtocol.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Trigger\ObjectFactory.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Trigger\TriggerBase.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Trigger\TriggerMng.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\CocoStudio\Trigger\TriggerObj.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\ExtensionMacros.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControl.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlButton.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlColourPicker.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlExtensions.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlHuePicker.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlPotentiometer.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlSaturationBrightnessPicker.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlSlider.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlStepper.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlSwitch.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCControlUtils.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCInvocation.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\CCScale9Sprite.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCControlExtension\ColorPickerDelegate.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBox.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImpl.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImplAndroid.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImplIOS.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImplMac.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImplTizen.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImplWin.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCEditBox\CCEditBoxImplWp8.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCScrollView\CCScrollView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCScrollView\CCSorting.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCScrollView\CCTableView.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\GUI\CCScrollView\CCTableViewCell.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\LocalStorage\LocalStorage.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\network\HttpClient.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\network\HttpRequest.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\network\HttpResponse.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\network\WebSocket.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\physics_nodes\CCPhysicsDebugNode.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\physics_nodes\CCPhysicsSprite.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Animation.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\AnimationState.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\AnimationStateData.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Atlas.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\AtlasAttachmentLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Attachment.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\AttachmentLoader.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Bone.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\BoneData.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\CCSkeleton.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\CCSkeletonAnimation.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\extension.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Json.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\RegionAttachment.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Skeleton.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\SkeletonData.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\SkeletonJson.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Skin.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\Slot.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\SlotData.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\spine-cocos2dx.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\cocos-headers\extensions\spine\spine.h">
+      <Filter>Файлы заголовков\Libraries\cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\actions\CCCircleWave.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\audio_nodes\FMODAudioEngine.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\include\gd.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\include\gdMacros.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\include\GDProtocols.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCBlockLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\FLAlertLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJDropDownLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingCircle.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\PauseLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\PlayLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ScrollingLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\AchievementManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\GameManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\GameSoundManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\GManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\menu_nodes\CCMenuItemSpriteExtra.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\menu_nodes\CCMenuItemToggler.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\scroll_nodes\BoomListView.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\scroll_nodes\CCContentLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\scroll_nodes\CCIndexPath.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\scroll_nodes\CCScrollLayerExt.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\scroll_nodes\CustomListView.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\scroll_nodes\TableView.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\ButtonSprite.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\CCAnimatedSprite.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\CCSpritePlus.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\GameObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\PlayerObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\TextArea.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\text_input_nodes\CCTextInputNode.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\MinHook\MinHook.h">
+      <Filter>Файлы заголовков\Libraries\MinHook</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\delegates\delegates.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3_loader.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\imconfig.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\imgui.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\imgui_internal.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\imstb_rectpack.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\imstb_textedit.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\imstb_truetype.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.h">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui-hook\imgui-hook.hpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="schema.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.hpp">
+      <Filter>Файлы заголовков\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="CocosExplorer.hpp">
+      <Filter>Файлы заголовков\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="patching.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashLogger.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ccTouchFix.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorUI.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorUI.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ColorSelectPopup.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\SongInfoObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\UndoObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\BoomScrollLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\menu_nodes\Slider.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorPauseLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\OBB2D.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\StartPosObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\LevelSettingsObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\SettingsColorObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomizeObjectLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SetGroupIDLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="SetGroupIDLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomizeObjectLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="EditButtonBar.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ButtonPage.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorPauseLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\include\GameToolbox.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalClipboard.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorObjectLayering.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelEditorLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\GhostTrailEffect.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\HardStreak.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\CheckpointObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\level_nodes\EndPortalObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\AudioEffectsLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGroundLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\UILayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\ColorAction.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorOptionsLayer.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSettingsLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SelectArtLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongWidget.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelSettingsLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorLayerInput.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="hsv.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiUtils.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\GameLevelManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\GameStatsManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\GJSearchObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerObject.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\OptionsLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\imgui.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\imgui_demo.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\imgui_draw.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\imgui_tables.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\imgui_widgets.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui-hook\imgui-hook.cpp">
+      <Filter>Файлы заголовков\Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Setting.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Исходные файлы\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="CocosExplorer.cpp">
+      <Filter>Исходные файлы\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="patching.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLogger.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ccTouchFix.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorUI.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SetGroupIDLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomizeObjectLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditButtonBar.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorPauseLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalClipboard.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorObjectLayering.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelEditorLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorOptionsLayer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelSettingsLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorLayerInput.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiUtils.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerObject.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\glew32.lib">
+      <Filter>Файлы заголовков\Libraries</Filter>
+    </Library>
+    <Library Include="libs\MinHook\libMinHook-x86-v141-mtd.lib">
+      <Filter>Файлы заголовков\Libraries\MinHook</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Setting.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+  </ItemGroup>
+</Project>

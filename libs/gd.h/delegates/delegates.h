@@ -1,138 +1,120 @@
-#ifndef DELEGATES_H
-#define DELEGATES_h
+#ifndef __DELEGATES_H__
+#define __DELEGATES_H__
 
 #include <gd.h>
 
 namespace gd {
-    class GJGameLevel;
-    class NumberInputLayer;
-    class SetIDPopup;
-    class CCTextInputNode;
-    class SongInfoObject;
-    class GJSpecialColorSelect;
-    class BoomScrollLayer;
+	class ColorSelectPopup;
+	class SongInfoObject;
+	class PlayerObject;
+	enum class GJSongError;
+	class CCCircleWave;
+	class SelectArtLayer;
+	class CCTextInputNode;
+	class GJGameLevel;
 
-    enum GJSongError {
-        kGJSongErrorUnknown = 0,
-        // dunno, didnt bother to RE
-    };
+	enum class UpdateResponse {
+		Unknown,
+		UpToDate,
+		GameVerOutOfDate,
+		UpdateSuccess,
+	};
 
-    class TextInputDelegate {
-        virtual void textChanged(CCTextInputNode*) {}
-        virtual void textInputOpened(CCTextInputNode*) {}
-        virtual void textInputClosed(CCTextInputNode*) {}
-        virtual void textInputShouldOffset(CCTextInputNode*, float) {}
-        virtual void textInputReturn(CCTextInputNode*) {}
-        virtual bool allowTextInput(CCTextInputNode*) { return true; }
-    };
+	class GameRateDelegate {
+		virtual void updateRate() {}
+	};
 
-    class ColorSelectDelegate {
-        virtual void colorSelectClosed(cocos2d::CCNode*);
-    };
+	class ColorSelectDelegate {
+		virtual void colorSelectClosed(ColorSelectPopup*) {}
+	};
 
-    class GJSpecialColorSelectDelegate {
-        virtual void colorSelectClosed(GJSpecialColorSelect*, int);
-    };
+	class GJRotationControlDelegate {
+		virtual void angleChanged(float);
+		virtual void angleChangeBegin();
+		virtual void angleChangeEnded();
+	};
 
-    class GJRotationControlDelegate {
-        virtual void angleChangeBegin(void);
-        virtual void angleChangeEnded(void);
-        virtual void angleChanged(float);
-    };
+	class MusicDownloadDelegate {
+		virtual void loadSongInfoFinished(SongInfoObject*);
+		virtual void loadSongInfoFailed(int, GJSongError);
+		virtual void downloadSongFinished(SongInfoObject*);
+		virtual void downloadSongFailed(int, GJSongError);
+		virtual void songStateChanged();
+	};
 
-    class GJScaleControlDelegate {
-        virtual void scaleChangeBegin(void);
-        virtual void scaleChangeEnded(void);
-        virtual void scaleChanged(float);
-    };
+	class LevelSettingsDelegate {
+		virtual void levelSettingsUpdated();
+	};
 
-    class MusicDownloadDelegate {
-        virtual void downloadSongFailed(int, GJSongError);
-        virtual void downloadSongFinished(SongInfoObject*);
-        virtual void loadSongInfoFailed(int, GJSongError);
-        virtual void loadSongInfoFinished(SongInfoObject*);
-        virtual void songStateChanged(void);
-    };
+	class GameplayDelegate {
+		virtual void flipGravity(PlayerObject*, bool, bool);
+	};
 
-    enum UpdateResponse {
-        kUpdateResponseUnknown = 0x0,
-        kUpdateResponseUpToDate = 0x1,
-        kUpdateResponseGameVerOutOfDate = 0x2,
-        kUpdateResponseUpdateSuccess = 0x3,
-    };
+	class CCCircleWaveDelegate {
+		virtual void circleWaveWillBeRemoved(CCCircleWave*);
+	};
 
-    enum LikeItemType {
-        kLikeItemTypeUnknown = 0x0,
-    };
+	class SelectArtDelegate {
+		virtual void selectArtClosed(SelectArtLayer*);
+	};
 
-    class LevelDownloadDelegate {
-        virtual void levelDownloadFinished(GJGameLevel *);
-        virtual void levelDownloadFailed(int);
-    };
+	class CustomSongLayerDelegate {
+		virtual void customSongLayerClosed();
+	};
 
-    class LevelDeleteDelegate {
-        virtual void levelDeleteFinished(int);
-        virtual void levelDeleteFailed(int);
-    };
+	class TextInputDelegate {
+		virtual void textChanged(CCTextInputNode*) {}
+		virtual void textInputOpened(CCTextInputNode*) {}
+		virtual void textInputClosed(CCTextInputNode*) {}
+		virtual void textInputShouldOffset(CCTextInputNode*, float) {}
+		virtual void textInputReturn(CCTextInputNode*) {}
+		virtual bool allowTextInput(CCTextInputNode*) { return true; }
+	};
 
-    class LevelUpdateDelegate {
-        virtual void levelUpdateFinished(GJGameLevel *,UpdateResponse);
-        virtual void levelUpdateFailed(int);
-    };
+	class LevelManagerDelegate {
+		virtual void loadLevelsFinished(cocos2d::CCArray*, char const*);
+		virtual void loadLevelsFailed(char const*);
+		virtual void setupPageInfo(std::string, char const*);
+	};
 
-    class UploadActionDelegate {
-        virtual void uploadActionFinished(int, int) {};
-        virtual void uploadActionFailed(int, int) {};
-    };
+	class LevelDownloadDelegate {
+		virtual void levelDownloadFinished(GJGameLevel*);
+		virtual void levelDownloadFailed(int);
+	};
 
-    class UploadPopupDelegate {
-        virtual void onClosePopup(void) {};
-    };
-    
-    class LikeItemDelegate {
-        virtual void likedItem(LikeItemType, int, bool);
-    };
+	class LevelCommentDelegate {
+		virtual void loadCommentsFinished(cocos2d::CCArray*, char const*);
+		virtual void loadCommentsFailed(char const*);
+		virtual void updateUserScoreFinished();
+		virtual void setupPageInfo(std::string, char const*);
+	};
 
-    class RateLevelDelegate {
-        virtual void rateLevelClosed(void);
-    };
+	class CommentUploadDelegate {
+		virtual void commentUploadFinished(int) {}
+		virtual void commentUploadFailed(int) {}
+	};
 
-    class NumberInputDelegate {
-        virtual void numberInputClosed(NumberInputLayer *);
-    };
+	class LevelUploadDelegate {
+		virtual void levelUploadFinished(GJGameLevel*);
+		virtual void levelUploadFailed(GJGameLevel*);
+	};
 
-    class SetIDPopupDelegate {
-        virtual void setIDPopupClosed(SetIDPopup *,int);
-    };
+	class LevelUpdateDelegate {
+		virtual void levelUpdateFinished(GJGameLevel*, UpdateResponse);
+		virtual void levelUpdateFailed(int);
+	};
 
-    class AppDelegate : public cocos2d::CCApplication {
+	class LeaderboardManagerDelegate {
+		virtual void updateUserScoreFinished();
+		virtual void updateUserScoreFailed();
+		virtual void loadLeaderboardFinished(cocos2d::CCArray*, char const*);
+		virtual void loadLeaderboardFailed(char const*);
+	};
 
-    };
-
-    class LeaderboardManagerDelegate {
-        virtual void updateUserScoreFinished() {}
-        virtual void updateUserScoreFailed() {}
-        virtual void loadLeaderboardFinished(cocos2d::CCArray*, const char*) {}
-        virtual void loadLeaderboardFailed(const char*) {}
-    };
-
-    class LevelSettingsDelegate {
-        virtual void levelSettingsUpdated() {}
-    };
-
-    class GameRateDelegate {
-        virtual void updateRate();
-    };
-
-    class DynamicScrollDelegate {
-        virtual void updatePageWithObject(cocos2d::CCObject*, cocos2d::CCObject*) {}
-    };
-
-    class BoomScrollLayerDelegate {
-        virtual void scrollLayerScrollingStarted(BoomScrollLayer*);
-        virtual void scrollLayerScrolledToPage(BoomScrollLayer*, int);
-        virtual void scrollLayerMoved(cocos2d::CCPoint);
-    };
+	class LevelDeleteDelegate {
+		virtual void levelDeleteFinished(int);
+		virtual void levelDeleteFailed(int);
+	};
 }
 
-#endif
+#endif // !__DELEGATES_H__

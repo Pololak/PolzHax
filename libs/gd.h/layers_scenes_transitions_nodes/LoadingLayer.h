@@ -4,7 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-
 	class LoadingLayer : public cocos2d::CCLayer {
 	protected:
 		PAD(4);
@@ -20,7 +19,7 @@ namespace gd {
 	public:
 		static LoadingLayer* create(bool fromReload) {
 			return reinterpret_cast<LoadingLayer* (__fastcall*)(bool)>(
-			base + 0xAB150 //18BFE0
+				base + 0x18BFE0
 				)(fromReload);
 		}
 		void setFromRefresh(bool value) {

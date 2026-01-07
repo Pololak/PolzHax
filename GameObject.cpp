@@ -1,0 +1,55 @@
+#include "GameObject.hpp"
+#include "LevelEditorLayer.hpp"
+#include "Setting.hpp"
+
+ccColor3B __fastcall GameObject::getEditorColorH(gd::GameObject* self) {
+	int color = static_cast<int>(self->m_customColorMode);
+	
+	switch (color) {
+	case 8:
+		return ccc3(255, 255, 0);
+		break;
+	default:
+		return GameObject::getEditorColor(self);
+		break;
+	}
+}
+
+bool __fastcall GameObject::shouldBlendColorH(gd::GameObject* self) {
+	if (gd::GameManager::sharedState()->getPlayLayer()) {
+		return GameObject::shouldBlendColor(self);
+	}
+	else {
+		if (!LevelEditorLayer::get()) return false;
+
+		switch (self->getColorMode()) {
+		case gd::GJCustomColorMode::Col1:
+		case gd::GJCustomColorMode::Col2:
+		case gd::GJCustomColorMode::Col3:
+		case gd::GJCustomColorMode::Col4:
+		case gd::GJCustomColorMode::Col3DL:
+			return LevelEditorLayer::isColorBlending(self->getColorMode());
+			break;
+		default: break;
+		}
+		return false;
+	}
+}
+
+void __fastcall RingObject::spawnCircleH(gd::RingObject* self) {
+	if (!setting().onNoOrbRing) RingObject::spawnCircle(self);
+}
+
+void __fastcall GameObject::playShineEffectH(gd::GameObject* self) {
+	if (!setting().onNoPortalShine) GameObject::playShineEffect(self);
+}
+
+void GameObject::mem_init() {
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColorH, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x736e0), GameObject::playShineEffectH, reinterpret_cast<void**>(&GameObject::playShineEffect));
+}
+
+void RingObject::mem_init() {
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf6d40), RingObject::spawnCircleH, reinterpret_cast<void**>(&RingObject::spawnCircle));
+}

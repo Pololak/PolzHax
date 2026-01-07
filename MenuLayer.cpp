@@ -1,83 +1,84 @@
-#include "MenuLayer.h"
-#include "Icons.h"
+#include "MenuLayer.hpp"
 
-#include "GameVariables.hpp"
-#include "nodes.hpp"
-#include <filesystem>
+class RandomPopup : public gd::FLAlertLayer {
+public:
+	bool init() override {
+		if (!this->initWithColor({ 0, 0, 0, 75 })) return false;
 
-#include "FullscreenManager.h"
+		auto* director = CCDirector::sharedDirector();
+		director->getTouchDispatcher()->incrementForcePrio();
+		this->registerWithTouchDispatcher();
 
-bool isReload = false;
+		auto layer = CCLayer::create();
+		auto menu = CCMenu::create();
+		this->m_mainLayer = layer;
+		this->m_buttonMenu = menu;
 
-class ReloadTexAlertProtocol : public gd::FLAlertLayerProtocol {
-protected:
+		layer->addChild(menu);
+		this->addChild(layer);
 
-	void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override
-	{
-		if (btn2)
-		{
-			isReload = true;
+		menu->addChild(gd::CCMenuItemSpriteExtra::create(CCSprite::create("GJ_button_01.png"), this, nullptr));
 
-			gd::GameManager::sharedState()->reloadAll(false, false, true);
+		this->setKeypadEnabled(true);
+		this->setTouchEnabled(true);
+
+		return true;
+	}
+
+	static RandomPopup* create() {
+		RandomPopup* ret = new RandomPopup();
+		if (ret && ret->init()) {
+			ret->autorelease();
+			return ret;
 		}
+		CC_SAFE_DELETE(ret);
+		return nullptr;
+	}
+
+	virtual void keyBackClicked() {
+		this->setTouchEnabled(false);
+		this->setKeypadEnabled(false);
+		this->removeFromParentAndCleanup(true);
+	}
+
+	void popup(CCObject*) {
+		RandomPopup::create()->show();
 	}
 };
 
-ReloadTexAlertProtocol raProtocol;
-
-void MenuLayer::Callback::onReload(CCObject*) {
-	gd::FLAlertLayer::create(&raProtocol, "Reload Textures", "Are you sure you want to <cj>reload textures</c>?", "Cancel", "Yes", 300.f, false, 0)->show();
-}
-
-static CCScene* scene(bool p0) {
-	if (!isReload) return gd::MenuLayer::scene(p0);
-	else {
-		isReload = false;
-		return gd::MenuLayer::scene(false);
-	}
-}
-
-bool __fastcall MenuLayer::init_H(gd::MenuLayer* self, void* edx) {
+bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	if (!MenuLayer::init(self)) return false;
-	gd::GameManager::sharedState()->m_lastScene2 = static_cast<gd::LastGameScene>(0);
-	gd::GameManager::sharedState()->m_premiumPopup = nullptr;
 
 	auto director = CCDirector::sharedDirector();
+
+	std::cout << director << std::endl;
+	std::cout << director->m_pTouchDispatcher << std::endl;
+
+	auto gm = gd::GameManager::sharedState();
+
+	std::cout << gm << "\n";
+	std::cout << gm->m_playerName << "\n";
+
 	auto menu = CCMenu::create();
-	menu->setPosition(0, 0);
-
-	auto reloadSpr = CCSprite::createWithSpriteFrameName("GJ_replayBtn_001.png");
-	reloadSpr->setScale(0.525f);
-	auto reloadBtn = gd::CCMenuItemSpriteExtra::create(reloadSpr, nullptr, self, menu_selector(MenuLayer::Callback::onReload));
-	reloadBtn->setPosition({ director->getScreenLeft() + 18.750f, director->getScreenTop() - 55 });
-
-	menu->addChild(reloadBtn);
 	self->addChild(menu);
 
-	Icons::patchCube(Icons::getCount("player", "001"));
-	Icons::patchShip(Icons::getCount("ship", "001"));
-	Icons::patchBall(Icons::getCount("player_ball", "001"));
-	Icons::patchBird(Icons::getCount("bird", "001"));
-	Icons::patchDart(Icons::getCount("dart", "001"), setting().selected_dart);
-	//Icons::patchTrail(Icons::getCount("player_special", "001"));
+	auto buttonSpr = gd::ButtonSprite::create("Wow", 0, 0, 1.f, false, "goldFont.fnt", "GJ_button_01.png", 32.f);
+	self->addChild(buttonSpr);
 
-	auto t = std::time(nullptr);
-	auto tm = *std::localtime(&t);
+	auto button = gd::CCMenuItemSpriteExtra::create(CCSprite::create("GJ_button_01.png"), self, menu_selector(RandomPopup::popup));
+	button->setPositionX(-170.f);
+	menu->addChild(button);
 
-	switch (tm.tm_mon)
-	{
-	case 11:
-		CCParticleSnow * snow = CCParticleSnow::createWithTotalParticles(700);
-		self->addChild(snow);
-		break;
-	}
+	auto input = gd::CCTextInputNode::create(60.f, 30.f, "Something", self, "bigFont.fnt");
+	input->setAllowedChars("abcdef");
+	self->addChild(input);
+
+	std::cout << gd::GameLevelManager::sharedState() << std::endl;
+	std::cout << gd::GameLevelManager::sharedState()->m_mainLevels << std::endl;
 
 	return true;
 }
 
 void MenuLayer::mem_init() {
-	MH_CreateHook(
-		reinterpret_cast<void*>(gd::base + 0xaf210),
-		MenuLayer::init_H,
-		reinterpret_cast<void**>(&MenuLayer::init));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xaf210), MenuLayer::initH, reinterpret_cast<void**>(&MenuLayer::init));
 }

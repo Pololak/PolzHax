@@ -13,7 +13,7 @@ namespace gd {
 	public:
 		static AchievementManager* sharedState() {
 			return reinterpret_cast<AchievementManager* (__stdcall*)()>(
-				base + 0x4e10 //0x7B10
+				base + 0x7B10
 				)();
 		}
 	};

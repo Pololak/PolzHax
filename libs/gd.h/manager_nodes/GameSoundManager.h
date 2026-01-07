@@ -17,22 +17,8 @@ namespace gd {
 	public:
 		static GameSoundManager* sharedState() {
 			return reinterpret_cast<GameSoundManager* (__stdcall*)()>(
-				base + 0x172d0
+				base + 0x24800
 				)();
-		}
-
-		void stopBackgroundMusic() {
-			reinterpret_cast<void(__thiscall*)(GameSoundManager*)>(base + 0x17940)(this);
-		}
-
-		static void playSound(std::string sName) {
-			reinterpret_cast<void(__stdcall*)(
-				std::string
-			)>(
-				base + 0x179f0
-			)(
-				sName
-			);
 		}
 	};
 }

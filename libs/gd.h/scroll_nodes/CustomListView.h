@@ -9,6 +9,7 @@ namespace gd {
 
 	#pragma runtime_checks("s", off)
 	class CustomListView : public BoomListView {
+		//no members
 	protected:
 		CustomListView() {
 			reinterpret_cast<void(__thiscall*)(CustomListView*)>(
@@ -32,7 +33,7 @@ namespace gd {
 				movss xmm2, height
 			}
 			auto pRet = reinterpret_cast<CustomListView* (__thiscall*)(cocos2d::CCArray*, int)>(
-				base + 0x2e970
+				base + 0x57F90
 				)(entries, type);
 			__asm add esp, 0x4
 			return pRet;
@@ -40,17 +41,17 @@ namespace gd {
 
 		virtual void setupList() {
 			return reinterpret_cast<void(__thiscall*)(BoomListView*)>(
-				base + 0x2ef30
+				base + 0x58870
 				)(this);
 		}
 		virtual TableViewCell* getListCell(const char* key) {
 			return reinterpret_cast<TableViewCell * (__thiscall*)(BoomListView*, const char*)>(
-				base + 0x2ea30
+				base + 0x58050
 				)(this, key);
 		}
 		virtual void loadCell(TableViewCell* cell, unsigned int index) {
 			return reinterpret_cast<void(__thiscall*)(BoomListView*, TableViewCell*, unsigned int)>(
-				base + 0x2ed70
+				base + 0x585C0
 				)(this, cell, index);
 		}
 	};

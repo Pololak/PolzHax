@@ -4,61 +4,22 @@
 #include <gd.h>
 
 namespace gd {
-
+	class CCCircleWaveDelegate;
+	class GameplayDelegate;
+	class StartPosObject;
+	class LevelSettingsObject;
+	class EndPortalObject;
+	class AudioEffectsLayer;
+	class GJGroundLayer;
+	class GameObject;
+	class UILayer;
+	class PlayerObject;
 	class GJGameLevel;
-	class EndPortalObject {};
+	class ColorAction;
 
-	class GJGroundLayer : public cocos2d::CCLayer {
+	class PlayLayer : public cocos2d::CCLayer, CCCircleWaveDelegate, GameplayDelegate {
 	public:
-		static GJGroundLayer* create(int p0) {
-			return reinterpret_cast<GJGroundLayer * (__fastcall*)(int)>(base + 0x81140)(p0);
-		}
-
-		void hideShadows(bool hide) {
-			if (hide) {
-				reinterpret_cast<cocos2d::CCSprite*>(this->getChildren()->objectAtIndex(2))->setVisible(0);
-				reinterpret_cast<cocos2d::CCSprite*>(this->getChildren()->objectAtIndex(3))->setVisible(0);
-			}
-		}
-
-		auto groundSprite() {
-			return from<cocos2d::CCSprite*>(this, 0x118);
-		}
-
-		auto lineSprite() {
-			return from<cocos2d::CCSprite*>(this, 0x120);
-		}
-	};
-
-	class UILayer : public cocos2d::CCLayerColor {
-	public:
-		PAD(0x8)
-			cocos2d::CCMenu* m_checkpointMenu;
-			CCMenuItemSpriteExtra* m_pauseBtn;
-
-		void onCheck(CCObject* pSender) {
-			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
-				base + 0x25fb60
-				)(this, pSender);
-		}
-
-		void onDeleteCheck(CCObject* pSender) {
-			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
-				base + 0x25fc90
-				)(this, pSender);
-		}
-
-		void onPause(CCObject* pSender) {
-			reinterpret_cast<void(__thiscall*)(UILayer*, CCObject*)>(
-				base + 0x25fad0
-				)(this, pSender);
-		}
-	};
-
-	class PlayLayer : public cocos2d::CCLayer {
-	public:
-		PAD(8)
-		bool m_drawDebug; // 0x120 // show hitboxes by RobTop
+		bool m_drawDebug; // 0x120
 		cocos2d::CCDrawNode* m_drawNode; // 0x124
 		PAD(32)
 		StartPosObject* m_startPosObject; // 0x148
@@ -73,7 +34,8 @@ namespace gd {
 		cocos2d::CCArray* m_levelSections; // 0x170
 		PAD(0x4)
 		cocos2d::CCArray* m_activeObjects; // 0x178
-		PAD(0x8)
+		PAD(0x4)
+		cocos2d::CCArray* m_spawnObjects; // 0x180
 		cocos2d::CCArray* m_objects; // 0x184
 		cocos2d::CCArray* m_stateObjects; // 0x188
 		cocos2d::CCParticleSystemQuad* m_glitterParticleSystem; // 0x18c
@@ -83,15 +45,21 @@ namespace gd {
 		PAD(0x8)
 		GJGroundLayer* m_bottomGround; // 0x1a4
 		GJGroundLayer* m_topGround; // 0x1a8
-		PAD(0x10)
+		PAD(0x8)
+		bool m_isDead; // 0x1b4
+		PAD(0x1)
+		bool m_cameraMovingX; // 0x1b6
+		bool m_cameraMovingY; // 0x1b7
+		PAD(0x4)
 		int m_firstVisibleSection; // 0x1bc
 		int m_lastVisibleSection; // 0x1c0
-		PAD(0xC)
+		PAD(0x8)
+		bool m_groundMoving; // 0x1cc
 		float m_levelLength; // 0x1d0
 		float m_realLevelLength; // 0x1d4
 		cocos2d::CCLabelBMFont* m_attemptsLabel; // 0x1d8
-		PAD(0x18)
-		cocos2d::CCDictionary* m_particlesDictionary; // 0x1f4
+		PAD(24)
+		cocos2d::CCDictionary* m_particlesDict; // 0x1f4
 		PAD(0x4)
 		cocos2d::CCArray* m_particles; // 0x1fc
 		cocos2d::CCNode* m_backgroundFlash; // 0x200 // bg white flash when entering sizing portals
@@ -105,16 +73,25 @@ namespace gd {
 		cocos2d::CCSprite* m_custom04ColorRef; // 0x220
 		cocos2d::CCSprite* m_sliderGroove; // 0x224
 		cocos2d::CCSprite* m_sliderBar; // 0x228
-		PAD(0x28)
-		gd::string m_replayString; // 0x
+		PAD(40)
+		std::string m_replayString; // 0x254
 		cocos2d::CCArray* m_replayActions; // 0x26c
 		double m_levelTime; // 0x270
 		bool m_needsReorderColor01; // 0x278
 		bool m_needsReorderColor02; // 0x279
 		bool m_needsReorderColor03; // 0x27a
 		bool m_needsReorderColor04; // 0x27b
-		bool m_needsReorderColorDL; // 0x27c
-		PAD(0x20)
+		bool m_needsReorderColor3D; // 0x27c
+		PAD(0x3)
+		PAD(0x8)
+		bool m_inCameraFlip; // 0x288
+		bool m_meteringEnabled; // 0x289
+		bool m_playbackMode; // 0x28a
+		GameObject* m_cameraPortal; // 0x28c
+		GameObject* m_dualModeCamera; // 0x290
+		bool m_isFlipped; // 0x294
+		float m_flipValue; // 0x298
+		bool m_dualMode; // 0x29c
 		UILayer* m_uiLayer; // 0x2a0
 		PlayerObject* m_player; // 0x2a4
 		PlayerObject* m_player2; // 0x2a8
@@ -158,163 +135,16 @@ namespace gd {
 		bool m_customColor04Blend; // 0x32c
 		bool m_customColorDLBlend; // 0x32d
 
-		static PlayLayer* create(GJGameLevel* lvl) {
-			return reinterpret_cast<PlayLayer * (__fastcall*)(GJGameLevel*)>(
-				base + 0xe3530
-				)(lvl);
-		}
-
 		void resetLevel() {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f20)(this); //0xf1f20 - GHS 1.92
-		}
-		void destroyPlayer(PlayerObject* selfig) { // self ig, nice job
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*)>(base + 0xf04a0)(this, selfig); //ee990 1.91
-		}
-		void resume() {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf39b0)(this); //f1e10 1.91
-		}
-		void onQuit() {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf3b80)(this); //f1fe0 1.91
+			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f20)(this);
 		}
 
-		void updateCustomColorBlend(int colorID, bool isBlend) {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xecf30)(this, colorID, isBlend);
+		void togglePracticeMode(bool practice) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, bool)>(base + 0xf3610)(this, practice);
 		}
 
-		void updateVisibility(float dt) {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, float)>(base + 0xeb3f0)(this, dt);
-		}
-
-		auto layer() {
-			return from<cocos2d::CCLayer*>(this, 0x2D4);
-		}
-
-		auto getFirstVisibleSection() {
-			return from<int>(this, 0x1BC);
-		}
-		auto getLastVisibleSection() {
-			return from<int>(this, 0x1C0);
-		}
-
-		auto getSections() {
-			return from<cocos2d::CCArray*>(this, 0x170);
-		}
-
-		auto getObjects() {
-			return from<cocos2d::CCArray*>(this, 0x184);
-		}
-
-		auto getLevelSettings() {
-			return from <gd::LevelSettingsObject*>(this, 0x14C);
-		}
-
-		auto getStartPosObject() {
-			return from <gd::StartPosObject*>(this, 0x148);
-		}
-		void setStartPosObject(gd::StartPosObject* startPos) {
-			from <gd::StartPosObject*>(this, 0x148) = startPos;
-		}
-
-		auto getPlayerStartPosition() {
-			return from<cocos2d::CCPoint>(this, 0x2E0);
-		}
-		void setPlayerStartPosition(cocos2d::CCPoint playerStartPosition) {
-			from<cocos2d::CCPoint>(this, 0x2E0) = playerStartPosition;
-		}
-
-
-
-		/*auto getScene() {
-			return from<cocos2d::CCScene*>(this, 0xa8);
-		}*/
-		// TODO: make these actual members
-		auto player1() {
-			return from<PlayerObject*>(this, 0x2a4); //2a4
-		}
-		auto player2() {
-			return from<PlayerObject*>(this, 0x2a8); //2a8
-		}
-		auto levelLength() {
-			return from<float>(this, 0x1d0); //1d0
-		}
-		auto attemptsLabel() {
-			return from<cocos2d::CCLabelBMFont*>(this, 0x1d8); //1d8
-		}
-		auto attemptsCount() {
-			return from<int>(this, 0x2e8); 
-		}
-		auto jumpsCount() {
-			return from<int>(this, 0x2ec); 
-		}
-		auto getStartPos() {
-			return from<cocos2d::CCPoint*>(this, 0x2e0);
-		}
-		auto getLastRunPercent() {
-			return from<int>(this, 0x2fc);
-		}
-		auto getClkTimer() {
-			return from<float>(this, 0x2f4);
-		}
-		void setAttempts(int atts) {
-			from<int>(this, 0x2e8) = atts; 
-		}
-		bool getPracticeMode() {
-			return from<bool>(this, 0x2b9);
-		}
-		bool hasLevelCompleteMenu() {
-			return from<bool>(this, 0x2f8);
-		}
-		bool hasCompletedLevel() {
-			return from<bool>(this, 0x2f9);
-		}
-		bool isDead() {
-			return from<bool>(this, 0x1b4);
-		}
-		auto getAudioEffectsLayer() {
-			return from<gd::AudioEffectsLayer*>(this, 0x198);
-		}
-		auto getBackgroundSprite() {
-			return from<cocos2d::CCSprite*>(this, 0x164);
-		}
-		auto getGroundBottom() {
-			return from<cocos2d::CCLayer*>(this, 0x1a4);
-		}
-		auto getGroundTop() {
-			return from<cocos2d::CCLayer*>(this, 0x1a8);
-		}
-		GJGameLevel* getGameLevel() {
-			return from<GJGameLevel*>(this, 0x2ac);
-		}
-
-		UILayer* getUILayer() {
-			return from<UILayer*>(this, 0x2a0);
-		}
-		auto playerGlowNode() {
-			return from<cocos2d::CCSpriteBatchNode*>(this, 0x2d0);
-		}
-		void pushButton(int p0, bool push) {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0a00)(this, p0, push);
-		}
-		void releaseButton(int p0, bool push) {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0af0)(this, p0, push);
-		}
-		void showEndLayer() {
-			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xe6a80)(this);
-		}
-		void pickupItem(GameObject* p0) {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, GameObject*)>(base + 0xee080)(this, p0);
-		}
-		void togglePracticeMode(bool p0) {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*, bool)>(base + 0xf3610)(this, p0);
-		}
-		cocos2d::CCSpriteBatchNode* getPlayerBatchNode() {
-			return from<cocos2d::CCSpriteBatchNode*>(this, 0x2cc);
-		}
-		cocos2d::CCArray* getCheckpoints() {
-			return from<cocos2d::CCArray*>(this, 0x154);
-		}
-		void delayedResetLevel() {
-			return reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f10)(this);
+		void pickupItem(GameObject* obj) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, GameObject*)>(base + 0xee080)(this, obj);
 		}
 	};
 }

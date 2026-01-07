@@ -20,7 +20,7 @@ namespace gd {
 			cocos2d::CCObject* target, cocos2d::SEL_MenuHandler callback) {
 			auto pRet = reinterpret_cast<CCMenuItemToggler* (__fastcall*)(cocos2d::CCNode*,
 				cocos2d::CCNode*, cocos2d::CCObject*, cocos2d::SEL_MenuHandler)>(
-					base + 0xd720 //0x19600 GD 2.1
+					base + 0xd720
 					)(off, on, target, callback);
 			__asm add esp, 0x8
 			return pRet;
@@ -28,15 +28,14 @@ namespace gd {
 		void setSizeMult(float mult) {
 			__asm movss xmm1, mult
 			return reinterpret_cast<void(__thiscall*)(CCMenuItemToggler*)>(
-				base + 0xd3b0
+				base + 0x19850
 				)(this);
 		}
 		//my own function
 		inline bool isOn() { return m_bOn; }
-
 		void toggle(bool on) {
 			return reinterpret_cast<void(__thiscall*)(CCMenuItemToggler*, bool)>(
-				base + 0xda70 //0x199B0
+				base + 0xda70
 				)(this, on);
 		}
 	};

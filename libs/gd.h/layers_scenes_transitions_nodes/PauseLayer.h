@@ -4,21 +4,15 @@
 #include <gd.h>
 
 namespace gd {
-
 	class CCBlockLayer;
+	class CCMenuItemToggler;
 
 	class PauseLayer : public CCBlockLayer {
-	protected:
-		bool m_bUnknown;
-		bool m_bUnknown2;
-
 	public:
-		void createToggleButton(cocos2d::SEL_MenuHandler callback, bool on,
-			cocos2d::CCMenu* menu, std::string caption, cocos2d::CCPoint pos) {
-			return reinterpret_cast<void(__thiscall*)(PauseLayer*, cocos2d::SEL_MenuHandler,
-				bool, cocos2d::CCMenu*, std::string, cocos2d::CCPoint)>(
-					base + 0x98d70 //1E5570 original toggle button
-					)(this, callback, on, menu, caption, pos);
+		bool m_unfocused; // 0x198
+
+		void createToggleButton(std::string label, cocos2d::SEL_MenuHandler callback, bool value, cocos2d::CCMenu* menu, cocos2d::CCPoint pos) {
+			return reinterpret_cast<void(__thiscall*)(PauseLayer*, cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, std::string, cocos2d::CCPoint)>(base + 0xd6eb0)(this, callback, value, menu, label, pos);
 		}
 	};
 }

@@ -23,7 +23,7 @@ namespace gd {
 				movss xmm2, duration
 			}
 			return reinterpret_cast<CCCircleWave* (__fastcall*)(bool, bool)>(
-				base + 0xaca0
+				base + 0x16C00
 				)(fade1, fade2);
 		}
 		void setColor(cocos2d::ccColor3B color) { m_cColor = color; }

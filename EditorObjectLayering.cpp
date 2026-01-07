@@ -1,7 +1,6 @@
 #include "EditorObjectLayering.hpp"
-#include "utils.hpp"
 
-void EditorObjectLayering::updateObjLayering(gd::GameObject* obj) {
+void updateObjectLayering(gd::GameObject* obj) {
 	if (!obj) return;
 	switch (obj->m_objectID)
 	{

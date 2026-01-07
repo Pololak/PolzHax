@@ -17,10 +17,10 @@ namespace color_utils {
 		double min, max, delta;
 
 		min = in.r < in.g ? in.r : in.g;
-		min = min  < in.b ? min  : in.b;
+		min = min < in.b ? min : in.b;
 
 		max = in.r > in.g ? in.r : in.g;
-		max = max  > in.b ? max  : in.b;
+		max = max > in.b ? max : in.b;
 
 		out.v = max;
 		delta = max - min;
@@ -32,7 +32,8 @@ namespace color_utils {
 
 		if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
 			out.s = delta / max;
-		} else {
+		}
+		else {
 			// if max is 0, then r = g = b = 0
 			// s = 0, h is undefined
 			out.s = 0.0;
