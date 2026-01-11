@@ -1393,6 +1393,46 @@ public:
 
     //Robtop Modification
     RT_ADD(virtual void updateTweenAction(float, char const*);)
+
+    RT_ADD(
+        /**
+        * Get nth child that is a given type. Checks bounds.
+        * @returns Child at index cast to the given type,
+        * or nullptr if index exceeds bounds
+        */
+        template <class InpT = CCNode*, class T = std::remove_pointer_t<InpT>>
+        T* getChildByType(int index) {
+            size_t indexCounter = 0;
+            if (this->getChildrenCount() == 0) return nullptr;
+            // start from end for negative index
+            if (index < 0) {
+                index = -index - 1;
+                for (size_t i = this->getChildrenCount() - 1; i >= 0; i--) {
+                    auto obj = dynamic_cast<T*>(this->getChildren()->objectAtIndex(i));
+                    if (obj != nullptr) {
+                        if (indexCounter == index) {
+                            return obj;
+                        }
+                        ++indexCounter;
+                    }
+                    if (i == 0) break;
+                }
+            }
+            else {
+                for (size_t i = 0; i < this->getChildrenCount(); i++) {
+                    auto obj = dynamic_cast<T*>(this->getChildren()->objectAtIndex(i));
+                    if (obj != nullptr) {
+                        if (indexCounter == index) {
+                            return obj;
+                        }
+                        ++indexCounter;
+                    }
+                }
+            }
+
+            return nullptr;
+        }
+    )
 private:
     /// lazy allocs
     void childrenAlloc(void);

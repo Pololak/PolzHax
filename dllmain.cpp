@@ -4,12 +4,17 @@
 #pragma comment(lib, "dbghelp.lib")
 
 // Hooks
+#include "CCSchedulerHook.hpp"
 #include "CustomizeObjectLayer.hpp"
 #include "EditButtonBar.hpp"
+#include "EditLevelLayer.hpp"
 #include "EditorPauseLayer.hpp"
 #include "EditorUI.hpp"
 #include "GameObject.hpp"
+#include "LevelBrowserLayer.hpp"
 #include "LevelEditorLayer.hpp"
+#include "LevelInfoLayer.hpp"
+#include "LevelSearchLayer.hpp"
 #include "LevelSettingsLayer.hpp"
 #include "MenuLayer.hpp"
 #include "PauseLayer.hpp"
@@ -20,6 +25,7 @@
 // Utils
 #include "patching.hpp"
 #include "CrashLogger.hpp"
+#include "SpeedHack.h"
 
 // Menu
 #include "Menu.hpp"
@@ -73,6 +79,50 @@ void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float dt) 
     HardStreak_updateStroke(self, dt);
 }
 
+inline extension::RGBA(__cdecl* CCControlUtils_RGBfromHSV)(extension::HSV);
+extension::RGBA __cdecl CCControlUtils_RGBfromHSVH(extension::HSV hsv) {
+    if (setting().onHUEFix) {
+        if (std::isnan(hsv.h)) {
+            hsv.h = 0.0;
+        }
+
+        if (std::isnan(hsv.s)) {
+            hsv.s = 0.0;
+        }
+
+        if (std::isnan(hsv.v)) {
+            hsv.v = 0.0;
+        }
+    }
+
+    return CCControlUtils_RGBfromHSV(hsv);
+}
+
+inline void(__thiscall* CCTransitionScene_initWithDuration)(CCTransitionScene*, float, CCScene*);
+void __fastcall CCTransitionScene_initWithDurationH(CCTransitionScene* self, void*, float duration, CCScene* scene) {
+    if (setting().onNoTransition) return CCTransitionScene_initWithDuration(self, 0.f, scene);
+    else CCTransitionScene_initWithDuration(self, duration, scene);
+}
+
+inline bool(__thiscall* CCKeyboardDispatcher_dispatchKeyboardMSG)(CCKeyboardDispatcher*, enumKeyCodes, bool);
+bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* self, void*, enumKeyCodes key, bool isDown) {
+    auto ret = CCKeyboardDispatcher_dispatchKeyboardMSG(self, key, isDown);
+
+    auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+    if (playLayer && isDown) {
+        if (!playLayer->m_endTriggered) {
+            if (key == setting().m_retryKeybind) {
+                if (PauseLayer::get()) {
+                    PauseLayer::get()->onResume(nullptr);
+                }
+                playLayer->resetLevel();
+            }
+        }
+    }
+
+    return ret;
+}
+
 DWORD WINAPI my_thread(void* hModule) {
     AllocConsole();
     freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
@@ -85,6 +135,8 @@ DWORD WINAPI my_thread(void* hModule) {
     sequence_patch(gd::base + 0x3a49b, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90, 0x90 }); // Play Music Button.
     sequence_patch(gd::base + 0x145128, { 0x42, 0x61, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }); // Progress Bar -> Bar
 
+    SpeedHack::Setup();
+
     //ccTouchFixPatch();
 
     auto cocos = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
@@ -96,13 +148,21 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29ac0), AudioEffectsLayer_updateTweenActionH, reinterpret_cast<void**>(&AudioEffectsLayer_updateTweenAction));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x165f0), FMODAudioEngine_updateH, reinterpret_cast<void**>(&FMODAudioEngine_update));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
+    MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0xcee0), CCControlUtils_RGBfromHSVH, reinterpret_cast<void**>(&CCControlUtils_RGBfromHSV));
+    MH_CreateHook(reinterpret_cast<void*>(cocos + 0xa4990), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
+    MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
 
+    //CCSchedulerHook::mem_init();
     CustomizeObjectLayer::mem_init();
     EditButtonBar::mem_init();
+    EditLevelLayer::mem_init();
     EditorPauseLayer::mem_init();
     EditorUI::mem_init();
     GameObject::mem_init();
+    LevelBrowserLayer::mem_init();
     LevelEditorLayer::mem_init();
+    LevelInfoLayer::mem_init();
+    //LevelSearchLayer::mem_init();
     LevelSettingsLayer::mem_init();
     MenuLayer::mem_init();
     PauseLayer::mem_init();

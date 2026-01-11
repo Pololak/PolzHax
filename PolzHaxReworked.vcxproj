@@ -96,7 +96,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\cocos-headers\extensions;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\third_party\win32\OGLES;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\third_party\win32;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\win32;$(SolutionDir)libs\cocos-headers\cocos2dx\kazmath\include;$(SolutionDir)libs\cocos-headers\cocos2dx\include;$(SolutionDir)libs\cocos-headers\cocos2dx;$(SolutionDir)libs\MinHook;$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)libs\imgui-hook;$(SolutionDir)libs\imgui-hook\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\cocos-headers\extensions;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\third_party\win32\OGLES;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\third_party\win32;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\win32;$(SolutionDir)libs\cocos-headers\cocos2dx\kazmath\include;$(SolutionDir)libs\cocos-headers\cocos2dx\include;$(SolutionDir)libs\cocos-headers\cocos2dx\robtop\xml;$(SolutionDir)libs\cocos-headers\cocos2dx\robtop;$(SolutionDir)libs\cocos-headers\cocos2dx;$(SolutionDir)libs\MinHook;$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)libs\imgui-hook;$(SolutionDir)libs\imgui-hook\imgui;$(SolutionDir)libs\fmod-headers;$(SolutionDir)libs\detours;$(SolutionDir)libs\nfd;$(SolutionDir)libs\nfd\src;$(SolutionDir)libs\nfd\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp23</LanguageStandard>
       <AdditionalOptions>-D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -104,7 +104,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(SolutionDir)libs\MinHook\libMinHook-x86-v141-mtd.lib;$(SolutionDir)libs\cocos-headers\cocos2dx\libcocos2d.lib;$(SolutionDir)libs\cocos-headers\extensions\libExtensions.lib;$(SolutionDir)libs\glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)libs\MinHook\libMinHook-x86-v141-mtd.lib;$(SolutionDir)libs\cocos-headers\cocos2dx\libcocos2d.lib;$(SolutionDir)libs\cocos-headers\extensions\libExtensions.lib;$(SolutionDir)libs\glew32.lib;$(SolutionDir)libs\fmod-headers\fmod.lib;$(SolutionDir)libs\detours\libdetours.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y /F "$(TargetPath)" "D:\GD PC Builds\GeometryDash"</Command>
@@ -147,11 +147,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CCSchedulerHook.hpp" />
     <ClInclude Include="ccTouchFix.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="CustomizeObjectLayer.hpp" />
     <ClInclude Include="EditButtonBar.hpp" />
+    <ClInclude Include="EditLevelLayer.hpp" />
     <ClInclude Include="EditorLayerInput.hpp" />
     <ClInclude Include="EditorObjectLayering.hpp" />
     <ClInclude Include="EditorOptionsLayer.hpp" />
@@ -162,8 +164,12 @@
     <ClInclude Include="GlobalClipboard.hpp" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="ImGuiUtils.hpp" />
+    <ClInclude Include="LevelBrowserLayer.hpp" />
     <ClInclude Include="LevelEditorLayer.hpp" />
+    <ClInclude Include="LevelInfoLayer.hpp" />
+    <ClInclude Include="LevelSearchLayer.hpp" />
     <ClInclude Include="LevelSettingsLayer.hpp" />
+    <ClInclude Include="LevelShare.hpp" />
     <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCAction.h" />
     <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionCamera.h" />
     <ClInclude Include="libs\cocos-headers\cocos2dx\actions\CCActionCatmullRom.h" />
@@ -546,6 +552,14 @@
     <ClInclude Include="libs\cocos-headers\extensions\spine\SlotData.h" />
     <ClInclude Include="libs\cocos-headers\extensions\spine\spine-cocos2dx.h" />
     <ClInclude Include="libs\cocos-headers\extensions\spine\spine.h" />
+    <ClInclude Include="libs\fmod-headers\fmod.h" />
+    <ClInclude Include="libs\fmod-headers\fmod.hpp" />
+    <ClInclude Include="libs\fmod-headers\fmod_codec.h" />
+    <ClInclude Include="libs\fmod-headers\fmod_common.h" />
+    <ClInclude Include="libs\fmod-headers\fmod_dsp.h" />
+    <ClInclude Include="libs\fmod-headers\fmod_dsp_effects.h" />
+    <ClInclude Include="libs\fmod-headers\fmod_errors.h" />
+    <ClInclude Include="libs\fmod-headers\fmod_output.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementBar.h" />
     <ClInclude Include="libs\gd.h\achievement_nodes\AchievementNotifier.h" />
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
@@ -563,13 +577,17 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomizeObjectLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongWidget.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditLevelLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorPauseLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorUI.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\FLAlertLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJDropDownLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGroundLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSettingsLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingCircle.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingLayer.h" />
@@ -590,6 +608,7 @@
     <ClInclude Include="libs\gd.h\manager_nodes\GameSoundManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameStatsManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GManager.h" />
+    <ClInclude Include="libs\gd.h\manager_nodes\LocalLevelManager.h" />
     <ClInclude Include="libs\gd.h\menu_nodes\CCMenuItemSpriteExtra.h" />
     <ClInclude Include="libs\gd.h\menu_nodes\CCMenuItemToggler.h" />
     <ClInclude Include="libs\gd.h\menu_nodes\Slider.h" />
@@ -628,6 +647,12 @@
     <ClInclude Include="libs\imgui-hook\imgui\imstb_truetype.h" />
     <ClInclude Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="libs\MinHook\MinHook.h" />
+    <ClInclude Include="libs\nfd\src\common.h" />
+    <ClInclude Include="libs\nfd\src\ftg_core.h" />
+    <ClInclude Include="libs\nfd\src\include\nfd.h" />
+    <ClInclude Include="libs\nfd\src\nfd_common.h" />
+    <ClInclude Include="libs\portable-file-dialogs.h" />
+    <ClInclude Include="matplist.hpp" />
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="MenuLayer.hpp" />
     <ClInclude Include="patching.hpp" />
@@ -637,15 +662,19 @@
     <ClInclude Include="PlayLayer.hpp" />
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
+    <ClInclude Include="SpeedHack.h" />
+    <ClInclude Include="SURVEY_PROGRAM.hpp" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CCSchedulerHook.cpp" />
     <ClCompile Include="ccTouchFix.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="CustomizeObjectLayer.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EditButtonBar.cpp" />
+    <ClCompile Include="EditLevelLayer.cpp" />
     <ClCompile Include="EditorLayerInput.cpp" />
     <ClCompile Include="EditorObjectLayering.cpp" />
     <ClCompile Include="EditorOptionsLayer.cpp" />
@@ -654,7 +683,10 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalClipboard.cpp" />
     <ClCompile Include="ImGuiUtils.cpp" />
+    <ClCompile Include="LevelBrowserLayer.cpp" />
     <ClCompile Include="LevelEditorLayer.cpp" />
+    <ClCompile Include="LevelInfoLayer.cpp" />
+    <ClCompile Include="LevelSearchLayer.cpp" />
     <ClCompile Include="LevelSettingsLayer.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui-hook.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\backends\imgui_impl_opengl3.cpp" />
@@ -665,6 +697,8 @@
     <ClCompile Include="libs\imgui-hook\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\imgui_widgets.cpp" />
     <ClCompile Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="libs\nfd\src\nfd_common.c" />
+    <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="patching.cpp" />
@@ -679,8 +713,11 @@
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
+    <ClCompile Include="SpeedHack.cpp" />
+    <ClCompile Include="SURVEY_PROGRAM.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="libs\fmod-headers\fmod.lib" />
     <Library Include="libs\glew32.lib" />
     <Library Include="libs\MinHook\libMinHook-x86-v141-mtd.lib" />
   </ItemGroup>

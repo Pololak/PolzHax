@@ -8,26 +8,23 @@ namespace gd {
 	class AchievementBar;
 
 	class AchievementNotifier : public cocos2d::CCNode {
-	protected:
-		cocos2d::CCScene* m_pCurrentScene;
-		cocos2d::CCArray* m_pQueue;
-		AchievementBar* m_pCurrentAchievement;
-
 	public:
+		cocos2d::CCScene* m_nextScene; // 0xe8
+		cocos2d::CCArray* m_achievementBarArray; // 0xec
+		AchievementBar* m_activeAchievementBar; // 0xf0
+
 		static AchievementNotifier* sharedState() {
-			return reinterpret_cast<AchievementNotifier* (__stdcall*)()>(
-				base + 0xFC90
-				)();
+			return reinterpret_cast<AchievementNotifier*(__stdcall*)()>(base + 0x5bc0)();
 		}
+
 		void showNextAchievement() {
-			return reinterpret_cast<void(__thiscall*)(AchievementNotifier*)>(
-				base + 0xFD60
-				)(this);
+			reinterpret_cast<void(__thiscall*)(AchievementNotifier*)>(base + 0x5c90)(this);
 		}
-		//this is inlined on win32 so let's reconstruct it
-		void notifyAchievement(const char* title, const char* desc, const char* icon, bool quest) {
-			m_pQueue->addObject(AchievementBar::create(title, desc, icon, quest));
-			if (!m_pCurrentAchievement) {
+
+		void notifyAchievement(char const* title, char const* desc, char const* icon) {
+			auto achievement = AchievementBar::create(title, desc, icon);
+			this->m_achievementBarArray->addObject(achievement);
+			if (this->m_activeAchievementBar == nullptr) {
 				this->showNextAchievement();
 			}
 		}

@@ -195,3 +195,9 @@ bool ImGui::HotKey(const char* label, int& key, float samelineOffset, const ImVe
 
 	return true;
 }
+
+void ImGui::Tooltip(const char* tooltip) {
+	if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > .5f) {
+		ImGui::SetTooltip(tooltip);
+	}
+}

@@ -2,6 +2,7 @@
 #define __FMODAUDIOENGINE_H__
 
 #include <gd.h>
+#include <fmod.hpp>
 
 namespace gd {
 	class FMODAudioEngine : public cocos2d::CCNode {
@@ -18,15 +19,19 @@ namespace gd {
 		bool m_fading; // 0x11d
 		bool m_fadeIn; // 0x11e
 		float m_fadeInDuration; // 0x120
-		void* m_system; // 0x124
-		void* m_sound; // 0x128
-		void* m_currentSoundChannel; // 0x12c
-		void* m_globalChannel; // 0x130
-		void* m_DSP; // 0x134
-		int m_lastResult; // 0x138
+		FMOD::System* m_system; // 0x124
+		FMOD::Sound* m_sound; // 0x128
+		FMOD::Channel* m_currentSoundChannel; // 0x12c
+		FMOD::Channel* m_globalChannel; // 0x130
+		FMOD::DSP* m_DSP; // 0x134
+		FMOD_RESULT m_lastResult; // 0x138
 		int m_version; // 0x13c
 		void* m_extraDriverData; // 0x140
 		int m_musicOffset; // 0x144
+
+		static auto sharedEngine() {
+			return reinterpret_cast<FMODAudioEngine * (__stdcall*)()>(base + 0x164c0)();
+		}
 	};
 }
 

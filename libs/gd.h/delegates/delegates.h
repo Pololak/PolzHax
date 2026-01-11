@@ -115,6 +115,18 @@ namespace gd {
 		virtual void levelDeleteFinished(int);
 		virtual void levelDeleteFailed(int);
 	};
+
+	class RateLevelDelegate {
+		virtual void rateLevelClosed();
+	};
+
+	class LikeItemDelegate {
+		virtual void likedItem(int, int, bool);
+	};
+
+	class NumberInputDelegate {
+		virtual void numberInputClosed(void*/*NumberInputLayer**/);
+	};
 }
 
 #endif // !__DELEGATES_H__

@@ -46,6 +46,15 @@
     <Filter Include="Файлы заголовков\Libraries\imgui">
       <UniqueIdentifier>{9387ea2b-ff24-4315-9479-2c6e3450ad12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Libraries\fmod">
+      <UniqueIdentifier>{284ec4cd-3774-44ed-9db7-a99a7251e929}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries\Detours">
+      <UniqueIdentifier>{873f84b2-0a86-4663-ac89-bee095f33483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Libraries\nfd">
+      <UniqueIdentifier>{70efae15-160e-4e42-814f-0a2618edba66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1509,9 +1518,6 @@
     <ClInclude Include="libs\gd.h\manager_nodes\GameStatsManager.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="libs\gd.h\other_nodes\GJSearchObject.h">
-      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
-    </ClInclude>
     <ClInclude Include="PauseLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
@@ -1520,6 +1526,90 @@
     </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\OptionsLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod.hpp">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod_codec.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod_common.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod_dsp.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod_dsp_effects.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod_errors.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmod-headers\fmod_output.h">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
+    </ClInclude>
+    <ClInclude Include="SpeedHack.h">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCSchedulerHook.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="EditLevelLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditLevelLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\LocalLevelManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelShare.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\portable-file-dialogs.h">
+      <Filter>Файлы заголовков\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\common.h">
+      <Filter>Файлы заголовков\Libraries\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\ftg_core.h">
+      <Filter>Файлы заголовков\Libraries\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\include\nfd.h">
+      <Filter>Файлы заголовков\Libraries\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\nfd\src\nfd_common.h">
+      <Filter>Файлы заголовков\Libraries\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="matplist.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelBrowserLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\other_nodes\GJSearchObject.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelInfoLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelSearchLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="SURVEY_PROGRAM.hpp">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1625,6 +1715,33 @@
     <ClCompile Include="PlayerObject.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
+    <ClCompile Include="SpeedHack.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCSchedulerHook.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditLevelLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\nfd\src\nfd_common.c">
+      <Filter>Файлы заголовков\Libraries\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\nfd\src\nfd_win.cpp">
+      <Filter>Файлы заголовков\Libraries\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelBrowserLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelInfoLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelSearchLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SURVEY_PROGRAM.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\glew32.lib">
@@ -1632,6 +1749,9 @@
     </Library>
     <Library Include="libs\MinHook\libMinHook-x86-v141-mtd.lib">
       <Filter>Файлы заголовков\Libraries\MinHook</Filter>
+    </Library>
+    <Library Include="libs\fmod-headers\fmod.lib">
+      <Filter>Файлы заголовков\Libraries\fmod</Filter>
     </Library>
   </ItemGroup>
   <ItemGroup>

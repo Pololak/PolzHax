@@ -1,0 +1,15 @@
+<xml>
+	
+	<files id="native-toolkit-nfd">
+		
+		<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/nfd/src/include/" />
+		<compilerflag value="-D_CRT_SECURE_NO_WARNINGS" if="windows" />
+		
+		<file name="${NATIVE_TOOLKIT_PATH}/nfd/src/nfd_common.c" />
+		<file name="${NATIVE_TOOLKIT_PATH}/nfd/src/nfd_win.cpp" if="windows" />
+		<file name="${NATIVE_TOOLKIT_PATH}/nfd/src/nfd_cocoa.m" if="mac" />
+		<file name="${NATIVE_TOOLKIT_PATH}/nfd/src/nfd_gtk.c" if="linux" />
+		
+	</files>
+	
+</xml>

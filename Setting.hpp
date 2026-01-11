@@ -98,6 +98,30 @@ struct SettingStruct {
 	bool onVerifyHack;
 	bool onZoomBypass;
 
+	// Universal
+	bool onAllowLowVolume;
+	bool onAutoSafeMode;
+	bool onDisableSongAlert;
+	bool onFastAltTab;
+	bool onForceVisibility;
+	bool onFreeWindowResize;
+	bool onHUEFix;
+	bool onIncreaseMaxLevels;
+	bool onLockCursor;
+	bool onNoRotation;
+	bool onNoTransition;
+	bool onRetryKeybind; int m_retryKeybind = 0x52;
+	bool onSafeMode;
+	bool onShowRestartButton;
+	bool onTransparentBG;
+	bool onTransparentLists;
+	bool onZeroDelay;
+
+	// Speedhack
+	bool onSpeedhack; float speedhackValue;
+	bool onSpeedhackAudio;
+	bool onClassicMode;
+
 	// Editor settings
 	bool onSelectFilter;
 	bool onShowObjectInfo;
@@ -199,6 +223,30 @@ DEF_SCHEMA(
 	onSmoothEditorTrail,
 	onVerifyHack,
 	onZoomBypass,
+
+	// Universal
+	onAllowLowVolume,
+	onAutoSafeMode,
+	onDisableSongAlert,
+	onFastAltTab,
+	onForceVisibility,
+	onFreeWindowResize,
+	onHUEFix,
+	onIncreaseMaxLevels,
+	onLockCursor,
+	onNoRotation,
+	onNoTransition,
+	onRetryKeybind, m_retryKeybind,
+	onSafeMode,
+	onShowRestartButton,
+	onTransparentBG,
+	onTransparentLists,
+	onZeroDelay,
+
+	// Speedhack
+	onSpeedhack, speedhackValue,
+	onSpeedhackAudio,
+	onClassicMode,
 
 	// Editor settings
 	onSelectFilter,

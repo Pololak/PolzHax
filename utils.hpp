@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "support/base64.h"
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -125,3 +126,33 @@ public:
 		return text;
 	}
 };
+
+namespace base64 {
+	inline std::string encode(std::string_view str) {
+		char* out;
+		const auto size = cocos2d::base64Encode(str.data(), str.size(), &out, false);
+		std::string outs(out);
+		free(out);
+		return outs;
+	}
+
+	inline std::string decode(std::string_view str) {
+		char* out;
+		const auto size = cocos2d::base64Decode(str.data(), str.size(), &out);
+		std::string outs(out, size);
+		free(out);
+		return outs;
+	}
+}
+
+inline void safeModeON() {
+	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
+	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);
+	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\xe9\x14\x00\x00\x00\x90", 6, NULL);
+}
+
+inline void safeModeOFF() {
+	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\x75\x6c", 2, NULL);
+	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\x0f\x85\x76\x01\x00\x00", 6, NULL);
+	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
+}

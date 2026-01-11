@@ -76,6 +76,25 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	std::cout << gd::GameLevelManager::sharedState() << std::endl;
 	std::cout << gd::GameLevelManager::sharedState()->m_mainLevels << std::endl;
 
+	std::cout << gd::LocalLevelManager::sharedState() << std::endl;
+
+	auto checkpoint = CCSprite::createWithSpriteFrameName("checkpoint_01_001.png");
+	auto achi = gd::AchievementBar::create("ayo", "ayo", nullptr);
+	auto iconSprite = achi->m_layerColor->getChildByType<CCSprite*>(0);
+	achi->m_layerColor->addChild(checkpoint);
+
+	if (iconSprite) {
+		checkpoint->setPosition(iconSprite->getPosition());
+	}
+
+	checkpoint->setZOrder(4);
+
+	auto an = gd::AchievementNotifier::sharedState();
+	an->m_achievementBarArray->addObject(achi);
+	if (an->m_activeAchievementBar == nullptr) {
+		an->showNextAchievement();
+	}
+
 	return true;
 }
 

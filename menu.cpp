@@ -14,6 +14,7 @@
 #include "patching.hpp"
 #include "ImGuiUtils.hpp"
 #include "utils.hpp"
+#include "SpeedHack.h"
 
 ImVec4 color1;
 ImVec4 color2;
@@ -27,6 +28,22 @@ bool oneX = true;
 std::vector<std::string> dllNames;
 
 auto libcocosbase = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
+
+void updateSpeedhack() {
+	if (setting().speedhackValue == 0.f) return;
+
+	const auto value = setting().onSpeedhack ? setting().speedhackValue : 1.f;
+
+	CCDirector::sharedDirector()->m_pScheduler->setTimeScale(setting().onClassicMode ? 1.f : value);
+	SpeedHack::SetSpeed(setting().onClassicMode ? value : 1.f);
+
+	if (auto fme = gd::FMODAudioEngine::sharedEngine()) {
+		if (auto sound = fme->m_globalChannel) {
+			if (setting().onSpeedhackAudio) sound->setPitch(value);
+			else sound->setPitch(1.f);
+		}
+	}
+}
 
 void cheatAdd() {
 	setting().cheatsCount++;
@@ -161,14 +178,6 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Speedhack", nullptr);
 		ImGui::SetWindowPos(ImVec2(universal_xPos, addingSpeedhackY));
-	}
-}
-
-namespace ImGui {
-	IMGUI_API void Tooltip(const char* tooltip) {
-		if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > .5f) {
-			ImGui::SetTooltip(tooltip);
-		}
 	}
 }
 
@@ -428,10 +437,12 @@ void imgui_render() {
 		if (setting().onCopyHack) {
 			sequence_patch(gd::base + 0x9c7ed, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 			sequence_patch(gd::base + 0x9dfe5, { 0x90, 0x90 });
+			sequence_patch(gd::base + 0x9c80f, { 0x8b, 0xcf, 0x90 });
 		}
 		else {
 			sequence_patch(gd::base + 0x9c7ed, { 0x0f, 0x84, 0x2e, 0x01, 0x00, 0x00 });
 			sequence_patch(gd::base + 0x9dfe5, { 0x75, 0x0e });
+			sequence_patch(gd::base + 0x9c80f, { 0x0f, 0x44, 0xcf });
 		}
 
 		if (setting().onDefaultSongBypass) {
@@ -623,6 +634,81 @@ void imgui_render() {
 			sequence_patch(gd::base + 0x48bba, { 0x0f, 0x28, 0xc8 });
 			sequence_patch(gd::base + 0x48c15, { 0x0f, 0x2f, 0xc8 });
 			sequence_patch(gd::base + 0x48c1a, { 0x0f, 0x28, 0xc8 });
+		}
+
+		// Universal
+
+		if (setting().onAllowLowVolume) {
+			sequence_patch(gd::base + 0xd772e, { 0xeb });
+			sequence_patch(gd::base + 0xd0e0e, { 0xeb });
+			sequence_patch(gd::base + 0xd0cb0, { 0xeb });
+		}
+		else {
+			sequence_patch(gd::base + 0xd772e, { 0x76 });
+			sequence_patch(gd::base + 0xd0e0e, { 0x76 });
+			sequence_patch(gd::base + 0xd0cb0, { 0x76 });
+		}
+
+		if (setting().onDisableSongAlert) {
+			sequence_patch(gd::base + 0x9dd2b, { 0xeb });
+		}
+		else {
+			sequence_patch(gd::base + 0x9dd2b, { 0x75 });
+		}
+
+		if (setting().onFastAltTab) {
+			sequence_patch(gd::base + 0x28dfe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0x28dfe, { 0x8b, 0x03, 0x8b, 0xcb, 0xff, 0x50, 0x18 });
+		}
+
+		if (setting().onForceVisibility) {
+			sequence_patch(libcocosbase + 0x60783, { 0xb0, 0x01, 0x90 });
+			sequence_patch(libcocosbase + 0x60c9a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(libcocosbase + 0x60783, { 0x8a, 0x45, 0x08 });
+			sequence_patch(libcocosbase + 0x60c9a, { 0x0f, 0x84, 0xcb, 0x00, 0x00, 0x00 });
+		}
+
+		if (setting().onFreeWindowResize) {
+			sequence_patch(libcocosbase + 0x10f48b, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(libcocosbase + 0x10ee81, { 0xe9, 0x2f, 0xff, 0xff, 0xff, 0x90 });
+			sequence_patch(libcocosbase + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(libcocosbase + 0x10f48b, { 0xe8, 0xb0, 0xf3, 0xff, 0xff });
+			sequence_patch(libcocosbase + 0x10ee81, { 0x0f, 0x85, 0x2e, 0xff, 0xff, 0xff });
+		}
+
+		if (setting().onIncreaseMaxLevels) {
+			sequence_patch(gd::base + 0x5875b, { 0x64 });
+		}
+		else {
+			sequence_patch(gd::base + 0x5875b, { 0x14 });
+		}
+
+		if (setting().onNoRotation) {
+			sequence_patch(libcocosbase + 0x60578, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(libcocosbase + 0x60578, { 0xf3, 0x0f, 0x11, 0x41, 0x1c, 0xf3, 0x0f, 0x11, 0x41, 0x18 });
+		}
+
+		if (setting().onShowRestartButton) {
+			sequence_patch(gd::base + 0xd64d9, { 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xd64d9, { 0x75, 0x29 });
+		}
+
+
+
+		// Speedhack
+
+		if (setting().onSpeedhack) {
+			cheatAdd();
 		}
 
 		oneX = false;
@@ -1237,10 +1323,12 @@ void imgui_render() {
 				if (setting().onCopyHack) {
 					sequence_patch(gd::base + 0x9c7ed, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 					sequence_patch(gd::base + 0x9dfe5, { 0x90, 0x90 });
+					sequence_patch(gd::base + 0x9c80f, { 0x8b, 0xcf, 0x90 }); // replaces passworded copy button sprite with normal one
 				}
 				else {
 					sequence_patch(gd::base + 0x9c7ed, { 0x0f, 0x84, 0x2e, 0x01, 0x00, 0x00 });
 					sequence_patch(gd::base + 0x9dfe5, { 0x75, 0x0e });
+					sequence_patch(gd::base + 0x9c80f, { 0x0f, 0x44, 0xcf });
 				}
 			}
 			ImGui::Tooltip("Lets you copy any level, without a password.");
@@ -1499,13 +1587,151 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			if (ImGui::Checkbox("Allow Low Volume", &setting().onAllowLowVolume)) {
+				if (setting().onAllowLowVolume) {
+					sequence_patch(gd::base + 0xd772e, { 0xeb });
+					sequence_patch(gd::base + 0xd0e0e, { 0xeb });
+					sequence_patch(gd::base + 0xd0cb0, { 0xeb });
+				}
+				else {
+					sequence_patch(gd::base + 0xd772e, { 0x76 });
+					sequence_patch(gd::base + 0xd0e0e, { 0x76 });
+					sequence_patch(gd::base + 0xd0cb0, { 0x76 });
+				}
+			}
+			ImGui::Tooltip("Removes snapping to 0%% when setting volume to 3%% or below.");
+
+			ImGui::Checkbox("Auto Safe Mode", &setting().onAutoSafeMode);
+			ImGui::Tooltip("Enables Safe Mode when cheats are enabled.");
+
+			if (ImGui::Checkbox("Disable Song Alert", &setting().onDisableSongAlert)) {
+				if (setting().onDisableSongAlert) {
+					sequence_patch(gd::base + 0x9dd2b, { 0xeb });
+				}
+				else {
+					sequence_patch(gd::base + 0x9dd2b, { 0x75 });
+				}
+			}
+			ImGui::Tooltip("Disables song alert when trying to play a level without downloaded song.");
+
+			if (ImGui::Checkbox("Fast Alt-Tab", &setting().onFastAltTab)) {
+				if (setting().onFastAltTab) {
+					sequence_patch(gd::base + 0x28dfe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0x28dfe, { 0x8b, 0x03, 0x8b, 0xcb, 0xff, 0x50, 0x18 });
+				}
+			}
+			ImGui::Tooltip("Disables savefile saving on minimize.");
+
+			if (ImGui::Checkbox("Force Visibility", &setting().onForceVisibility)) {
+				if (setting().onForceVisibility) {
+					sequence_patch(libcocosbase + 0x60783, { 0xb0, 0x01, 0x90 });
+					sequence_patch(libcocosbase + 0x60c9a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(libcocosbase + 0x60783, { 0x8a, 0x45, 0x08 });
+					sequence_patch(libcocosbase + 0x60c9a, { 0x0f, 0x84, 0xcb, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Sets all nodes to be visible.");
+
+			if (ImGui::Checkbox("Free Window Resize", &setting().onFreeWindowResize)) {
+				if (setting().onFreeWindowResize) {
+					sequence_patch(libcocosbase + 0x10f48b, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(libcocosbase + 0x10ee81, { 0xe9, 0x2f, 0xff, 0xff, 0xff, 0x90 });
+					sequence_patch(libcocosbase + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(libcocosbase + 0x10f48b, { 0xe8, 0xb0, 0xf3, 0xff, 0xff });
+					sequence_patch(libcocosbase + 0x10ee81, { 0x0f, 0x85, 0x2e, 0xff, 0xff, 0xff });
+				}
+			}
+			ImGui::Tooltip("Removes limits in place for window resizing.");
+
+			ImGui::Checkbox("HUE Fix", &setting().onHUEFix);
+			ImGui::Tooltip("Fixes that yellow and purple color bug.");
+
+			if (ImGui::Checkbox("Increase Max Levels", &setting().onIncreaseMaxLevels)) {
+				if (setting().onIncreaseMaxLevels) {
+					sequence_patch(gd::base + 0x5875b, { 0x64 });
+				}
+				else {
+					sequence_patch(gd::base + 0x5875b, { 0x14 });
+				}
+			}
+			ImGui::Tooltip("Increases the maximum saved levels from 20 to 100.");
+
+			ImGui::Checkbox("Lock Cursor", &setting().onLockCursor);
+			ImGui::Tooltip("Locks cursor position while playing."); // CURSOS
+
+			if (ImGui::Checkbox("No Rotation", &setting().onNoRotation)) {
+				if (setting().onNoRotation) {
+					sequence_patch(libcocosbase + 0x60578, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(libcocosbase + 0x60578, { 0xf3, 0x0f, 0x11, 0x41, 0x1c, 0xf3, 0x0f, 0x11, 0x41, 0x18 });
+				}
+			}
+			ImGui::Tooltip("Locks all rotation at 0 degrees.");
+
+			ImGui::Checkbox("No Transition", &setting().onNoTransition);
+			ImGui::Tooltip("Shorterns scene transition time to 0s.");
+
+			ImGui::Checkbox("Retry Keybind", &setting().onRetryKeybind);
+			ImGui::Tooltip("Lets you restart level by pressing R.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##retryKeySettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::HotKey("Keybind", setting().m_retryKeybind, 0.f, ImVec2(80.f, 0.f));
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::Checkbox("Show Restart Button", &setting().onShowRestartButton)) {
+				if (setting().onShowRestartButton) {
+					sequence_patch(gd::base + 0xd64d9, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xd64d9, { 0x75, 0x29 });
+				}
+			}
+			ImGui::Tooltip("Shows the restart button in pause menu.");
+
 
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextItemWidth(90.f);
+			if (ImGui::DragFloat("##speedhack", &setting().speedhackValue, .05f, 0.f, 10.f)) {
+				if (setting().speedhackValue < 0.f) setting().speedhackValue = 0.f;
+				updateSpeedhack();
+			}
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Enabled", &setting().onSpeedhack)) {
+				updateSpeedhack();
+				if (setting().onSpeedhack) {
+					cheatAdd();
+				}
+				else {
+					cheatDec();
+				}
+			}
 
+			if (ImGui::Checkbox("Speedhack Music", &setting().onSpeedhackAudio)) {
+				updateSpeedhack();
+			}
+
+			if (ImGui::Checkbox("Classic Mode", &setting().onClassicMode)) {
+				updateSpeedhack();
+			}
 		}
+	}
+
+	updateSpeedhack();
+
+	if (setting().onSpeedhack) {
+		updateSpeedhack();
 	}
 }
 
@@ -1522,8 +1748,6 @@ void imgui_init() {
 }
 
 void setupImGuiMenu() {
-	//SpeedHack::Setup();
-
 	if (!std::filesystem::is_directory("PolzHax") || !std::filesystem::exists("PolzHax"))
 	{
 		std::filesystem::create_directory("PolzHax");

@@ -47,19 +47,6 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	PlayLayer::update(self, dt);
 
-	//
-	if (self->m_attemptsLabel->isVisible()) {
-		self->m_attemptsLabel->setVisible(!setting().onHideAttempts);
-	}
-
-	if (self->m_player->isVisible()) {
-		self->m_player->setVisible(!setting().onHidePlayer);
-	}
-	if (self->m_player2->isVisible()) {
-		self->m_player2->setVisible(!setting().onHidePlayer);
-	}
-	//
-
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 
 	auto percentageLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(301));
@@ -70,6 +57,16 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		else {
 			percentageLabel->setString(CCString::create("100%")->getCString());
 		}
+	}
+
+	if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->m_isDead) {
+		HWND hwnd = WindowFromDC(wglGetCurrentDC());
+		RECT winSize; GetWindowRect(hwnd, &winSize);
+		auto width = winSize.right - winSize.left;
+		auto height = winSize.bottom - winSize.top;
+		auto centerX = width / 2.f + winSize.left;
+		auto centerY = height / 2.f + winSize.top;
+		SetCursorPos(centerX, centerY);
 	}
 }
 
@@ -107,6 +104,20 @@ void __fastcall PlayLayer::showNewBestH(gd::PlayLayer* self) {
 
 void __fastcall PlayLayer::updateVisibilityH(gd::PlayLayer* self) {
 	PlayLayer::updateVisibility(self);
+
+	//
+	if (self->m_attemptsLabel->isVisible() && setting().onHideAttempts) {
+		self->m_attemptsLabel->setVisible(false);
+	}
+
+	if (self->m_player->isVisible() && setting().onHidePlayer) {
+		self->m_player->setVisible(false);
+	}
+	if (self->m_player2->isVisible() && setting().onHidePlayer) {
+		self->m_player2->setVisible(false);
+	}
+	//
+
 	if (setting().onNoWavePulse) {
 		self->m_player->m_audioScale = 1.f;
 		self->m_player2->m_audioScale = 1.f;
