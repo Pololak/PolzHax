@@ -4,6 +4,8 @@
 #include <fstream>
 #include "Setting.hpp"
 
+gd::CustomSongWidget* m_songWidget;
+
 void LevelInfoLayer::Callback::onExportLevel(CCObject*) {
 	if (!this->m_level->m_levelString.size()) {
 		gd::FLAlertLayer::create("Error", "Level string is empty!", "OK")->show();
@@ -21,6 +23,14 @@ void LevelInfoLayer::Callback::onExportLevel(CCObject*) {
 
 bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGameLevel* level) {
 	if (!LevelInfoLayer::init(self, level)) return false;
+
+	if (m_songWidget) {
+		std::cout << m_songWidget << std::endl;
+		
+		if (setting().onAutoSongDownload) {
+			m_songWidget->onDownload(nullptr);
+		}
+	}
 
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
@@ -47,7 +57,15 @@ void __fastcall LevelInfoLayer::onCloneH(gd::LevelInfoLayer* self, void*, CCObje
 	}
 }
 
+void __fastcall LevelInfoLayer::songWidgetH() {
+	__asm {
+		mov m_songWidget, eax
+	}
+	LevelInfoLayer::songWidget();
+}
+
 void LevelInfoLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9bc10), LevelInfoLayer::initH, reinterpret_cast<void**>(&LevelInfoLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer::onCloneH, reinterpret_cast<void**>(&LevelInfoLayer::onClone));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9cb06), LevelInfoLayer::songWidgetH, reinterpret_cast<void**>(&LevelInfoLayer::songWidget));
 }

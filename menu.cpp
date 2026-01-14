@@ -9,6 +9,7 @@
 #include "EditorUI.hpp"
 #include "LevelEditorLayer.hpp"
 #include "PauseLayer.hpp"
+#include "PlayLayer.hpp"
 
 #include "Setting.hpp"
 #include "patching.hpp"
@@ -636,6 +637,116 @@ void imgui_render() {
 			sequence_patch(gd::base + 0x48c1a, { 0x0f, 0x28, 0xc8 });
 		}
 
+		// Level
+
+		if (setting().onAutoPickupCoins) {
+			cheatAdd();
+		}
+
+		if (setting().onConfirmExit) {
+			sequence_patch(gd::base + 0xd7f80, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0xd7f8d, { 0x90, 0x90 });
+			sequence_patch(gd::base + 0xd7f9d, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0xd7fa5, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xd7f80, { 0xe8, 0xfb, 0xbb, 0x01, 0x00 });
+			sequence_patch(gd::base + 0xd7f8d, { 0x6a, 0x10 });
+			sequence_patch(gd::base + 0xd7f9d, { 0x68, 0x7c, 0x42, 0x51, 0x00 });
+			sequence_patch(gd::base + 0xd7fa5, { 0xe8, 0xc6, 0xd7, 0xf2, 0xff });
+		}
+
+		if (setting().onCorrectiveMusicSync) {
+			sequence_patch(gd::base + 0xee59e, { 0xeb });
+		}
+		else {
+			sequence_patch(gd::base + 0xee59e, { 0x75 });
+		}
+
+		if (setting().onEverythingHurts) {
+			sequence_patch(gd::base + 0xeaa42, { 0x90, 0x90 });
+			cheatAdd();
+		}
+		else {
+			sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
+		}
+
+		if (setting().onHighFPSRotationFix) {
+			sequence_patch(gd::base + 0xdc13b, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xdc13b, { 0x0f, 0x82, 0xd6, 0x00, 0x00, 0x00 });
+		}
+
+		if (setting().onHitboxes) {
+			cheatAdd();
+		}
+
+		if (setting().onInstantComplete) {
+			sequence_patch(gd::base + 0xe16f6, { 0xc7, 0x87, 0x74, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x90, 0x90 });
+			cheatAdd();
+		}
+		else {
+			sequence_patch(gd::base + 0xe16f6, { 0xf3, 0x0f, 0x11, 0x8f, 0x74, 0x04, 0x00, 0x00, 0x9f, 0xf6, 0xc4, 0x44 });
+		}
+
+		if (setting().onJumpHack) {
+			sequence_patch(gd::base + 0xda510, { 0x01 });
+			sequence_patch(gd::base + 0xda295, { 0x01 });
+			cheatAdd();
+		}
+		else {
+			sequence_patch(gd::base + 0xda510, { 0x00 });
+			sequence_patch(gd::base + 0xda295, { 0x00 });
+		}
+
+		if (setting().onNoclip) {
+			sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
+			cheatAdd();
+		}
+		else {
+			sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
+		}
+
+		if (setting().onNoclipUnstuck) {
+			sequence_patch(gd::base + 0xdae16, { 0xe9, 0x00, 0x02, 0x00, 0x00, 0x90 });
+			sequence_patch(gd::base + 0xdb02d, { 0xe9, 0x10, 0x01, 0x00, 0x00, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xdae16, { 0x0f, 0x84, 0xff, 0x01, 0x00, 0x00 });
+			sequence_patch(gd::base + 0xdb02d, { 0x0f, 0x8b, 0x0f, 0x01, 0x00, 0x00 });
+		}
+
+		if (setting().onPauseDuringCompletion) {
+			sequence_patch(gd::base + 0xe531b, { 0x00 });
+			sequence_patch(gd::base + 0xe2906, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xe531b, { 0x01 });
+			sequence_patch(gd::base + 0xe2906, { 0x88, 0x81, 0xf9, 0x02, 0x00, 0x00 });
+		}
+
+		if (setting().onPracticeMusic) {
+			sequence_patch(gd::base + 0xf284f, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0xf3663, { 0x90, 0x90 });
+			sequence_patch(gd::base + 0xf0699, { 0x90, 0x90 });
+			sequence_patch(gd::base + 0xf06cb, { 0x90, 0x90 });
+			sequence_patch(gd::base + 0xf3691, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0xf3943, { 0xeb });
+			sequence_patch(gd::base + 0xf3a96, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xf284f, { 0x0f, 0x85, 0x4d, 0x07, 0x00, 0x00 });
+			sequence_patch(gd::base + 0xf3663, { 0x75, 0x41 });
+			sequence_patch(gd::base + 0xf0699, { 0x75, 0x3e });
+			sequence_patch(gd::base + 0xf06cb, { 0x75, 0x0c });
+			sequence_patch(gd::base + 0xf3691, { 0xe8, 0xaa, 0x42, 0xf2, 0xff });
+			sequence_patch(gd::base + 0xf3943, { 0x74 });
+			sequence_patch(gd::base + 0xf3a96, { 0x0f, 0x85, 0xb5, 0x00, 0x00, 0x00 });
+		}
+
+
+
 		// Universal
 
 		if (setting().onAllowLowVolume) {
@@ -696,6 +807,13 @@ void imgui_render() {
 			sequence_patch(libcocosbase + 0x60578, { 0xf3, 0x0f, 0x11, 0x41, 0x1c, 0xf3, 0x0f, 0x11, 0x41, 0x18 });
 		}
 
+		if (setting().onSafeMode) {
+			safeModeON();
+		}
+		else {
+			safeModeOFF();
+		}
+
 		if (setting().onShowRestartButton) {
 			sequence_patch(gd::base + 0xd64d9, { 0x90, 0x90 });
 		}
@@ -703,7 +821,62 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xd64d9, { 0x75, 0x29 });
 		}
 
+		if (setting().onTransparentBG) {
+			sequence_patch(gd::base + 0x2cf96, { 0x90, 0xb1, 0xff }); // CreatorLayer
+			sequence_patch(gd::base + 0x2cf9e, { 0xff, 0xff });
+			sequence_patch(gd::base + 0x3b7db, { 0x90, 0xb1, 0xff }); // LevelBrowserLayer
+			sequence_patch(gd::base + 0x3b7e3, { 0xff, 0xff });
+			sequence_patch(gd::base + 0x88132, { 0x90, 0xb1, 0xff }); // LevelSearchLayer
+			sequence_patch(gd::base + 0x8813a, { 0xff, 0xff });
+			sequence_patch(gd::base + 0x8969e, { 0x90, 0xb1, 0xff }); // LevelInfoLayer
+			sequence_patch(gd::base + 0x896a5, { 0xff, 0xff });
+			sequence_patch(gd::base + 0x9bde1, { 0x90, 0xb1, 0xff }); // EditLevelLayer
+			sequence_patch(gd::base + 0x9bde9, { 0xff, 0xff });
+			sequence_patch(gd::base + 0x9f97c, { 0x90, 0xb1, 0xff }); // LeaderboardsLayer
+			sequence_patch(gd::base + 0x9f984, { 0xff, 0xff });
+		}
+		else {
+			sequence_patch(gd::base + 0x2cf96, { 0x80, 0xc9, 0xff }); // CreatorLayer
+			sequence_patch(gd::base + 0x2cf9e, { 0x00, 0x66 });
+			sequence_patch(gd::base + 0x3b7db, { 0x80, 0xc9, 0xff }); // LevelBrowserLayer
+			sequence_patch(gd::base + 0x3b7e3, { 0x00, 0x66 });
+			sequence_patch(gd::base + 0x88132, { 0x80, 0xc9, 0xff }); // LevelSearchLayer
+			sequence_patch(gd::base + 0x8813a, { 0x00, 0x66 });
+			sequence_patch(gd::base + 0x8969e, { 0x80, 0xc9, 0xff }); // LevelInfoLayer
+			sequence_patch(gd::base + 0x896a5, { 0x00, 0x66 });
+			sequence_patch(gd::base + 0x9bde1, { 0x80, 0xc9, 0xff }); // EditLevelLayer
+			sequence_patch(gd::base + 0x9bde9, { 0x00, 0x66 });
+			sequence_patch(gd::base + 0x9f97c, { 0x80, 0xc9, 0xff }); // LeaderboardsLayer
+			sequence_patch(gd::base + 0x9f984, { 0x00, 0x66 });
+		}
 
+		if (setting().onTransparentLists) {
+			sequence_patch((uint32_t)gd::base + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
+			sequence_patch((uint32_t)gd::base + 0x31c82, { 0x00 });
+			sequence_patch((uint32_t)gd::base + 0x31c89, { 0x00, 0x00 });
+			sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x00 });
+			sequence_patch((uint32_t)gd::base + 0x31cba, { 0x00 });
+
+			sequence_patch((uint32_t)gd::base + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
+			sequence_patch((uint32_t)gd::base + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
+		}
+		else {
+			sequence_patch((uint32_t)gd::base + 0x31c7f, { 0xc2, 0x72 });
+			sequence_patch((uint32_t)gd::base + 0x31c82, { 0x3e });
+			sequence_patch((uint32_t)gd::base + 0x31c89, { 0xa1, 0x58 });
+			sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x2c });
+			sequence_patch((uint32_t)gd::base + 0x31cba, { 0xff });
+
+			sequence_patch((uint32_t)gd::base + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
+			sequence_patch((uint32_t)gd::base + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+		}
+
+		if (setting().onZeroDelay) {
+			MH_DisableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240));
+		}
+		else {
+			MH_DisableHook(reinterpret_cast<LPVOID*>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240));
+		}
 
 		// Speedhack
 
@@ -1582,7 +1755,282 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::Checkbox("Auto Deafen", &setting().onAutoDeafen);
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Deafens user in Discord after a certain %%.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##autodeafenSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::Checkbox("Undeafen On Pause", &setting().onPauseUndeafen);
 
+				ImGui::Checkbox("Deafen in Practice", &setting().onPracticeDeafen);
+
+				ImGui::Checkbox("Deafen with StartPos", &setting().onTestmodeDeafen);
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Deafen at", &setting().deafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Undeafen at", &setting().undeafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
+
+				ImGui::HotKey("Shortcut", setting().m_autoDeafenKey, 0.f, ImVec2(80.f, 0.f));
+
+				ImGui::TreePop();
+			}
+
+			ImGui::Checkbox("Auto Kill", &setting().onAutoKill);
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Kills a player at a certain percentage.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##autoKillSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Kill at", &setting().killPercentage, 1.f, 0.f, 100.f, "%.0f%%");
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::Checkbox("Auto Pickup Coins", &setting().onAutoPickupCoins)) {
+				if (setting().onAutoPickupCoins) {
+					cheatAdd();
+				}
+				else {
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Automatically collects gold coins.");
+
+			ImGui::Checkbox("Auto Practice Mode", &setting().onAutoPracticeMode);
+			ImGui::Tooltip("Auto-enables practice mode.");
+
+			ImGui::Checkbox("Auto Song Download", &setting().onAutoSongDownload);
+			ImGui::Tooltip("Automatically starts downloading songs when you open the level page.");
+
+			ImGui::Checkbox("Ball Rotation Bug Fix", &setting().onBallRotationBugFix);
+			ImGui::Tooltip("Fixes that ball rotation bug when entering a portal mid ball animation.");
+
+			ImGui::Checkbox("Checkpoint Lag Fix", &setting().onCheckpointLagFix);
+			ImGui::Tooltip("Fixes lag caused by starting from a checkpoint/startpos.");
+
+			if (ImGui::Checkbox("Confirm Exit", &setting().onConfirmExit)) {
+				if (setting().onConfirmExit) {
+					sequence_patch(gd::base + 0xd7f80, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0xd7f8d, { 0x90, 0x90 });
+					sequence_patch(gd::base + 0xd7f9d, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0xd7fa5, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xd7f80, { 0xe8, 0xfb, 0xbb, 0x01, 0x00 });
+					sequence_patch(gd::base + 0xd7f8d, { 0x6a, 0x10 });
+					sequence_patch(gd::base + 0xd7f9d, { 0x68, 0x7c, 0x42, 0x51, 0x00 });
+					sequence_patch(gd::base + 0xd7fa5, { 0xe8, 0xc6, 0xd7, 0xf2, 0xff });
+				}
+			}
+			ImGui::Tooltip("Requires confirmation when exiting a level.");
+
+			if (ImGui::Checkbox("Corrective Music Sync", &setting().onCorrectiveMusicSync)) {
+				if (setting().onCorrectiveMusicSync) {
+					sequence_patch(gd::base + 0xee59e, { 0xeb });
+				}
+				else {
+					sequence_patch(gd::base + 0xee59e, { 0x75 });
+				}
+			}
+			ImGui::Tooltip("Syncs music to checked speed-portals, instead of only ones the player hit.");
+
+			if (ImGui::Checkbox("Everything Hurts", &setting().onEverythingHurts)) {
+				if (setting().onEverythingHurts) {
+					sequence_patch(gd::base + 0xeaa42, { 0x90, 0x90 });
+					cheatAdd();
+				}
+				else {
+					sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Owie.");
+
+			if (ImGui::Checkbox("High FPS Rotation Fix", &setting().onHighFPSRotationFix)) {
+				if (setting().onHighFPSRotationFix) {
+					sequence_patch(gd::base + 0xdc13b, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xdc13b, { 0x0f, 0x82, 0xd6, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Fixed vehicles rotation on high fps (affects hitboxes).");
+
+			if (ImGui::Checkbox("Hitboxes", &setting().onHitboxes)) {
+				if (playLayer) {
+					PlayLayer::updateShowHitboxes();
+				}
+
+				if (setting().onHitboxes) {
+					cheatAdd();
+				}
+				else {
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Visualizes level hitboxes.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##hitboxesSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				// Solids
+
+				ImGui::Checkbox("Solids", &setting().onSolidHitboxes);
+
+				static float solidsColor[3] = {
+					setting().solidR,
+					setting().solidG,
+					setting().solidB
+				};
+
+				ImGui::SameLine(120.f);
+				if (ImGui::ColorEdit3("##solidsColor", solidsColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().solidR = solidsColor[0] * 255;
+					setting().solidG = solidsColor[1] * 255;
+					setting().solidB = solidsColor[2] * 255;
+				}
+
+				// Hazards
+
+				ImGui::Checkbox("Hazards", &setting().onHazardHitboxes);
+
+				static float hazardsColor[3] = {
+					setting().hazardR,
+					setting().hazardG,
+					setting().hazardB
+				};
+
+				ImGui::SameLine(120.f);
+				if (ImGui::ColorEdit3("##hazardsColor", hazardsColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().hazardR = hazardsColor[0] * 255;
+					setting().hazardG = hazardsColor[1] * 255;
+					setting().hazardB = hazardsColor[2] * 255;
+				}
+
+				// Specials
+
+				ImGui::Checkbox("Specials", &setting().onSpecialHitboxes);
+
+				static float specialsColor[3] = {
+					setting().specialR,
+					setting().specialG,
+					setting().specialB
+				};
+
+				ImGui::SameLine(120.f);
+				if (ImGui::ColorEdit3("##specialsColor", specialsColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().specialR = specialsColor[0] * 255;
+					setting().specialG = specialsColor[1] * 255;
+					setting().specialB = specialsColor[2] * 255;
+				}
+
+				ImGui::Checkbox("Player", &setting().onPlayerHitboxes);
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragInt("Opacity", &setting().hitboxesOpacity, 1.f, 0, 255);
+
+				ImGui::TreePop();
+			}
+
+			ImGui::Checkbox("Hitboxes on Death", &setting().onHitboxesOnDeath);
+			ImGui::Tooltip("Visualizes level hitboxes, only on death");
+
+			if (ImGui::Checkbox("Instant Complete", &setting().onInstantComplete)) {
+				if (setting().onInstantComplete) {
+					sequence_patch(gd::base + 0xe16f6, { 0xc7, 0x87, 0x74, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x90, 0x90 });
+					cheatAdd();
+				}
+				else {
+					sequence_patch(gd::base + 0xe16f6, { 0xf3, 0x0f, 0x11, 0x8f, 0x74, 0x04, 0x00, 0x00, 0x9f, 0xf6, 0xc4, 0x44 });
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Teleports the player to the end of a level.");
+
+			ImGui::Checkbox("Invisible Dual Fix", &setting().onInvisibleDualFix);
+			ImGui::Tooltip("Fixes where your 2nd player sometimes becomes invisible.");
+
+			if (ImGui::Checkbox("Jump Hack", &setting().onJumpHack)) {
+				if (setting().onJumpHack) {
+					sequence_patch(gd::base + 0xda510, { 0x01 });
+					sequence_patch(gd::base + 0xda295, { 0x01 });
+					cheatAdd();
+				}
+				else {
+					sequence_patch(gd::base + 0xda510, { 0x00 });
+					sequence_patch(gd::base + 0xda295, { 0x00 });
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Allows you to jump in mid-air.");
+
+			if (ImGui::Checkbox("Noclip", &setting().onNoclip)) {
+				if (setting().onNoclip) {
+					sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
+					cheatAdd();
+				}
+				else {
+					sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Makes the player invincible.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##noclipSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				if (ImGui::Checkbox("Experimental (buggy)", &setting().onNoclipUnstuck)) {
+					if (setting().onNoclipUnstuck) {
+						sequence_patch(gd::base + 0xdae16, { 0xe9, 0x00, 0x02, 0x00, 0x00, 0x90 });
+						sequence_patch(gd::base + 0xdb02d, { 0xe9, 0x10, 0x01, 0x00, 0x00, 0x90 });
+					}
+					else {
+						sequence_patch(gd::base + 0xdae16, { 0x0f, 0x84, 0xff, 0x01, 0x00, 0x00 });
+						sequence_patch(gd::base + 0xdb02d, { 0x0f, 0x8b, 0x0f, 0x01, 0x00, 0x00 });
+					}
+				}
+				ImGui::Tooltip("Prevents player from getting stuck.");
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::Checkbox("Pause During Completion", &setting().onPauseDuringCompletion)) {
+				if (setting().onPauseDuringCompletion) {
+					sequence_patch(gd::base + 0xe531b, { 0x00 });
+					sequence_patch(gd::base + 0xe2906, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xe531b, { 0x01 });
+					sequence_patch(gd::base + 0xe2906, { 0x88, 0x81, 0xf9, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Lets you pause during the level complete animation.");
+
+			ImGui::Checkbox("Practice Bug Fix", &setting().onPracticeFix);
+			ImGui::Tooltip("Saves & restores player velocity and object blending in practice mode.");
+
+			if (ImGui::Checkbox("Practice Music", &setting().onPracticeMusic)) {
+				if (setting().onPracticeMusic) {
+					sequence_patch(gd::base + 0xf284f, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0xf3663, { 0x90, 0x90 });
+					sequence_patch(gd::base + 0xf0699, { 0x90, 0x90 });
+					sequence_patch(gd::base + 0xf06cb, { 0x90, 0x90 });
+					sequence_patch(gd::base + 0xf3691, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0xf3943, { 0xeb });
+					sequence_patch(gd::base + 0xf3a96, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xf284f, { 0x0f, 0x85, 0x4d, 0x07, 0x00, 0x00 });
+					sequence_patch(gd::base + 0xf3663, { 0x75, 0x41 });
+					sequence_patch(gd::base + 0xf0699, { 0x75, 0x3e });
+					sequence_patch(gd::base + 0xf06cb, { 0x75, 0x0c });
+					sequence_patch(gd::base + 0xf3691, { 0xe8, 0xaa, 0x42, 0xf2, 0xff });
+					sequence_patch(gd::base + 0xf3943, { 0x74 });
+					sequence_patch(gd::base + 0xf3a96, { 0x0f, 0x85, 0xb5, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Plays the level's song in-sync with your position.");
+
+			ImGui::Checkbox("Replay Last Checkpoint", &setting().onReplayLastCheckpoint);
+			ImGui::Tooltip("Respawn from your last practice mode checkpoint after completing a level.");
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
@@ -1687,6 +2135,16 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
+			if (ImGui::Checkbox("Safe Mode", &setting().onSafeMode)) {
+				if (setting().onSafeMode) {
+					safeModeON();
+				}
+				else {
+					safeModeOFF();
+				}
+			}
+			ImGui::Tooltip("Disables progress and completion of levels.");
+
 			if (ImGui::Checkbox("Show Restart Button", &setting().onShowRestartButton)) {
 				if (setting().onShowRestartButton) {
 					sequence_patch(gd::base + 0xd64d9, { 0x90, 0x90 });
@@ -1697,7 +2155,71 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Shows the restart button in pause menu.");
 
+			if (ImGui::Checkbox("Transparent BG", &setting().onTransparentBG)) {
+				if (setting().onTransparentBG) {
+					sequence_patch(gd::base + 0x2cf96, { 0x90, 0xb1, 0xff }); // CreatorLayer
+					sequence_patch(gd::base + 0x2cf9e, { 0xff, 0xff });
+					sequence_patch(gd::base + 0x3b7db, { 0x90, 0xb1, 0xff }); // LevelBrowserLayer
+					sequence_patch(gd::base + 0x3b7e3, { 0xff, 0xff });
+					sequence_patch(gd::base + 0x88132, { 0x90, 0xb1, 0xff }); // LevelSearchLayer
+					sequence_patch(gd::base + 0x8813a, { 0xff, 0xff });
+					sequence_patch(gd::base + 0x8969e, { 0x90, 0xb1, 0xff }); // LevelInfoLayer
+					sequence_patch(gd::base + 0x896a5, { 0xff, 0xff });
+					sequence_patch(gd::base + 0x9bde1, { 0x90, 0xb1, 0xff }); // EditLevelLayer
+					sequence_patch(gd::base + 0x9bde9, { 0xff, 0xff });
+					sequence_patch(gd::base + 0x9f97c, { 0x90, 0xb1, 0xff }); // LeaderboardsLayer
+					sequence_patch(gd::base + 0x9f984, { 0xff, 0xff });
+				}
+				else {
+					sequence_patch(gd::base + 0x2cf96, { 0x80, 0xc9, 0xff }); // CreatorLayer
+					sequence_patch(gd::base + 0x2cf9e, { 0x00, 0x66 });
+					sequence_patch(gd::base + 0x3b7db, { 0x80, 0xc9, 0xff }); // LevelBrowserLayer
+					sequence_patch(gd::base + 0x3b7e3, { 0x00, 0x66 });
+					sequence_patch(gd::base + 0x88132, { 0x80, 0xc9, 0xff }); // LevelSearchLayer
+					sequence_patch(gd::base + 0x8813a, { 0x00, 0x66 });
+					sequence_patch(gd::base + 0x8969e, { 0x80, 0xc9, 0xff }); // LevelInfoLayer
+					sequence_patch(gd::base + 0x896a5, { 0x00, 0x66 });
+					sequence_patch(gd::base + 0x9bde1, { 0x80, 0xc9, 0xff }); // EditLevelLayer
+					sequence_patch(gd::base + 0x9bde9, { 0x00, 0x66 });
+					sequence_patch(gd::base + 0x9f97c, { 0x80, 0xc9, 0xff }); // LeaderboardsLayer
+					sequence_patch(gd::base + 0x9f984, { 0x00, 0x66 });
+				}
+			}
+			ImGui::Tooltip("Removes the blue filter from menu's backgrounds.");
 
+			if (ImGui::Checkbox("Transparent Lists", &setting().onTransparentLists)) {
+				if (setting().onTransparentLists) {
+					sequence_patch((uint32_t)gd::base + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
+					sequence_patch((uint32_t)gd::base + 0x31c82, { 0x00 });
+					sequence_patch((uint32_t)gd::base + 0x31c89, { 0x00, 0x00 });
+					sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x00 });
+					sequence_patch((uint32_t)gd::base + 0x31cba, { 0x00 });
+
+					sequence_patch((uint32_t)gd::base + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
+					sequence_patch((uint32_t)gd::base + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
+				}
+				else {
+					sequence_patch((uint32_t)gd::base + 0x31c7f, { 0xc2, 0x72 });
+					sequence_patch((uint32_t)gd::base + 0x31c82, { 0x3e });
+					sequence_patch((uint32_t)gd::base + 0x31c89, { 0xa1, 0x58 });
+					sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x2c });
+					sequence_patch((uint32_t)gd::base + 0x31cba, { 0xff });
+
+					sequence_patch((uint32_t)gd::base + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
+					sequence_patch((uint32_t)gd::base + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+				}
+			}
+			ImGui::Tooltip("Makes the menu lists transparent.");
+
+			if (ImGui::Checkbox("Zero Delay", &setting().onZeroDelay)) {
+				if (setting().onZeroDelay) {
+					MH_DisableHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240));
+				}
+				else {
+					MH_DisableHook(reinterpret_cast<LPVOID*>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240));
+				}
+			}
+			ImGui::Tooltip("Reduces input delay.");
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));

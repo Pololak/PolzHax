@@ -146,6 +146,49 @@ namespace gd {
 		void pickupItem(GameObject* obj) {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*, GameObject*)>(base + 0xee080)(this, obj);
 		}
+
+		void destroyPlayer(PlayerObject* player) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*)>(base + 0xf04a0)(this, player);
+		}
+
+		void onQuit() {
+			reinterpret_cast<void(__fastcall*)(PlayLayer*)>(base + 0xf3b80)(this);
+		}
+
+		void updateCustomColorBlend(int channel, bool blend) {
+			switch (channel) {
+			case 3:
+				if (this->m_customColor01Blend != blend) {
+					this->m_customColor01Blend = blend;
+					this->m_needsReorderColor01 = true;
+				}
+				break;
+			case 4:
+				if (this->m_customColor02Blend != blend) {
+					this->m_customColor02Blend = blend;
+					this->m_needsReorderColor02 = true;
+				}
+				break;
+			case 6:
+				if (this->m_customColor03Blend != blend) {
+					this->m_customColor03Blend = blend;
+					this->m_needsReorderColor03 = true;
+				}
+				break;
+			case 7:
+				if (this->m_customColor04Blend != blend) {
+					this->m_customColor04Blend = blend;
+					this->m_needsReorderColor04 = true;
+				}
+				break;
+			case 8:
+				if (this->m_customColorDLBlend != blend) {
+					this->m_customColorDLBlend = blend;
+					this->m_needsReorderColor3D = true;
+				}
+				break;
+			}
+		}
 	};
 }
 

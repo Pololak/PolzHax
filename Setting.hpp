@@ -98,6 +98,30 @@ struct SettingStruct {
 	bool onVerifyHack;
 	bool onZoomBypass;
 
+	// Level
+	bool onAutoDeafen; bool onPauseUndeafen; bool onPracticeDeafen; bool onTestmodeDeafen; float deafenPercent = 50; float undeafenPercent = 100; int m_autoDeafenKey;
+	bool onAutoKill; float killPercentage = 50;
+	bool onAutoPickupCoins;
+	bool onAutoPracticeMode;
+	bool onAutoSongDownload;
+	bool onBallRotationBugFix;
+	bool onCheckpointLagFix;
+	bool onConfirmExit;
+	bool onCorrectiveMusicSync;
+	bool onEverythingHurts;
+	bool onHighFPSRotationFix;
+	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0;
+	bool onHitboxesOnDeath;
+	bool onInstantComplete;
+	bool onInvisibleDualFix;
+	bool onJumpHack;
+	bool onNoclip;
+	bool onNoclipUnstuck;
+	bool onPauseDuringCompletion;
+	bool onPracticeFix;
+	bool onPracticeMusic;
+	bool onReplayLastCheckpoint;
+
 	// Universal
 	bool onAllowLowVolume;
 	bool onAutoSafeMode;

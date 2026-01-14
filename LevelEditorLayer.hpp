@@ -32,6 +32,9 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* onResumePlaytest)(gd::LevelEditorLayer*);
 	void __fastcall onResumePlaytestH(gd::LevelEditorLayer*);
 
+	inline void(__thiscall* update)(gd::LevelEditorLayer*, float);
+	void __fastcall updateH(gd::LevelEditorLayer*, void*, float);
+
 	void updatePreviewMode();
 	void resetColors();
 	bool getIsEditorPaused();
@@ -40,6 +43,8 @@ namespace LevelEditorLayer {
 	void setLastPos(float);
 	void moveTrigger(gd::GameObject*);
 	void updateOrientedHitboxes(gd::LevelEditorLayer*);
+
+	void updateShowHitboxes();
 
 	gd::LevelEditorLayer* get();
 

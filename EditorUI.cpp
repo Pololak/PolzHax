@@ -71,8 +71,8 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 			ss << "C: " << colorToString(static_cast<int>(self->m_selectedObject->getColorMode())) << " (" << static_cast<int>(self->m_selectedObject->getColorMode()) << ")" << "\n";
 			ss << "G: " << self->m_selectedObject->m_editorGroup << "\n";
 			ss << "Rot: " << self->m_selectedObject->getRotation() << "\n";
-			ss << "X: " << std::fixed << std::setprecision(0) << self->m_selectedObject->getPositionX() << "\n";
-			ss << "Y: " << std::fixed << std::setprecision(0) << self->m_selectedObject->getPositionY() << "\n";
+			ss << "X: " << self->m_selectedObject->getPositionX() << "\n";
+			ss << "Y: " << self->m_selectedObject->getPositionY() << "\n";
 			ss << "ID: " << self->m_selectedObject->m_objectID << "\n";
 			ss << "Type: " << typeToString(self->m_selectedObject->m_objectType) << "\n";
 			ss << "Time: " << self->m_editorLayer->m_gridLayer->timeForXPos(self->m_selectedObject->getPositionX()) << "\n";

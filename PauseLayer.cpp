@@ -47,7 +47,23 @@ void __fastcall PauseLayer::onResumeH(gd::PauseLayer* self, void*, CCObject* sen
 	m_pauseLayer = nullptr;
 }
 
+class ExitAlertProtocol : public gd::FLAlertLayerProtocol {
+protected:
+	virtual void FLAlert_Clicked(gd::FLAlertLayer* layer, bool btn2) override {
+		if (btn2) {
+			gd::GameManager::sharedState()->getPlayLayer()->onQuit();
+			gd::GameSoundManager::sharedState()->playSound("quitSound_01.ogg");
+		}
+	}
+};
+
+ExitAlertProtocol exitAlertProtocol;
+
 void __fastcall PauseLayer::onQuitH(gd::PauseLayer* self, void*, CCObject* sender) {
+	if (setting().onConfirmExit) {
+		gd::FLAlertLayer::create(&exitAlertProtocol, "Confirm Exit", "Are you sure you want to <cr>exit</c> the level?", "Cancel", "Exit")->show();
+	}
+
 	PauseLayer::onQuit(self, sender);
 	m_bottomMenu = nullptr;
 	m_pauseLayer = nullptr;
@@ -57,6 +73,8 @@ void __fastcall PauseLayer::onRestartH(gd::PauseLayer* self, void*, CCObject* se
 	PauseLayer::onRestart(self, sender);
 	m_bottomMenu = nullptr;
 	m_pauseLayer = nullptr;
+
+	CCEGLView::sharedOpenGLView()->showCursor(gd::GameManager::sharedState()->getGameVariable("0024"));
 }
 
 void __fastcall PauseLayer::onProgressBarH(gd::PauseLayer* self, void*, CCObject* sender) {

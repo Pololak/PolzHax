@@ -12,6 +12,7 @@ namespace gd {
 	class SelectArtLayer;
 	class CCTextInputNode;
 	class GJGameLevel;
+	class GJDropDownLayer;
 
 	enum class UpdateResponse {
 		Unknown,
@@ -126,6 +127,10 @@ namespace gd {
 
 	class NumberInputDelegate {
 		virtual void numberInputClosed(void*/*NumberInputLayer**/);
+	};
+
+	class GJDropDownLayerDelegate {
+		virtual void dropDownLayerWillClose(GJDropDownLayer*);
 	};
 }
 

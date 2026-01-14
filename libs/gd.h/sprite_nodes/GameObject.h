@@ -181,6 +181,14 @@ namespace gd {
 		void calculateOrientedBox() {
 			reinterpret_cast<void(__fastcall*)(GameObject*)>(base + 0x75a20)(this);
 		}
+
+		cocos2d::CCRect const& getObjectRect() {
+			return *reinterpret_cast<cocos2d::CCRect * (__thiscall*)(GameObject*)>(base + 0x722a0)(this);
+		}
+
+		void updateOrientedBox() {
+			reinterpret_cast<void(__thiscall*)(GameObject*)>(base + 0x75a50)(this);
+		}
 	};
 
 	class RingObject : public GameObject {

@@ -117,6 +117,10 @@ namespace gd {
 		void updatePlayerFrame(int frameID) {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xdfff0)(this, frameID);
 		}
+
+		OBB2D* getOrientedBox() {
+			return reinterpret_cast<OBB2D * (__fastcall*)(PlayerObject*)>(base + 0xe1260)(this);
+		}
 	};
 }
 

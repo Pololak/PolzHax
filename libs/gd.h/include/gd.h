@@ -106,6 +106,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/LevelBrowserLayer.h"
 #include "layers_scenes_transitions_nodes/LevelInfoLayer.h"
 #include "layers_scenes_transitions_nodes/LevelSearchLayer.h"
+#include "layers_scenes_transitions_nodes/EndLevelLayer.h"
 
 #include "scroll_nodes/CCContentLayer.h"
 #include "scroll_nodes/CCIndexPath.h"

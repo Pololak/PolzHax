@@ -1,10 +1,57 @@
 #include "PlayLayer.hpp"
 #include "Setting.hpp"
+#include "Hitboxes.hpp"
+#include "PracticeFix.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
+CCObject* m_hz;
+
+bool m_deafenPressed = false;
+
+int m_smoothFrames = 0; // https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/include/hooks/PlayLayer.hpp#L16
+
+std::vector<Checkpoint> m_checkpoints;
+
+void PlayLayer::updateShowHitboxes() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (self == nullptr) return;
+
+	auto playerDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(124));
+	playerDrawNode->clear();
+	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
+	objectDrawNode->clear();
+
+	if ((self->m_player->m_isDead && setting().onHitboxesOnDeath) || setting().onHitboxes) {
+		if (setting().onPlayerHitboxes) {
+			if (self->m_player) Hitboxes::drawPlayerHitbox(self->m_player, playerDrawNode);
+			if (self->m_player2) Hitboxes::drawPlayerHitbox(self->m_player2, playerDrawNode);
+		}
+
+		for (int i = self->m_firstVisibleSection + 1; i <= self->m_lastVisibleSection - 1; i++) {
+			if (i < 0) continue;
+			if (i >= self->m_levelSections->count()) break;
+
+			auto objectAtIndex = self->m_levelSections->objectAtIndex(i);
+			auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+			for (int j = 0; j < objArr->count(); j++) {
+				auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+				if (setting().onSolidHitboxes)
+					Hitboxes::drawSolidsObjectHitbox(obj, objectDrawNode);
+				if (setting().onHazardHitboxes)
+					Hitboxes::drawHazardsObjectHitbox(obj, objectDrawNode);
+				if (setting().onSpecialHitboxes)
+					Hitboxes::drawSpecialsObjectHitbox(obj, objectDrawNode);
+			}
+		}
+	}
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
+	m_checkpoints.clear();
 
 	if (!PlayLayer::init(self, level)) return false;
 
@@ -24,6 +71,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	if (setting().onShowTotalAttempts) {
 		self->m_attemptsLabel->setString(CCString::createWithFormat("Attempt %i", level->m_attempts + 1)->getCString());
 	}
+
+	if (setting().onAutoPracticeMode) self->togglePracticeMode(true);
 	//
 
 	auto director = CCDirector::sharedDirector();
@@ -41,10 +90,31 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	percentageLabel->setString(CCString::createWithFormat("%.0f%%", playerPercentPos)->getCString());
 	self->addChild(percentageLabel, 15, 301);
 
+	auto playerDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(playerDrawNode, 1000, 124);
+	auto objectDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(objectDrawNode, 1000, 125);
+
+	if (setting().onHitboxes) {
+		PlayLayer::updateShowHitboxes();
+	}
+
 	return true;
 }
 
 void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
+	if (self->m_practiceMode || self->m_testMode) {
+		if (m_smoothFrames > 0) {
+			auto ideal_dt = CCDirector::sharedDirector()->getAnimationInterval();
+
+			if (dt - ideal_dt < 1) {
+				m_smoothFrames--;
+			}
+
+			dt = ideal_dt;
+		}
+	}
+
 	PlayLayer::update(self, dt);
 
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
@@ -68,18 +138,57 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		auto centerY = height / 2.f + winSize.top;
 		SetCursorPos(centerX, centerY);
 	}
+
+	if (setting().onAutoKill && (setting().killPercentage <= playerPercentPos)) {
+		if (!self->m_isDead) {
+			self->destroyPlayer(self->m_player);
+		}
+	}
+
+	if ((setting().onAutoDeafen && !m_deafenPressed) && (playerPercentPos > setting().deafenPercent) && !self->m_isDead && !self->m_endTriggered) {
+		if ((self->m_practiceMode && !setting().onPracticeDeafen) || (self->m_testMode && !setting().onTestmodeDeafen)) return;
+
+		m_deafenPressed = true;
+		keybd_event(VK_MENU, 0x38, 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+	}
+
+	updateShowHitboxes();
 }
 
 void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
+	if (setting().onCheckpointLagFix) {
+		if (self->m_practiceMode || self->m_testMode) {
+			m_smoothFrames = 2;
+		}
+	}
+
 	PlayLayer::resetLevel(self);
 
-	// Don't forget
-	//for (auto* coin : m_coinsToPickup) {
-	//	if (coin == nullptr) continue;
+	if (setting().onPracticeFix) {
+		if (self->m_practiceMode && m_checkpoints.size() > 0) {
+			m_checkpoints.back().restore(self);
+		}
+	}
 
-	//	coin->destroyObject();
-	//	self->pickupItem(coin);
-	//}
+	if (m_deafenPressed) {
+		m_deafenPressed = false;
+		keybd_event(VK_MENU, 0x38, 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+	}
+
+	if (setting().onAutoPickupCoins) {
+		for (auto* coin : m_coinsToPickup) {
+			if (coin == nullptr) continue;
+
+			coin->destroyObject();
+			self->pickupItem(coin);
+		}
+	}
 }
 
 void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObject* object) {
@@ -91,6 +200,7 @@ void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObj
 }
 
 void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void*, bool practice) {
+	m_checkpoints.clear();
 	PlayLayer::togglePracticeMode(self, practice);
 
 	if (setting().onHidePracticeButtons) {
@@ -132,6 +242,110 @@ void __fastcall PlayLayer::updateAttemptsH(gd::PlayLayer* self) {
 	}
 }
 
+void __fastcall PlayLayer::processItemsH(gd::PlayLayer* self) {
+	if (!setting().onSafeMode) PlayLayer::processItems(self);
+}
+
+void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
+	PlayLayer::destroyPlayer(self, player);
+
+	if (m_deafenPressed) {
+		m_deafenPressed = false;
+		keybd_event(VK_MENU, 0x38, 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+	}
+
+	if (m_hz) {
+		std::cout << "Death hazard: " << m_hz << std::endl;
+	}
+}
+
+void __fastcall PlayLayer::collidedWithObjectH(gd::PlayerObject* self, void*, gd::GameObject* obj) {
+	PlayLayer::collidedWithObject(self, obj);
+	std::cout << obj << std::endl;
+}
+
+void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
+	PlayLayer::levelComplete(self);
+
+	if (m_deafenPressed) {
+		m_deafenPressed = false;
+		keybd_event(VK_MENU, 0x38, 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+	}
+}
+
+void __fastcall PlayLayer::pauseGameH(gd::PlayLayer* self, void*, bool idk) {
+	PlayLayer::pauseGame(self, idk);
+
+	if (setting().onPauseUndeafen && m_deafenPressed) {
+		m_deafenPressed = false;
+		keybd_event(VK_MENU, 0x38, 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | 0, 0);
+		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
+	}
+}
+
+void __fastcall PlayLayer::loadLastCheckpointH(gd::PlayLayer* self) {
+	if (setting().onPracticeFix) {
+		if (self->m_checkpoints->count() > 0) {
+			auto checkpoint = static_cast<gd::CheckpointObject*>(self->m_checkpoints->lastObject());
+
+			self->updateCustomColorBlend(3, checkpoint->m_customColor01Action->m_blend);
+			self->updateCustomColorBlend(4, checkpoint->m_customColor02Action->m_blend);
+			self->updateCustomColorBlend(6, checkpoint->m_customColor03Action->m_blend);
+			self->updateCustomColorBlend(7, checkpoint->m_customColor04Action->m_blend);
+			self->updateCustomColorBlend(8, checkpoint->m_dLineColorAction->m_blend);
+		}
+	}
+
+	PlayLayer::loadLastCheckpoint(self);
+}
+
+gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
+	if (self->m_player != nullptr) {
+		m_checkpoints.push_back({ Checkpoint::from(self) });
+	}
+
+	return PlayLayer::createCheckpoint(self);
+}
+
+void __fastcall PlayLayer::removeLastCheckpointH(gd::PlayLayer* self) {
+	PlayLayer::removeLastCheckpoint(self);
+
+	if (m_checkpoints.size() > 0) {
+		m_checkpoints.pop_back();
+	}
+}
+
+void __fastcall PlayLayer::spawnPlayer2H(gd::PlayLayer* self) {
+	PlayLayer::spawnPlayer2(self);
+
+	if (setting().onInvisibleDualFix) {
+		self->m_player2->setVisible(true);
+	}
+}
+
+void __fastcall PlayLayer::gjH() {
+	__asm {
+		mov m_hz, eax
+	}
+	PlayLayer::gj();
+}
+
+inline void(__thiscall* gj2)();
+void __fastcall gj2H() {
+	__asm {
+		mov m_hz, eax
+	}
+	gj2();
+}
+
 void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe35d0), PlayLayer::initH, reinterpret_cast<void**>(&PlayLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe9360), PlayLayer::updateH, reinterpret_cast<void**>(&PlayLayer::update));
@@ -141,4 +355,16 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe5ff0), PlayLayer::showNewBestH, reinterpret_cast<void**>(&PlayLayer::showNewBest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb3f0), PlayLayer::updateVisibilityH, reinterpret_cast<void**>(&PlayLayer::updateVisibility));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf33a0), PlayLayer::updateAttemptsH, reinterpret_cast<void**>(&PlayLayer::updateAttempts));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee230), PlayLayer::processItemsH, reinterpret_cast<void**>(&PlayLayer::processItems));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf04a0), PlayLayer::destroyPlayerH, reinterpret_cast<void**>(&PlayLayer::destroyPlayer));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe52e0), PlayLayer::levelCompleteH, reinterpret_cast<void**>(&PlayLayer::levelComplete));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf38c0), PlayLayer::pauseGameH, reinterpret_cast<void**>(&PlayLayer::pauseGame));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf15b0), PlayLayer::loadLastCheckpointH, reinterpret_cast<void**>(&PlayLayer::loadLastCheckpoint));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1010), PlayLayer::createCheckpointH, reinterpret_cast<void**>(&PlayLayer::createCheckpoint));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1d70), PlayLayer::removeLastCheckpointH, reinterpret_cast<void**>(&PlayLayer::removeLastCheckpoint));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayLayer::collidedWithObjectH, reinterpret_cast<void**>(&PlayLayer::collidedWithObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb28f), PlayLayer::gjH, reinterpret_cast<void**>(&PlayLayer::gj));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdbb09), gj2H, reinterpret_cast<void**>(&gj2));
 }

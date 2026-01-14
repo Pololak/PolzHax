@@ -8,6 +8,9 @@ namespace LevelInfoLayer {
 	inline void(__thiscall* onClone)(gd::LevelInfoLayer*, CCObject*);
 	void __fastcall onCloneH(gd::LevelInfoLayer*, void*, CCObject*);
 
+	inline void(__thiscall* songWidget)();
+	void __fastcall songWidgetH();
+
 	class Callback : public gd::LevelInfoLayer {
 	public:
 		void onExportLevel(CCObject*);

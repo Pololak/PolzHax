@@ -6,10 +6,12 @@
 // Hooks
 #include "CCSchedulerHook.hpp"
 #include "CustomizeObjectLayer.hpp"
+#include "DrawGridLayer.hpp"
 #include "EditButtonBar.hpp"
 #include "EditLevelLayer.hpp"
 #include "EditorPauseLayer.hpp"
 #include "EditorUI.hpp"
+#include "EndLevelLayer.hpp"
 #include "GameObject.hpp"
 #include "LevelBrowserLayer.hpp"
 #include "LevelEditorLayer.hpp"
@@ -31,6 +33,16 @@
 #include "Menu.hpp"
 
 #include "Setting.hpp"
+
+#include <imgui-hook.hpp>
+
+void(__thiscall* fpMainLoop)(cocos2d::CCDirector*);
+void __fastcall hkMainLoop(cocos2d::CCDirector* self)
+{
+    ImGuiHook::poll(self->getOpenGLView());
+    fpMainLoop(self);
+}
+
 
 inline void(__thiscall* CCTextInputNode_updateLabel)(gd::CCTextInputNode*, std::string);
 void __fastcall CCTextInputNode_updateLabelH(gd::CCTextInputNode* self, void*, std::string string) {
@@ -111,7 +123,7 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
     auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
     if (playLayer && isDown) {
         if (!playLayer->m_endTriggered) {
-            if (key == setting().m_retryKeybind) {
+            if ((key == setting().m_retryKeybind) && setting().onRetryKeybind) {
                 if (PauseLayer::get()) {
                     PauseLayer::get()->onResume(nullptr);
                 }
@@ -154,10 +166,12 @@ DWORD WINAPI my_thread(void* hModule) {
 
     //CCSchedulerHook::mem_init();
     CustomizeObjectLayer::mem_init();
+    DrawGridLayer::mem_init();
     EditButtonBar::mem_init();
     EditLevelLayer::mem_init();
     EditorPauseLayer::mem_init();
     EditorUI::mem_init();
+    EndLevelLayer::mem_init();
     GameObject::mem_init();
     LevelBrowserLayer::mem_init();
     LevelEditorLayer::mem_init();
@@ -174,6 +188,8 @@ DWORD WINAPI my_thread(void* hModule) {
     setupImGuiMenu();
 
     MH_EnableHook(MH_ALL_HOOKS);
+
+    MH_CreateHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240), hkMainLoop, reinterpret_cast<LPVOID*>(&fpMainLoop));
 
     return true;
 }

@@ -5,9 +5,30 @@
 
 namespace gd {
 	class GameObject;
+	class PlayerCheckpoint {};
+	class ColorAction;
+	enum class EnterEffect {};
 
-	class CheckpointObject : public GameObject {
+	class CheckpointObject : public cocos2d::CCNode {
 	public:
+		GameObject* m_object;				// 0xe8
+		PlayerCheckpoint* m_playerCheck01;	// 0xec
+		PlayerCheckpoint* m_playerCheck02;	// 0xf0
+		bool m_dualMode;					// 0xf4
+		bool m_isFlipped;					// 0xf5
+		cocos2d::CCPoint m_cameraPos;		// 0xf8
+		ColorAction* m_bgColorAction;		// 0x100
+		ColorAction* m_lineColorAction;		// 0x104
+		ColorAction* m_objColorAction;		// 0x108
+		ColorAction* m_gColorAction;		// 0x10c
+		ColorAction* m_dLineColorAction;	// 0x110
+		ColorAction* m_customColor01Action; // 0x114
+		ColorAction* m_customColor02Action; // 0x118
+		ColorAction* m_customColor03Action; // 0x11c
+		ColorAction* m_customColor04Action; // 0x120
+		EnterEffect m_activeEnterEffect;	// 0x124
+		GameObject* m_portalObject;			// 0x128
+		double m_timeStamp;					// 0x12c
 	};
 }
 

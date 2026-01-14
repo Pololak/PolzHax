@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "support/base64.h"
+#include "patching.hpp"
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -146,13 +147,13 @@ namespace base64 {
 }
 
 inline void safeModeON() {
-	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\xeb\x6c", 2, NULL);
-	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\xe9\x77\x01\x00\x00\x90", 6, NULL);
-	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\xe9\x14\x00\x00\x00\x90", 6, NULL);
+	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
+	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });
+	sequence_patch(gd::base + 0xe5419, { 0xe9, 0x14, 0x00, 0x00, 0x00, 0x90 });
 }
 
 inline void safeModeOFF() {
-	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4f0624), "\x75\x6c", 2, NULL);
-	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e53b6), "\x0f\x85\x76\x01\x00\x00", 6, NULL);
-	WriteProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(0x4e5419), "\x0f\x85\x13\x01\x00\x00", 6, NULL);
+	sequence_patch(gd::base + 0xf0624, { 0x75, 0x6c });
+	sequence_patch(gd::base + 0xe53b6, { 0x0f, 0x85, 0x76, 0x01, 0x00, 0x00 });
+	sequence_patch(gd::base + 0xe5419, { 0x0f, 0x85, 0x13, 0x01, 0x00, 0x00 });
 }

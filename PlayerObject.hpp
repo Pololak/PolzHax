@@ -14,5 +14,8 @@ namespace PlayerObject {
 	inline void(__thiscall* toggleDartMode)(gd::PlayerObject*, bool);
 	void __fastcall toggleDartModeH(gd::PlayerObject*, void*, bool);
 
+	inline void(__thiscall* runBallRotation2)(gd::PlayerObject*);
+	void __fastcall runBallRotation2H(gd::PlayerObject*);
+
 	void mem_init();
 }

@@ -4,6 +4,7 @@
 #include "Setting.hpp"
 #include "hsv.hpp"
 #include "utils.hpp"
+#include "Hitboxes.hpp"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -22,6 +23,42 @@ bool LevelEditorLayer::getIsEditorPaused() {
 
 void LevelEditorLayer::setIsEditorPaused(bool val) {
 	isEditorPaused = val;
+}
+
+void LevelEditorLayer::updateShowHitboxes() {
+	auto self = LevelEditorLayer::get();
+
+	if (self == nullptr) return;
+
+	auto playerDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(124));
+	playerDrawNode->clear();
+	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
+	objectDrawNode->clear();
+
+	if (setting().onHitboxes) {
+		if (setting().onPlayerHitboxes) {
+			if (self->m_player) Hitboxes::drawPlayerHitbox(self->m_player, playerDrawNode);
+			if (self->m_player2) Hitboxes::drawPlayerHitbox(self->m_player2, playerDrawNode);
+		}
+
+		for (int i = self->m_firstVisibleSection + 1; i <= self->m_lastVisibleSection - 1; i++) {
+			if (i < 0) continue;
+			if (i >= self->m_levelSections->count()) break;
+
+			auto objectAtIndex = self->m_levelSections->objectAtIndex(i);
+			auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+			for (int j = 0; j < objArr->count(); j++) {
+				auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+				if (setting().onSolidHitboxes)
+					Hitboxes::drawSolidsObjectHitbox(obj, objectDrawNode);
+				if (setting().onHazardHitboxes)
+					Hitboxes::drawHazardsObjectHitbox(obj, objectDrawNode);
+				if (setting().onSpecialHitboxes)
+					Hitboxes::drawSpecialsObjectHitbox(obj, objectDrawNode);
+			}
+		}
+	}
 }
 
 struct CompareTriggers {
@@ -415,6 +452,11 @@ bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::G
 	m_blendingBatchNode->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
 	self->m_gameLayer->addChild(m_blendingBatchNode, 0);
 
+	auto playerDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(playerDrawNode, 1000, 124);
+	auto objectDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(objectDrawNode, 1000, 125);
+
 	return true;
 }
 
@@ -431,6 +473,8 @@ void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, voi
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
 	LevelEditorLayer::updateVisibility(self, dt);
 
+	LevelEditorLayer::updateShowHitboxes();
+
 	if (isEditorPaused) return;
 	if (!setting().onPreviewMode) {
 		if (wasPreviewModeEnabled) resetColors();
@@ -446,6 +490,12 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 
 		LevelEditorLayer::updatePreviewMode();
 	}
+}
+
+void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, float dt) {
+	LevelEditorLayer::update(self, dt);
+
+	LevelEditorLayer::updateShowHitboxes();
 }
 
 gd::GameObject* __fastcall LevelEditorLayer::addObjectFromStringH(gd::LevelEditorLayer* self, void*, std::string object) {
@@ -522,6 +572,7 @@ void LevelEditorLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ed10), LevelEditorLayer::addSpecialH, reinterpret_cast<void**>(&LevelEditorLayer::addSpecial));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ee30), LevelEditorLayer::removeSpecialH, reinterpret_cast<void**>(&LevelEditorLayer::removeSpecial));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ef20), LevelEditorLayer::updateVisibilityH, reinterpret_cast<void**>(&LevelEditorLayer::updateVisibility));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x91620), LevelEditorLayer::updateH, reinterpret_cast<void**>(&LevelEditorLayer::update));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x909f0), LevelEditorLayer::onPlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onPlaytest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90fc0), LevelEditorLayer::onResumePlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onResumePlaytest));
