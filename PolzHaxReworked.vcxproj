@@ -723,6 +723,7 @@
     <ClCompile Include="Setting.cpp" />
     <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="SURVEY_PROGRAM.cpp" />
+    <ClCompile Include="UILayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\fmod-headers\fmod.lib" />
@@ -731,6 +732,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Setting.hpp" />
+    <None Include="UILayer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

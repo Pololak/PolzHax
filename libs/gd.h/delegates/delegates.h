@@ -21,6 +21,13 @@ namespace gd {
 		UpdateSuccess,
 	};
 
+	class AppDelegate : public cocos2d::CCApplication {
+	public:
+		static AppDelegate* get() {
+			return static_cast<AppDelegate*>(cocos2d::CCApplication::sharedApplication());
+		}
+	};
+
 	class GameRateDelegate {
 		virtual void updateRate() {}
 	};

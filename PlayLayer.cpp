@@ -2,6 +2,7 @@
 #include "Setting.hpp"
 #include "Hitboxes.hpp"
 #include "PracticeFix.hpp"
+#include "utils.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -12,6 +13,148 @@ bool m_deafenPressed = false;
 int m_smoothFrames = 0; // https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/include/hooks/PlayLayer.hpp#L16
 
 std::vector<Checkpoint> m_checkpoints;
+
+std::vector<gd::StartPosObject*> m_startPositions;
+std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges, m_mirrorPortals;
+
+int currentStartPos = 0;
+std::vector<gd::StartPosObject*> startPosObjects;
+
+void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
+	if (startPosObjects.empty()) return;
+
+	auto count = static_cast<int32_t>(startPosObjects.size());
+	if (index >= count) index = -1;
+	else if (index < -1) index = count - 1;
+
+	currentStartPos = index;
+
+	auto* startPos = index >= 0 ? startPosObjects[index] : nullptr;
+	playLayer->setStartPosObject(startPos);
+	playLayer->m_testMode = index >= 0;
+
+	if (currentStartPos >= 0) { // Taswert's thing
+		playLayer->m_playerStartPos = playLayer->m_startPosObject->getOrientedBox()->m_center;
+	}
+	else {
+		playLayer->m_playerStartPos = ccp(0, 105);
+	}
+
+	playLayer->resetLevel();
+}
+
+void PlayLayer::nextStartPos() {
+	pickStartPos(gd::GameManager::sharedState()->getPlayLayer(), currentStartPos + 1);
+}
+
+void PlayLayer::prevStartPos() {
+	pickStartPos(gd::GameManager::sharedState()->getPlayLayer(), currentStartPos - 1);
+}
+
+static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
+	gd::GameObject* closest = nullptr;
+
+	std::ranges::sort(vec, [](gd::GameObject* a, gd::GameObject* b) {
+		return a->getPositionX() < b->getPositionX();
+		});
+
+	for (auto obj : vec) {
+		if (obj->getPositionX() - 10 > startPos->getPositionX())
+			break;
+		if (obj->getPositionX() - 10 < startPos->getPositionX())
+			closest = obj;
+	}
+
+	return closest;
+}
+
+void setupStartPos(gd::StartPosObject* startPos) { // Eclipse menu https://github.com/EclipseMenu/EclipseMenu/blob/main/src/hacks/Level/SmartStartPos.cpp
+	gd::LevelSettingsObject* startPosSettings = startPos->m_settings;
+	gd::LevelSettingsObject* levelSettings = gd::GameManager::sharedState()->getPlayLayer()->m_levelSettings;
+
+	startPosSettings->m_startDual = levelSettings->m_startDual;
+	startPosSettings->m_startMode = levelSettings->m_startMode;
+	startPosSettings->m_startMini = levelSettings->m_startMini;
+	startPosSettings->m_startSpeed = levelSettings->m_startSpeed;
+
+	gd::GameObject* obj = getClosestObject(m_dualPortals, startPos);
+	if (obj)
+		startPosSettings->m_startDual = obj->m_objectID == 286;
+
+	obj = getClosestObject(m_gamemodePortals, startPos);
+
+	if (obj) {
+		switch (obj->m_objectID) {
+		case 12: startPosSettings->m_startMode = 0;
+			break;
+		case 13: startPosSettings->m_startMode = 1;
+			break;
+		case 47: startPosSettings->m_startMode = 2;
+			break;
+		case 111: startPosSettings->m_startMode = 3;
+			break;
+		case 660: startPosSettings->m_startMode = 4;
+			break;
+		default: break;
+		}
+	}
+
+	obj = getClosestObject(m_miniPortals, startPos);
+
+	if (obj)
+		startPosSettings->m_startMini = obj->m_objectID == 101;
+
+	obj = getClosestObject(m_speedChanges, startPos);
+	if (obj) {
+		switch (obj->m_objectID) {
+		case 200: startPosSettings->m_startSpeed = 1;
+			break;
+		case 201: startPosSettings->m_startSpeed = 0;
+			break;
+		case 202: startPosSettings->m_startSpeed = 2;
+			break;
+		case 203: startPosSettings->m_startSpeed = 3;
+			break;
+		default: break;
+		}
+	}
+}
+
+void PlayLayer::updateShowLayout() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (self == nullptr) return;
+
+	ccColor3B bgColor = ccc3(setting().layoutBGR, setting().layoutBGG, setting().layoutBGB);
+	ccColor3B gColor = ccc3(setting().layoutGR, setting().layoutGG, setting().layoutGB);
+
+	self->m_backgroundSprite->setColor(bgColor);
+	self->m_bottomGround->m_groundSprite->setColor(gColor);
+	self->m_bottomGround->m_line->setColor(ccWHITE);
+	self->m_topGround->m_groundSprite->setColor(gColor);
+	self->m_topGround->m_line->setColor(ccWHITE);
+
+	self->m_backgroundFlash->setVisible(false);
+
+	for (int i = self->m_firstVisibleSection - 1; i <= self->m_lastVisibleSection + 1; i++) {
+		if (i < 0) continue;
+		if (i >= self->m_levelSections->count()) break;
+
+		auto objectAtIndex = self->m_levelSections->objectAtIndex(i);
+		auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+		for (int j = 0; j < objArr->count(); j++) {
+			auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+			if ((obj->m_objectType == gd::GameObjectType::Decoration || obj->m_objectType == gd::GameObjectType::PulsingDecoration) && obj->isVisible()/* && (obj->m_objectID == 50 && obj->m_objectID == 51 && obj->m_objectID == 52 && obj->m_objectID == 53 && obj->m_objectID == 54 && obj->m_objectID == 60 && obj->m_objectID == 148 && obj->m_objectID == 149 && obj->m_objectID == 405) */ && (obj->m_objectID != 10 && obj->m_objectID != 11 && obj->m_objectID != 12 && obj->m_objectID != 13 && obj->m_objectID != 38 && obj->m_objectID != 44 && obj->m_objectID != 45 && obj->m_objectID != 46 && obj->m_objectID != 47 && obj->m_objectID != 99 && obj->m_objectID != 101 && obj->m_objectID != 111 && obj->m_objectID != 286 && obj->m_objectID != 287 && obj->m_objectID != 660 && obj->m_objectID != 745 && obj->m_objectID != 749) && obj != self->m_endPortalObject) {
+				obj->setVisible(false);
+			}
+
+			obj->setObjectColor(ccWHITE);
+			if (obj->m_colorSprite) obj->m_colorSprite->setColor(ccWHITE);
+			obj->m_customColorMode = static_cast<gd::GJCustomColorMode>(9);
+		}
+	}
+}
 
 void PlayLayer::updateShowHitboxes() {
 	auto self = gd::GameManager::sharedState()->getPlayLayer();
@@ -52,6 +195,15 @@ void PlayLayer::updateShowHitboxes() {
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpoints.clear();
+
+	m_dualPortals.clear();
+	m_gamemodePortals.clear();
+	m_miniPortals.clear();
+	m_speedChanges.clear();
+	m_mirrorPortals.clear();
+	m_startPositions.clear();
+	startPosObjects.clear();
+	currentStartPos = 0;
 
 	if (!PlayLayer::init(self, level)) return false;
 
@@ -99,6 +251,13 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 		PlayLayer::updateShowHitboxes();
 	}
 
+	if (setting().onShowLayout) {
+		PlayLayer::updateShowLayout();
+	}
+
+	if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
+	else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
+
 	return true;
 }
 
@@ -129,6 +288,9 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		}
 	}
 
+	if ((setting().onAutoSafeMode || setting().onSafeMode) && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
+	else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
+
 	if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->m_isDead) {
 		HWND hwnd = WindowFromDC(wglGetCurrentDC());
 		RECT winSize; GetWindowRect(hwnd, &winSize);
@@ -155,10 +317,24 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
 
-	updateShowHitboxes();
+	if (setting().onHitboxes) {
+		PlayLayer::updateShowHitboxes();
+	}
+
+	if (setting().onShowLayout) {
+		PlayLayer::updateShowLayout();
+	}
 }
 
 void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
+	if (setting().onSmartStartPos) {
+		for (gd::StartPosObject* obj : m_startPositions) {
+			if (obj) {
+				setupStartPos(obj);
+			}
+		}
+	}
+
 	if (setting().onCheckpointLagFix) {
 		if (self->m_practiceMode || self->m_testMode) {
 			m_smoothFrames = 2;
@@ -194,8 +370,55 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObject* object) {
 	PlayLayer::addToSection(self, object);
 
+	if (object->m_objectID == 31) {
+		startPosObjects.push_back(static_cast<gd::StartPosObject*>(object));
+	}
+
+	switch (object->m_objectID) {
+	case 31:
+		m_startPositions.push_back(static_cast<gd::StartPosObject*>(object));
+		break;
+	case 12:
+	case 13:
+	case 47:
+	case 111:
+	case 660: m_gamemodePortals.push_back(object);
+		break;
+	case 45:
+	case 46: m_mirrorPortals.push_back(object);
+		break;
+	case 99:
+	case 101: m_miniPortals.push_back(object);
+		break;
+	case 286:
+	case 287: m_dualPortals.push_back(object);
+		break;
+	case 200:
+	case 201:
+	case 202:
+	case 203: m_speedChanges.push_back(object);
+		break;
+	default: break;
+	}
+
 	if (object->m_objectID == 142) {
 		m_coinsToPickup.push_back(object);
+	}
+}
+
+void __fastcall PlayLayer::createObjectsFromSetupH(gd::PlayLayer* self, void*, gd::string objects) {
+	PlayLayer::createObjectsFromSetup(self, objects);
+	if (startPosObjects.empty()) return;
+
+	std::ranges::sort(startPosObjects, [](gd::GameObject* a, gd::GameObject* b) {
+		return a->getPositionX() < b->getPositionX();
+		});
+
+	currentStartPos = -1;
+	if (self->m_startPosObject) {
+		auto it = std::ranges::find(startPosObjects, self->m_startPosObject);
+		if (it != startPosObjects.end())
+			currentStartPos = static_cast<int32_t>(std::distance(startPosObjects.begin(), it));
 	}
 }
 
@@ -226,12 +449,12 @@ void __fastcall PlayLayer::updateVisibilityH(gd::PlayLayer* self) {
 	if (self->m_player2->isVisible() && setting().onHidePlayer) {
 		self->m_player2->setVisible(false);
 	}
-	//
 
 	if (setting().onNoWavePulse) {
 		self->m_player->m_audioScale = 1.f;
 		self->m_player2->m_audioScale = 1.f;
 	}
+	//
 }
 
 void __fastcall PlayLayer::updateAttemptsH(gd::PlayLayer* self) {
@@ -351,6 +574,7 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe9360), PlayLayer::updateH, reinterpret_cast<void**>(&PlayLayer::update));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1f20), PlayLayer::resetLevelH, reinterpret_cast<void**>(&PlayLayer::resetLevel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe9280), PlayLayer::addToSectionH, reinterpret_cast<void**>(&PlayLayer::addToSection));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe81c0), PlayLayer::createObjectsFromSetupH, reinterpret_cast<void**>(&PlayLayer::createObjectsFromSetup));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf3610), PlayLayer::togglePracticeModeH, reinterpret_cast<void**>(&PlayLayer::togglePracticeMode));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe5ff0), PlayLayer::showNewBestH, reinterpret_cast<void**>(&PlayLayer::showNewBest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb3f0), PlayLayer::updateVisibilityH, reinterpret_cast<void**>(&PlayLayer::updateVisibility));

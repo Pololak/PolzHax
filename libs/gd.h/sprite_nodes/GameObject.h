@@ -189,6 +189,10 @@ namespace gd {
 		void updateOrientedBox() {
 			reinterpret_cast<void(__thiscall*)(GameObject*)>(base + 0x75a50)(this);
 		}
+
+		OBB2D* getOrientedBox() {
+			return reinterpret_cast<OBB2D * (__thiscall*)(GameObject*)>(base + 0x759e0)(this);
+		}
 	};
 
 	class RingObject : public GameObject {

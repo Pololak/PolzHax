@@ -79,7 +79,7 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	std::cout << gd::LocalLevelManager::sharedState() << std::endl;
 
 	auto checkpoint = CCSprite::createWithSpriteFrameName("checkpoint_01_001.png");
-	auto achi = gd::AchievementBar::create("ayo", "ayo", nullptr);
+	auto achi = gd::AchievementBar::create("PolzHax", "Welcome to PolzHax: <cg>Reworked</c> beta (150125).", nullptr);
 	auto iconSprite = achi->m_layerColor->getChildByType<CCSprite*>(0);
 	achi->m_layerColor->addChild(checkpoint);
 

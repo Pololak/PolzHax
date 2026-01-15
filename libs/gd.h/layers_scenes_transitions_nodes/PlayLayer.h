@@ -189,6 +189,26 @@ namespace gd {
 				break;
 			}
 		}
+
+		void setStartPosObject(StartPosObject* startPos) {
+			if (startPos != m_startPosObject) {
+				if (startPos) {
+					startPos->retain();
+				}
+				if (m_startPosObject) {
+					m_startPosObject->release();
+				}
+				m_startPosObject = startPos;
+			}
+		}
+
+		void pushButton(int p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0a00)(this, p0, p1);
+		}
+
+		void releaseButton(int p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0af0)(this, p0, p1);
+		}
 	};
 }
 

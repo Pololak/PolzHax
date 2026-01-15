@@ -44,10 +44,21 @@ void __fastcall GameObject::playShineEffectH(gd::GameObject* self) {
 	if (!setting().onNoPortalShine) GameObject::playShineEffect(self);
 }
 
+void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
+	if (setting().onShowLayout) {
+		switch (self->m_objectID) {
+		case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
+			return;
+		}
+	}
+	GameObject::triggerObject(self);
+}
+
 void GameObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColorH, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x736e0), GameObject::playShineEffectH, reinterpret_cast<void**>(&GameObject::playShineEffect));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6e230), GameObject::triggerObjectH, reinterpret_cast<void**>(&GameObject::triggerObject));
 }
 
 void RingObject::mem_init() {

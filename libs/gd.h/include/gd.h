@@ -76,6 +76,10 @@ namespace gd {
 #include "achievement_nodes/AchievementBar.h"
 #include "achievement_nodes/AchievementNotifier.h"
 
+#include "sprite_nodes/CCSpritePlus.h"
+#include "sprite_nodes/GameObject.h"
+#include "other_nodes/StartPosObject.h"
+
 #include "layers_scenes_transitions_nodes/FLAlertLayer.h"
 #include "layers_scenes_transitions_nodes/GJDropDownLayer.h"
 #include "layers_scenes_transitions_nodes/GJListLayer.h"
@@ -125,9 +129,7 @@ namespace gd {
 
 #include "audio_nodes/FMODAudioEngine.h"
 
-#include "sprite_nodes/CCSpritePlus.h"
 #include "sprite_nodes/ButtonSprite.h"
-#include "sprite_nodes/GameObject.h"
 #include "sprite_nodes/CCAnimatedSprite.h"
 #include "sprite_nodes/PlayerObject.h"
 #include "sprite_nodes/TextArea.h"
@@ -142,7 +144,6 @@ namespace gd {
 #include "other_nodes/SongInfoObject.h"
 #include "other_nodes/UndoObject.h"
 #include "other_nodes/OBB2D.h"
-#include "other_nodes/StartPosObject.h"
 #include "other_nodes/SettingsColorObject.h"
 #include "other_nodes/GhostTrailEffect.h"
 #include "other_nodes/CheckpointObject.h"

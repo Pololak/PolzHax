@@ -1766,6 +1766,9 @@
     <ClCompile Include="EndLevelLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
+    <ClCompile Include="UILayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\glew32.lib">
@@ -1781,6 +1784,9 @@
   <ItemGroup>
     <None Include="Setting.hpp">
       <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="UILayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
     </None>
   </ItemGroup>
 </Project>

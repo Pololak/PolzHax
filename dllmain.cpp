@@ -23,6 +23,7 @@
 #include "PlayerObject.hpp"
 #include "PlayLayer.hpp"
 #include "SetGroupIDLayer.hpp"
+#include "UILayer.hpp"
 
 // Utils
 #include "patching.hpp"
@@ -129,10 +130,28 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
                 }
                 playLayer->resetLevel();
             }
+
+            if (setting().onStartPosSwitcher) {
+                if (key == setting().m_previousStartPosKey) {
+                    PlayLayer::prevStartPos();
+                }
+                if (key == setting().m_nextStartPosKey) {
+                    PlayLayer::nextStartPos();
+                }
+            }
         }
     }
 
     return ret;
+}
+
+inline void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate*);
+void __fastcall AppDelegate_trySaveGameH(gd::AppDelegate* self) {
+    AppDelegate_trySaveGame(self);
+    if (setting().onAutoSave) {
+        setting().save();
+    }
+    std::cout << "Saved state..." << std::endl;
 }
 
 DWORD WINAPI my_thread(void* hModule) {
@@ -163,6 +182,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0xcee0), CCControlUtils_RGBfromHSVH, reinterpret_cast<void**>(&CCControlUtils_RGBfromHSV));
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0xa4990), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x293f0), AppDelegate_trySaveGameH, reinterpret_cast<void**>(&AppDelegate_trySaveGame));
 
     //CCSchedulerHook::mem_init();
     CustomizeObjectLayer::mem_init();
@@ -184,6 +204,7 @@ DWORD WINAPI my_thread(void* hModule) {
     PlayLayer::mem_init();
     RingObject::mem_init();
     SetGroupIDLayer::mem_init();
+    UILayer::mem_init();
 
     setupImGuiMenu();
 

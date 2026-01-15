@@ -14,6 +14,9 @@ namespace PlayLayer {
 	inline void(__thiscall* addToSection)(gd::PlayLayer*, gd::GameObject*);
 	void __fastcall addToSectionH(gd::PlayLayer*, void*, gd::GameObject*);
 
+	inline void(__thiscall* createObjectsFromSetup)(gd::PlayLayer*, gd::string);
+	void __fastcall createObjectsFromSetupH(gd::PlayLayer*, void*, gd::string);
+
 	inline void(__thiscall* togglePracticeMode)(gd::PlayLayer*, bool);
 	void __fastcall togglePracticeModeH(gd::PlayLayer*, void*, bool);
 
@@ -57,6 +60,9 @@ namespace PlayLayer {
 	void __fastcall gjH();
 
 	void updateShowHitboxes();
+	void updateShowLayout();
+	void nextStartPos();
+	void prevStartPos();
 
 	void mem_init();
 }

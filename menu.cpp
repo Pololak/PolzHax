@@ -30,6 +30,11 @@ std::vector<std::string> dllNames;
 
 auto libcocosbase = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
 
+void updateFPSBypass() {
+	float value = 1.f / (setting().onFPSBypass ? setting().fpsValue : 60.f);
+	CCDirector::sharedDirector()->setAnimationInterval(value);
+}
+
 void updateSpeedhack() {
 	if (setting().speedhackValue == 0.f) return;
 
@@ -896,7 +901,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (beta.1)");
+			ImGui::Text("1.920 - v1.3.0 (150126)");
 
 			ImGui::Checkbox("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -1878,9 +1883,9 @@ void imgui_render() {
 				ImGui::Checkbox("Solids", &setting().onSolidHitboxes);
 
 				static float solidsColor[3] = {
-					setting().solidR,
-					setting().solidG,
-					setting().solidB
+					setting().solidR / 255.f,
+					setting().solidG / 255.f,
+					setting().solidB / 255.f
 				};
 
 				ImGui::SameLine(120.f);
@@ -1895,9 +1900,9 @@ void imgui_render() {
 				ImGui::Checkbox("Hazards", &setting().onHazardHitboxes);
 
 				static float hazardsColor[3] = {
-					setting().hazardR,
-					setting().hazardG,
-					setting().hazardB
+					setting().hazardR / 255.f,
+					setting().hazardG / 255.f,
+					setting().hazardB / 255.f
 				};
 
 				ImGui::SameLine(120.f);
@@ -1912,9 +1917,9 @@ void imgui_render() {
 				ImGui::Checkbox("Specials", &setting().onSpecialHitboxes);
 
 				static float specialsColor[3] = {
-					setting().specialR,
-					setting().specialG,
-					setting().specialB
+					setting().specialR / 255.f,
+					setting().specialG / 255.f,
+					setting().specialB / 255.f
 				};
 
 				ImGui::SameLine(120.f);
@@ -2031,10 +2036,70 @@ void imgui_render() {
 
 			ImGui::Checkbox("Replay Last Checkpoint", &setting().onReplayLastCheckpoint);
 			ImGui::Tooltip("Respawn from your last practice mode checkpoint after completing a level.");
+
+			if (ImGui::Checkbox("Show Layout", &setting().onShowLayout)) {
+				if (setting().onShowLayout) {
+					cheatAdd();
+				}
+				else {
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Removes all decoration and color from levels.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##layoutSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				static float layoutBg[3] = {
+					setting().layoutBGR / 255.f,
+					setting().layoutBGG / 255.f,
+					setting().layoutBGB / 255.f
+				};
+
+				if (ImGui::ColorEdit3("Background Color##layout", layoutBg, ImGuiColorEditFlags_NoInputs)) {
+					setting().layoutBGR = layoutBg[0] * 255;
+					setting().layoutBGG = layoutBg[1] * 255;
+					setting().layoutBGB = layoutBg[2] * 255;
+				}
+
+				static float layoutG[3] = {
+					setting().layoutGR / 255.f,
+					setting().layoutGG / 255.f,
+					setting().layoutGB / 255.f
+				};
+
+				if (ImGui::ColorEdit3("Ground Color##layout", layoutG, ImGuiColorEditFlags_NoInputs)) {
+					setting().layoutGR = layoutG[0] * 255;
+					setting().layoutGG = layoutG[1] * 255;
+					setting().layoutGB = layoutG[2] * 255;
+				}
+
+				ImGui::TreePop();
+			}
+
+			ImGui::Checkbox("Smart StartPos", &setting().onSmartStartPos);
+			ImGui::Tooltip("Automatically sets gamemode, speed, size & border for a startpos.");
+
+			ImGui::Checkbox("StartPos Switcher", &setting().onStartPosSwitcher);
+			ImGui::Tooltip("Lets you switch between multiple start positions in-level.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##startPosSwitcherSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::HotKey("Previous", setting().m_previousStartPosKey, 0.f, ImVec2(80.f, 0.f));
+				ImGui::HotKey("Next", setting().m_nextStartPosKey, 0.f, ImVec2(80.f, 0.f));
+
+				ImGui::TreePop();
+			}
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextItemWidth(80.f);
+			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
+				updateFPSBypass();
+			}
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Unlock FPS", &setting().onFPSBypass)) {
+				updateFPSBypass();
+			}
+
 			if (ImGui::Checkbox("Allow Low Volume", &setting().onAllowLowVolume)) {
 				if (setting().onAllowLowVolume) {
 					sequence_patch(gd::base + 0xd772e, { 0xeb });
@@ -2250,8 +2315,12 @@ void imgui_render() {
 		}
 	}
 
+	updateFPSBypass();
 	updateSpeedhack();
 
+	if (setting().onFPSBypass) {
+		updateFPSBypass();
+	}
 	if (setting().onSpeedhack) {
 		updateSpeedhack();
 	}

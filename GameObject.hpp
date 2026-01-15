@@ -11,6 +11,9 @@ namespace GameObject {
 	inline void(__thiscall* playShineEffect)(gd::GameObject*);
 	void __fastcall playShineEffectH(gd::GameObject*);
 
+	inline void(__thiscall* triggerObject)(gd::GameObject*);
+	void __fastcall triggerObjectH(gd::GameObject*);
+
 	void mem_init();
 }
 
