@@ -317,9 +317,7 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
 
-	if (setting().onHitboxes) {
-		PlayLayer::updateShowHitboxes();
-	}
+	PlayLayer::updateShowHitboxes();
 
 	if (setting().onShowLayout) {
 		PlayLayer::updateShowLayout();

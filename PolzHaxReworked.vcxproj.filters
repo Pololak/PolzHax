@@ -1626,6 +1626,12 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EndLevelLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="ColorSelectPopup.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PulseBuilderPopup.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1768,6 +1774,12 @@
     </ClCompile>
     <ClCompile Include="UILayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorSelectPopup.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="PulseBuilderPopup.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

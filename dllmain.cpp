@@ -5,6 +5,7 @@
 
 // Hooks
 #include "CCSchedulerHook.hpp"
+#include "ColorSelectPopup.hpp"
 #include "CustomizeObjectLayer.hpp"
 #include "DrawGridLayer.hpp"
 #include "EditButtonBar.hpp"
@@ -155,8 +156,8 @@ void __fastcall AppDelegate_trySaveGameH(gd::AppDelegate* self) {
 }
 
 DWORD WINAPI my_thread(void* hModule) {
-    AllocConsole();
-    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    //AllocConsole();
+    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     if (MH_Initialize() != MH_OK) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
@@ -185,6 +186,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x293f0), AppDelegate_trySaveGameH, reinterpret_cast<void**>(&AppDelegate_trySaveGame));
 
     //CCSchedulerHook::mem_init();
+    ColorSelectPopup::mem_init();
     CustomizeObjectLayer::mem_init();
     DrawGridLayer::mem_init();
     EditButtonBar::mem_init();

@@ -6,9 +6,9 @@
 namespace gd {
 	class SettingsColorObject : public cocos2d::CCNode {
 	public:
-		cocos2d::ccColor3B m_color;
-		bool m_blending;
-		int m_playerColor; // m_custom
+		cocos2d::ccColor3B m_color; // 0xe8
+		bool m_blending; // 0xec
+		int m_playerColor; // 0xf0
 	};
 }
 

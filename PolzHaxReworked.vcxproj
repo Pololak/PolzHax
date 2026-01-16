@@ -150,6 +150,7 @@
     <ClInclude Include="CCSchedulerHook.hpp" />
     <ClInclude Include="ccTouchFix.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
+    <ClInclude Include="ColorSelectPopup.hpp" />
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="CustomizeObjectLayer.hpp" />
     <ClInclude Include="DrawGridLayer.hpp" />
@@ -665,6 +666,7 @@
     <ClInclude Include="PlayerObject.hpp" />
     <ClInclude Include="PlayLayer.hpp" />
     <ClInclude Include="PracticeFix.hpp" />
+    <ClInclude Include="PulseBuilderPopup.hpp" />
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
@@ -675,6 +677,7 @@
     <ClCompile Include="CCSchedulerHook.cpp" />
     <ClCompile Include="ccTouchFix.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />
+    <ClCompile Include="ColorSelectPopup.cpp" />
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="CustomizeObjectLayer.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -719,6 +722,7 @@
     </ClCompile>
     <ClCompile Include="PlayerObject.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
+    <ClCompile Include="PulseBuilderPopup.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
     <ClCompile Include="SpeedHack.cpp" />

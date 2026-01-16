@@ -210,6 +210,14 @@ namespace gd {
 		void constrainGameLayerPosition() {
 			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41e60)(this);
 		}
+
+		void onDuplicate(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x48e70)(this, sender);
+		}
+
+		void moveObject(GameObject* obj, cocos2d::CCPoint position) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, GameObject*, cocos2d::CCPoint)>(base + 0x4b410)(this, obj, position);
+		}
 	};
 }
 
