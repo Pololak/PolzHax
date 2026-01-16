@@ -169,8 +169,6 @@ DWORD WINAPI my_thread(void* hModule) {
 
     SpeedHack::Setup();
 
-    //ccTouchFixPatch();
-
     auto cocos = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
     auto cocos_ext = reinterpret_cast<uintptr_t>(GetModuleHandleA("libExtensions.dll"));
 

@@ -1383,9 +1383,6 @@
     <ClInclude Include="CrashLogger.hpp">
       <Filter>Файлы заголовков\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="ccTouchFix.hpp">
-      <Filter>Файлы заголовков\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="EditorUI.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
@@ -1686,9 +1683,6 @@
       <Filter>Исходные файлы\Utils</Filter>
     </ClCompile>
     <ClCompile Include="CrashLogger.cpp">
-      <Filter>Исходные файлы\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="ccTouchFix.cpp">
       <Filter>Исходные файлы\Utils</Filter>
     </ClCompile>
     <ClCompile Include="EditorUI.cpp">

@@ -148,7 +148,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CCSchedulerHook.hpp" />
-    <ClInclude Include="ccTouchFix.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
     <ClInclude Include="ColorSelectPopup.hpp" />
     <ClInclude Include="CrashLogger.hpp" />
@@ -675,7 +674,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCSchedulerHook.cpp" />
-    <ClCompile Include="ccTouchFix.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />
     <ClCompile Include="ColorSelectPopup.cpp" />
     <ClCompile Include="CrashLogger.cpp" />
