@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="CCSchedulerHook.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
+    <ClInclude Include="ColorFilterPopup.hpp" />
     <ClInclude Include="ColorSelectPopup.hpp" />
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="CustomizeObjectLayer.hpp" />
@@ -161,11 +162,17 @@
     <ClInclude Include="EditorPauseLayer.hpp" />
     <ClInclude Include="EditorUI.hpp" />
     <ClInclude Include="EndLevelLayer.hpp" />
+    <ClInclude Include="FindLevelPopup.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameObject.hpp" />
+    <ClInclude Include="GJGarageLayer.hpp" />
+    <ClInclude Include="GJRotationControl.hpp" />
+    <ClInclude Include="GJScoreCell.hpp" />
     <ClInclude Include="GlobalClipboard.hpp" />
     <ClInclude Include="Hitboxes.hpp" />
     <ClInclude Include="hsv.hpp" />
+    <ClInclude Include="IconPreviewPopup.hpp" />
+    <ClInclude Include="Icons.hpp" />
     <ClInclude Include="ImGuiUtils.hpp" />
     <ClInclude Include="LevelBrowserLayer.hpp" />
     <ClInclude Include="LevelEditorLayer.hpp" />
@@ -585,9 +592,12 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EditorUI.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\EndLevelLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\FLAlertLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GaragePage.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJDropDownLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGroundLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJScoreCell.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
@@ -637,6 +647,7 @@
     <ClInclude Include="libs\gd.h\sprite_nodes\GameObject.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\HardStreak.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\PlayerObject.h" />
+    <ClInclude Include="libs\gd.h\sprite_nodes\SimplePlayer.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\TextArea.h" />
     <ClInclude Include="libs\gd.h\text_input_nodes\CCTextInputNode.h" />
     <ClInclude Include="libs\imgui-hook\imgui-hook.hpp" />
@@ -666,6 +677,7 @@
     <ClInclude Include="PlayLayer.hpp" />
     <ClInclude Include="PracticeFix.hpp" />
     <ClInclude Include="PulseBuilderPopup.hpp" />
+    <ClInclude Include="RGBColorInputWidget.hpp" />
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
@@ -675,6 +687,7 @@
   <ItemGroup>
     <ClCompile Include="CCSchedulerHook.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />
+    <ClCompile Include="ColorFilterPopup.cpp" />
     <ClCompile Include="ColorSelectPopup.cpp" />
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="CustomizeObjectLayer.cpp" />
@@ -688,9 +701,14 @@
     <ClCompile Include="EditorPauseLayer.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="EndLevelLayer.cpp" />
+    <ClCompile Include="FindLevelPopup.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GJGarageLayer.cpp" />
+    <ClCompile Include="GJRotationControl.cpp" />
+    <ClCompile Include="GJScoreCell.cpp" />
     <ClCompile Include="GlobalClipboard.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
+    <ClCompile Include="IconPreviewPopup.cpp" />
     <ClCompile Include="ImGuiUtils.cpp" />
     <ClCompile Include="LevelBrowserLayer.cpp" />
     <ClCompile Include="LevelEditorLayer.cpp" />
@@ -721,6 +739,7 @@
     <ClCompile Include="PlayerObject.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="PulseBuilderPopup.cpp" />
+    <ClCompile Include="RGBColorInputWidget.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
     <ClCompile Include="SpeedHack.cpp" />

@@ -21,6 +21,13 @@ void LevelInfoLayer::Callback::onExportLevel(CCObject*) {
 	}
 }
 
+void LevelInfoLayer::Callback::onGarage(CCObject*) {
+	auto scene = gd::GJGarageLayer::scene();
+	scene->setUserData(this->m_level);
+	CCDirector::sharedDirector()->pushScene(CCTransitionMoveInT::create(.5f, scene));
+	gd::GameManager::sharedState()->m_lastScene = static_cast<gd::LastGameScene>(3);
+}
+
 bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGameLevel* level) {
 	if (!LevelInfoLayer::init(self, level)) return false;
 
@@ -44,6 +51,11 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 	auto onExportLevel = gd::CCMenuItemSpriteExtra::create(onExportLevelSpr, self, menu_selector(LevelInfoLayer::Callback::onExportLevel));
 	onExportLevel->setPosition(actionsMenu->convertToNodeSpace({ director->getScreenLeft() + 30.f, winSize.height / 2.f + 75.f }));
 	actionsMenu->addChild(onExportLevel);
+
+	//auto onGarageSpr = CCSprite::createWithSpriteFrameName("gj_iconBtn_on_001.png");
+	//auto onGarage = gd::CCMenuItemSpriteExtra::create(onGarageSpr, self, menu_selector(LevelInfoLayer::Callback::onGarage));
+	//onGarage->setPosition(100, 50);
+	//actionsMenu->addChild(onGarage);
 
 	return true;
 }

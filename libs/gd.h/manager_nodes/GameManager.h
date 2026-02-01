@@ -15,7 +15,14 @@ namespace gd {
 
 	class PlayLayer;
 	class LevelSelectLayer {};
-	enum class LastGameScene {};
+	enum class LastGameScene {
+		MenuLayer = 0,
+		CreatorLayer = 1,
+		MyLevelsLayer = 2,
+		LevelInfoLayerOrEditLevelLayer = 3,
+		AnotherMenuLayer = 7,
+		LevelSelectLayer = 9
+	};
 	class PremiumPopup : public cocos2d::CCNode {};
 	class GameRateDelegate;
 
@@ -122,6 +129,10 @@ namespace gd {
 
 		void reloadAll(bool swtch, bool fscreen, bool inSession) {
 			reinterpret_cast<void(__thiscall*)(GameManager*, bool, bool, bool)>(base + 0x6c990)(this, swtch, fscreen, inSession);
+		}
+
+		void returnToLastScene(GJGameLevel* level) {
+			reinterpret_cast<void(__thiscall*)(GameManager*, GJGameLevel*)>(base + 0x6c700)(this, level);
 		}
 
 		PlayLayer* getPlayLayer() {

@@ -10,6 +10,7 @@ struct SettingStruct {
 	bool onAutoSave = true;
 	bool onCocosExplorer;
 	bool onDeveloperMode;
+	bool onThreadPriority; int priority = 2;
 
 	float bgColor01 = .0f;
 	float bgColor02 = .0f;
@@ -20,6 +21,8 @@ struct SettingStruct {
 	float overlayColor02 = .235f;
 	float overlayColor03 = .235f;
 	float overlayColor04 = 1.f;
+
+	float UISize = 1.f;
 
 	int cheatsCount = 0;
 	int beforeRestartCheatsCount = 0;
@@ -32,6 +35,7 @@ struct SettingStruct {
 	bool onTextLength;
 
 	// Cosmetic
+	bool onAccuratePercentage; int decimalPlaces;
 	bool onCoinsShowUncollected;
 	bool onCoinsInPractice;
 	bool onForceDontEnter;
@@ -115,12 +119,12 @@ struct SettingStruct {
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
-	bool onNoclip;
-	bool onNoclipUnstuck;
+	bool onNoclip; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
 	bool onPauseDuringCompletion;
 	bool onPracticeFix;
 	bool onPracticeMusic;
 	bool onReplayLastCheckpoint;
+	bool onRespawnTime; float respawnValue = 1000.f;
 	bool onShowLayout; int layoutBGR = 40, layoutBGG = 125, layoutBGB = 255; int layoutGR = 0, layoutGG = 102, layoutGB = 255;
 	bool onSmartStartPos;
 	bool onStartPosSwitcher; int m_previousStartPosKey = 0x25, m_nextStartPosKey = 0x27;
@@ -150,6 +154,28 @@ struct SettingStruct {
 	bool onSpeedhackAudio;
 	bool onClassicMode;
 
+	// Status
+	float labelsOpacity = 1.f;
+	float labelsScale = 1.f;
+	bool onHideLabels;
+	bool onCheatIndicator;
+	bool onMessageLabel; std::string message;
+	bool onFPSCounter;
+	bool onCPSCounter;
+	bool onNoclipAccuracy;
+	bool onNoclipDeaths;
+	bool onClockLabel;
+	bool onSessionTime;
+	bool onBestRunLabel;
+	bool onAttemptsLabel;
+	bool onJumpsLabel;
+	bool onMetaLabel;
+
+	// Icons
+	bool onIconEffects; bool onIconColor1 = true, onIconColor2 = true;
+	bool onSameDualColor;
+	bool onIconRandomizer; bool onRandomizeCube = true, onRandomizeShip = true, onRandomizeBall = true, onRandomizeUFO = true, onRandomizeDart = true, onRandomizeColor1 = true, onRandomizeColor2 = true, onRandomizeTrail = true;
+
 	// Editor settings
 	bool onSelectFilter;
 	bool onShowObjectInfo;
@@ -161,10 +187,13 @@ struct SettingStruct {
 	bool onExperimentalLayering;
 	bool onUnusedObjects;
 
-	// Other menu things
+	// Other stuff
 	int m_p1click;
 	int m_p2click;
 	bool onShowPercentage;
+	int colorFilter = 0;
+	int colorFilterOrder = 0;
+	int selectedDartIdx = 1;
 };
 
 SettingStruct& setting();
@@ -173,8 +202,11 @@ DEF_SCHEMA(
 	SettingStruct,
 	onAutoSave, onDeveloperMode,
 
+	onThreadPriority, priority,
+
 	bgColor01, bgColor02, bgColor03, bgColor04,
 	overlayColor01, overlayColor02, overlayColor03, overlayColor04,
+	UISize,
 
 	cheatsCount, beforeRestartCheatsCount,
 
@@ -186,6 +218,7 @@ DEF_SCHEMA(
 	onTextLength,
 
 	// Cosmetic
+	onAccuratePercentage, decimalPlaces,
 	onCoinsShowUncollected,
 	onCoinsInPractice,
 	onForceDontEnter,
@@ -269,12 +302,12 @@ DEF_SCHEMA(
 	onInstantComplete,
 	onInvisibleDualFix,
 	onJumpHack,
-	onNoclip,
-	onNoclipUnstuck,
+	onNoclip, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck,
 	onPauseDuringCompletion,
 	onPracticeFix,
 	onPracticeMusic,
 	onReplayLastCheckpoint,
+	onRespawnTime, respawnValue,
 	onShowLayout, layoutBGR, layoutBGG, layoutBGB, layoutGR, layoutGG, layoutGB,
 	onSmartStartPos,
 	onStartPosSwitcher, m_previousStartPosKey, m_nextStartPosKey,
@@ -304,6 +337,27 @@ DEF_SCHEMA(
 	onSpeedhackAudio,
 	onClassicMode,
 
+	// Status
+	labelsOpacity,
+	labelsScale,
+	onHideLabels,
+	onCheatIndicator,
+	onMessageLabel, message,
+	onFPSCounter,
+	onCPSCounter,
+	onNoclipAccuracy,
+	onNoclipDeaths,
+	onClockLabel,
+	onSessionTime,
+	onBestRunLabel,
+	onAttemptsLabel,
+	onJumpsLabel,
+	onMetaLabel,
+
+	// Icons
+	onSameDualColor,
+	onIconRandomizer, onRandomizeCube, onRandomizeShip, onRandomizeBall, onRandomizeUFO, onRandomizeDart, onRandomizeColor1, onRandomizeColor2, onRandomizeTrail,
+
 	// Editor settings
 	onSelectFilter,
 	onShowObjectInfo,
@@ -318,5 +372,6 @@ DEF_SCHEMA(
 	// Other menu things
 	m_p1click,
 	m_p2click,
-	onShowPercentage
+	onShowPercentage,
+	selectedDartIdx
 )

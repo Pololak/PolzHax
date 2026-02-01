@@ -55,6 +55,12 @@
     <Filter Include="Файлы заголовков\Libraries\nfd">
       <UniqueIdentifier>{70efae15-160e-4e42-814f-0a2618edba66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Layers">
+      <UniqueIdentifier>{283c63af-4c88-45c4-94a6-ceb91a1b03d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Layers">
+      <UniqueIdentifier>{2a8b7d9c-73d2-4d0d-aec3-e2db394a9572}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1482,9 +1488,6 @@
     <ClInclude Include="libs\gd.h\other_nodes\ColorAction.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="EditorOptionsLayer.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSettingsLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
@@ -1499,9 +1502,6 @@
     </ClInclude>
     <ClInclude Include="GameObject.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorLayerInput.hpp">
-      <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="hsv.hpp">
       <Filter>Файлы заголовков\Utils</Filter>
@@ -1605,9 +1605,6 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
-    <ClInclude Include="SURVEY_PROGRAM.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="DrawGridLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
@@ -1626,8 +1623,53 @@
     <ClInclude Include="ColorSelectPopup.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="PulseBuilderPopup.hpp">
+    <ClInclude Include="Icons.hpp">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="GJGarageLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\sprite_nodes\SimplePlayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorFilterPopup.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorLayerInput.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorOptionsLayer.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="FindLevelPopup.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="PulseBuilderPopup.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="SURVEY_PROGRAM.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="IconPreviewPopup.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GaragePage.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="GJRotationControl.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="GJScoreCell.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJScoreCell.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBColorInputWidget.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1709,17 +1751,11 @@
     <ClCompile Include="LevelEditorLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="EditorOptionsLayer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="LevelSettingsLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorLayerInput.cpp">
-      <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="ImGuiUtils.cpp">
       <Filter>Исходные файлы\Utils</Filter>
@@ -1754,9 +1790,6 @@
     <ClCompile Include="LevelSearchLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
-    <ClCompile Include="SURVEY_PROGRAM.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="DrawGridLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
@@ -1772,8 +1805,38 @@
     <ClCompile Include="ColorSelectPopup.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
+    <ClCompile Include="GJGarageLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorLayerInput.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorOptionsLayer.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="FindLevelPopup.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorFilterPopup.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
     <ClCompile Include="PulseBuilderPopup.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="SURVEY_PROGRAM.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="IconPreviewPopup.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="GJRotationControl.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="GJScoreCell.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="RGBColorInputWidget.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

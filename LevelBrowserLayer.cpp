@@ -2,9 +2,22 @@
 #include "LevelShare.hpp"
 #include "nfd.h"
 #include <fstream>
+#include "FindLevelPopup.hpp"
 
-void LevelBrowserLayer::Callback::onFirstPage(CCObject*) {
+void LevelBrowserLayer::Callback::onSearch(CCObject*) {
+	FindLevelPopup::create(this)->show();
+}
+
+void LevelBrowserLayer::Callback::onFirstPage(CCObject* sender) {
 	this->m_searchObject->m_page = 0;
+	this->loadPage(this->m_searchObject);
+}
+
+void LevelBrowserLayer::Callback::onLastPage(CCObject* sender) {
+	int totalItems = this->m_itemCount;
+
+	this->m_searchObject->m_page = (totalItems % 2 == 0) ? totalItems / 10 - 1 : totalItems / 10;
+
 	this->loadPage(this->m_searchObject);
 }
 
@@ -62,16 +75,44 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 
 	if (searchObject->m_searchType == gd::SearchType::MyLevels || searchObject->m_searchType == gd::SearchType::SavedLevels) {
 		auto menu = CCMenu::create();
-		self->addChild(menu, 10);
+		self->addChild(menu, 10, 10);
 
 		auto onFirstPageSpr = CCSprite::createWithSpriteFrameName("edit_leftBtn2_001.png");
 		auto onFirstPage = gd::CCMenuItemSpriteExtra::create(onFirstPageSpr, self, menu_selector(LevelBrowserLayer::Callback::onFirstPage));
-		menu->addChild(onFirstPage);
+		onFirstPage->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 20.f, director->getScreenTop() - 70.f }));
+		onFirstPage->setVisible(self->m_leftArrow->isVisible());
+		menu->addChild(onFirstPage, 0, 11);
+
+		auto onLastPageSpr = CCSprite::createWithSpriteFrameName("edit_rightBtn2_001.png");
+		auto onLastPage = gd::CCMenuItemSpriteExtra::create(onLastPageSpr, self, menu_selector(LevelBrowserLayer::Callback::onLastPage));
+		onLastPage->setPosition(menu->convertToNodeSpace({ director->getScreenRight() - 20.f, director->getScreenTop() - 70.f }));
+		onLastPage->setVisible(self->m_rightArrow->isVisible());
+		menu->addChild(onLastPage, 0, 12);
+
+		auto onSearchSpr = CCSprite::create("GJ_button_04.png");
+		auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
+		onSearch->setPositionX(-100);
+		menu->addChild(onSearch);
 	}
 
 	return true;
 }
 
+void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* searchObject) {
+	LevelBrowserLayer::loadPage(self, searchObject);
+
+	auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
+	if (menu) {
+		auto onFirstPage = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(11));
+		auto onLastPage = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(12));
+		if (onFirstPage && onLastPage) {
+			onFirstPage->setVisible(self->m_leftArrow->isVisible());
+			onLastPage->setVisible(self->m_rightArrow->isVisible());
+		}
+	}
+}
+
 void LevelBrowserLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x89590), LevelBrowserLayer::initH, reinterpret_cast<void**>(&LevelBrowserLayer::init));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8a000), LevelBrowserLayer::loadPageH, reinterpret_cast<void**>(&LevelBrowserLayer::loadPage));
 }

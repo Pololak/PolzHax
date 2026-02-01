@@ -20,12 +20,12 @@ namespace gd {
 		cocos2d::CCPoint m_spritePosition;
 		std::string m_caption;
 
-		static auto create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float labelHeight) {
+		static auto create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float buttonHeight) {
 			auto ret = reinterpret_cast<ButtonSprite*(__vectorcall*)(
 				float, float, float, float, float, float, // xmm registers
 				const char*, int, // ecx and edx
 				int, bool, const char*, const char*, float // stack
-				)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, buttonWidth, widthLimit, limitWidth, font, sprite, labelHeight);
+				)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, buttonWidth, widthLimit, limitWidth, font, sprite, buttonHeight);
 
 			__asm add esp, 0x14
 

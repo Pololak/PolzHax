@@ -2,11 +2,17 @@
 #include "Setting.hpp"
 #include "Hitboxes.hpp"
 #include "PracticeFix.hpp"
+#include "PlayerObject.hpp"
+#include "Icons.hpp"
 #include "utils.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
-CCObject* m_hz;
+CCObject* m_deathObject;
+
+void PlayLayer::setDeathObject(CCObject* object) {
+	m_deathObject = object;
+}
 
 bool m_deafenPressed = false;
 
@@ -192,6 +198,32 @@ void PlayLayer::updateShowHitboxes() {
 	}
 }
 
+void PlayLayer::clearHitboxes() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (self == nullptr) return;
+
+	auto playerDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(124));
+	playerDrawNode->clear();
+	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
+	objectDrawNode->clear();
+}
+
+void PlayLayer::updatePlayerColors() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (self == nullptr) return;
+
+	if (self->m_player2 == nullptr) return;
+
+	auto gm = gd::GameManager::sharedState();
+
+	self->m_player2->setColor(setting().onSameDualColor ? gm->colorForIdx(gm->m_playerColor) : gm->colorForIdx(gm->m_playerColor2));
+	self->m_player2->setSecondColor(setting().onSameDualColor ? gm->colorForIdx(gm->m_playerColor2) : gm->colorForIdx(gm->m_playerColor));
+
+	self->m_player2->updateGlowColor();
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpoints.clear();
@@ -239,7 +271,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	percentageLabel->setScale(.5f);
 	percentageLabel->setVisible(setting().onShowPercentage);
 	percentageLabel->setPosition(winSize.width / 2.f + (gm->m_showProgressBar ? 110.2f : 0.f), winSize.height - 8.f);
-	percentageLabel->setString(CCString::createWithFormat("%.0f%%", playerPercentPos)->getCString());
+	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";
+	percentageLabel->setString(CCString::createWithFormat(percentageString.c_str(), playerPercentPos)->getCString());
 	self->addChild(percentageLabel, 15, 301);
 
 	auto playerDrawNode = CCDrawNode::create();
@@ -255,8 +288,14 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 		PlayLayer::updateShowLayout();
 	}
 
+	PlayLayer::updatePlayerColors();
+
 	if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
 	else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
+
+	auto noclipTint = CCLayerColor::create(ccc4(setting().noclipTintR, setting().noclipTintG, setting().noclipTintB, 255), winSize.width, winSize.height);
+	noclipTint->setOpacity(0);
+	self->addChild(noclipTint, 11, 875);
 
 	return true;
 }
@@ -277,14 +316,15 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	PlayLayer::update(self, dt);
 
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
+	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";
 
 	auto percentageLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(301));
 	if (percentageLabel) {
 		if (playerPercentPos < 100.f) {
-			percentageLabel->setString(CCString::createWithFormat("%.0f%%", playerPercentPos)->getCString());
+			percentageLabel->setString(CCString::createWithFormat(percentageString.c_str(), playerPercentPos)->getCString());
 		}
 		else {
-			percentageLabel->setString(CCString::create("100%")->getCString());
+			percentageLabel->setString(CCString::createWithFormat(percentageString.c_str(), 100.f)->getCString());
 		}
 	}
 
@@ -307,6 +347,12 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		}
 	}
 
+	PlayLayer::updateShowHitboxes();
+
+	if (setting().onShowLayout) {
+		PlayLayer::updateShowLayout();
+	}
+
 	if ((setting().onAutoDeafen && !m_deafenPressed) && (playerPercentPos > setting().deafenPercent) && !self->m_isDead && !self->m_endTriggered) {
 		if ((self->m_practiceMode && !setting().onPracticeDeafen) || (self->m_testMode && !setting().onTestmodeDeafen)) return;
 
@@ -317,10 +363,9 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
 
-	PlayLayer::updateShowHitboxes();
-
-	if (setting().onShowLayout) {
-		PlayLayer::updateShowLayout();
+	if (setting().onDeveloperMode) {
+		auto devLabel = CCLabelBMFont::create("", "chatFont.fnt");
+		devLabel->setString(CCString::createWithFormat("X: %.2f Y: %.2f NoclipDeaths")->getCString());
 	}
 }
 
@@ -340,6 +385,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	}
 
 	PlayLayer::resetLevel(self);
+
+	//PlayLayer::clearHitboxes();
 
 	if (setting().onPracticeFix) {
 		if (self->m_practiceMode && m_checkpoints.size() > 0) {
@@ -362,6 +409,39 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 			coin->destroyObject();
 			self->pickupItem(coin);
 		}
+	}
+
+	if (setting().onIconRandomizer) {
+		auto gm = gd::GameManager::sharedState();
+
+		auto randColor1 = rand() % (31 - 0 + 1) + 0;
+		auto randColor2 = rand() % (31 - 0 + 1) + 0;
+
+		if (setting().onRandomizeColor1) {
+			self->m_player->setColor(gm->colorForIdx(randColor1));
+			self->m_player2->setSecondColor(gm->colorForIdx(randColor1));
+
+			self->m_player->updateGlowColor();
+			self->m_player2->updateGlowColor();
+		}
+		if (setting().onRandomizeColor2) {
+			self->m_player->setSecondColor(gm->colorForIdx(randColor2));
+			self->m_player2->setColor(gm->colorForIdx(randColor2));
+
+			self->m_player->updateGlowColor();
+			self->m_player2->updateGlowColor();
+		}
+
+		int cubeIcon = rand() % (Icons::getCount("player", "001") - 1 + 1) + 1;
+
+		PlayerObject::setCubeIcon(cubeIcon);
+		PlayerObject::setShipIcon(rand() % (Icons::getCount("ship", "001") - 0 + 1) + 0);
+		PlayerObject::setRollIcon(rand() % (Icons::getCount("player_ball", "001") - 0 + 1) + 0);
+		PlayerObject::setBirdIcon(rand() % (Icons::getCount("bird", "001") - 0 + 1) + 0);
+		PlayerObject::setDartIcon(rand() % (Icons::getCount("dart", "001") - 0 + 1) + 0);
+
+		self->m_player->updatePlayerFrame(cubeIcon);
+		self->m_player2->updatePlayerFrame(cubeIcon);
 	}
 }
 
@@ -470,6 +550,15 @@ void __fastcall PlayLayer::processItemsH(gd::PlayLayer* self) {
 void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
 	PlayLayer::destroyPlayer(self, player);
 
+	if (setting().onNoclipTint && setting().onNoclip) {
+		auto noclipTint = static_cast<CCLayerColor*>(self->getChildByTag(875));
+		if (noclipTint) {
+			noclipTint->runAction(CCSequence::create(CCFadeTo::create(0.f, 65), CCFadeTo::create(.25f, 0), nullptr));
+		}
+	}
+
+	//PlayLayer::updateShowHitboxes();
+
 	if (m_deafenPressed) {
 		m_deafenPressed = false;
 		keybd_event(VK_MENU, 0x38, 0, 0);
@@ -478,14 +567,30 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
 
-	if (m_hz) {
-		std::cout << "Death hazard: " << m_hz << std::endl;
-	}
-}
+	//std::cout << "Death hazard: " << m_deathObject << std::endl;
+	//if (m_deathObject) {
+	//	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
 
-void __fastcall PlayLayer::collidedWithObjectH(gd::PlayerObject* self, void*, gd::GameObject* obj) {
-	PlayLayer::collidedWithObject(self, obj);
-	std::cout << obj << std::endl;
+	//	if (setting().onSolidHitboxes)
+	//		Hitboxes::drawSolidsObjectHitbox(reinterpret_cast<gd::GameObject*>(m_deathObject), objectDrawNode);
+	//	if (setting().onHazardHitboxes)
+	//		Hitboxes::drawHazardsObjectHitbox(reinterpret_cast<gd::GameObject*>(m_deathObject), objectDrawNode);
+	//	if (setting().onSpecialHitboxes)
+	//		Hitboxes::drawSpecialsObjectHitbox(reinterpret_cast<gd::GameObject*>(m_deathObject), objectDrawNode);
+	//}
+
+	if (setting().onRespawnTime) {
+		float respawnTime = setting().respawnValue / 1000.f;
+
+		if (auto* respawnSequence = self->getActionByTag(0x10)) {
+			self->stopAction(respawnSequence);
+
+			auto* delayedSequence = CCSequence::create(CCDelayTime::create(respawnTime), CCCallFunc::create(self, callfunc_selector(gd::PlayLayer::delayedResetLevel)), nullptr);
+
+			delayedSequence->setTag(0x10);
+			self->runAction(delayedSequence);
+		}
+	}
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
@@ -552,20 +657,29 @@ void __fastcall PlayLayer::spawnPlayer2H(gd::PlayLayer* self) {
 	}
 }
 
-void __fastcall PlayLayer::gjH() {
-	__asm {
-		mov m_hz, eax
-	}
-	PlayLayer::gj();
-}
+//inline bool(__thiscall* hazardDeathObject)();
+//void __fastcall hazardDeathObjectH() {
+//	__asm {
+//		mov m_deathObject, eax
+//	}
+//	hazardDeathObject();
+//}
 
-inline void(__thiscall* gj2)();
-void __fastcall gj2H() {
-	__asm {
-		mov m_hz, eax
-	}
-	gj2();
-}
+//inline bool(__thiscall* solidDeathObject)();
+//void __fastcall solidDeathObjectH() {
+//	__asm {
+//		mov m_deathObject, eax
+//	}
+//	solidDeathObject();
+//}
+
+//inline bool(__thiscall* slopeDeathObject)();
+//void __fastcall slopeDeathObjectH() {
+//	__asm {
+//		mov m_deathObject, ebx
+//	}
+//	slopeDeathObject();
+//}
 
 void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe35d0), PlayLayer::initH, reinterpret_cast<void**>(&PlayLayer::init));
@@ -587,6 +701,7 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayLayer::collidedWithObjectH, reinterpret_cast<void**>(&PlayLayer::collidedWithObject));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb28f), PlayLayer::gjH, reinterpret_cast<void**>(&PlayLayer::gj));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdbb09), gj2H, reinterpret_cast<void**>(&gj2));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb28f), hazardDeathObjectH, reinterpret_cast<void**>(&hazardObject));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc52a), solidDeathObjectH, reinterpret_cast<void**>(&solidDeathObject));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdb5e7), slopeDeathObjectH, reinterpret_cast<void**>(&slopeDeathObject));
 }

@@ -201,3 +201,13 @@ void ImGui::Tooltip(const char* tooltip) {
 		ImGui::SetTooltip(tooltip);
 	}
 }
+
+bool ImGui::CheckboxF(const char* label, bool* v) {
+	bool isDisabled = false;
+	if (!PolzHax::getTextFilter().PassFilter(label)) isDisabled = true;
+	ImGui::BeginDisabled(isDisabled);
+	auto checkbox = ImGui::Checkbox(label, v);
+	ImGui::EndDisabled();
+
+	return checkbox;
+}

@@ -43,6 +43,10 @@ namespace gd {
 			return m_textField->getString();
 		}
 
+		const char* getCString() {
+			return m_textField->getString();
+		}
+
 		void setAllowedChars(std::string filter) {
 			m_allowedChars = filter;
 		}

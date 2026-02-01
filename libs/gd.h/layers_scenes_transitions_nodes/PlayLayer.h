@@ -209,6 +209,10 @@ namespace gd {
 		void releaseButton(int p0, bool p1) {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*, int, bool)>(base + 0xf0af0)(this, p0, p1);
 		}
+
+		void delayedResetLevel() {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f10)(this);
+		}
 	};
 }
 

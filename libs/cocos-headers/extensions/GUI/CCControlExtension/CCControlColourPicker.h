@@ -51,46 +51,43 @@ NS_CC_EXT_BEGIN
 class CC_DLL CCControlColourPicker: public CCControl
 {
 public:
+    // @note RobTop Addition
+    virtual ccColor3B const& getColorValue() const;
+    // @note RobTop Addition
+    virtual void setColorValue(ccColor3B const&);
+
     CCControlColourPicker();
     virtual ~CCControlColourPicker();
-    virtual void setColor(const ccColor3B& colorValue);
-    virtual void setEnabled(bool bEnabled);
 
-protected:
+public:
+
+    // @note RobTop Addition
+    ccColor3B m_rgb; // m_colorValue
     HSV m_hsv;
-    RT_REMOVE( CC_SYNTHESIZE_RETAIN(CCControlSaturationBrightnessPicker*, m_colourPicker, colourPicker) )
+    CCControlSaturationBrightnessPicker* m_colourPicker;
+    CCControlHuePicker* m_huePicker;
+
+    CC_SYNTHESIZE_READONLY(CCSprite*, m_background, Background)
+
+    // @note RobTop Addition
+    CC_SYNTHESIZE(CCSprite*, m_colorTarget, ColorTarget)
+    // @note RobTop Addition
+    CC_SYNTHESIZE(ColorPickerDelegate*, m_delegate, Delegate)
+
 
 public:
-    RT_ADD(
-        virtual ccColor3B const& getColorValue() const;
-        CCSprite* getColorTarget();
-        ColorPickerDelegate* getDelegate();
-
-        virtual void setColorValue(ccColor3B const&);
-        void setColorTarget(CCSprite*);
-        void setDelegate(ColorPickerDelegate*);
-    )
-
-    CC_SYNTHESIZE_RETAIN(CCControlHuePicker*, m_huePicker, HuePicker)
-    CC_SYNTHESIZE_RETAIN(CCSprite*, m_background, Background)
-    
-public:
-    RT_REMOVE(
-        static CCControlColourPicker* create();
-    )
-    RT_ADD(
-        static CCControlColourPicker* colourPicker();
-    )
+    // @note RobTop Addition: renamed create to colourPicker
+    static CCControlColourPicker* colourPicker();
 
     virtual bool init();
-    void hueSliderValueChanged(CCObject * sender, CCControlEvent controlEvent);
-    void colourSliderValueChanged(CCObject * sender, CCControlEvent controlEvent);
+    void hueSliderValueChanged(CCObject* sender, CCControlEvent controlEvent);
+    void colourSliderValueChanged(CCObject* sender, CCControlEvent controlEvent);
 
-protected:    
+protected:
     void updateControlPicker();
     void updateHueAndControlPicker();
     virtual bool ccTouchBegan(CCTouch* touch, CCEvent* pEvent);
-    
+
 };
 
 // end of GUI group

@@ -35,9 +35,6 @@ namespace PlayLayer {
 	inline void(__thiscall* destroyPlayer)(gd::PlayLayer*, gd::PlayerObject*);
 	void __fastcall destroyPlayerH(gd::PlayLayer*, void*, gd::PlayerObject*);
 
-	inline void(__thiscall* collidedWithObject)(gd::PlayerObject*, gd::GameObject*);
-	void __fastcall collidedWithObjectH(gd::PlayerObject*, void*, gd::GameObject*);
-
 	inline void(__thiscall* levelComplete)(gd::PlayLayer*);
 	void __fastcall levelCompleteH(gd::PlayLayer*);
 
@@ -56,13 +53,20 @@ namespace PlayLayer {
 	inline void(__thiscall* spawnPlayer2)(gd::PlayLayer*);
 	void __fastcall spawnPlayer2H(gd::PlayLayer*);
 
-	inline void(__thiscall* gj)();
-	void __fastcall gjH();
+	inline void(__thiscall* collidedWithObject)(gd::PlayerObject*, gd::GameObject*);
+	void __fastcall collidedWithObjectH(gd::PlayerObject*, void*, gd::GameObject*);
+
+	inline void(__thiscall* hazardObject)();
+	void __fastcall hazardObjectH();
+
+	void setDeathObject(CCObject*);
 
 	void updateShowHitboxes();
+	void clearHitboxes();
 	void updateShowLayout();
 	void nextStartPos();
 	void prevStartPos();
+	void updatePlayerColors();
 
 	void mem_init();
 }

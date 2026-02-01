@@ -13,6 +13,9 @@ namespace gd {
 	class CCTextInputNode;
 	class GJGameLevel;
 	class GJDropDownLayer;
+	class CCIndexPath;
+	class TableView;
+	class TableViewCell;
 
 	enum class UpdateResponse {
 		Unknown,
@@ -37,6 +40,7 @@ namespace gd {
 	};
 
 	class GJRotationControlDelegate {
+	public:
 		virtual void angleChanged(float);
 		virtual void angleChangeBegin();
 		virtual void angleChangeEnded();
@@ -138,6 +142,20 @@ namespace gd {
 
 	class GJDropDownLayerDelegate {
 		virtual void dropDownLayerWillClose(GJDropDownLayer*);
+	};
+
+	class ListButtonBarDelegate {
+		virtual void listButtonBarSwitchedPage(void*/*ListButtonBar**/, int) {}
+	};
+
+	class TableViewDelegate {
+		virtual void willTweenToIndexPath(CCIndexPath&, TableViewCell*, TableView*) {}
+		virtual void didEndTweenToIndexPath(CCIndexPath&, TableView*) {}
+		virtual void TableViewWillDisplayCellForRowAtIndexPath(CCIndexPath&, TableViewCell*, TableView*) {}
+		virtual void TableViewDidDisplayCellForRowAtIndexPath(CCIndexPath&, TableViewCell*, TableView*) {}
+		virtual void TableViewWillReloadCellForRowAtIndexPath(CCIndexPath&, TableViewCell*, TableView*) {}
+		virtual float cellHeightForRowAtIndexPath(CCIndexPath&, TableView*) { return 0; }
+		virtual void didSelectRowAtIndexPath(CCIndexPath&, TableView*) {}
 	};
 }
 

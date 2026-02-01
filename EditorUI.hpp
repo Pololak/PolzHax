@@ -64,6 +64,14 @@ namespace EditorUI {
 	inline void(__thiscall* scrollWheel)(gd::EditorUI*, float, float);
 	void __fastcall scrollWheelH(gd::EditorUI*, void*, float, float);
 
+	inline void(__thiscall* onCreateButton)(gd::EditorUI*, CCObject*);
+	void __fastcall onCreateButtonH(gd::EditorUI*, void*, CCObject*);
+
+	inline void(__thiscall* setupDeleteMenu)(gd::EditorUI*);
+	void __fastcall setupDeleteMenuH(gd::EditorUI*);
+
+	std::string colorToShortString(int);
+
 	gd::EditorUI* get();
 
 	void updateObjectInfoLabel(gd::EditorUI*);
@@ -73,6 +81,7 @@ namespace EditorUI {
 	public:
 		void onAllGroup(CCObject*);
 		void onNextFreeGroup(CCObject*);
+		void onColorFilter(CCObject*);
 	};
 
 	void mem_init();

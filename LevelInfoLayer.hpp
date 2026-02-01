@@ -14,6 +14,7 @@ namespace LevelInfoLayer {
 	class Callback : public gd::LevelInfoLayer {
 	public:
 		void onExportLevel(CCObject*);
+		void onGarage(CCObject*);
 	};
 
 	void mem_init();

@@ -5,11 +5,28 @@
 #include "utils.hpp"
 #include "EditorLayerInput.hpp"
 #include "LevelEditorLayer.hpp"
+#include "ColorFilterPopup.hpp"
 
 gd::EditorUI* m_editorUI;
 
 gd::EditorUI* EditorUI::get() {
 	return m_editorUI;
+}
+
+std::string EditorUI::colorToShortString(int id) {
+	switch (id) {
+	case 0: return "D"; break;
+	case 1: return "P1"; break;
+	case 2: return "P2"; break;
+	case 3: return "C1"; break;
+	case 4: return "C2"; break;
+	case 5: return "LBG"; break;
+	case 6: return "C3"; break;
+	case 7: return "C4"; break;
+	case 8: return "3DL"; break;
+	case 9: return "W"; break;
+	default: return "Unk"; break;
+	}
 }
 
 std::string colorToString(int id) {
@@ -62,6 +79,8 @@ std::string typeToString(gd::GameObjectType type) {
 }
 
 void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
+	if (!setting().onShowObjectInfo) return;
+
 	auto objectInfoLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(2701));
 
 	if (objectInfoLabel) {
@@ -241,6 +260,15 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	}
 	//
 
+	if (setting().onDeveloperMode) {
+		auto selectedObjectInToolboxIdLabel = CCLabelBMFont::create("ID: ", "chatFont.fnt");
+		selectedObjectInToolboxIdLabel->setAnchorPoint({ 0.f, .5f });
+		selectedObjectInToolboxIdLabel->setScale(.65f);
+		selectedObjectInToolboxIdLabel->setString(CCString::createWithFormat("ID: %i", self->m_selectedCreateObjectID)->getCString());
+		selectedObjectInToolboxIdLabel->setPosition(director->getScreenLeft() + 90.f, director->getScreenBottom() + 80.f);
+		self->addChild(selectedObjectInToolboxIdLabel, 10, 756);
+	}
+
 	return true;
 }
 
@@ -253,6 +281,9 @@ void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void*, gd::GameObjec
 
 	if ((selectFilterObject != 0) && setting().onSelectFilter) {
 		if (object->m_objectID == selectFilterObject) return EditorUI::selectObject(self, object);
+	}
+	else if ((setting().colorFilter != 0) && setting().onSelectFilter) {
+		if (object->getColorMode() == static_cast<gd::GJCustomColorMode>(setting().colorFilter)) return EditorUI::selectObject(self, object);
 	}
 	else {
 		EditorUI::selectObject(self, object);
@@ -270,6 +301,15 @@ void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void*, CCArray* obj
 		auto filteredObjects = CCArray::create();
 		for (int i = 0; i < objects->count(); i++) {
 			if (reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i))->m_objectID == selectFilterObject) {
+				filteredObjects->addObject(objects->objectAtIndex(i));
+			}
+		}
+		return EditorUI::selectObjects(self, filteredObjects);
+	}
+	else if ((setting().colorFilter != 0) && setting().onSelectFilter) {
+		auto filteredObjects = CCArray::create();
+		for (int i = 0; i < objects->count(); i++) {
+			if (reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i))->getColorMode() == static_cast<gd::GJCustomColorMode>(setting().colorFilter)) {
 				filteredObjects->addObject(objects->objectAtIndex(i));
 			}
 		}
@@ -567,6 +607,36 @@ void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void* edx, float dy,
 	}
 }
 
+void __fastcall EditorUI::onCreateButtonH(gd::EditorUI* self, void*, CCObject* sender) {
+	EditorUI::onCreateButton(self, sender);
+
+	auto selectedObjectInToolboxIdLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(756));
+	if (selectedObjectInToolboxIdLabel) {
+		selectedObjectInToolboxIdLabel->setString(CCString::createWithFormat("ID: %i", self->m_selectedCreateObjectID)->getCString());
+	}
+}
+
+void EditorUI::Callback::onColorFilter(CCObject* sender) {
+	ColorFilterPopup::create(this)->show();
+}
+
+void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
+	EditorUI::setupDeleteMenu(self);
+
+	const int colors[] = {
+		0, 1, 2, 5, 3, 4, 6, 7, 8, 9
+	};
+
+	auto onColorFilterSpr = gd::ButtonSprite::create("", 24, 0, 1.f, true, "bigFont.fnt", "GJ_button_04.png", 40.f);
+	onColorFilterSpr->setScale(.9f);
+	onColorFilterSpr->m_label->setString(EditorUI::colorToShortString(colors[setting().colorFilter]).c_str());
+	onColorFilterSpr->m_label->limitLabelWidth(32.f, .75f, .1f);
+	auto onColorFilter = gd::CCMenuItemSpriteExtra::create(onColorFilterSpr, self, menu_selector(EditorUI::Callback::onColorFilter));
+	onColorFilter->setPosition({ 33.f, -18.f });
+
+	self->m_deleteMenu->addChild(onColorFilter, 0, 23);
+}
+
 void __fastcall EditorUI::destructorH(gd::EditorUI* self, void*) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
@@ -598,6 +668,8 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x489c0), EditorUI::onPlaytestH, reinterpret_cast<void**>(&EditorUI::onPlaytest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48380), EditorUI::deselectAllH, reinterpret_cast<void**>(&EditorUI::deselectAll));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee90), EditorUI::scrollWheelH, reinterpret_cast<void**>(&EditorUI::scrollWheel));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47400), EditorUI::onCreateButtonH, reinterpret_cast<void**>(&EditorUI::onCreateButton));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3fb90), EditorUI::destructorH, reinterpret_cast<void**>(&EditorUI::destructor));
 }

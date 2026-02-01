@@ -137,6 +137,7 @@ void EditorPauseLayer::Callback::onShowObjectInfo(CCObject*) {
 		auto objectInfoLabel = static_cast<CCLabelBMFont*>(editorUI->getChildByTag(2701));
 		if (objectInfoLabel) {
 			objectInfoLabel->setVisible(setting().onShowObjectInfo);
+			EditorUI::updateObjectInfoLabel(editorUI);
 		}
 	}
 }

@@ -39,6 +39,14 @@ namespace gd {
         bool m_customSongFilter; // 0x148
         bool m_songFilter; // 0x149
 
+        static GJSearchObject* create(SearchType searchType, std::string searchQuery) {
+            auto ret = reinterpret_cast<GJSearchObject * (__fastcall*)(SearchType, std::string)>(base + 0x651b0)(searchType, searchQuery);
+
+            __asm add esp, 0x18
+
+            return ret;
+        }
+
         const char* getKey() {
             return reinterpret_cast<const char*(__fastcall*)(GJSearchObject*)>(base + 0x65570)(this);
         }

@@ -16,6 +16,10 @@ namespace gd {
 		void updateLevelOrder() {
 			reinterpret_cast<void(__fastcall*)(LocalLevelManager*)>(base + 0xacce0)(this);
 		}
+
+		cocos2d::CCArray* getAllLevelsWithName(gd::string string) {
+			return reinterpret_cast<cocos2d::CCArray * (__thiscall*)(LocalLevelManager*, gd::string)>(base + 0xac700)(this, string);
+		}
 	};
 }
 

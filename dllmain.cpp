@@ -14,6 +14,9 @@
 #include "EditorUI.hpp"
 #include "EndLevelLayer.hpp"
 #include "GameObject.hpp"
+#include "GJGarageLayer.hpp"
+#include "GJRotationControl.hpp"
+#include "GJScoreCell.hpp"
 #include "LevelBrowserLayer.hpp"
 #include "LevelEditorLayer.hpp"
 #include "LevelInfoLayer.hpp"
@@ -120,7 +123,7 @@ void __fastcall CCTransitionScene_initWithDurationH(CCTransitionScene* self, voi
 
 inline bool(__thiscall* CCKeyboardDispatcher_dispatchKeyboardMSG)(CCKeyboardDispatcher*, enumKeyCodes, bool);
 bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* self, void*, enumKeyCodes key, bool isDown) {
-    auto ret = CCKeyboardDispatcher_dispatchKeyboardMSG(self, key, isDown);
+    bool ret = CCKeyboardDispatcher_dispatchKeyboardMSG(self, key, isDown);
 
     auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
     if (playLayer && isDown) {
@@ -193,6 +196,9 @@ DWORD WINAPI my_thread(void* hModule) {
     EditorUI::mem_init();
     EndLevelLayer::mem_init();
     GameObject::mem_init();
+    GJGarageLayer::mem_init();
+    //GJRotationControl::mem_init();
+    GJScoreCell::mem_init();
     LevelBrowserLayer::mem_init();
     LevelEditorLayer::mem_init();
     LevelInfoLayer::mem_init();
@@ -210,7 +216,7 @@ DWORD WINAPI my_thread(void* hModule) {
 
     MH_EnableHook(MH_ALL_HOOKS);
 
-    MH_CreateHook(reinterpret_cast<LPVOID>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240), hkMainLoop, reinterpret_cast<LPVOID*>(&fpMainLoop));
+    MH_CreateHook(reinterpret_cast<LPVOID*>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240), hkMainLoop, reinterpret_cast<LPVOID*>(&fpMainLoop));
 
     return true;
 }

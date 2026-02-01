@@ -65,16 +65,30 @@ namespace gd {
 
 #include "GDProtocols.h"
 #include "delegates/delegates.h"
-#include "GameToolbox.h"
 
 #include "actions/CCCircleWave.h"
+
+#include "achievement_nodes/AchievementBar.h"
+#include "achievement_nodes/AchievementNotifier.h"
 
 #include "menu_nodes/CCMenuItemSpriteExtra.h"
 #include "menu_nodes/CCMenuItemToggler.h"
 #include "menu_nodes/Slider.h"
 
-#include "achievement_nodes/AchievementBar.h"
-#include "achievement_nodes/AchievementNotifier.h"
+#include "manager_nodes/GManager.h"
+#include "manager_nodes/GameManager.h"
+#include "manager_nodes/GameSoundManager.h"
+#include "manager_nodes/AchievementManager.h"
+#include "manager_nodes/GameLevelManager.h"
+#include "manager_nodes/GameStatsManager.h"
+#include "manager_nodes/LocalLevelManager.h"
+
+#include "scroll_nodes/CCContentLayer.h"
+#include "scroll_nodes/CCIndexPath.h"
+#include "scroll_nodes/CCScrollLayerExt.h"
+#include "scroll_nodes/TableView.h"
+#include "scroll_nodes/BoomListView.h"
+#include "scroll_nodes/CustomListView.h"
 
 #include "sprite_nodes/CCSpritePlus.h"
 #include "sprite_nodes/GameObject.h"
@@ -111,33 +125,22 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/LevelInfoLayer.h"
 #include "layers_scenes_transitions_nodes/LevelSearchLayer.h"
 #include "layers_scenes_transitions_nodes/EndLevelLayer.h"
-
-#include "scroll_nodes/CCContentLayer.h"
-#include "scroll_nodes/CCIndexPath.h"
-#include "scroll_nodes/CCScrollLayerExt.h"
-#include "scroll_nodes/TableView.h"
-#include "scroll_nodes/BoomListView.h"
-#include "scroll_nodes/CustomListView.h"
-
-#include "manager_nodes/GManager.h"
-#include "manager_nodes/GameManager.h"
-#include "manager_nodes/GameSoundManager.h"
-#include "manager_nodes/AchievementManager.h"
-#include "manager_nodes/GameLevelManager.h"
-#include "manager_nodes/GameStatsManager.h"
-#include "manager_nodes/LocalLevelManager.h"
+#include "layers_scenes_transitions_nodes/GJGarageLayer.h"
+#include "layers_scenes_transitions_nodes/GaragePage.h"
+#include "layers_scenes_transitions_nodes/GJScoreCell.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
+
+#include "level_nodes/EndPortalObject.h"
+#include "level_nodes/GJGameLevel.h"
+#include "level_nodes/LevelSettingsObject.h"
 
 #include "sprite_nodes/ButtonSprite.h"
 #include "sprite_nodes/CCAnimatedSprite.h"
 #include "sprite_nodes/PlayerObject.h"
 #include "sprite_nodes/TextArea.h"
 #include "sprite_nodes/HardStreak.h"
-
-#include "level_nodes/EndPortalObject.h"
-#include "level_nodes/GJGameLevel.h"
-#include "level_nodes/LevelSettingsObject.h"
+#include "sprite_nodes/SimplePlayer.h"
 
 #include "text_input_nodes/CCTextInputNode.h"
 
@@ -149,5 +152,7 @@ namespace gd {
 #include "other_nodes/CheckpointObject.h"
 #include "other_nodes/ColorAction.h"
 #include "other_nodes/GJSearchObject.h"
+
+#include "GameToolbox.h"
 
 #endif

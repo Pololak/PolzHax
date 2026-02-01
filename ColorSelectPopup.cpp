@@ -1,6 +1,7 @@
 #include "ColorSelectPopup.hpp"
 #include "LevelEditorLayer.hpp"
 #include "PulseBuilderPopup.hpp"
+#include "RGBColorInputWidget.hpp"
 
 class FadeTimeInput : public cocos2d::CCLayer, gd::TextInputDelegate {
 protected:
@@ -103,6 +104,10 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 		self->m_buttonMenu->addChild(onPulseHelper);
 	}
 
+	auto colorInputWidget = RGBColorInputWidget::create(self);
+	colorInputWidget->setPosition(director->getScreenLeft() + 67.5f, winSize.height / 2.f + 20.f);
+	self->m_mainLayer->addChild(colorInputWidget, 0, 211);
+
 	return true;
 }
 
@@ -115,7 +120,18 @@ void __fastcall ColorSelectPopup::sliderChangedH(gd::ColorSelectPopup* self, voi
 	}
 }
 
+void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* _self, void*, ccColor3B color) {
+	ColorSelectPopup::colorValueChanged(_self, color);
+	auto self = reinterpret_cast<gd::ColorSelectPopup*>(reinterpret_cast<uintptr_t>(_self) - 0x1bc);
+
+	auto colorInputWidget = static_cast<RGBColorInputWidget*>(self->m_mainLayer->getChildByTag(211));
+	if (colorInputWidget) {
+		colorInputWidget->update_labels(true, true);
+	}
+}
+
 void ColorSelectPopup::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29db0), ColorSelectPopup::initH, reinterpret_cast<void**>(&ColorSelectPopup::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x2ae00), ColorSelectPopup::sliderChangedH, reinterpret_cast<void**>(&ColorSelectPopup::sliderChanged));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x2af60), ColorSelectPopup::colorValueChangedH, reinterpret_cast<void**>(&ColorSelectPopup::colorValueChanged));
 }

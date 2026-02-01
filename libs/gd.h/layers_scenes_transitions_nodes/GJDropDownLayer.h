@@ -19,8 +19,11 @@ namespace gd {
 		bool m_removeOnExit;
 		GJDropDownLayerDelegate* m_delegate;
 
-		void showLayer(bool transition) {
-			reinterpret_cast<void(__thiscall*)(GJDropDownLayer*, bool)>(base + 0x7bf20)(this, transition);
+		void showLayer(bool noTransition) {
+			reinterpret_cast<void(__thiscall*)(GJDropDownLayer*, bool)>(base + 0x7bf20)(this, noTransition);
+		}
+		void hideLayer(bool noTransition) {
+			reinterpret_cast<void(__thiscall*)(GJDropDownLayer*, bool)>(base + 0x7bff0)(this, noTransition);
 		}
 	};
 	#pragma runtime_checks("s", restore)

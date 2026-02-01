@@ -110,7 +110,7 @@ void Hitboxes::drawSolidsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode)
 }
 
 void Hitboxes::drawHazardsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
-    if (obj->m_objectRadius > 0)
+    if ((obj->m_objectRadius > 0) && obj->m_objectType == gd::GameObjectType::Hazard)
         Hitboxes::drawCircleObj(drawNode, obj, { setting().hazardR / 255.f, setting().hazardG / 255.f, setting().hazardB / 255.f, setting().hitboxesOpacity / 255.f });
     else if (obj->m_objectType == gd::GameObjectType::Hazard)
         Hitboxes::drawRectObj(drawNode, obj, { setting().hazardR / 255.f, setting().hazardG / 255.f, setting().hazardB / 255.f, setting().hitboxesOpacity / 255.f });

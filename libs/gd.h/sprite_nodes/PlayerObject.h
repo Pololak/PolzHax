@@ -118,8 +118,37 @@ namespace gd {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xdfff0)(this, frameID);
 		}
 
+		void updatePlayerShipFrame(int frameID) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xe0140)(this, frameID);
+		}
+
+		void updatePlayerRollFrame(int frameID) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xe0430)(this, frameID);
+		}
+
+		void updatePlayerBirdFrame(int frameID) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xe0290)(this, frameID);
+		}
+
+		void updatePlayerDartFrame(int frameID) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xe0580)(this, frameID);
+		}
+
 		OBB2D* getOrientedBox() {
 			return reinterpret_cast<OBB2D * (__fastcall*)(PlayerObject*)>(base + 0xe1260)(this);
+		}
+
+		virtual void setColor(cocos2d::_ccColor3B const& color) {
+			return reinterpret_cast<void(__thiscall*)(PlayerObject*, cocos2d::_ccColor3B const&)>(base + 0xdfc40)(this, color);
+		}
+
+		void setSecondColor(cocos2d::_ccColor3B const& color) {
+			this->m_playerFrameSecondary->setColor(color);
+			this->m_vehicleFrameSecondary->setColor(color);
+		}
+
+		void updateGlowColor() {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*)>(base + 0xdfc80)(this);
 		}
 	};
 }
