@@ -166,6 +166,31 @@ void EditorUI::Callback::onNextFreeGroup(CCObject* sender) {
 	}
 }
 
+void EditorUI::Callback::onGoToGroup(CCObject*) {
+	auto objs = this->getSelectedObjects();
+
+	CCARRAY_FOREACH_B_TYPE(objs, obj, gd::GameObject) {
+		if (obj) {
+			int objectGroup = obj->m_editorGroup;
+			this->m_editorLayer->m_groupIDFilter = objectGroup;
+			this->m_currentGroupLabel->setString(CCString::createWithFormat("%d", objectGroup)->getCString());
+
+			auto onAllGroup = static_cast<gd::CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(this->m_deselectBtn->getParent())->getChildByTag(2702));
+			if (onAllGroup) {
+				onAllGroup->setVisible(false);
+				onAllGroup->setEnabled(false);
+			}
+
+			updateGuideTogglePosition(this);
+
+			auto editorLayerInput = static_cast<EditorLayerInput*>(this->getChildByTag(2703));
+			if (editorLayerInput) {
+				editorLayerInput->updateInputNode();
+			}
+		}
+	}
+}
+
 bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer* editorLayer) {
 	m_editorUI = self;
 	if (!EditorUI::init(self, editorLayer)) return false;
@@ -236,6 +261,18 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	self->addChild(editorLayerInput, 0, 2703);
 
 	updateGuideTogglePosition(self);
+
+	auto onGoToGroupSpr = CCSprite::create("GJ_goToGroupBtn_001.png");
+	onGoToGroupSpr->setScale(.85f);
+	onGoToGroupSpr->setPositionY(onGoToGroupSpr->getPositionY() - 1.f);
+	auto onGoToGroup = gd::CCMenuItemSpriteExtra::create(onGoToGroupSpr, self, menu_selector(EditorUI::Callback::onGoToGroup));
+	onGoToGroup->setPosition(self->m_editGroupBtn->getPositionX() - 44.f, self->m_editGroupBtn->getPositionY());
+	onGoToGroup->setOpacity(175);
+	onGoToGroup->setColor(ccGRAY);
+	onGoToGroup->setEnabled(false);
+	onGoToGroup->setVisible(false);
+	rightMenu->addChild(onGoToGroup, 0, 2704);
+
 
 	// fake buttons lol
 	auto buttonPageMenu = static_cast<CCMenu*>(static_cast<gd::ButtonPage*>(self->m_editButtonBar->m_pagesArray->objectAtIndex(1))->getChildren()->objectAtIndex(0));
@@ -356,6 +393,22 @@ void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self, void*) {
 			onTrash->setOpacity(175);
 			onTrash->setColor(ccGRAY);
 			onTrash->setEnabled(false);
+		}
+	}
+
+	auto onGoToGroup = static_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(2704));
+	if (onGoToGroup) {
+		if (self->getSelectedObjects()->count()) {
+			onGoToGroup->setOpacity(255);
+			onGoToGroup->setColor(ccWHITE);
+			onGoToGroup->setEnabled(true);
+			onGoToGroup->setVisible(true);
+		}
+		else {
+			onGoToGroup->setOpacity(175);
+			onGoToGroup->setColor(ccGRAY);
+			onGoToGroup->setEnabled(false);
+			onGoToGroup->setVisible(false);
 		}
 	}
 
@@ -637,7 +690,7 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 	self->m_deleteMenu->addChild(onColorFilter, 0, 23);
 }
 
-void __fastcall EditorUI::destructorH(gd::EditorUI* self, void*) {
+void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
 	m_editorUI = nullptr;

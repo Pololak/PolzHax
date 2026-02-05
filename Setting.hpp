@@ -131,6 +131,7 @@ struct SettingStruct {
 
 	// Universal
 	bool onFPSBypass; float fpsValue = 60.f;
+	bool onTPSBypass; float tpsValue = 60.f;
 	bool onAllowLowVolume;
 	bool onAutoSafeMode;
 	bool onDisableSongAlert;
@@ -314,6 +315,7 @@ DEF_SCHEMA(
 
 	// Universal
 	onFPSBypass, fpsValue,
+	onTPSBypass, tpsValue,
 	onAllowLowVolume,
 	onAutoSafeMode,
 	onDisableSongAlert,

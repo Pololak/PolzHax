@@ -2,6 +2,8 @@
 #include "LevelEditorLayer.hpp"
 #include "PulseBuilderPopup.hpp"
 #include "RGBColorInputWidget.hpp"
+#include "LiveColorEdit.hpp"
+#include "LevelSettingsLayer.hpp"
 
 class FadeTimeInput : public cocos2d::CCLayer, gd::TextInputDelegate {
 protected:
@@ -76,6 +78,24 @@ void ColorSelectPopup::Callback::onPulseHelper(CCObject* sender) {
 	pulseBuilder->show();
 }
 
+void ColorSelectPopup::Callback::onLiveEdit(CCObject*) {
+	if (LevelEditorLayer::get()) {
+		auto liveColorEdit = static_cast<LiveColorEdit*>(LevelEditorLayer::get()->m_uiLayer->getChildByTag(9095));
+		if (liveColorEdit) {
+			liveColorEdit->closeColorEdit(nullptr);
+		}
+
+		auto newLiveColorEdit = LiveColorEdit::create(this->m_targetObject, this->getTag());
+		newLiveColorEdit->setPosition(CCDirector::sharedDirector()->getScreenLeft() + 110.f, CCDirector::sharedDirector()->getScreenTop() - 140.f);
+		LevelEditorLayer::get()->m_uiLayer->addChild(newLiveColorEdit, 105, 9095);
+	}
+
+	this->closeColorSelect(nullptr);
+	if (LevelSettingsLayer::get()) {
+		LevelSettingsLayer::get()->onClose(nullptr);
+	}
+}
+
 bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::GameObject* object, int colorID, int playerColor, int blending) {
 	if (!ColorSelectPopup::init(self, object, colorID, playerColor, blending)) return false;
 
@@ -107,6 +127,18 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 	auto colorInputWidget = RGBColorInputWidget::create(self);
 	colorInputWidget->setPosition(director->getScreenLeft() + 67.5f, winSize.height / 2.f + 20.f);
 	self->m_mainLayer->addChild(colorInputWidget, 0, 211);
+
+	auto onLiveEditSpr = CCSprite::create("GJ_editHSVBtn2_001.png");
+	auto onLiveEdit = gd::CCMenuItemSpriteExtra::create(onLiveEditSpr, self, menu_selector(ColorSelectPopup::Callback::onLiveEdit));
+	onLiveEdit->setPosition(-130.f, 260.f);
+	self->m_buttonMenu->addChild(onLiveEdit);
+
+	if (LevelEditorLayer::get()) {
+		auto liveColorEdit = static_cast<LiveColorEdit*>(LevelEditorLayer::get()->m_uiLayer->getChildByTag(9095));
+		if (liveColorEdit) {
+			liveColorEdit->closeColorEdit(nullptr);
+		}
+	}
 
 	return true;
 }

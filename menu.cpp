@@ -2231,6 +2231,11 @@ void imgui_render() {
 				updateFPSBypass();
 			}
 
+			ImGui::SetNextItemWidth(80.f);
+			ImGui::DragFloat("##tpsBypass", &setting().tpsValue, 1.f, 1.f, 480.f, "%.0f TPS");
+			ImGui::SameLine();
+			ImGui::CheckboxF("Unlock TPS", &setting().onTPSBypass);
+
 			if (ImGui::CheckboxF("Allow Low Volume", &setting().onAllowLowVolume)) {
 				if (setting().onAllowLowVolume) {
 					sequence_patch(gd::base + 0xd772e, { 0xeb });

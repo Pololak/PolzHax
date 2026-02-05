@@ -186,7 +186,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x293f0), AppDelegate_trySaveGameH, reinterpret_cast<void**>(&AppDelegate_trySaveGame));
 
-    //CCSchedulerHook::mem_init();
+    CCSchedulerHook::mem_init();
     ColorSelectPopup::mem_init();
     CustomizeObjectLayer::mem_init();
     DrawGridLayer::mem_init();

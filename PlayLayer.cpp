@@ -237,6 +237,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	startPosObjects.clear();
 	currentStartPos = 0;
 
+	setting().beforeRestartCheatsCount = setting().cheatsCount;
+
 	if (!PlayLayer::init(self, level)) return false;
 
 	//
@@ -385,6 +387,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	}
 
 	PlayLayer::resetLevel(self);
+
+	setting().beforeRestartCheatsCount = setting().cheatsCount;
 
 	//PlayLayer::clearHitboxes();
 

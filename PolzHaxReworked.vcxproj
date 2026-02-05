@@ -667,6 +667,7 @@
     <ClInclude Include="libs\nfd\src\include\nfd.h" />
     <ClInclude Include="libs\nfd\src\nfd_common.h" />
     <ClInclude Include="libs\portable-file-dialogs.h" />
+    <ClInclude Include="LiveColorEdit.hpp" />
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="MenuLayer.hpp" />
@@ -726,6 +727,7 @@
     <ClCompile Include="libs\imgui-hook\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="libs\nfd\src\nfd_common.c" />
     <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
+    <ClCompile Include="LiveColorEdit.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="patching.cpp" />

@@ -93,6 +93,26 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	onShowEndLayer->setEnabled(false);
 	onShowEndLayer->setPosition(showEndLayerMenu->convertToNodeSpace(ccp(winSize.width / 2.f, director->getScreenTop() + 20.f)));
 	showEndLayerMenu->addChild(onShowEndLayer, 0, 56);
+
+	auto cheatIndicator = CCLabelBMFont::create(".", "bigFont.fnt");
+	cheatIndicator->setAnchorPoint({ 0.f, 1.f });
+	cheatIndicator->setPosition(winSize.width / 2.f - 172.f, winSize.height / 2.f + 127.5f);
+
+	cheatIndicator->setColor(ccGREEN);
+
+	if (setting().cheatsCount == 0 && setting().beforeRestartCheatsCount == 0 && !(setting().onSafeMode || setting().isSafeMode)) {
+		cheatIndicator->setColor(ccGREEN);
+	}
+	else if (setting().cheatsCount == 0 && setting().beforeRestartCheatsCount == 0 && setting().onSafeMode) {
+		cheatIndicator->setColor(ccYELLOW);
+	}
+	else if (setting().cheatsCount > 0 || setting().beforeRestartCheatsCount > 0 && (setting().onSafeMode || setting().isSafeMode)) {
+		cheatIndicator->setColor(ccORANGE);
+	}
+	else if (setting().cheatsCount > 0 || setting().beforeRestartCheatsCount > 0 && !(setting().onSafeMode || setting().isSafeMode)) {
+		cheatIndicator->setColor(ccRED);
+	}
+	self->m_mainLayer->addChild(cheatIndicator, 15);
 }
 
 void __fastcall EndLevelLayer::completeSpriteH() {

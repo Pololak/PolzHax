@@ -42,6 +42,10 @@ namespace gd {
 		void onGravityFlipped(CCObject* sender) {
 			reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, CCObject*)>(base + 0x99b10)(this, sender);
 		}
+
+		void onClose(CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, CCObject*)>(base + 0x99dc0)(this, sender);
+		}
 	};
 }
 

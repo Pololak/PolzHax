@@ -15,6 +15,7 @@ namespace ColorSelectPopup {
 	public:
 		void onDefault(CCObject*);
 		void onPulseHelper(CCObject*);
+		void onLiveEdit(CCObject*);
 	};
 
 	void mem_init();

@@ -8,5 +8,10 @@ namespace LevelSettingsLayer {
 	inline void(__thiscall* colorSelectClosed)(gd::LevelSettingsLayer*, gd::ColorSelectPopup*);
 	void __fastcall colorSelectClosedH(gd::LevelSettingsLayer*, void*, gd::ColorSelectPopup*);
 
+	inline void(__thiscall* destructor)(gd::LevelSettingsLayer*);
+	void __fastcall destructorH(gd::LevelSettingsLayer*);
+
+	gd::LevelSettingsLayer* get();
+
 	void mem_init();
 }

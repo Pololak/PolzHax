@@ -1,6 +1,13 @@
 #include "LevelSettingsLayer.hpp"
 
+gd::LevelSettingsLayer* m_levelSettingsLayer;
+
+gd::LevelSettingsLayer* LevelSettingsLayer::get() {
+	return m_levelSettingsLayer;
+}
+
 bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject) {
+	m_levelSettingsLayer = self;
 	if (!LevelSettingsLayer::init(self, settingsObject)) return false;
 
 	auto director = CCDirector::sharedDirector();
@@ -85,7 +92,13 @@ void __fastcall LevelSettingsLayer::colorSelectClosedH(gd::LevelSettingsLayer* _
 	}
 }
 
+void __fastcall LevelSettingsLayer::destructorH(gd::LevelSettingsLayer* self) {
+	LevelSettingsLayer::destructor(self);
+	m_levelSettingsLayer = nullptr;
+}
+
 void LevelSettingsLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x97050), LevelSettingsLayer::initH, reinterpret_cast<void**>(&LevelSettingsLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9a0c0), LevelSettingsLayer::colorSelectClosedH, reinterpret_cast<void**>(&LevelSettingsLayer::colorSelectClosed));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x96e90), LevelSettingsLayer::destructorH, reinterpret_cast<void**>(&LevelSettingsLayer::destructor));
 }

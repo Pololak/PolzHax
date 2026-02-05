@@ -8,6 +8,7 @@ namespace gd {
 
 	class SliderThumb : public cocos2d::CCMenuItemImage {
 	public:
+
 		float getValue() {
 			return (this->getPosition().x + this->getScale() * 200.0 * 0.5) / (this->getScale() * 200.0);
 		}

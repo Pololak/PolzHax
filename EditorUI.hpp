@@ -5,7 +5,7 @@ namespace EditorUI {
 	bool __fastcall initH(gd::EditorUI*, void*, gd::LevelEditorLayer*);
 
 	inline void(__thiscall* destructor)(gd::EditorUI*);
-	void __fastcall destructorH(gd::EditorUI*, void*);
+	void __fastcall destructorH(gd::EditorUI*);
 
 	inline void(__thiscall* selectObject)(gd::EditorUI*, gd::GameObject*);
 	void __fastcall selectObjectH(gd::EditorUI*, void*, gd::GameObject*);
@@ -82,6 +82,7 @@ namespace EditorUI {
 		void onAllGroup(CCObject*);
 		void onNextFreeGroup(CCObject*);
 		void onColorFilter(CCObject*);
+		void onGoToGroup(CCObject*);
 	};
 
 	void mem_init();

@@ -63,6 +63,19 @@ namespace gd {
 		}
 		FLAlertLayer() {
 			reinterpret_cast<void(__thiscall*)(FLAlertLayer*)>(base + 0x15160)(this);
+
+			// This works too (how)
+			//m_buttonMenu = nullptr;
+			//m_controlConnected = -1;
+			//m_ZOrder = 0;
+			//m_alertProtocol = nullptr;
+			//m_scene = nullptr;
+			//m_reverseKeyBack = false;
+			//m_mainLayer = nullptr;
+			//m_scrollingLayer = nullptr;
+			//m_scrollAction = -1;
+			//m_containsBorder = false;
+			//m_noAction = false;
 		}
 
 		void onBtn1(cocos2d::CCObject* btn) {
