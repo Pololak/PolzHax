@@ -55,6 +55,15 @@ namespace gd {
 		void resetTimerForKey(char const* key) {
 			reinterpret_cast<void(__thiscall*)(GameLevelManager*, char const*)>(gd::base + 0x5440)(this, key);
 		}
+
+		int getTimeLeft(char const* key, float delay) {
+			__asm movss xmm2, delay
+			return reinterpret_cast<int(__thiscall*)(GameLevelManager*, char const*)>(base + 0x585d0)(this, key);
+		}
+
+		void makeTimeStamp(char const* key) {
+			reinterpret_cast<void(__thiscall*)(GameLevelManager*, char const*)>(base + 0x58350)(this, key);
+		}
 	};
 }
 

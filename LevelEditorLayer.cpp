@@ -414,6 +414,9 @@ void LevelEditorLayer::resetColors() {
 
 					if (object->m_invisibleMode)
 						object->setObjectColor(ccORANGE);
+
+					if (object->getColorMode() == gd::GJCustomColorMode::Col3DL)
+						object->setObjectColor(ccYELLOW);
 				}
 			}
 		}

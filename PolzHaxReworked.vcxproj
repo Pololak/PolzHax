@@ -174,6 +174,7 @@
     <ClInclude Include="IconPreviewPopup.hpp" />
     <ClInclude Include="Icons.hpp" />
     <ClInclude Include="ImGuiUtils.hpp" />
+    <ClInclude Include="InfoLayer.hpp" />
     <ClInclude Include="LevelBrowserLayer.hpp" />
     <ClInclude Include="LevelEditorLayer.hpp" />
     <ClInclude Include="LevelInfoLayer.hpp" />
@@ -598,6 +599,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGroundLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJScoreCell.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
@@ -711,6 +713,7 @@
     <ClCompile Include="Hitboxes.cpp" />
     <ClCompile Include="IconPreviewPopup.cpp" />
     <ClCompile Include="ImGuiUtils.cpp" />
+    <ClCompile Include="InfoLayer.cpp" />
     <ClCompile Include="LevelBrowserLayer.cpp" />
     <ClCompile Include="LevelEditorLayer.cpp" />
     <ClCompile Include="LevelInfoLayer.cpp" />

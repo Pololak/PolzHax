@@ -128,6 +128,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/GJGarageLayer.h"
 #include "layers_scenes_transitions_nodes/GaragePage.h"
 #include "layers_scenes_transitions_nodes/GJScoreCell.h"
+#include "layers_scenes_transitions_nodes/InfoLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
 

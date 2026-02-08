@@ -7,27 +7,45 @@ namespace gd {
 	#pragma runtime_checks("s", off)
 	class ButtonSprite : public cocos2d::CCSprite {
 	public:
-		int m_mode;
-		float m_width;
-		float m_fUnknown1;
-		float m_scale;
-		float m_height;
-		bool m_absolute;
-		cocos2d::CCLabelBMFont* m_label;
-		cocos2d::CCSprite* m_btnSprite;
-		cocos2d::extension::CCScale9Sprite* m_bgSprite;
-		cocos2d::CCPoint m_textOffset;
-		cocos2d::CCPoint m_spritePosition;
-		std::string m_caption;
+		int m_mode; // 0x1b8
+		float m_width; // 0x1bc
+		float m_fUnknown1; // 0x1c0
+		float m_scale; // 0x1c4
+		float m_height; // 0x1c8
+		bool m_absolute; // 0x1cc
+		cocos2d::CCLabelBMFont* m_label; // 0x1d0
+		cocos2d::CCSprite* m_btnSprite; // 0x1d4
+		cocos2d::extension::CCScale9Sprite* m_bgSprite; // 0x1d8
+		cocos2d::CCPoint m_textOffset; // 0x1dc
+		cocos2d::CCPoint m_spritePosition; // 0x1e4
+		std::string m_caption; // 0x1ec
 
-		static auto create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float buttonHeight) {
-			auto ret = reinterpret_cast<ButtonSprite*(__vectorcall*)(
-				float, float, float, float, float, float, // xmm registers
-				const char*, int, // ecx and edx
-				int, bool, const char*, const char*, float // stack
-				)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, buttonWidth, widthLimit, limitWidth, font, sprite, buttonHeight);
+		//static auto create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float buttonHeight) {
+		//	auto ret = reinterpret_cast<ButtonSprite*(__vectorcall*)(
+		//		float, float, float, float, float, float, // xmm registers
+		//		const char*, int, // ecx and edx
+		//		int, bool, const char*, const char*, float // stack
+		//		)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, buttonWidth, widthLimit, limitWidth, font, sprite, buttonHeight);
+
+		//	__asm add esp, 0x14
+
+		//	return ret;
+		//}
+		
+		static ButtonSprite* create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float buttonHeight) {
+			__asm movss xmm3, scale
+			auto ret = reinterpret_cast<ButtonSprite * (__fastcall*)(const char*, int, int, bool, const char*, const char*, float)>(base + 0x9800)(label, buttonWidth, widthLimit, limitWidth, font, sprite, buttonHeight);
 
 			__asm add esp, 0x14
+
+			return ret;
+		}
+
+		static ButtonSprite* create(cocos2d::CCSprite* topSprite, int buttonWidth, int widthLimit, float height, float scale, bool limitWidth, char const* sprite) {
+			__asm movss xmm3, height
+			auto ret = reinterpret_cast<ButtonSprite * (__fastcall*)(cocos2d::CCSprite*, int, int, float, bool, char const*)>(base + 0x9510)(topSprite, buttonWidth, widthLimit, scale, limitWidth, sprite);
+
+			__asm add esp, 0xc
 
 			return ret;
 		}

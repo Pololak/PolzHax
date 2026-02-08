@@ -1674,6 +1674,12 @@
     <ClInclude Include="LiveColorEdit.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="InfoLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1843,6 +1849,9 @@
     </ClCompile>
     <ClCompile Include="LiveColorEdit.cpp">
       <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

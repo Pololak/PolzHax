@@ -128,6 +128,7 @@ struct SettingStruct {
 	bool onShowLayout; int layoutBGR = 40, layoutBGG = 125, layoutBGB = 255; int layoutGR = 0, layoutGG = 102, layoutGB = 255;
 	bool onSmartStartPos;
 	bool onStartPosSwitcher; int m_previousStartPosKey = 0x25, m_nextStartPosKey = 0x27;
+	bool onWaveSlide;
 
 	// Universal
 	bool onFPSBypass; float fpsValue = 60.f;
@@ -312,6 +313,7 @@ DEF_SCHEMA(
 	onShowLayout, layoutBGR, layoutBGG, layoutBGB, layoutGR, layoutGG, layoutGB,
 	onSmartStartPos,
 	onStartPosSwitcher, m_previousStartPosKey, m_nextStartPosKey,
+	onWaveSlide,
 
 	// Universal
 	onFPSBypass, fpsValue,

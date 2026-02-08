@@ -17,6 +17,7 @@
 #include "GJGarageLayer.hpp"
 #include "GJRotationControl.hpp"
 #include "GJScoreCell.hpp"
+#include "InfoLayer.hpp"
 #include "LevelBrowserLayer.hpp"
 #include "LevelEditorLayer.hpp"
 #include "LevelInfoLayer.hpp"
@@ -199,6 +200,7 @@ DWORD WINAPI my_thread(void* hModule) {
     GJGarageLayer::mem_init();
     //GJRotationControl::mem_init();
     GJScoreCell::mem_init();
+    InfoLayer::mem_init();
     LevelBrowserLayer::mem_init();
     LevelEditorLayer::mem_init();
     LevelInfoLayer::mem_init();

@@ -801,7 +801,15 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xf3a96, { 0x0f, 0x85, 0xb5, 0x00, 0x00, 0x00 });
 		}
 
-
+		if (setting().onWaveSlide) {
+			sequence_patch(gd::base + 0xdba98, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0xdc75a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			cheatAdd();
+		}
+		else {
+			sequence_patch(gd::base + 0xdba98, { 0x0f, 0x85, 0xe0, 0x02, 0x00, 0x00 });
+			sequence_patch(gd::base + 0xdc75a, { 0x0f, 0x85, 0x91, 0x03, 0x00, 0x00 });
+		}
 
 		// Universal
 
@@ -864,9 +872,11 @@ void imgui_render() {
 		}
 
 		if (setting().onSafeMode) {
+			setting().isSafeMode = true;
 			safeModeON();
 		}
 		else {
+			setting().isSafeMode = false;
 			safeModeOFF();
 		}
 
@@ -2218,6 +2228,20 @@ void imgui_render() {
 
 				ImGui::TreePop();
 			}
+
+			if (ImGui::CheckboxF("Wave Slide", &setting().onWaveSlide)) {
+				if (setting().onWaveSlide) {
+					sequence_patch(gd::base + 0xdba98, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0xdc75a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					cheatAdd();
+				}
+				else {
+					sequence_patch(gd::base + 0xdba98, { 0x0f, 0x85, 0xe0, 0x02, 0x00, 0x00 });
+					sequence_patch(gd::base + 0xdc75a, { 0x0f, 0x85, 0x91, 0x03, 0x00, 0x00 });
+					cheatDec();
+				}
+			}
+			ImGui::Tooltip("Lets wave slide on blocks and slopes (like D blocks in 2.1).");
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
@@ -2338,9 +2362,11 @@ void imgui_render() {
 
 			if (ImGui::CheckboxF("Safe Mode", &setting().onSafeMode)) {
 				if (setting().onSafeMode) {
+					setting().isSafeMode = true;
 					safeModeON();
 				}
 				else {
+					setting().isSafeMode = false;
 					safeModeOFF();
 				}
 			}

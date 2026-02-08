@@ -86,8 +86,8 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
     auto p2y = pointRectangle[1].y - pointRectangle[2].y;
     auto distance2 = sqrt(p2x * p2x + p2y * p2y);
 
-    auto distanceS1 = distance1 / 4;
-    auto distanceS2 = distance2 / 4;
+    auto distanceS1 = distance1 * (player->m_playerScale >= 1 ? .25f : .4f);
+    auto distanceS2 = distance2 * (player->m_playerScale >= 1 ? .25f : .4f);
 
     rectRectangle.setRect(player->getPositionX() - distance1 / 2, player->getPositionY() - distance2 / 2, distance1, distance2);
     rectRectangleSmall.setRect(player->getPositionX() - distanceS1 / 2, player->getPositionY() - distanceS2 / 2, distanceS1, distanceS2);
