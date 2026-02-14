@@ -70,6 +70,14 @@ namespace gd {
 
 			return fVar6;
 		}
+
+		void pushButton(int p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, int, bool)>(base + 0x90800)(this, p0, p1);
+		}
+
+		void releaseButton(int p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, int, bool)>(base + 0x908f0)(this, p0, p1);
+		}
 	};
 }
 

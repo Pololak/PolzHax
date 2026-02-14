@@ -150,6 +150,17 @@ namespace gd {
 		void updateGlowColor() {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*)>(base + 0xdfc80)(this);
 		}
+
+		void placeStreakPoint() {
+			reinterpret_cast<void(__fastcall*)(PlayerObject*)>(base + 0xe1270)(this);
+		}
+
+		void pushButton(int p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde080)(this, p0);
+		}
+		void releaseButton(int p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde150)(this, p0);
+		}
 	};
 }
 

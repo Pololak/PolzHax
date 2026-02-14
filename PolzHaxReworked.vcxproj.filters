@@ -1680,6 +1680,9 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="MenuGameLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1851,6 +1854,9 @@
       <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
     <ClCompile Include="InfoLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuGameLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>

@@ -53,6 +53,8 @@ protected:
 		if (btn2) {
 			gd::GameManager::sharedState()->getPlayLayer()->onQuit();
 			gd::GameSoundManager::sharedState()->playSound("quitSound_01.ogg");
+			m_bottomMenu = nullptr;
+			m_pauseLayer = nullptr;
 		}
 	}
 };
@@ -62,6 +64,7 @@ ExitAlertProtocol exitAlertProtocol;
 void __fastcall PauseLayer::onQuitH(gd::PauseLayer* self, void*, CCObject* sender) {
 	if (setting().onConfirmExit) {
 		gd::FLAlertLayer::create(&exitAlertProtocol, "Confirm Exit", "Are you sure you want to <cr>exit</c> the level?", "Cancel", "Exit")->show();
+		return;
 	}
 
 	PauseLayer::onQuit(self, sender);

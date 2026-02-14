@@ -124,6 +124,10 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 			self->updatePlayerFrame(0);
 		}
 	}
+
+	if (setting().onWaveTrailBugFix) {
+		self->placeStreakPoint();
+	}
 }
 
 void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
@@ -140,6 +144,14 @@ void __fastcall PlayerObject::collidedWithObjectH(gd::PlayerObject* self, void*,
 	PlayLayer::setDeathObject(object);
 }
 
+void __fastcall PlayerObject::loadFromCheckpointH(gd::PlayerObject* self, void*, gd::PlayerCheckpoint* playerCheckpoint) {
+	PlayerObject::loadFromCheckpoint(self, playerCheckpoint);
+
+	if (setting().onWaveTrailBugFix) {
+		self->placeStreakPoint();
+	}
+}
+
 void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd8ca0), PlayerObject::initH, reinterpret_cast<void**>(&PlayerObject::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
@@ -152,5 +164,6 @@ void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe12e0), PlayerObject::togglePlayerScaleH, reinterpret_cast<void**>(&PlayerObject::togglePlayerScale));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdad10), PlayerObject::runBallRotation2H, reinterpret_cast<void**>(&PlayerObject::runBallRotation2));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe19c0), PlayerObject::loadFromCheckpointH, reinterpret_cast<void**>(&PlayerObject::loadFromCheckpoint));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayerObject::collidedWithObjectH, reinterpret_cast<void**>(&PlayerObject::collidedWithObject));
 }

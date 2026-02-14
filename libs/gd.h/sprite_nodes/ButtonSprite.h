@@ -19,18 +19,6 @@ namespace gd {
 		cocos2d::CCPoint m_textOffset; // 0x1dc
 		cocos2d::CCPoint m_spritePosition; // 0x1e4
 		std::string m_caption; // 0x1ec
-
-		//static auto create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float buttonHeight) {
-		//	auto ret = reinterpret_cast<ButtonSprite*(__vectorcall*)(
-		//		float, float, float, float, float, float, // xmm registers
-		//		const char*, int, // ecx and edx
-		//		int, bool, const char*, const char*, float // stack
-		//		)>(base + 0x9800)(0.f, 0.f, 0.f, scale, 0.f, 0.f, label, buttonWidth, widthLimit, limitWidth, font, sprite, buttonHeight);
-
-		//	__asm add esp, 0x14
-
-		//	return ret;
-		//}
 		
 		static ButtonSprite* create(const char* label, int buttonWidth, int widthLimit, float scale, bool limitWidth, const char* font, const char* sprite, float buttonHeight) {
 			__asm movss xmm3, scale

@@ -70,6 +70,12 @@ namespace EditorUI {
 	inline void(__thiscall* setupDeleteMenu)(gd::EditorUI*);
 	void __fastcall setupDeleteMenuH(gd::EditorUI*);
 
+	inline void(__thiscall* keyDown)(gd::EditorUI*, enumKeyCodes);
+	void __fastcall keyDownH(gd::EditorUI*, void*, enumKeyCodes);
+
+	inline void(__thiscall* keyUp)(gd::EditorUI*, enumKeyCodes);
+	void __fastcall keyUpH(gd::EditorUI*, void*, enumKeyCodes);
+
 	std::string colorToShortString(int);
 
 	gd::EditorUI* get();

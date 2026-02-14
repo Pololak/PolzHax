@@ -62,22 +62,23 @@ void EditorPauseLayer::Callback::onSave(CCObject*) {
 
 void EditorPauseLayer::Callback::onSelectAll(CCObject*) {
 	auto editorLayer = this->m_levelEditorLayer;
+	auto editorUI = editorLayer->m_uiLayer;
 
-	if (editorLayer) {
-		auto editorUI = editorLayer->m_uiLayer;
-
-		CCArray* arr = CCArray::create();
-
-		CCARRAY_FOREACH_B_TYPE(editorLayer->getAllObjects(), object, gd::GameObject) {
-			if (object && (object->m_editorGroup == editorLayer->m_groupIDFilter) || editorLayer->m_groupIDFilter == -1) {
-				arr->addObject(object);
-				editorUI->selectObjects(arr);
-			}
-		}
-
-		editorUI->updateButtons();
-		editorUI->deactivateRotationControl();
+	auto sections = CCArray::create();
+	for (int i = 0; i < editorLayer->m_levelSections->count(); i++) {
+		sections->addObjectsFromArray(static_cast<CCArray*>(editorLayer->m_levelSections->objectAtIndex(i)));
 	}
+	
+	auto objects = CCArray::create();
+	for (int i = 0; i < sections->count(); i++) {
+		if (reinterpret_cast<gd::GameObject*>(sections->objectAtIndex(i))->m_editorGroup == editorLayer->m_groupIDFilter || editorLayer->m_groupIDFilter == -1) {
+			objects->addObject(sections->objectAtIndex(i));
+		}
+	}
+
+	editorUI->selectObjects(objects);
+	editorUI->updateButtons();
+	editorUI->deactivateRotationControl();
 }
 
 void selectAllWithDirection(bool rightDir) {
@@ -90,17 +91,22 @@ void selectAllWithDirection(bool rightDir) {
 		auto cameraScale = editorLayer->m_gameLayer->getScale();
 		int centerX = -(cameraPos.x) / cameraScale + CCDirector::sharedDirector()->getWinSize().width / 2;
 
-		CCArray* arr = CCArray::create();
+		auto sections = CCArray::create();
+		for (int i = 0; i < editorLayer->m_levelSections->count(); i++) {
+			sections->addObjectsFromArray(static_cast<CCArray*>(editorLayer->m_levelSections->objectAtIndex(i)));
+		}
 
-		CCARRAY_FOREACH_B_TYPE(editorLayer->getAllObjects(), object, gd::GameObject) {
+		auto objects = CCArray::create();
+		for (int i = 0; i < sections->count(); i++) {
+			auto object = reinterpret_cast<gd::GameObject*>(sections->objectAtIndex(i));
 			if (object && (object->m_editorGroup == editorLayer->m_groupIDFilter) || editorLayer->m_groupIDFilter == -1) {
 				if ((rightDir && object->getPositionX() >= centerX) || (!rightDir && object->getPositionX() <= centerX)) {
-					arr->addObject(object);
-					editorUI->selectObjects(arr);
+					objects->addObject(sections->objectAtIndex(i));
 				}
 			}
 		}
 
+		editorUI->selectObjects(objects);
 		editorUI->updateButtons();
 		editorUI->deactivateRotationControl();
 	}

@@ -672,6 +672,7 @@
     <ClInclude Include="LiveColorEdit.hpp" />
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="Menu.hpp" />
+    <ClInclude Include="MenuGameLayer.hpp" />
     <ClInclude Include="MenuLayer.hpp" />
     <ClInclude Include="patching.hpp" />
     <ClInclude Include="PauseLayer.hpp" />
@@ -732,6 +733,7 @@
     <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
     <ClCompile Include="LiveColorEdit.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MenuGameLayer.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="patching.cpp" />
     <ClCompile Include="PauseLayer.cpp" />

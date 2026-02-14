@@ -16,7 +16,7 @@ void LevelBrowserLayer::Callback::onFirstPage(CCObject* sender) {
 void LevelBrowserLayer::Callback::onLastPage(CCObject* sender) {
 	int totalItems = this->m_itemCount;
 
-	this->m_searchObject->m_page = (totalItems % 2 == 0) ? totalItems / 10 - 1 : totalItems / 10;
+	this->m_searchObject->m_page = (totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10;
 
 	this->loadPage(this->m_searchObject);
 }

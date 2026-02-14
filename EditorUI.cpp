@@ -82,7 +82,6 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 	if (!setting().onShowObjectInfo) return;
 
 	auto objectInfoLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(2701));
-
 	if (objectInfoLabel) {
 		if (self->m_selectedObject) {
 			std::stringstream ss;
@@ -99,10 +98,10 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 
 			objectInfoLabel->setString(ss.str().c_str());
 		}
-		else if (self->getSelectedObjects()->count() > 1) {
+		else if (self->m_selectedObjects->count() > 1) {
 			std::stringstream ss;
 
-			ss << "Objects: " << self->getSelectedObjects()->count() << "\n";
+			ss << "Objects: " << self->m_selectedObjects->count() << "\n";
 
 			objectInfoLabel->setString(ss.str().c_str());
 		}
@@ -690,6 +689,40 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 	self->m_deleteMenu->addChild(onColorFilter, 0, 23);
 }
 
+void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key) {
+	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf4);
+	if ((key == KEY_Up) || (key == setting().m_p1click)) {
+		if (self->m_editorLayer->m_playerState == 1) {
+			self->m_editorLayer->pushButton(1, true);
+		}
+	}
+	else if (key == setting().m_p2click) {
+		if (self->m_editorLayer->m_playerState == 1) {
+			self->m_editorLayer->pushButton(1, false);
+		}
+	}
+	else {
+		EditorUI::keyDown(_self, key);
+	}
+}
+
+void __fastcall EditorUI::keyUpH(gd::EditorUI* _self, void*, enumKeyCodes key) {
+	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf4);
+	if ((key == KEY_Up) || (key == setting().m_p1click)) {
+		if (self->m_editorLayer->m_playerState == 1) {
+			self->m_editorLayer->releaseButton(1, true);
+		}
+	}
+	else if (key == setting().m_p2click) {
+		if (self->m_editorLayer->m_playerState == 1) {
+			self->m_editorLayer->releaseButton(1, false);
+		}
+	}
+	else {
+		EditorUI::keyUp(_self, key);
+	}
+}
+
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
@@ -723,6 +756,9 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee90), EditorUI::scrollWheelH, reinterpret_cast<void**>(&EditorUI::scrollWheel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47400), EditorUI::onCreateButtonH, reinterpret_cast<void**>(&EditorUI::onCreateButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));
+
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3fb90), EditorUI::destructorH, reinterpret_cast<void**>(&EditorUI::destructor));
 }

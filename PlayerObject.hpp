@@ -32,6 +32,9 @@ namespace PlayerObject {
 	inline void(__thiscall* collidedWithObject)(gd::PlayerObject*, gd::GameObject*, CCRect);
 	void __fastcall collidedWithObjectH(gd::PlayerObject*, void*, gd::GameObject*, CCRect);
 
+	inline void(__thiscall* loadFromCheckpoint)(gd::PlayerObject*, gd::PlayerCheckpoint*);
+	void __fastcall loadFromCheckpointH(gd::PlayerObject*, void*, gd::PlayerCheckpoint*);
+
 	void setCubeIcon(int);
 	void setShipIcon(int);
 	void setRollIcon(int);

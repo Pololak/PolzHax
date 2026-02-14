@@ -25,6 +25,7 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	if (!MenuLayer::init(self)) return false;
 
 	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
 
 	std::cout << director << std::endl;
 

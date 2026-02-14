@@ -23,6 +23,7 @@
 #include "LevelInfoLayer.hpp"
 #include "LevelSearchLayer.hpp"
 #include "LevelSettingsLayer.hpp"
+#include "MenuGameLayer.hpp"
 #include "MenuLayer.hpp"
 #include "PauseLayer.hpp"
 #include "PlayerObject.hpp"
@@ -206,6 +207,7 @@ DWORD WINAPI my_thread(void* hModule) {
     LevelInfoLayer::mem_init();
     //LevelSearchLayer::mem_init();
     LevelSettingsLayer::mem_init();
+    //MenuGameLayer::mem_init();
     MenuLayer::mem_init();
     PauseLayer::mem_init();
     PlayerObject::mem_init();

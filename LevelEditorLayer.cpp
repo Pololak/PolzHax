@@ -153,8 +153,8 @@ void removeTrigger(gd::GameObject* object) {
 
 void LevelEditorLayer::moveTrigger(gd::GameObject* object) {
 	if (isColorTrigger(object)) {
-		insertTrigger(object);
 		removeTrigger(object);
+		insertTrigger(object);
 
 		if (setting().onPreviewMode) {
 			LevelEditorLayer::updatePreviewMode();
@@ -425,10 +425,22 @@ void LevelEditorLayer::resetColors() {
 
 void LevelEditorLayer::updateOrientedHitboxes(gd::LevelEditorLayer* self) {
 	if (setting().onHitboxBugFix) {
-		CCARRAY_FOREACH_B_TYPE(self->getAllObjects(), object, gd::GameObject) {
+		/*CCARRAY_FOREACH_B_TYPE(self->getAllObjects(), object, gd::GameObject) {
 			if (object && object->canRotateFree()) {
 				if ((object->getRotation() / 90.f) != 0.f) {
 					object->calculateOrientedBox();
+				}
+			}
+		}*/
+
+		CCARRAY_FOREACH_B_TYPE(self->m_levelSections, section, CCArray) {
+			if (section) {
+				CCARRAY_FOREACH_B_TYPE(section, object, gd::GameObject) {
+					if (object && object->canRotateFree()) {
+						if ((object->getRotation() / 90.f) != 0.f) {
+							object->calculateOrientedBox();
+						}
+					}
 				}
 			}
 		}

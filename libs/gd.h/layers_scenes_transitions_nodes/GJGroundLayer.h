@@ -36,6 +36,17 @@ namespace gd {
 			if (auto leftShadow = this->getChildByTag(0)) leftShadow->setVisible(false);
 			if (auto rightShadow = this->getChildByTag(1)) rightShadow->setVisible(false);
 		}
+
+		static GJGroundLayer* create(int groundID) {
+			return reinterpret_cast<GJGroundLayer * (__fastcall*)(int)>(base + 0x81140)(groundID);
+		}
+
+		//void loadGroundSprites(int p0, bool p1) {
+		//	if (this->m_groundSprite) {
+		//		auto this_00 = CCArray::create();
+		//		auto iVar1 = this->m_groundSprite->getChildren();
+		//	}
+		//}
 	};
 }
 

@@ -962,7 +962,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (010226)");
+			ImGui::Text("1.920 - v1.3.0 (140226)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -1575,6 +1575,9 @@ void imgui_render() {
 
 				ImGui::TreePop();
 			}
+
+			ImGui::CheckboxF("Wave Trail Bug Fix", &setting().onWaveTrailBugFix);
+			ImGui::Tooltip("Fixes wave trail not being visible until you click after a checkpoint/startpos.");
 
 			if (ImGui::CheckboxF("Wave Trail on Death", &setting().onWaveTrailOnDeath)) {
 				if (setting().onWaveTrailOnDeath) {
