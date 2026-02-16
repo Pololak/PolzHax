@@ -34,10 +34,14 @@ namespace gd {
 		}
 
 		float timeForXPos(float pos) {
-			return reinterpret_cast<float(__vectorcall*)(
+			__asm movss xmm1, pos
+
+			return reinterpret_cast<float(__vectorcall*)(DrawGridLayer*)>(base + 0x934f0)(this);
+
+			/*return reinterpret_cast<float(__vectorcall*)(
 				float, float, float, float, float, float,
 				DrawGridLayer*
-				)>(base + 0x934f0)(0.f, pos, 0.f, 0.f, 0.f, 0.f, this);
+				)>(base + 0x934f0)(0.f, pos, 0.f, 0.f, 0.f, 0.f, this);*/
 		}
 
 		float xPosForTime(float time) {

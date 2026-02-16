@@ -26,6 +26,9 @@ std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_
 int currentStartPos = 0;
 std::vector<gd::StartPosObject*> startPosObjects;
 
+gd::GameObject* m_portalRef;
+gd::GameObject* m_dualPortalRef;
+
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 	if (startPosObjects.empty()) return;
 
@@ -236,6 +239,9 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_startPositions.clear();
 	startPosObjects.clear();
 	currentStartPos = 0;
+
+	m_portalRef = nullptr;
+	m_dualPortalRef = nullptr;
 
 	setting().beforeRestartCheatsCount = setting().cheatsCount;
 
@@ -635,12 +641,20 @@ void __fastcall PlayLayer::loadLastCheckpointH(gd::PlayLayer* self) {
 	}
 
 	PlayLayer::loadLastCheckpoint(self);
+
+	if (setting().onPracticeFix) {
+		self->m_cameraPortal = m_portalRef;
+		self->m_dualModeCamera = m_dualPortalRef;
+	}
 }
 
 gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
 	if (self->m_player != nullptr) {
 		m_checkpoints.push_back({ Checkpoint::from(self) });
 	}
+
+	m_portalRef = self->m_cameraPortal;
+	m_dualPortalRef = self->m_dualModeCamera;
 
 	return PlayLayer::createCheckpoint(self);
 }

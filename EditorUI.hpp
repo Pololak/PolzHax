@@ -76,6 +76,9 @@ namespace EditorUI {
 	inline void(__thiscall* keyUp)(gd::EditorUI*, enumKeyCodes);
 	void __fastcall keyUpH(gd::EditorUI*, void*, enumKeyCodes);
 
+	inline void(__thiscall* onDuplicate)(gd::EditorUI*, CCObject*);
+	void __fastcall onDuplicateH(gd::EditorUI*, void*, CCObject*);
+
 	std::string colorToShortString(int);
 
 	gd::EditorUI* get();

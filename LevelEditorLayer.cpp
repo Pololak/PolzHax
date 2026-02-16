@@ -433,14 +433,47 @@ void LevelEditorLayer::updateOrientedHitboxes(gd::LevelEditorLayer* self) {
 			}
 		}*/
 
-		CCARRAY_FOREACH_B_TYPE(self->m_levelSections, section, CCArray) {
-			if (section) {
-				CCARRAY_FOREACH_B_TYPE(section, object, gd::GameObject) {
-					if (object && object->canRotateFree()) {
-						if ((object->getRotation() / 90.f) != 0.f) {
-							object->calculateOrientedBox();
-						}
-					}
+		//CCARRAY_FOREACH_B_TYPE(self->m_levelSections, section, CCArray) {
+		//	if (section) {
+		//		CCARRAY_FOREACH_B_TYPE(section, object, gd::GameObject) {
+		//			if (object && object->canRotateFree()) {
+		//				if ((object->getRotation() / 90.f) != 0.f) {
+		//					object->calculateOrientedBox();
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
+
+		auto sections = CCArray::create();
+		for (int i = 0; i < self->m_levelSections->count(); i++) {
+			sections->addObjectsFromArray(static_cast<CCArray*>(self->m_levelSections->objectAtIndex(i)));
+		}
+
+		for (int i = 0; i < sections->count(); i++) {
+			auto object = reinterpret_cast<gd::GameObject*>(sections->objectAtIndex(i));
+			if (object && object->canRotateFree()) {
+				switch (object->m_objectType) {
+				case gd::GameObjectType::Hazard:
+				case gd::GameObjectType::InverseGravityPortal:
+				case gd::GameObjectType::NormalGravityPortal:
+				case gd::GameObjectType::ShipPortal:
+				case gd::GameObjectType::CubePortal:
+				case gd::GameObjectType::YellowJumpPad:
+				case gd::GameObjectType::PinkJumpPad:
+				case gd::GameObjectType::GravityPad:
+				case gd::GameObjectType::YellowJumpRing:
+				case gd::GameObjectType::PinkJumpRing:
+				case gd::GameObjectType::GravityRing:
+				case gd::GameObjectType::BallPortal:
+				case gd::GameObjectType::RegularSizePortal:
+				case gd::GameObjectType::MiniSizePortal:
+				case gd::GameObjectType::UfoPortal:
+				case gd::GameObjectType::Modifier:
+				case gd::GameObjectType::DualPortal:
+				case gd::GameObjectType::SoloPortal:
+				case gd::GameObjectType::WavePortal:
+					object->calculateOrientedBox();
 				}
 			}
 		}

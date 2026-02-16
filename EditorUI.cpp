@@ -723,6 +723,17 @@ void __fastcall EditorUI::keyUpH(gd::EditorUI* _self, void*, enumKeyCodes key) {
 	}
 }
 
+void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* sender) {
+	// Wacky bug fix
+	int currentEditorLayer = self->m_editorLayer->m_groupIDFilter;
+
+	self->m_editorLayer->m_groupIDFilter = -1;
+
+	EditorUI::onDuplicate(self, sender);
+
+	self->m_editorLayer->m_groupIDFilter = currentEditorLayer;
+}
+
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
@@ -756,6 +767,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee90), EditorUI::scrollWheelH, reinterpret_cast<void**>(&EditorUI::scrollWheel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47400), EditorUI::onCreateButtonH, reinterpret_cast<void**>(&EditorUI::onCreateButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));
