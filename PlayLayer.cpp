@@ -5,6 +5,7 @@
 #include "PlayerObject.hpp"
 #include "Icons.hpp"
 #include "utils.hpp"
+#include "imgui.h"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -28,6 +29,26 @@ std::vector<gd::StartPosObject*> startPosObjects;
 
 gd::GameObject* m_portalRef;
 gd::GameObject* m_dualPortalRef;
+
+bool m_cheatingBeforeRestart;
+
+bool PlayLayer::getCheatingBeforeRestart() {
+	return m_cheatingBeforeRestart;
+}
+
+bool PlayLayer::isCheating() {
+	return
+		setting().onInstantMirror ||
+		setting().onNoMirror ||
+		setting().onNoShadeEffect ||
+		setting().onAutoPickupCoins ||
+		setting().onEverythingHurts ||
+		setting().onHitboxes ||
+		setting().onInstantComplete ||
+		setting().onJumpHack ||
+		setting().onNoclip ||
+		setting().onSpeedhack;
+}
 
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 	if (startPosObjects.empty()) return;
@@ -227,7 +248,11 @@ void PlayLayer::updatePlayerColors() {
 	self->m_player2->updateGlowColor();
 }
 
+CCLabelBMFont* m_debugLabel = nullptr;
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
+	m_debugLabel = nullptr;
+
 	m_coinsToPickup.clear();
 	m_checkpoints.clear();
 
@@ -242,6 +267,10 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	m_portalRef = nullptr;
 	m_dualPortalRef = nullptr;
+
+	m_cheatingBeforeRestart = PlayLayer::isCheating();
+
+	m_deathObject = nullptr;
 
 	setting().beforeRestartCheatsCount = setting().cheatsCount;
 
@@ -298,12 +327,37 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	PlayLayer::updatePlayerColors();
 
-	if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
-	else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
+	if ((setting().onAutoSafeMode && (PlayLayer::isCheating() || m_cheatingBeforeRestart)) || setting().onSafeMode) {
+		safeModeON();
+		setting().isSafeMode = true;
+	}
+	else {
+		safeModeOFF();
+		setting().isSafeMode = false;
+	}
+
+	//if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
+	//else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
 
 	auto noclipTint = CCLayerColor::create(ccc4(setting().noclipTintR, setting().noclipTintG, setting().noclipTintB, 255), winSize.width, winSize.height);
 	noclipTint->setOpacity(0);
 	self->addChild(noclipTint, 11, 875);
+
+	if (setting().onDeveloperMode) {
+		m_debugLabel = CCLabelBMFont::create("", "chatFont.fnt");
+		m_debugLabel->setAnchorPoint({ 0.f, 0.f });
+		m_debugLabel->setScale(.5f);
+		m_debugLabel->setOpacity(100);
+		m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
+			ImGui::GetIO().Framerate,
+			self->m_player->getPositionX(),
+			self->m_player->getPositionY(),
+			setting().isSafeMode,
+			PlayLayer::isCheating(),
+			m_cheatingBeforeRestart
+		)->getCString());
+		self->addChild(m_debugLabel, 9999);
+	}
 
 	return true;
 }
@@ -336,8 +390,21 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		}
 	}
 
-	if ((setting().onAutoSafeMode || setting().onSafeMode) && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
-	else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
+	if (PlayLayer::isCheating()) {
+		m_cheatingBeforeRestart = PlayLayer::isCheating();
+	}
+
+	if ((setting().onAutoSafeMode && (PlayLayer::isCheating() || m_cheatingBeforeRestart)) || setting().onSafeMode) {
+		safeModeON();
+		setting().isSafeMode = true;
+	}
+	else {
+		safeModeOFF();
+		setting().isSafeMode = false;
+	}
+
+	//if ((setting().onAutoSafeMode || setting().onSafeMode) && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
+	//else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
 
 	if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->m_isDead) {
 		HWND hwnd = WindowFromDC(wglGetCurrentDC());
@@ -372,8 +439,16 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	if (setting().onDeveloperMode) {
-		auto devLabel = CCLabelBMFont::create("", "chatFont.fnt");
-		devLabel->setString(CCString::createWithFormat("X: %.2f Y: %.2f NoclipDeaths")->getCString());
+		if (m_debugLabel) {
+			m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
+				ImGui::GetIO().Framerate,
+				self->m_player->getPositionX(),
+				self->m_player->getPositionY(),
+				setting().isSafeMode,
+				PlayLayer::isCheating(),
+				m_cheatingBeforeRestart
+			)->getCString());
+		}
 	}
 }
 
@@ -394,7 +469,7 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 
 	PlayLayer::resetLevel(self);
 
-	setting().beforeRestartCheatsCount = setting().cheatsCount;
+	m_cheatingBeforeRestart = PlayLayer::isCheating();
 
 	//PlayLayer::clearHitboxes();
 

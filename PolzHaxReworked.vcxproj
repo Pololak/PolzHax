@@ -153,6 +153,7 @@
     <ClInclude Include="ColorSelectPopup.hpp" />
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="CustomizeObjectLayer.hpp" />
+    <ClInclude Include="CustomSongWidget.hpp" />
     <ClInclude Include="DrawGridLayer.hpp" />
     <ClInclude Include="EditButtonBar.hpp" />
     <ClInclude Include="EditLevelLayer.hpp" />
@@ -695,6 +696,7 @@
     <ClCompile Include="ColorSelectPopup.cpp" />
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="CustomizeObjectLayer.cpp" />
+    <ClCompile Include="CustomSongWidget.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DrawGridLayer.cpp" />
     <ClCompile Include="EditButtonBar.cpp" />

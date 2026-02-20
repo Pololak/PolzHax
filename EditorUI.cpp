@@ -272,7 +272,6 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	onGoToGroup->setVisible(false);
 	rightMenu->addChild(onGoToGroup, 0, 2704);
 
-
 	// fake buttons lol
 	auto buttonPageMenu = static_cast<CCMenu*>(static_cast<gd::ButtonPage*>(self->m_editButtonBar->m_pagesArray->objectAtIndex(1))->getChildren()->objectAtIndex(0));
 	
@@ -420,36 +419,12 @@ void __fastcall EditorUI::clickOnPositionH(gd::EditorUI* self, void*, cocos2d::C
 	updateObjectInfoLabel(self);
 }
 
-//void __fastcall EditorUI::toggleSpecialEditButtonsH(gd::EditorUI* self) {
-//	EditorUI::toggleSpecialEditButtons(self);
-//
-//	auto freeRotateBtn = static_cast<gd::CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("21"));
-//	auto snapRotateBtn = static_cast<gd::CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("22"));
-//
-//	if (freeRotateBtn == nullptr) return;
-//	if (snapRotateBtn == nullptr) return;
-//
-//	freeRotateBtn->setVisible(true);
-//	static_cast<gd::ButtonSprite*>(freeRotateBtn->getChildren()->objectAtIndex(0))->setColor(ccGRAY);
-//	freeRotateBtn->setEnabled(false);
-//
-//	snapRotateBtn->setVisible(true);
-//	static_cast<gd::ButtonSprite*>(snapRotateBtn->getChildren()->objectAtIndex(0))->setColor(ccGRAY);
-//	snapRotateBtn->setEnabled(false);
-//
-//	for (int i = 0; i < self->getSelectedObjects()->count(); i++) {
-//		auto object = reinterpret_cast<gd::GameObject*>(self->getSelectedObjects()->objectAtIndex(i));
-//		if (object && object->canRotateFree()) {
-//			freeRotateBtn->setVisible(true);
-//			static_cast<gd::ButtonSprite*>(freeRotateBtn->getChildren()->objectAtIndex(0))->setColor(ccWHITE);
-//			freeRotateBtn->setEnabled(true);
-//
-//			snapRotateBtn->setVisible(true);
-//			static_cast<gd::ButtonSprite*>(snapRotateBtn->getChildren()->objectAtIndex(0))->setColor(ccWHITE);
-//			snapRotateBtn->setEnabled(true);
-//		}
-//	}
-//}
+void __fastcall EditorUI::toggleSpecialEditButtonsH(gd::EditorUI* self) {
+	EditorUI::toggleSpecialEditButtons(self);
+
+	auto freeRotateBtn = static_cast<gd::CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("21"));
+	if (freeRotateBtn == nullptr) return;
+}
 
 CCPoint* __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, int id) {
 	CCPoint* ret = EditorUI::offsetForKey(self, id);

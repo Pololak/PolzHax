@@ -6,23 +6,30 @@
 namespace gd {
 	#pragma runtime_checks("s", off)
 	class TextArea : public cocos2d::CCSprite {
-	protected:
-		PAD(0x58);
-
 	public:
-		static TextArea* create(const char* font, bool unknown,
-			std::string caption, float scale, float width, float height) {
+		void* m_label; // MultilineBitmapFont // 0x1b8
+		float m_width; // 0x1bc
+		int m_iUnused1; // 0x1c0
+		std::string m_fontFile; // 0x1c4
+		float m_height; // 0x1dc
+		bool m_onTimer; // 0x1e0
+		cocos2d::CCPoint m_anchorPoint; // 0x1e4
+		bool m_allShown; // 0x1ec
+		float m_scale; // 0x1f0
+		int m_rectHeight; // m_textHeight
+		int m_rectWidth; // m_textWidth
+		float m_maxWidth; // m_sizeWidth
+		cocos2d::CCPoint m_textPosition;
+
+		static TextArea* create(char const* str, char const* font, float scale, float width, cocos2d::CCPoint anchor, float height) {
+			auto ret = reinterpret_cast<TextArea * (__fastcall*)(char const*, char const*, float, cocos2d::CCPoint)>(base + 0x200a0)(str, font, height, anchor);
+
 			__asm {
-				movss xmm1, scale
-				movss xmm2, width
-				movss xmm3, height
+				movss xmm2, scale
+				movss xmm3, width
 			}
-			auto pRet = reinterpret_cast<TextArea* (__fastcall*)(const char*,
-				bool, std::string)>(
-					base + 0x33270
-					)(font, unknown, caption);
-			__asm add esp, 0x20
-			return pRet;
+
+			return ret;
 		}
 	};
 	#pragma runtime_checks("s", restore)

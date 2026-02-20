@@ -1,4 +1,5 @@
 #include "EndLevelLayer.hpp"
+#include "PlayLayer.hpp"
 #include "Setting.hpp"
 
 cocos2d::CCSprite* m_completeSprite;
@@ -39,6 +40,28 @@ void EndLevelLayer::Callback::onLastCheckpoint(CCObject*) {
 		this->removeFromParent();
 		pl->resetLevel();
 		CCEGLView::sharedOpenGLView()->showCursor(gd::GameManager::sharedState()->getGameVariable("0024"));
+	}
+}
+
+void EndLevelLayer::Callback::updateCheatIndicator(float) {
+	bool isCheating = PlayLayer::isCheating();
+	bool cheatingBeforeRestart = PlayLayer::getCheatingBeforeRestart();
+
+	auto cheatIndicator = static_cast<CCLabelBMFont*>(this->m_mainLayer->getChildByTag(507));
+
+	if (cheatIndicator) {
+		if (!isCheating && !cheatingBeforeRestart && setting().isSafeMode) {
+			cheatIndicator->setColor(ccGREEN);
+		}
+		else if (!isCheating && !cheatingBeforeRestart && setting().isSafeMode) {
+			cheatIndicator->setColor(ccYELLOW);
+		}
+		else if (isCheating && cheatingBeforeRestart && !setting().isSafeMode) {
+			cheatIndicator->setColor(ccRED);
+		}
+		else if (isCheating || cheatingBeforeRestart && setting().isSafeMode) {
+			cheatIndicator->setColor(ccORANGE);
+		}
 	}
 }
 
@@ -97,22 +120,9 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	auto cheatIndicator = CCLabelBMFont::create(".", "bigFont.fnt");
 	cheatIndicator->setAnchorPoint({ 0.f, 1.f });
 	cheatIndicator->setPosition(winSize.width / 2.f - 172.f, winSize.height / 2.f + 127.5f);
+	self->m_mainLayer->addChild(cheatIndicator, 15, 507);
 
-	cheatIndicator->setColor(ccGREEN);
-
-	if (setting().cheatsCount == 0 && setting().beforeRestartCheatsCount == 0 && !(setting().onSafeMode || setting().isSafeMode)) {
-		cheatIndicator->setColor(ccGREEN);
-	}
-	else if (setting().cheatsCount == 0 && setting().beforeRestartCheatsCount == 0 && setting().onSafeMode) {
-		cheatIndicator->setColor(ccYELLOW);
-	}
-	else if (setting().cheatsCount > 0 || setting().beforeRestartCheatsCount > 0 && (setting().onSafeMode || setting().isSafeMode)) {
-		cheatIndicator->setColor(ccORANGE);
-	}
-	else if (setting().cheatsCount > 0 || setting().beforeRestartCheatsCount > 0 && !(setting().onSafeMode || setting().isSafeMode)) {
-		cheatIndicator->setColor(ccRED);
-	}
-	self->m_mainLayer->addChild(cheatIndicator, 15);
+	self->schedule(schedule_selector(EndLevelLayer::Callback::updateCheatIndicator));
 }
 
 void __fastcall EndLevelLayer::completeSpriteH() {

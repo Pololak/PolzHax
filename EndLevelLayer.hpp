@@ -13,6 +13,7 @@ namespace EndLevelLayer {
 		void onLastCheckpoint(CCObject*);
 		void onHideEndLayer(CCObject*);
 		void onShowEndLayer(CCObject*);
+		void updateCheatIndicator(float);
 	};
 
 	void mem_init();

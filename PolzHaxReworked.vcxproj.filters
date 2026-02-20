@@ -1683,6 +1683,9 @@
     <ClInclude Include="MenuGameLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="CustomSongWidget.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -1857,6 +1860,9 @@
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="MenuGameLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSongWidget.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>

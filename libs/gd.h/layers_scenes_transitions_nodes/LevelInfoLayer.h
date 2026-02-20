@@ -9,7 +9,7 @@ namespace gd {
 	enum class GJLevelType;
 	class LoadingLayer;
 
-	class LevelInfoLayer : public cocos2d::CCLayer, LevelDownloadDelegate, LevelUpdateDelegate, RateLevelDelegate, LikeItemDelegate, FLAlertLayerProtocol, LevelDeleteDelegate, NumberInputDelegate {
+	class LevelInfoLayer : public cocos2d::CCLayer, LevelDownloadDelegate, LevelUpdateDelegate, RateLevelDelegate, LikeItemDelegate, public FLAlertLayerProtocol, LevelDeleteDelegate, NumberInputDelegate {
 	public:
 		bool m_willExitScene; // 0x134
 		cocos2d::CCMenu* m_playBtnMenu; // 0x138

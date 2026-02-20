@@ -991,7 +991,7 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
-			filter.Draw("Search", 90.f);
+			filter.Draw("Search", 135.f);
 
 			if (setting().onDeveloperMode) {
 				if (ImGui::Button("Cocos Explorer", ImVec2(185.f, 0.f))) {

@@ -78,6 +78,18 @@ namespace gd {
 		void releaseButton(int p0, bool p1) {
 			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, int, bool)>(base + 0x908f0)(this, p0, p1);
 		}
+
+		void setStartPosObject(StartPosObject* startPos) {
+			if (this->m_startPosObject != startPos) {
+				if (startPos) {
+					startPos->retain();
+				}
+				if (this->m_startPosObject) {
+					this->m_startPosObject->release();
+				}
+				this->m_startPosObject = startPos;
+			}
+		}
 	};
 }
 

@@ -92,6 +92,8 @@ namespace EditorUI {
 		void onNextFreeGroup(CCObject*);
 		void onColorFilter(CCObject*);
 		void onGoToGroup(CCObject*);
+
+		void onStartPos(CCObject*);
 	};
 
 	void mem_init();

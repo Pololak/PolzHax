@@ -28,6 +28,12 @@ void LevelInfoLayer::Callback::onGarage(CCObject*) {
 	gd::GameManager::sharedState()->m_lastScene = static_cast<gd::LastGameScene>(3);
 }
 
+void LevelInfoLayer::Callback::onMoveToTop(CCObject*) {
+	auto layer = gd::FLAlertLayer::create(this, "Move To Top", "Move this level to the top of the levels list?", "NO", "YES", 300.f);
+	layer->setTag(10);
+	layer->show();
+}
+
 bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGameLevel* level) {
 	if (!LevelInfoLayer::init(self, level)) return false;
 
@@ -57,6 +63,11 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 	//onGarage->setPosition(100, 50);
 	//actionsMenu->addChild(onGarage);
 
+	auto onMoveToTopSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+	auto onMoveToTop = gd::CCMenuItemSpriteExtra::create(onMoveToTopSpr, self, menu_selector(LevelInfoLayer::Callback::onMoveToTop));
+	onMoveToTop->setPosition(actionsMenu->convertToNodeSpace(ccp(director->getScreenRight() - 80.f, director->getScreenBottom() + 70.f)));
+	actionsMenu->addChild(onMoveToTop);
+
 	return true;
 }
 
@@ -69,6 +80,16 @@ void __fastcall LevelInfoLayer::onCloneH(gd::LevelInfoLayer* self, void*, CCObje
 	}
 }
 
+void __fastcall LevelInfoLayer::FLAlert_ClickedH(gd::LevelInfoLayer* _self, void*, gd::FLAlertLayer* layer, bool btn2) {
+	auto self = reinterpret_cast<gd::LevelInfoLayer*>(reinterpret_cast<uintptr_t>(_self) - 0x128);
+	if ((layer->getTag() == 10) && btn2) {
+		auto savedLevels = gd::GameLevelManager::sharedState()->m_savedLevelsDict;
+		savedLevels->removeObjectForKey(std::to_string(self->m_level->m_levelID));
+		savedLevels->setObject(self->m_level, std::to_string(self->m_level->m_levelID));
+	}
+	LevelInfoLayer::FLAlert_Clicked(_self, layer, btn2);
+}
+
 void __fastcall LevelInfoLayer::songWidgetH() {
 	__asm {
 		mov m_songWidget, eax
@@ -79,5 +100,6 @@ void __fastcall LevelInfoLayer::songWidgetH() {
 void LevelInfoLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9bc10), LevelInfoLayer::initH, reinterpret_cast<void**>(&LevelInfoLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer::onCloneH, reinterpret_cast<void**>(&LevelInfoLayer::onClone));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9f2d0), LevelInfoLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&LevelInfoLayer::FLAlert_Clicked));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9cb06), LevelInfoLayer::songWidgetH, reinterpret_cast<void**>(&LevelInfoLayer::songWidget));
 }

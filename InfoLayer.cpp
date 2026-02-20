@@ -1,4 +1,7 @@
 #include "InfoLayer.hpp"
+#include "utils.hpp"
+
+CCLabelBMFont* m_levelIDLabel = nullptr;
 
 void InfoLayer::Callback::onRefreshComments(CCObject*) {
 	auto glm = gd::GameLevelManager::sharedState();
@@ -13,6 +16,10 @@ void InfoLayer::Callback::onRefreshComments(CCObject*) {
 	this->loadPage(this->m_page);
 }
 
+void InfoLayer::Callback::onCopyLevelID(CCObject*) {
+	clipboard::write(std::to_string(this->m_level->m_levelID));
+}
+
 bool __fastcall InfoLayer::initH(gd::InfoLayer* self, void*, gd::GJGameLevel* level) {
 	if (!InfoLayer::init(self, level)) return false;
 
@@ -21,6 +28,15 @@ bool __fastcall InfoLayer::initH(gd::InfoLayer* self, void*, gd::GJGameLevel* le
 	auto onRefreshComments = gd::CCMenuItemSpriteExtra::create(onRefreshCommentsSpr, self, menu_selector(InfoLayer::Callback::onRefreshComments));
 	onRefreshComments->setPosition(406.f, -134.f);
 	self->m_buttonMenu->addChild(onRefreshComments);
+
+	if (m_levelIDLabel) {
+		m_levelIDLabel->setVisible(false);
+		auto onCopyLevelIDSpr = CCLabelBMFont::create(CCString::createWithFormat("ID: %i", self->m_level->m_levelID)->getCString(), "goldFont.fnt");
+		onCopyLevelIDSpr->setScale(.6f);
+		auto onCopyLevelID = gd::CCMenuItemSpriteExtra::create(onCopyLevelIDSpr, self, menu_selector(InfoLayer::Callback::onCopyLevelID));
+		onCopyLevelID->setPosition(self->m_buttonMenu->convertToNodeSpace(m_levelIDLabel->getPosition()));
+		self->m_buttonMenu->addChild(onCopyLevelID);
+	}
 
 	return true;
 }
@@ -45,7 +61,21 @@ void __fastcall InfoLayer::onLevelInfoH(gd::InfoLayer* self, void*, CCObject* se
 	//gd::FLAlertLayer::create("Level Info", ss.str().c_str(), "OK")->show();
 }
 
+void __fastcall InfoLayer::levelIDLabelH() {
+	__asm {
+		mov m_levelIDLabel, eax
+	}
+	InfoLayer::levelIDLabel();
+}
+
+void __fastcall InfoLayer::destructorH(gd::InfoLayer* self) {
+	InfoLayer::destructor(self);
+	m_levelIDLabel = nullptr;
+}
+
 void InfoLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x84080), InfoLayer::initH, reinterpret_cast<void**>(&InfoLayer::init));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x853b4), InfoLayer::levelIDLabelH, reinterpret_cast<void**>(&InfoLayer::levelIDLabel));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x83dd0), InfoLayer::destructorH, reinterpret_cast<void**>(&InfoLayer::destructor));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x859c0), InfoLayer::onLevelInfoH, reinterpret_cast<void**>(&InfoLayer::onLevelInfo));
 }

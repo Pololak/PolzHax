@@ -60,6 +60,8 @@ namespace PlayLayer {
 	void __fastcall hazardObjectH();
 
 	void setDeathObject(CCObject*);
+	bool isCheating();
+	bool getCheatingBeforeRestart();
 
 	void updateShowHitboxes();
 	void clearHitboxes();
