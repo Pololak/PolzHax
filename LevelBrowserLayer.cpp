@@ -89,10 +89,10 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		onLastPage->setVisible(self->m_rightArrow->isVisible());
 		menu->addChild(onLastPage, 0, 12);
 
-		auto onSearchSpr = CCSprite::create("GJ_button_04.png");
-		auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
-		onSearch->setPositionX(-100);
-		menu->addChild(onSearch);
+		//auto onSearchSpr = CCSprite::create("GJ_button_04.png");
+		//auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
+		//onSearch->setPositionX(-100);
+		//menu->addChild(onSearch);
 	}
 
 	return true;

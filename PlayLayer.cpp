@@ -636,21 +636,21 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	noclipTint->setOpacity(0);
 	self->addChild(noclipTint, 11, 875);
 
-	if (setting().onDeveloperMode) {
-		m_debugLabel = CCLabelBMFont::create("", "chatFont.fnt");
-		m_debugLabel->setAnchorPoint({ 0.f, 0.f });
-		m_debugLabel->setScale(.5f);
-		m_debugLabel->setOpacity(100);
-		m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
-			ImGui::GetIO().Framerate,
-			self->m_player->getPositionX(),
-			self->m_player->getPositionY(),
-			setting().isSafeMode,
-			PlayLayer::isCheating(),
-			m_cheatingBeforeRestart
-		)->getCString());
-		self->addChild(m_debugLabel, 9999);
-	}
+	//if (setting().onDeveloperMode) {
+	//	m_debugLabel = CCLabelBMFont::create("", "chatFont.fnt");
+	//	m_debugLabel->setAnchorPoint({ 0.f, 0.f });
+	//	m_debugLabel->setScale(.5f);
+	//	m_debugLabel->setOpacity(100);
+	//	m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
+	//		ImGui::GetIO().Framerate,
+	//		self->m_player->getPositionX(),
+	//		self->m_player->getPositionY(),
+	//		setting().isSafeMode,
+	//		PlayLayer::isCheating(),
+	//		m_cheatingBeforeRestart
+	//	)->getCString());
+	//	self->addChild(m_debugLabel, 9999);
+	//}
 
 	m_labelsNode = CCNode::create();
 	self->addChild(m_labelsNode, 99);
@@ -765,18 +765,18 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
 
-	if (setting().onDeveloperMode) {
-		if (m_debugLabel) {
-			m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
-				ImGui::GetIO().Framerate,
-				self->m_player->getPositionX(),
-				self->m_player->getPositionY(),
-				setting().isSafeMode,
-				PlayLayer::isCheating(),
-				m_cheatingBeforeRestart
-			)->getCString());
-		}
-	}
+	//if (setting().onDeveloperMode) {
+	//	if (m_debugLabel) {
+	//		m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
+	//			ImGui::GetIO().Framerate,
+	//			self->m_player->getPositionX(),
+	//			self->m_player->getPositionY(),
+	//			setting().isSafeMode,
+	//			PlayLayer::isCheating(),
+	//			m_cheatingBeforeRestart
+	//		)->getCString());
+	//	}
+	//}
 
 	time_t currentTick = time::getTime();
 	m_clickFrames.erase(std::remove_if(m_clickFrames.begin(), m_clickFrames.end(), [currentTick](float tick) {
