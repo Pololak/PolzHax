@@ -235,6 +235,7 @@ void __fastcall GJGarageLayer::iconTypeMenuH() {
 
 void __fastcall GJGarageLayer::destructorH(gd::GJGarageLayer* self) {
 	GJGarageLayer::destructor(self);
+	m_iconTypeMenu = nullptr;
 	m_dartBtn = nullptr;
 	m_dartSelector = nullptr;
 	m_dartPage = nullptr;

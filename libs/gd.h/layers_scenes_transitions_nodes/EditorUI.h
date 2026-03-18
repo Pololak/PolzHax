@@ -218,6 +218,10 @@ namespace gd {
 		void moveObject(GameObject* obj, cocos2d::CCPoint position) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, GameObject*, cocos2d::CCPoint)>(base + 0x4b410)(this, obj, position);
 		}
+
+		void updateGridNodeSize() {
+			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41ae0)(this);
+		}
 	};
 }
 

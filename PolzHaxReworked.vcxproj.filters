@@ -61,6 +61,9 @@
     <Filter Include="Файлы заголовков\Layers">
       <UniqueIdentifier>{2a8b7d9c-73d2-4d0d-aec3-e2db394a9572}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Libraries\discord-game-sdk">
+      <UniqueIdentifier>{1b6eb74c-0ddf-4048-ae38-ed523bf02ad6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -1671,9 +1674,6 @@
     <ClInclude Include="RGBColorInputWidget.hpp">
       <Filter>Файлы заголовков\Layers</Filter>
     </ClInclude>
-    <ClInclude Include="LiveColorEdit.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="InfoLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
@@ -1684,6 +1684,75 @@
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
     <ClInclude Include="CustomSongWidget.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="LiveColorEdit.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectToolbox.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\ObjectToolbox.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\achievement_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\activity_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\application_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\core.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\discord.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\event.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\ffi.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\image_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\lobby_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\network_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\overlay_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\relationship_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\storage_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\store_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\types.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\user_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\discord-game-sdk\cpp\voice_manager.h">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="PitchShifter.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LeaderboardsLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LeaderboardsLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1865,6 +1934,57 @@
     <ClCompile Include="CustomSongWidget.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectToolbox.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\achievement_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\activity_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\application_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\core.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\image_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\lobby_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\network_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\overlay_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\relationship_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\storage_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\store_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\types.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\user_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\discord-game-sdk\cpp\voice_manager.cpp">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="PitchShifter.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="LeaderboardsLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\glew32.lib">
@@ -1876,6 +1996,9 @@
     <Library Include="libs\fmod-headers\fmod.lib">
       <Filter>Файлы заголовков\Libraries\fmod</Filter>
     </Library>
+    <Library Include="libs\discord-game-sdk\lib\x86\discord_game_sdk.dll.lib">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
+    </Library>
   </ItemGroup>
   <ItemGroup>
     <None Include="Setting.hpp">
@@ -1883,6 +2006,9 @@
     </None>
     <None Include="UILayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
+    </None>
+    <None Include="libs\discord-game-sdk\lib\x86\discord_game_sdk.dll">
+      <Filter>Файлы заголовков\Libraries\discord-game-sdk</Filter>
     </None>
   </ItemGroup>
 </Project>

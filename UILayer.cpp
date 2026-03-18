@@ -19,6 +19,9 @@ void UILayer::updateLabels() {
 bool __fastcall UILayer::initH(gd::UILayer* self) {
 	if (!UILayer::init(self)) return false;
 
+	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
+
 	/*auto messageLabel = CCLabelBMFont::create("", "bigFont.fnt");
 	self->addChild(messageLabel, 105, 502);
 

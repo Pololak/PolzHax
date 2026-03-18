@@ -28,7 +28,9 @@ void PlayerObject::setDartIcon(int val) {
 bool __fastcall PlayerObject::initH(gd::PlayerObject* self, void*, int frameID, int iconType, CCLayer* gameLayer) {
 	if (!PlayerObject::init(self, frameID, iconType, gameLayer)) return false;
 
-	self->updatePlayerFrame(frameID);
+	if (setting().onNoMiniIcon || setting().onMiniCubeIcon) {
+		self->updatePlayerFrame(frameID);
+	}
 
 	return true;
 }
@@ -113,7 +115,7 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 
 	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
 
-	if (setting().onIconRandomizer && setting().onRandomizeCube) {
+	if (setting().onIconRandomizer && setting().onRandomizeCube && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
 		if (!p0) {
 			self->updatePlayerFrame(cubeIcon);
 		}

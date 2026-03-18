@@ -104,10 +104,16 @@ void __fastcall EditLevelLayer::levelActionsMenuH() {
 	EditLevelLayer::levelActionsMenu();
 }
 
+void __fastcall EditLevelLayer::destructorH(gd::EditLevelLayer* self) {
+	EditLevelLayer::destructor(self);
+	m_levelActionsMenu = nullptr;
+}
+
 void EditLevelLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3b5a0), EditLevelLayer::initH, reinterpret_cast<void**>(&EditLevelLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3d440), EditLevelLayer::onEditH, reinterpret_cast<void**>(&EditLevelLayer::onEdit));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3d910), EditLevelLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&EditLevelLayer::FLAlert_Clicked));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3da30), EditLevelLayer::onCloneH, reinterpret_cast<void**>(&EditLevelLayer::onClone));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3b3d0), EditLevelLayer::destructorH, reinterpret_cast<void**>(&EditLevelLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3c065), EditLevelLayer::levelActionsMenuH, reinterpret_cast<void**>(&EditLevelLayer::levelActionsMenu));
 }

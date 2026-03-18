@@ -6,6 +6,7 @@
 #include "Icons.hpp"
 #include "utils.hpp"
 #include "imgui.h"
+#include <numeric>
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -30,6 +31,25 @@ std::vector<gd::StartPosObject*> startPosObjects;
 gd::GameObject* m_portalRef;
 gd::GameObject* m_dualPortalRef;
 
+CCNode* m_labelsNode = nullptr;
+CCLabelBMFont* m_cheatIndicatorLabel = nullptr;
+CCLabelBMFont* m_messageLabel = nullptr;
+CCLabelBMFont* m_attemptsLabel = nullptr;
+CCLabelBMFont* m_fpsCounterLabel = nullptr;
+CCLabelBMFont* m_cpsCounterLabel = nullptr;
+bool m_hasClicked;
+bool m_isHolding;
+std::vector<time_t> m_clickFrames;
+int m_totalClicks;
+CCLabelBMFont* m_jumpsLabel = nullptr;
+CCLabelBMFont* m_sessionTimeLabel = nullptr;
+CCLabelBMFont* m_bestRunLabel = nullptr;
+int m_lastRun;
+int m_bestRunPercentage;
+CCLabelBMFont* m_clockLabel = nullptr;
+std::time_t clockTime;
+SYSTEMTIME st;
+
 bool m_cheatingBeforeRestart;
 
 bool PlayLayer::getCheatingBeforeRestart() {
@@ -47,10 +67,13 @@ bool PlayLayer::isCheating() {
 		setting().onInstantComplete ||
 		setting().onJumpHack ||
 		setting().onNoclip ||
+		setting().onWaveSlide ||
 		setting().onSpeedhack;
 }
 
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
+	if (playLayer->m_practiceMode) return;
+
 	if (startPosObjects.empty()) return;
 
 	auto count = static_cast<int32_t>(startPosObjects.size());
@@ -248,6 +271,213 @@ void PlayLayer::updatePlayerColors() {
 	self->m_player2->updateGlowColor();
 }
 
+void updateCheatIndicator() {
+	bool isCheating = PlayLayer::isCheating();
+	bool cheatingBeforeRestart = PlayLayer::getCheatingBeforeRestart();
+
+	if (m_cheatIndicatorLabel && m_cheatIndicatorLabel->isVisible()) {
+		if (!cheatingBeforeRestart && !setting().isSafeMode) {
+			m_cheatIndicatorLabel->setColor(ccGREEN);
+		}
+		else if (!cheatingBeforeRestart && setting().isSafeMode) {
+			m_cheatIndicatorLabel->setColor(ccYELLOW);
+		}
+		else if ((!isCheating || isCheating) && cheatingBeforeRestart && setting().isSafeMode) {
+			m_cheatIndicatorLabel->setColor(ccORANGE);
+		}
+		else if (isCheating || cheatingBeforeRestart && !setting().isSafeMode) {
+			m_cheatIndicatorLabel->setColor(ccRED);
+		}
+	}
+}
+
+void updateMessageLabel() {
+	if (m_messageLabel && m_messageLabel->isVisible()) {
+		m_messageLabel->setString(setting().message.c_str());
+	}
+}
+
+void updateAttemptsLabel() {
+	if (m_attemptsLabel && m_attemptsLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+		std::string prefix;
+
+		if (setting().attemptsPrefix) {
+			prefix = "Attempt ";
+		}
+		else {
+			prefix.clear();
+		}
+
+		int attempts = playLayer->m_attempts;
+
+		if (setting().onShowTotalAttempts) {
+			attempts = playLayer->m_level->m_attempts + 1;
+		}
+
+		m_attemptsLabel->setString((prefix + std::to_string(attempts)).c_str());
+	}
+}
+
+void updateFPSLabel() {
+	if (m_fpsCounterLabel && m_fpsCounterLabel->isVisible()) {
+		std::string prefix;
+
+		if (setting().fpsPrefix) {
+			prefix = " FPS";
+		}
+		else {
+			prefix.clear();
+		}
+
+		m_fpsCounterLabel->setString((std::to_string(static_cast<int>(ImGui::GetIO().Framerate)) + prefix).c_str());
+	}
+}
+
+void updateCPSLabel() {
+	if (m_cpsCounterLabel && m_cpsCounterLabel->isVisible()) {
+		std::string prefix;
+
+		if (setting().cpsPrefix) {
+			prefix = " CPS";
+		}
+		else {
+			prefix.clear();
+		}
+
+		//std::string cpsMax;
+
+		//if (setting().cpsMax) {
+		//	cpsMax = "/" + std::to_string(m_totalClicks);
+		//}
+		//else {
+		//	cpsMax.clear();
+		//}
+
+		std::string cpsTotal;
+
+		if (setting().cpsTotal) {
+			cpsTotal = "/" + std::to_string(m_totalClicks);
+		}
+
+		if (m_isHolding) {
+			m_cpsCounterLabel->setColor(ccc3(64, 255, 64));
+		}
+		else {
+			m_cpsCounterLabel->setColor(ccc3(255, 255, 255));
+		}
+
+		m_cpsCounterLabel->setString((std::to_string(m_clickFrames.size()) + cpsTotal + prefix).c_str());
+	}
+}
+
+void updateJumpsLabel() {
+	if (m_jumpsLabel && m_jumpsLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+		std::string prefix;
+
+		if (setting().jumpsPrefix) {
+			prefix = " Jumps";
+		}
+		else {
+			prefix.clear();
+		}
+
+		m_jumpsLabel->setString((std::to_string(playLayer->m_jumps) + prefix).c_str());
+	}
+}
+
+void updateSessionTimeLabel() {
+	if (m_sessionTimeLabel && m_sessionTimeLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+		m_sessionTimeLabel->setString(CCString::createWithFormat("%.01fs", playLayer->m_clkTime)->getCString());
+	}
+}
+
+void updateBestRunLabel() {
+	if (m_bestRunLabel && m_bestRunLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+		std::string prefix;
+
+		if (setting().bestRunPrefix) {
+			prefix = "Best Run: ";
+		}
+		else {
+			prefix.clear();
+		}
+
+		int newBest = m_lastRun;
+
+		if (newBest >= m_bestRunPercentage) {
+			m_bestRunPercentage = newBest;
+			m_bestRunLabel->setString((prefix + std::to_string(newBest) + "%").c_str());
+		}
+	}
+}
+
+void updateClockLabel() {
+	if (m_clockLabel && m_clockLabel->isVisible()) {
+		clockTime = std::time(nullptr);
+		auto tm = *std::localtime(&clockTime);
+		std::ostringstream s;
+		s << std::put_time(&tm, "%H:%M:%S");
+		m_clockLabel->setString(s.str().c_str());
+	}
+}
+
+void PlayLayer::updateStatusLabels() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (!self) return;
+
+	auto director = CCDirector::sharedDirector();
+
+	auto tlStatusXPos = director->getScreenLeft() + 5;
+	if (setting().labelsScale < 1.f) {
+		tlStatusXPos = director->getScreenLeft() + setting().labelsScale * 5;
+	}
+
+	m_labelsNode->setVisible(!setting().onHideLabels);
+
+	m_cheatIndicatorLabel->setVisible(setting().onCheatIndicator);
+	m_messageLabel->setVisible(setting().onMessageLabel);
+	m_attemptsLabel->setVisible(setting().onAttemptsLabel);
+	m_fpsCounterLabel->setVisible(setting().onFPSCounter);
+	m_cpsCounterLabel->setVisible(setting().onCPSCounter);
+	m_jumpsLabel->setVisible(setting().onJumpsLabel);
+	m_sessionTimeLabel->setVisible(setting().onSessionTime);
+	m_bestRunLabel->setVisible(setting().onBestRunLabel);
+	m_clockLabel->setVisible(setting().onClockLabel);
+
+	int labelsCount = 0;
+
+	for (int i = 0; i < m_labelsNode->getChildrenCount(); i++) {
+		auto label = static_cast<CCLabelBMFont*>(m_labelsNode->getChildren()->objectAtIndex(i));
+		if (label->isVisible()) {
+			label->setPosition(tlStatusXPos, director->getScreenTop() - (labelsCount * (setting().labelsScale * 13.f)));
+			label->setScale((1.f - .6f) * setting().labelsScale);
+			if (label != m_cheatIndicatorLabel) {
+				label->setOpacity((255 - 191) * setting().labelsOpacity);
+			}
+			labelsCount++;
+		}
+	}
+
+	updateCheatIndicator();
+	updateMessageLabel();
+	updateAttemptsLabel();
+	updateFPSLabel();
+	updateCPSLabel();
+	updateJumpsLabel();
+	updateSessionTimeLabel();
+	updateBestRunLabel();
+	updateClockLabel();
+}
+
 CCLabelBMFont* m_debugLabel = nullptr;
 
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
@@ -271,6 +501,14 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
 
 	m_deathObject = nullptr;
+
+	m_hasClicked = false;
+	m_clickFrames.clear();
+	m_totalClicks = 0;
+	m_isHolding = false;
+
+	m_lastRun = 0;
+	m_bestRunPercentage = 0;
 
 	setting().beforeRestartCheatsCount = setting().cheatsCount;
 
@@ -358,6 +596,64 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 		)->getCString());
 		self->addChild(m_debugLabel, 9999);
 	}
+
+	m_labelsNode = CCNode::create();
+	m_labelsNode->setPositionY(-2.f);
+	self->addChild(m_labelsNode, 99);
+
+	auto tlStatusXPos = director->getScreenLeft() + 5;
+	if (setting().labelsScale < 1.f) {
+		tlStatusXPos = director->getScreenLeft() + setting().labelsScale * 5;
+	}
+
+	m_cheatIndicatorLabel = CCLabelBMFont::create(". ", "bigFont.fnt");
+	static_cast<CCSprite*>(m_cheatIndicatorLabel->getChildren()->objectAtIndex(0))->setScale(3.f);
+	static_cast<CCSprite*>(m_cheatIndicatorLabel->getChildren()->objectAtIndex(0))->setAnchorPoint(ccp(.25f, .25f));
+	m_cheatIndicatorLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_cheatIndicatorLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_cheatIndicatorLabel);
+
+	m_messageLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_messageLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_messageLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_messageLabel);
+
+	m_attemptsLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_attemptsLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_attemptsLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_attemptsLabel);
+
+	m_fpsCounterLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_fpsCounterLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_fpsCounterLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_fpsCounterLabel);
+
+	m_cpsCounterLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_cpsCounterLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_cpsCounterLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_cpsCounterLabel);
+
+	m_jumpsLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_jumpsLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_jumpsLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_jumpsLabel);
+
+	m_sessionTimeLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_sessionTimeLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_sessionTimeLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_sessionTimeLabel);
+
+	m_bestRunLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_bestRunLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_bestRunLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_bestRunLabel);
+
+	m_clockLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_clockLabel->m_pAlignment = kCCTextAlignmentLeft;
+	m_clockLabel->setAnchorPoint(ccp(0.f, 1.f));
+	m_labelsNode->addChild(m_clockLabel);
+
+	PlayLayer::updateStatusLabels();
 
 	return true;
 }
@@ -450,6 +746,21 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 			)->getCString());
 		}
 	}
+
+	time_t currentTick = time::getTime();
+	m_clickFrames.erase(std::remove_if(m_clickFrames.begin(), m_clickFrames.end(), [currentTick](float tick) {
+		return currentTick - tick > 1000;
+		}), m_clickFrames.end());
+	m_hasClicked = false;
+
+	updateCheatIndicator();
+	updateMessageLabel();
+	updateAttemptsLabel();
+	updateFPSLabel();
+	updateCPSLabel();
+	updateJumpsLabel();
+	updateSessionTimeLabel();
+	updateClockLabel();
 }
 
 void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
@@ -466,6 +777,9 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 			m_smoothFrames = 2;
 		}
 	}
+
+	m_clickFrames.clear();
+	m_totalClicks = 0;
 
 	PlayLayer::resetLevel(self);
 
@@ -676,6 +990,12 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 			self->runAction(delayedSequence);
 		}
 	}
+
+	if (!self->m_practiceMode && !self->m_testMode) {
+		m_lastRun = self->m_player->getPositionX() / self->m_levelLength * 100.f;
+	}
+
+	updateBestRunLabel();
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
@@ -774,8 +1094,37 @@ void __fastcall PlayLayer::spawnPlayer2H(gd::PlayLayer* self) {
 //	slopeDeathObject();
 //}
 
+void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool p1) {
+	m_isHolding = true;
+	if (!m_hasClicked) {
+		m_clickFrames.push_back(time::getTime());
+		m_totalClicks++;
+		m_hasClicked = true;
+	}
+	PlayLayer::pushButton(self, p0, p1);
+}
+
+void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bool p1) {
+	m_isHolding = false;
+	PlayLayer::releaseButton(self, p0, p1);
+}
+
+void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
+	PlayLayer::destructor(self);
+	m_labelsNode = nullptr;
+	m_cheatIndicatorLabel = nullptr;
+	m_messageLabel = nullptr;
+	m_attemptsLabel = nullptr;
+	m_fpsCounterLabel = nullptr;
+	m_cpsCounterLabel = nullptr;
+	m_jumpsLabel = nullptr;
+	m_sessionTimeLabel = nullptr;
+	m_clockLabel = nullptr;
+}
+
 void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe35d0), PlayLayer::initH, reinterpret_cast<void**>(&PlayLayer::init));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe3170), PlayLayer::destructorH, reinterpret_cast<void**>(&PlayLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe9360), PlayLayer::updateH, reinterpret_cast<void**>(&PlayLayer::update));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1f20), PlayLayer::resetLevelH, reinterpret_cast<void**>(&PlayLayer::resetLevel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe9280), PlayLayer::addToSectionH, reinterpret_cast<void**>(&PlayLayer::addToSection));
@@ -792,6 +1141,8 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1010), PlayLayer::createCheckpointH, reinterpret_cast<void**>(&PlayLayer::createCheckpoint));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf1d70), PlayLayer::removeLastCheckpointH, reinterpret_cast<void**>(&PlayLayer::removeLastCheckpoint));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0a00), PlayLayer::pushButtonH, reinterpret_cast<void**>(&PlayLayer::pushButton));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0af0), PlayLayer::releaseButtonH, reinterpret_cast<void**>(&PlayLayer::releaseButton));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayLayer::collidedWithObjectH, reinterpret_cast<void**>(&PlayLayer::collidedWithObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb28f), hazardDeathObjectH, reinterpret_cast<void**>(&hazardObject));

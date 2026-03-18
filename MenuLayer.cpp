@@ -1,25 +1,25 @@
 #include "MenuLayer.hpp"
 #include "Setting.hpp"
 #include "Icons.hpp"
-
-void setPitch(float pitch) {
-	FMOD::DSP* pitchShifter = nullptr;
-
-	auto fme = gd::FMODAudioEngine::sharedEngine();
-
-	if (!fme || !fme->m_system || !fme->m_globalChannel) {
-		return;
-	}
-
-	pitchShifter->release();
-	pitchShifter = nullptr;
-
-	fme->m_system->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &pitchShifter);
-	pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 4096);
-	pitchShifter->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, pitch);
-
-	fme->m_globalChannel->addDSP(0, pitchShifter);
-}
+//#include <discord.h>
+//
+//class DiscordManager {
+//public:
+//	discord::Core* core{};
+//	discord::ClientId id = 1475062646033354843;
+//
+//	long long timeStart = 0;
+//
+//	void initDiscord() {
+//		if (!core) auto result = discord::Core::Create(id, DiscordCreateFlags_NoRequireDiscord, &core);
+//
+//		if (!core) return;
+//
+//		timeStart = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+//	}
+//};
+//
+//DiscordManager ds;
 
 bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	if (!MenuLayer::init(self)) return false;
@@ -44,6 +44,8 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	std::cout << gd::GameLevelManager::sharedState()->m_mainLevels << std::endl;
 
 	std::cout << gd::LocalLevelManager::sharedState() << std::endl;
+
+	setting().save();
 
 	//auto checkpoint = CCSprite::createWithSpriteFrameName("checkpoint_01_001.png");
 	//auto achi = gd::AchievementBar::create("PolzHax", "Welcome to PolzHax: <cg>Reworked</c> beta (010226).", nullptr);

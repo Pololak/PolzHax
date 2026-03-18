@@ -146,6 +146,14 @@ namespace base64 {
 	}
 }
 
+struct time {
+	static inline time_t getTime() {
+		return std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::high_resolution_clock::now().time_since_epoch()
+		).count();
+	}
+};
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

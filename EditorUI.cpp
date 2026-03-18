@@ -6,12 +6,15 @@
 #include "EditorLayerInput.hpp"
 #include "LevelEditorLayer.hpp"
 #include "ColorFilterPopup.hpp"
+#include <array>
 
 gd::EditorUI* m_editorUI;
 
 gd::EditorUI* EditorUI::get() {
 	return m_editorUI;
 }
+
+CCLabelBMFont* m_gridSizeLabel = nullptr;
 
 std::string EditorUI::colorToShortString(int id) {
 	switch (id) {
@@ -190,6 +193,44 @@ void EditorUI::Callback::onGoToGroup(CCObject*) {
 	}
 }
 
+static std::array SNAP_GRID_SIZES {
+	1.f, 2.f, 3.75f, 7.5f, 15.f, 30.f, 60.f, 90.f, 120.f
+};
+
+void updateGridSizeLabel() {
+	if (m_gridSizeLabel) {
+		std::stringstream gridSizeStr;
+		gridSizeStr << setting().m_customEditorGridSize;
+		m_gridSizeLabel->setString(gridSizeStr.str().c_str());
+	}
+}
+
+void decrementGridSize(gd::EditorUI* self) {
+	auto next = std::lower_bound(SNAP_GRID_SIZES.begin(), SNAP_GRID_SIZES.end(), setting().m_customEditorGridSize);
+	if (next != SNAP_GRID_SIZES.begin()) next--;
+	setting().m_customEditorGridSize = *next;
+	self->updateGridNodeSize();
+	updateGridSizeLabel();
+}
+
+void incrementGridSize(gd::EditorUI* self) {
+	auto next = std::upper_bound(SNAP_GRID_SIZES.begin(), SNAP_GRID_SIZES.end(), setting().m_customEditorGridSize);
+	if (next == SNAP_GRID_SIZES.end()) next--;
+	setting().m_customEditorGridSize = *next;
+	self->updateGridNodeSize();
+	updateGridSizeLabel();
+}
+
+void EditorUI::Callback::onGridSize(CCObject* sender) {
+	auto btn = static_cast<gd::CCMenuItemSpriteExtra*>(sender);
+	if (btn->getTag() == -1) {
+		decrementGridSize(this);
+	}
+	else {
+		incrementGridSize(this);
+	}
+}
+
 bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer* editorLayer) {
 	m_editorUI = self;
 	if (!EditorUI::init(self, editorLayer)) return false;
@@ -294,6 +335,36 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 		buttonPageMenu->addChild(fakeSnapRotate, -1);
 	}
 	//
+
+	auto gridSizeMenu = CCMenu::create();
+	auto gsMenuPos = ccp(director->getScreenRight() - 134.f, director->getScreenTop() - 20.f);
+	if ((winSize.width / winSize.height) <= 1.6f) {
+		gsMenuPos = ccp(winSize.width / 2.f, director->getScreenTop() - 50.f);
+	}
+	gridSizeMenu->setPosition(gsMenuPos);
+	self->addChild(gridSizeMenu);
+
+	auto onDecrementGridSpr = CCSprite::createWithSpriteFrameName("GJ_zoomInBtn_001.png");
+	onDecrementGridSpr->setScale(.4f);
+	auto onDecrementGrid = gd::CCMenuItemSpriteExtra::create(onDecrementGridSpr, self, menu_selector(EditorUI::Callback::onGridSize));
+	onDecrementGrid->setPositionX(-25.f);
+	gridSizeMenu->addChild(onDecrementGrid, 0, -1);
+
+	auto onIncrementGridSpr = CCSprite::createWithSpriteFrameName("GJ_zoomOutBtn_001.png");
+	onIncrementGridSpr->setScale(.4f);
+	auto onIncrementGrid = gd::CCMenuItemSpriteExtra::create(onIncrementGridSpr, self, menu_selector(EditorUI::Callback::onGridSize));
+	onIncrementGrid->setPositionX(25.f);
+	gridSizeMenu->addChild(onIncrementGrid, 0, 1);
+
+	auto gridSizeBg = extension::CCScale9Sprite::create("square02_small.png");
+	gridSizeBg->setOpacity(100);
+	gridSizeBg->setContentSize({ 75.f, 28.f });
+	gridSizeMenu->addChild(gridSizeBg, -1);
+
+	m_gridSizeLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	updateGridSizeLabel();
+	m_gridSizeLabel->setScale(.35f);
+	gridSizeMenu->addChild(m_gridSizeLabel);
 
 	if (setting().onDeveloperMode) {
 		auto selectedObjectInToolboxIdLabel = CCLabelBMFont::create("ID: ", "chatFont.fnt");
@@ -483,6 +554,7 @@ CCPoint* __fastcall EditorUI::moveForCommandH(gd::EditorUI* self, void*, CCPoint
 }
 
 void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void*, gd::GameObject* obj, gd::EditCommand command, bool p0) {
+	//std::cout << obj->getTexture()->getName() << std::endl;
 	CCArray* selectedObjects = self->getSelectedObjects();
 	int selectedObjectsCount = selectedObjects->count();
 
@@ -541,6 +613,16 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* sender
 	if (editorLayerInput) {
 		editorLayerInput->updateInputNode();
 	}
+
+	//if (auto obj = self->m_selectedObject) {
+	//	obj->m_objectID = self->m_selectedCreateObjectID;
+	//	auto newTextureName = gd::ObjectToolbox::sharedState()->intKeyToFrame(obj->m_objectID);
+	//	auto newSpr = CCSprite::createWithSpriteFrameName(newTextureName);
+	//	obj->m_textureName.clear();
+	//	obj->m_textureName = newTextureName;
+	//	obj->setTexture(newSpr->getTexture());
+	//	obj->setTextureRect(newSpr->getTextureRect());
+	//}
 }
 
 bool touchIntersectsInput(gd::CCTextInputNode* input, CCTouch* touch) {
@@ -709,9 +791,24 @@ void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* send
 	self->m_editorLayer->m_groupIDFilter = currentEditorLayer;
 }
 
+void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
+	auto size = setting().m_customEditorGridSize;
+	if (size < 1 || roundf(size) == 30) {
+		return EditorUI::updateGridNodeSize(self);
+	}
+
+	int actualMode = self->m_selectedTab;
+	self->m_selectedTab = 2;
+	EditorUI::updateGridNodeSize(self);
+	self->m_selectedTab = actualMode;
+
+	std::cout << size << std::endl;
+}
+
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
+	m_gridSizeLabel = nullptr;
 	m_editorUI = nullptr;
 }
 
@@ -743,6 +840,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47400), EditorUI::onCreateButtonH, reinterpret_cast<void**>(&EditorUI::onCreateButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));

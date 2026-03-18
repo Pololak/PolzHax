@@ -35,6 +35,9 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* update)(gd::LevelEditorLayer*, float);
 	void __fastcall updateH(gd::LevelEditorLayer*, void*, float);
 
+	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
+	void __fastcall drawH(gd::LevelEditorLayer*);
+
 	void updatePreviewMode();
 	void resetColors();
 	bool getIsEditorPaused();

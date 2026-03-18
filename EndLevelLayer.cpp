@@ -50,17 +50,39 @@ void EndLevelLayer::Callback::updateCheatIndicator(float) {
 	auto cheatIndicator = static_cast<CCLabelBMFont*>(this->m_mainLayer->getChildByTag(507));
 
 	if (cheatIndicator) {
-		if (!isCheating && !cheatingBeforeRestart && setting().isSafeMode) {
+		if (!cheatingBeforeRestart && !setting().isSafeMode) {
 			cheatIndicator->setColor(ccGREEN);
 		}
-		else if (!isCheating && !cheatingBeforeRestart && setting().isSafeMode) {
+		else if (!cheatingBeforeRestart && setting().isSafeMode) {
 			cheatIndicator->setColor(ccYELLOW);
 		}
-		else if (isCheating && cheatingBeforeRestart && !setting().isSafeMode) {
+		else if ((!isCheating || isCheating) && cheatingBeforeRestart && setting().isSafeMode) {
+			cheatIndicator->setColor(ccORANGE);
+		}
+		else if (isCheating || cheatingBeforeRestart && !setting().isSafeMode) {
 			cheatIndicator->setColor(ccRED);
 		}
-		else if (isCheating || cheatingBeforeRestart && setting().isSafeMode) {
+	}
+}
+
+void updateCheatIndicator2(gd::EndLevelLayer* self) {
+	bool isCheating = PlayLayer::isCheating();
+	bool cheatingBeforeRestart = PlayLayer::getCheatingBeforeRestart();
+
+	auto cheatIndicator = static_cast<CCLabelBMFont*>(self->m_mainLayer->getChildByTag(507));
+
+	if (cheatIndicator) {
+		if (!cheatingBeforeRestart && !setting().isSafeMode) {
+			cheatIndicator->setColor(ccGREEN);
+		}
+		else if (!cheatingBeforeRestart && setting().isSafeMode) {
+			cheatIndicator->setColor(ccYELLOW);
+		}
+		else if ((!isCheating || isCheating) && cheatingBeforeRestart && setting().isSafeMode) {
 			cheatIndicator->setColor(ccORANGE);
+		}
+		else if (isCheating || cheatingBeforeRestart && !setting().isSafeMode) {
+			cheatIndicator->setColor(ccRED);
 		}
 	}
 }
@@ -122,7 +144,8 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	cheatIndicator->setPosition(winSize.width / 2.f - 172.f, winSize.height / 2.f + 127.5f);
 	self->m_mainLayer->addChild(cheatIndicator, 15, 507);
 
-	self->schedule(schedule_selector(EndLevelLayer::Callback::updateCheatIndicator));
+	updateCheatIndicator2(self);
+	//self->schedule(schedule_selector(EndLevelLayer::Callback::updateCheatIndicator));
 }
 
 void __fastcall EndLevelLayer::completeSpriteH() {
@@ -132,7 +155,13 @@ void __fastcall EndLevelLayer::completeSpriteH() {
 	EndLevelLayer::completeSprite();
 }
 
+void __fastcall EndLevelLayer::destructorH(gd::EndLevelLayer* self) {
+	EndLevelLayer::destructor(self);
+	m_completeSprite = nullptr;
+}
+
 void EndLevelLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x50430), EndLevelLayer::customSetupH, reinterpret_cast<void**>(&EndLevelLayer::customSetup));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x50380), EndLevelLayer::destructorH, reinterpret_cast<void**>(&EndLevelLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x50503), EndLevelLayer::completeSpriteH, reinterpret_cast<void**>(&EndLevelLayer::completeSprite));
 }

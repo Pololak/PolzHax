@@ -5,6 +5,9 @@ namespace PlayLayer {
 	inline bool(__thiscall* init)(gd::PlayLayer*, gd::GJGameLevel*);
 	bool __fastcall initH(gd::PlayLayer*, void*, gd::GJGameLevel*);
 
+	inline void(__thiscall* destructor)(gd::PlayLayer*);
+	void __fastcall destructorH(gd::PlayLayer*);
+
 	inline void(__thiscall* update)(gd::PlayLayer*, float);
 	void __fastcall updateH(gd::PlayLayer*, void*, float);
 
@@ -56,6 +59,12 @@ namespace PlayLayer {
 	inline void(__thiscall* collidedWithObject)(gd::PlayerObject*, gd::GameObject*);
 	void __fastcall collidedWithObjectH(gd::PlayerObject*, void*, gd::GameObject*);
 
+	inline void(__thiscall* pushButton)(gd::PlayLayer*, int, bool);
+	void __fastcall pushButtonH(gd::PlayLayer*, void*, int, bool);
+
+	inline void(__thiscall* releaseButton)(gd::PlayLayer*, int, bool);
+	void __fastcall releaseButtonH(gd::PlayLayer*, void*, int, bool);
+
 	inline void(__thiscall* hazardObject)();
 	void __fastcall hazardObjectH();
 
@@ -69,6 +78,7 @@ namespace PlayLayer {
 	void nextStartPos();
 	void prevStartPos();
 	void updatePlayerColors();
+	void updateStatusLabels();
 
 	void mem_init();
 }

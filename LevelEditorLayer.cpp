@@ -601,6 +601,29 @@ void __fastcall LevelEditorLayer::onResumePlaytestH(gd::LevelEditorLayer* self) 
 	LevelEditorLayer::updateOrientedHitboxes(self);
 }
 
+void __fastcall LevelEditorLayer::drawH(gd::LevelEditorLayer* self) {
+	LevelEditorLayer::draw(self);
+
+	glLineWidth(2);
+	ccDrawColor4B(255, 0, 255, 255);
+	ccDrawLine(ccp(100, 100), ccp(500, 100));
+
+	//for (int i = self->m_firstVisibleSection + 1; i <= self->m_lastVisibleSection - 1; i++) {
+	//	if (i < 0) continue;
+	//	if (i >= self->m_levelSections->count()) break;
+
+	//	auto objectAtIndex = self->m_levelSections->objectAtIndex(i);
+	//	auto objArr = reinterpret_cast<CCArray*>(objectAtIndex);
+
+	//	for (int j = 0; j < objArr->count(); j++) {
+	//		auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
+	//		if (obj) {
+	//			ccDrawRect(ccp(obj->getTextureRect().getMinX(), obj->getTextureRect().getMaxY()), ccp(obj->getTextureRect().getMaxX(), obj->getTextureRect().getMinY()));
+	//		}
+	//	}
+	//}
+}
+
 void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	LevelEditorLayer::destructor(self);
 	m_colorTriggers.clear();
@@ -624,6 +647,8 @@ void LevelEditorLayer::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x909f0), LevelEditorLayer::onPlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onPlaytest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90fc0), LevelEditorLayer::onResumePlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onResumePlaytest));
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x926b0), LevelEditorLayer::drawH, reinterpret_cast<void**>(&LevelEditorLayer::draw));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8c080), LevelEditorLayer::destructorH, reinterpret_cast<void**>(&LevelEditorLayer::destructor));
 }

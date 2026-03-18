@@ -97,9 +97,15 @@ void __fastcall LevelInfoLayer::songWidgetH() {
 	LevelInfoLayer::songWidget();
 }
 
+void __fastcall LevelInfoLayer::destructorH(gd::LevelInfoLayer* self) {
+	LevelInfoLayer::destructor(self);
+	m_songWidget = nullptr;
+}
+
 void LevelInfoLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9bc10), LevelInfoLayer::initH, reinterpret_cast<void**>(&LevelInfoLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer::onCloneH, reinterpret_cast<void**>(&LevelInfoLayer::onClone));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9f2d0), LevelInfoLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&LevelInfoLayer::FLAlert_Clicked));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9b940), LevelInfoLayer::destructorH, reinterpret_cast<void**>(&LevelInfoLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9cb06), LevelInfoLayer::songWidgetH, reinterpret_cast<void**>(&LevelInfoLayer::songWidget));
 }

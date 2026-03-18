@@ -4,6 +4,7 @@
 #include "RGBColorInputWidget.hpp"
 #include "LiveColorEdit.hpp"
 #include "LevelSettingsLayer.hpp"
+#include "hsv.hpp"
 
 class FadeTimeInput : public cocos2d::CCLayer, gd::TextInputDelegate {
 protected:
@@ -96,6 +97,31 @@ void ColorSelectPopup::Callback::onLiveEdit(CCObject*) {
 	}
 }
 
+ccColor3B getLightBGColor(ccColor3B bgColor) {
+	std::cout << "allo" << std::endl;
+	auto hsv = extension::CCControlUtils::HSVfromRGB(extension::RGBA((int)bgColor.r, (int)bgColor.g, (int)bgColor.b, 255));
+	std::cout << hsv.h << std::endl;
+	std::cout << hsv.s << std::endl;
+	std::cout << hsv.v << std::endl;
+	hsv.s -= 20;
+
+	auto gm = gd::GameManager::sharedState();
+
+	auto rgb = extension::CCControlUtils::RGBfromHSV(hsv);
+
+	return ccc3(rgb.r, rgb.g, rgb.b);
+}
+
+void ColorSelectPopup::Callback::onLBGInfo(CCObject*) {
+	auto gm = gd::GameManager::sharedState();
+	//auto lbgColor = getLightBGColor(this->m_colorPicker->getColorValue());
+
+	//std::stringstream info;
+
+	//info << "Color value: " << lbgColor.r << " " << lbgColor.g << " " << lbgColor.b;
+	//gd::FLAlertLayer::create("Light BG", info.str().c_str(), "OK")->show();
+}
+
 bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::GameObject* object, int colorID, int playerColor, int blending) {
 	if (!ColorSelectPopup::init(self, object, colorID, playerColor, blending)) return false;
 
@@ -140,6 +166,14 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 		}
 	}
 
+	//if ((object && object->m_objectID == 29) || ((colorID == 0) && !self->m_durationSlider)) {
+	//	auto onLBGInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+	//	onLBGInfoSpr->setScale(.75f);
+	//	auto onLBGInfo = gd::CCMenuItemSpriteExtra::create(onLBGInfoSpr, self, menu_selector(ColorSelectPopup::Callback::onLBGInfo));
+	//	onLBGInfo->setPosition(135.f, 265.f);
+	//	self->m_buttonMenu->addChild(onLBGInfo);
+	//}
+
 	return true;
 }
 
@@ -160,6 +194,8 @@ void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* _self
 	if (colorInputWidget) {
 		colorInputWidget->update_labels(true, true);
 	}
+
+	//std::cout << (int)getLightBGColor(color).r << std::endl;
 }
 
 void ColorSelectPopup::mem_init() {

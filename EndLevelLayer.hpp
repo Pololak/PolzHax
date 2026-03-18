@@ -5,6 +5,9 @@ namespace EndLevelLayer {
 	inline void(__thiscall* customSetup)(gd::EndLevelLayer*);
 	void __fastcall customSetupH(gd::EndLevelLayer*);
 
+	inline void(__thiscall* destructor)(gd::EndLevelLayer*);
+	void __fastcall destructorH(gd::EndLevelLayer*);
+
 	inline void(__thiscall* completeSprite)();
 	void __fastcall completeSpriteH();
 

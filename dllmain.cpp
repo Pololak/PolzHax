@@ -19,6 +19,7 @@
 #include "GJRotationControl.hpp"
 #include "GJScoreCell.hpp"
 #include "InfoLayer.hpp"
+#include "LeaderboardsLayer.hpp"
 #include "LevelBrowserLayer.hpp"
 #include "LevelEditorLayer.hpp"
 #include "LevelInfoLayer.hpp"
@@ -26,6 +27,7 @@
 #include "LevelSettingsLayer.hpp"
 #include "MenuGameLayer.hpp"
 #include "MenuLayer.hpp"
+#include "ObjectToolbox.hpp"
 #include "PauseLayer.hpp"
 #include "PlayerObject.hpp"
 #include "PlayLayer.hpp"
@@ -36,6 +38,7 @@
 #include "patching.hpp"
 #include "CrashLogger.hpp"
 #include "SpeedHack.h"
+#include "PitchShifter.hpp"
 
 // Menu
 #include "Menu.hpp"
@@ -91,6 +94,17 @@ inline void(__thiscall* FMODAudioEngine_update)(gd::FMODAudioEngine*, float);
 void __fastcall FMODAudioEngine_updateH(gd::FMODAudioEngine* self, void*, float dt) {
     FMODAudioEngine_update(self, dt);
     if (setting().onNoPulse) self->m_pulse1 = .5f;
+}
+
+inline void(__thiscall* FMODAudioEngine_playBackgroundMusic)(gd::FMODAudioEngine*, bool, FMOD::Channel*, std::string);
+void __fastcall FMODAudioEngine_playBackgroundMusicH(gd::FMODAudioEngine* self, void*, bool fade, FMOD::Channel* channel, std::string path) {
+    FMODAudioEngine_playBackgroundMusic(self, fade, channel, path);
+
+    std::cout << "FMODAudioEngine::playBackgroundMusic()" << std::endl;
+
+    if (setting().onPitchShifter) {
+        PitchShifter::setPitch(setting().pitchValue);
+    }
 }
 
 inline void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
@@ -184,6 +198,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0xb7b60), CCParticleSystemQuad_initWithTotalParticlesH, reinterpret_cast<void**>(&CCParticleSystemQuad_initWithTotalParticles));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29ac0), AudioEffectsLayer_updateTweenActionH, reinterpret_cast<void**>(&AudioEffectsLayer_updateTweenAction));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x165f0), FMODAudioEngine_updateH, reinterpret_cast<void**>(&FMODAudioEngine_update));
+    MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x16850), FMODAudioEngine_playBackgroundMusicH, reinterpret_cast<void**>(&FMODAudioEngine_playBackgroundMusic));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
     MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0xcee0), CCControlUtils_RGBfromHSVH, reinterpret_cast<void**>(&CCControlUtils_RGBfromHSV));
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0xa4990), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
@@ -205,6 +220,7 @@ DWORD WINAPI my_thread(void* hModule) {
     //GJRotationControl::mem_init();
     GJScoreCell::mem_init();
     InfoLayer::mem_init();
+    LeaderboardsLayer::mem_init();
     LevelBrowserLayer::mem_init();
     LevelEditorLayer::mem_init();
     LevelInfoLayer::mem_init();
@@ -212,6 +228,7 @@ DWORD WINAPI my_thread(void* hModule) {
     LevelSettingsLayer::mem_init();
     //MenuGameLayer::mem_init();
     MenuLayer::mem_init();
+    ObjectToolbox::mem_init();
     PauseLayer::mem_init();
     PlayerObject::mem_init();
     PlayLayer::mem_init();

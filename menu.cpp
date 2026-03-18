@@ -18,6 +18,7 @@
 #include "ImGuiUtils.hpp"
 #include "utils.hpp"
 #include "SpeedHack.h"
+#include "PitchShifter.hpp"
 
 ImVec4 color1;
 ImVec4 color2;
@@ -48,6 +49,10 @@ const int decimalValues[] = {
 
 const char* priorities[] = {
 	"Lowest", "Low", "Normal", "High", "Highest"
+};
+
+const char* statusLabelsPosition[] = {
+	"Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left"
 };
 
 void updatePriority() {
@@ -962,7 +967,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (140226)");
+			ImGui::Text("1.920 - v1.3.0 (180326)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -2354,6 +2359,19 @@ void imgui_render() {
 			ImGui::CheckboxF("No Transition", &setting().onNoTransition);
 			ImGui::Tooltip("Shorterns scene transition time to 0s.");
 
+			//if (ImGui::CheckboxF("Pitch Shifter", &setting().onPitchShifter)) {
+			//	PitchShifter::setPitch(setting().onPitchShifter ? setting().pitchValue : 1.f);
+			//}
+			//ImGui::SameLine(170.f);
+			//if (ImGui::TreeNodeEx("##pitchShifterSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			//	ImGui::SetNextItemWidth(80.f);
+			//	if (ImGui::DragFloat("Pitch", &setting().pitchValue, .1f, .1f, 2.f, "%.1f")) {
+			//		PitchShifter::setPitch(setting().onPitchShifter ? setting().pitchValue : 1.f);
+			//	}
+
+			//	ImGui::TreePop();
+			//}
+
 			ImGui::CheckboxF("Retry Keybind", &setting().onRetryKeybind);
 			ImGui::Tooltip("Lets you restart level by pressing R.");
 			ImGui::SameLine(170.f);
@@ -2483,115 +2501,200 @@ void imgui_render() {
 		if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Currenty in works...");
-			ImGui::BeginDisabled();
 
 			ImGui::SetNextItemWidth(90.f);
-			if (ImGui::DragFloat("##labelsOpacity", &setting().labelsOpacity, .1f, 0.f, 1.f, "Opacity: %.1fx")) {
-				UILayer::updateLabels();
+			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
+				if (setting().labelsScale > 3.f) {
+					setting().labelsScale = 3.f;
+				}
+				if (setting().labelsScale < .1f) {
+					setting().labelsScale = .1f;
+				}
+
+				PlayLayer::updateStatusLabels();
 			}
 			ImGui::SameLine(0.f, 5.f);
 			ImGui::SetNextItemWidth(90.f);
-			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
-				UILayer::updateLabels();
+			if (ImGui::DragFloat("##labelsOpacity", &setting().labelsOpacity, .1f, .1f, 1.f, "Opacity: %.1fx")) {
+				if (setting().labelsOpacity > 1.f) {
+					setting().labelsOpacity = 1.f;
+				}
+				if (setting().labelsOpacity < .1f) {
+					setting().labelsOpacity = .1f;
+				}
+
+				PlayLayer::updateStatusLabels();
 			}
 
 			if (ImGui::CheckboxF("Hide All", &setting().onHideLabels)) {
-				UILayer::updateLabels();
+				PlayLayer::updateStatusLabels();
 			}
 
-			ImGui::CheckboxF("Cheat Indicator", &setting().onCheatIndicator);
+			if (ImGui::CheckboxF("Cheat Indicator", &setting().onCheatIndicator)) {
+				PlayLayer::updateStatusLabels();
+			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##ciSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-
-
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##ciPos", &setting().cheatIndicatorPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Message", &setting().onMessageLabel)) {
-				UILayer::updateLabels();
+				PlayLayer::updateStatusLabels();
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##msgSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##msgCounterPos", &setting().messagePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
 
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::InputText("##message", &setting().message)) {
-					UILayer::updateLabels();
+					PlayLayer::updateStatusLabels();
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Attempt", &setting().onAttemptsLabel)) {
-				if (setting().onAttemptsLabel) {
-
-				}
-				else {
-
-				}
+				PlayLayer::updateStatusLabels();
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##attsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##attsCounterPos", &setting().attemptsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
 
-
-
-				ImGui::TreePop();
-			}
-
-			ImGui::CheckboxF("Jumps", &setting().onJumpsLabel);
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##jmpSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-
-
-
-				ImGui::TreePop();
-			}
-
-			ImGui::CheckboxF("Session Time", &setting().onSessionTime);
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-
-
+				if (ImGui::CheckboxF("Show Prefix", &setting().attemptsPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}
 
-			ImGui::CheckboxF("Best Run", &setting().onBestRunLabel);
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-
-
-
-				ImGui::TreePop();
+			if (ImGui::CheckboxF("FPS Counter", &setting().onFPSCounter)) {
+				PlayLayer::updateStatusLabels();
 			}
-
-			ImGui::CheckboxF("Clock", &setting().onClockLabel);
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##clkSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-
-
-
-				ImGui::TreePop();
-			}
-
-			ImGui::CheckboxF("FPS Counter", &setting().onFPSCounter);
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##fpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##fpsCounterPos", &setting().fpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
 
-
+				if (ImGui::CheckboxF("Show Prefix", &setting().fpsPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}
 
-			ImGui::CheckboxF("CPS Counter", &setting().onCPSCounter);
+			if (ImGui::CheckboxF("CPS Counter", &setting().onCPSCounter)) {
+				PlayLayer::updateStatusLabels();
+			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##cpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##cpsCounterPos", &setting().cpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
 
+				if (ImGui::CheckboxF("Show Prefix", &setting().cpsPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
 
+				if (ImGui::CheckboxF("Show Total", &setting().cpsTotal)) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}
 
+			if (ImGui::CheckboxF("Jumps", &setting().onJumpsLabel)) {
+				PlayLayer::updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##jmpSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##jumpsCounterPos", &setting().jumpsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().jumpsPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Session Time", &setting().onSessionTime)) {
+				PlayLayer::updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##stimePos", &setting().sessionTimePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Best Run", &setting().onBestRunLabel)) {
+				PlayLayer::updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##brunPos", &setting().bestRunPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().bestRunPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Clock", &setting().onClockLabel)) {
+				PlayLayer::updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##clkSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::BeginDisabled();
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##clkPos", &setting().clockPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+				ImGui::EndDisabled();
+
+				ImGui::TreePop();
+			}
+
+			ImGui::BeginDisabled();
 			ImGui::CheckboxF("Noclip Accuracy", &setting().onNoclipAccuracy);
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##naccSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
@@ -2618,7 +2721,6 @@ void imgui_render() {
 
 				ImGui::TreePop();
 			}
-
 			ImGui::EndDisabled();
 		}
 

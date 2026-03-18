@@ -35,7 +35,7 @@ struct SettingStruct {
 	bool onTextLength;
 
 	// Cosmetic
-	bool onAccuratePercentage; int decimalPlaces;
+	bool onAccuratePercentage; int decimalPlaces = 1;
 	bool onCoinsShowUncollected;
 	bool onCoinsInPractice;
 	bool onForceDontEnter;
@@ -145,6 +145,7 @@ struct SettingStruct {
 	bool onLockCursor;
 	bool onNoRotation;
 	bool onNoTransition;
+	bool onPitchShifter; float pitchValue = 1.f;
 	bool onRetryKeybind; int m_retryKeybind = 0x52;
 	bool onSafeMode, isSafeMode;
 	bool onShowRestartButton;
@@ -153,7 +154,7 @@ struct SettingStruct {
 	bool onZeroDelay;
 
 	// Speedhack
-	bool onSpeedhack; float speedhackValue;
+	bool onSpeedhack; float speedhackValue = 1.f;
 	bool onSpeedhackAudio;
 	bool onClassicMode;
 
@@ -161,18 +162,18 @@ struct SettingStruct {
 	float labelsOpacity = 1.f;
 	float labelsScale = 1.f;
 	bool onHideLabels;
-	bool onCheatIndicator;
-	bool onMessageLabel; std::string message;
-	bool onFPSCounter;
-	bool onCPSCounter;
-	bool onNoclipAccuracy;
-	bool onNoclipDeaths;
-	bool onClockLabel;
-	bool onSessionTime;
-	bool onBestRunLabel;
-	bool onAttemptsLabel;
-	bool onJumpsLabel;
-	bool onMetaLabel;
+	bool onCheatIndicator; int cheatIndicatorPos = 0;
+	bool onMessageLabel; std::string message; int messagePos = 0;
+	bool onFPSCounter, fpsPrefix = true; int fpsCounterPos = 0;
+	bool onCPSCounter, cpsPrefix = true, cpsMax = true, cpsTotal; int cpsCounterPos = 0;
+	bool onNoclipAccuracy, nocAccPrefix = true; int nocAccPos = 0;
+	bool onNoclipDeaths, nocDeathsPrefix = true; int nocDeathsPos = 0;
+	bool onClockLabel; int clockPos = 0;
+	bool onSessionTime; int sessionTimePos = 0;
+	bool onBestRunLabel, bestRunPrefix = true; int bestRunPos = 0;
+	bool onAttemptsLabel, attemptsPrefix = true; int attemptsPos = 0;
+	bool onJumpsLabel, jumpsPrefix = true; int jumpsPos = 0;
+	bool onMetaLabel; int metaPos = 0;
 
 	// Icons
 	bool onIconEffects; bool onIconColor1 = true, onIconColor2 = true;
@@ -197,6 +198,7 @@ struct SettingStruct {
 	int colorFilter = 0;
 	int colorFilterOrder = 0;
 	int selectedDartIdx = 1;
+	float m_customEditorGridSize = 30.f;
 };
 
 SettingStruct& setting();
@@ -331,6 +333,7 @@ DEF_SCHEMA(
 	onLockCursor,
 	onNoRotation,
 	onNoTransition,
+	onPitchShifter, pitchValue,
 	onRetryKeybind, m_retryKeybind,
 	onSafeMode,
 	onShowRestartButton,
@@ -347,18 +350,18 @@ DEF_SCHEMA(
 	labelsOpacity,
 	labelsScale,
 	onHideLabels,
-	onCheatIndicator,
-	onMessageLabel, message,
-	onFPSCounter,
-	onCPSCounter,
-	onNoclipAccuracy,
-	onNoclipDeaths,
-	onClockLabel,
-	onSessionTime,
-	onBestRunLabel,
-	onAttemptsLabel,
-	onJumpsLabel,
-	onMetaLabel,
+	onCheatIndicator, cheatIndicatorPos,
+	onMessageLabel, message, messagePos,
+	onFPSCounter, fpsPrefix, fpsCounterPos,
+	onCPSCounter, cpsPrefix, cpsMax, cpsTotal, cpsCounterPos,
+	onNoclipAccuracy, nocAccPrefix, nocAccPos,
+	onNoclipDeaths, nocDeathsPrefix, nocDeathsPos,
+	onClockLabel, clockPos,
+	onSessionTime, sessionTimePos,
+	onBestRunLabel, bestRunPrefix, bestRunPos,
+	onAttemptsLabel, attemptsPrefix, attemptsPos,
+	onJumpsLabel, jumpsPrefix, jumpsPos,
+	onMetaLabel, metaPos,
 
 	// Icons
 	onSameDualColor,

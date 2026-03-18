@@ -79,6 +79,9 @@ namespace EditorUI {
 	inline void(__thiscall* onDuplicate)(gd::EditorUI*, CCObject*);
 	void __fastcall onDuplicateH(gd::EditorUI*, void*, CCObject*);
 
+	inline void(__thiscall* updateGridNodeSize)(gd::EditorUI*);
+	void __fastcall updateGridNodeSizeH(gd::EditorUI*);
+
 	std::string colorToShortString(int);
 
 	gd::EditorUI* get();
@@ -92,6 +95,7 @@ namespace EditorUI {
 		void onNextFreeGroup(CCObject*);
 		void onColorFilter(CCObject*);
 		void onGoToGroup(CCObject*);
+		void onGridSize(CCObject*);
 
 		void onStartPos(CCObject*);
 	};

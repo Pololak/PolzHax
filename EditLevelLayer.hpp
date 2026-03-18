@@ -17,6 +17,9 @@ namespace EditLevelLayer {
 	inline void(__thiscall* levelActionsMenu)();
 	void __fastcall levelActionsMenuH();
 
+	inline void(__thiscall* destructor)(gd::EditLevelLayer*);
+	void __fastcall destructorH(gd::EditLevelLayer*);
+
 	class Callback : public gd::EditLevelLayer {
 	public:
 		void onMoveToTop(CCObject*);

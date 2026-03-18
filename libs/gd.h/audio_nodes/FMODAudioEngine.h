@@ -29,9 +29,14 @@ namespace gd {
 		void* m_extraDriverData; // 0x140
 		int m_musicOffset; // 0x144
 
-		static auto sharedEngine() {
+		static FMODAudioEngine* sharedEngine() {
 			return reinterpret_cast<FMODAudioEngine * (__stdcall*)()>(base + 0x164c0)();
 		}
+		
+		void playBackgroundMusic(bool p0, FMOD::Channel* channel, std::string path) {
+			reinterpret_cast<void(__thiscall*)(FMODAudioEngine*, bool, FMOD::Channel*, std::string)>(base + 0x16850)(this, p0, channel, path);
+		}
+
 	};
 }
 

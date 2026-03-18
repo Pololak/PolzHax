@@ -64,6 +64,10 @@ namespace gd {
 		void makeTimeStamp(char const* key) {
 			reinterpret_cast<void(__thiscall*)(GameLevelManager*, char const*)>(base + 0x58350)(this, key);
 		}
+
+		void updateUserScore() {
+			reinterpret_cast<void(__thiscall*)(GameLevelManager*)>(base + 0x5c950)(this);
+		}
 	};
 }
 

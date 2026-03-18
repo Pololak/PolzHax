@@ -147,7 +147,7 @@ public:
     inline const char* getAtlasName(){ return m_sAtlasName.c_str(); }
     inline void setAtlasName(const char* atlasName) { m_sAtlasName = atlasName; }
     
-    std::set<unsigned int>* getCharacterSet() const;
+    inline std::set<unsigned int>* getCharacterSet() const { return m_pCharacterSet; }
 private:
     std::set<unsigned int>* parseConfigFile(const char *controlFile);
     void parseCharacterDefinition(std::string line, ccBMFontDef *characterDefinition);
@@ -233,7 +233,9 @@ public:
     virtual const char* getString(void);
     virtual void setCString(const char *label);
     virtual void setAnchorPoint(const CCPoint& var);
-    virtual void updateLabel();
+    virtual void updateLabel() {
+        return reinterpret_cast<void(__thiscall*)(CCLabelBMFont*)>(GetProcAddress(GetModuleHandleA("libcocos2d.dll"), "?updateLabel@CCLabelBMFont@cocos2d@@UAEXXZ"))(this);
+    }
     virtual void setAlignment(CCTextAlignment alignment);
     virtual void setWidth(float width);
     virtual void setLineBreakWithoutSpace(bool breakWithoutSpace);
@@ -258,24 +260,26 @@ public:
 
     void setFntFile(const char* fntFile);
     const char* getFntFile();
-	CCBMFontConfiguration* getConfiguration() const;
+    inline CCBMFontConfiguration* getConfiguration() const {
+        return m_pConfiguration;
+    }
 #if CC_LABELBMFONT_DEBUG_DRAW
     virtual void draw();
 #endif // CC_LABELBMFONT_DEBUG_DRAW
 
-    RT_ADD(
-        static CCLabelBMFont* createBatched(const char* str, const char* fntFile, CCArray*);
-        void limitLabelWidth(float width, float defaultScale, float minScale);
-    )
+    // @note RobTop Addition
+    static CCLabelBMFont* createBatched(const char* str, const char* fntFile, CCArray*, int);
+    // @note RobTop Addition
+    void limitLabelWidth(float width, float defaultScale, float minScale);
 
 private:
-    char * atlasNameFromFntFile(const char *fntFile);
     int kerningAmountForFirst(unsigned short first, unsigned short second);
     float getLetterPosXLeft( CCSprite* characterSprite );
     float getLetterPosXRight( CCSprite* characterSprite );
     
 protected:
     virtual void setString(unsigned short *newString, bool needUpdateLabel);
+public:
     // string to render
     unsigned short* m_sString;
     
@@ -309,13 +313,6 @@ protected:
     bool m_bCascadeOpacityEnabled;
     /** conforms to CCRGBAProtocol protocol */
     bool        m_bIsOpacityModifyRGB;
-
-    RT_ADD(
-        bool m_bIsBatched;
-        CCArray* m_pTargetArray;
-        CCTexture2D* m_pSomeTexture;
-    )
-
 };
 
 /** Free function that parses a FNT file a place it on the cache

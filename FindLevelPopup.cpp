@@ -63,18 +63,18 @@ bool FindLevelPopup::init(gd::LevelBrowserLayer* parent) {
 	return true;
 }
 
-auto ci_equal = [](char a, char b)
-	{
-		return std::tolower(static_cast<unsigned char>(a)) ==
-			std::tolower(static_cast<unsigned char>(b));
-	};
-
-bool ci_contains(const std::string& haystack, const std::string& needle)
-{
-	return std::search(haystack.begin(), haystack.end(),
-		needle.begin(), needle.end(),
-		ci_equal) != haystack.end();
-}
+//auto ci_equal = [](char a, char b)
+//	{
+//		return std::tolower(static_cast<unsigned char>(a)) ==
+//			std::tolower(static_cast<unsigned char>(b));
+//	};
+//
+//bool ci_contains(const std::string& haystack, const std::string& needle)
+//{
+//	return std::search(haystack.begin(), haystack.end(),
+//		needle.begin(), needle.end(),
+//		ci_equal) != haystack.end();
+//}
 
 void FindLevelPopup::onSearch(CCObject*) {
 	//if (m_parent) {
@@ -92,7 +92,7 @@ void FindLevelPopup::onSearch(CCObject*) {
 	for (int i = 0; i < localLevelManager->m_localLevels->count(); i++) {
 		auto level = static_cast<gd::GJGameLevel*>(localLevelManager->m_localLevels->objectAtIndex(i));
 		if (level) {
-			if (ci_contains(level->m_levelName, searchStr)) {
+			if (_stricmp(level->m_levelName.c_str(), searchStr.c_str()) == 0) {
 				std::cout << level->m_levelName << std::endl;
 				filteredLevels->addObject(level);
 			}

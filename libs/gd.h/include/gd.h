@@ -82,6 +82,7 @@ namespace gd {
 #include "manager_nodes/GameLevelManager.h"
 #include "manager_nodes/GameStatsManager.h"
 #include "manager_nodes/LocalLevelManager.h"
+#include "manager_nodes/ObjectToolbox.h"
 
 #include "scroll_nodes/CCContentLayer.h"
 #include "scroll_nodes/CCIndexPath.h"
@@ -129,6 +130,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/GaragePage.h"
 #include "layers_scenes_transitions_nodes/GJScoreCell.h"
 #include "layers_scenes_transitions_nodes/InfoLayer.h"
+#include "layers_scenes_transitions_nodes/LeaderboardsLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
 
