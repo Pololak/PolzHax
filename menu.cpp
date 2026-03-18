@@ -967,7 +967,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (180326)");
+			ImGui::Text("1.920 - v1.3.0 (180326-1)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -2535,12 +2535,10 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##ciSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##ciPos", &setting().cheatIndicatorPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
 
 				ImGui::TreePop();
 			}
@@ -2550,15 +2548,30 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##msgSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##msgCounterPos", &setting().messagePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
 
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::InputText("##message", &setting().message)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Best Run", &setting().onBestRunLabel)) {
+				PlayLayer::updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##brunPos", &setting().bestRunPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().bestRunPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
 
@@ -2570,12 +2583,10 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##attsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##attsCounterPos", &setting().attemptsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
 
 				if (ImGui::CheckboxF("Show Prefix", &setting().attemptsPrefix)) {
 					PlayLayer::updateStatusLabels();
@@ -2589,12 +2600,10 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##fpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##fpsCounterPos", &setting().fpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
 
 				if (ImGui::CheckboxF("Show Prefix", &setting().fpsPrefix)) {
 					PlayLayer::updateStatusLabels();
@@ -2608,12 +2617,10 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##cpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##cpsCounterPos", &setting().cpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
 
 				if (ImGui::CheckboxF("Show Prefix", &setting().cpsPrefix)) {
 					PlayLayer::updateStatusLabels();
@@ -2631,48 +2638,12 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##jmpSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##jumpsCounterPos", &setting().jumpsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
 
 				if (ImGui::CheckboxF("Show Prefix", &setting().jumpsPrefix)) {
-					PlayLayer::updateStatusLabels();
-				}
-
-				ImGui::TreePop();
-			}
-
-			if (ImGui::CheckboxF("Session Time", &setting().onSessionTime)) {
-				PlayLayer::updateStatusLabels();
-			}
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
-				ImGui::SetNextItemWidth(163.f);
-				if (ImGui::Combo("##stimePos", &setting().sessionTimePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
-				}
-				ImGui::EndDisabled();
-
-				ImGui::TreePop();
-			}
-
-			if (ImGui::CheckboxF("Best Run", &setting().onBestRunLabel)) {
-				PlayLayer::updateStatusLabels();
-			}
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
-				ImGui::SetNextItemWidth(163.f);
-				if (ImGui::Combo("##brunPos", &setting().bestRunPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
-				}
-				ImGui::EndDisabled();
-
-				if (ImGui::CheckboxF("Show Prefix", &setting().bestRunPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
 
@@ -2684,12 +2655,23 @@ void imgui_render() {
 			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##clkSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::BeginDisabled();
 				ImGui::SetNextItemWidth(163.f);
 				if (ImGui::Combo("##clkPos", &setting().clockPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
-				ImGui::EndDisabled();
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Session Time", &setting().onSessionTime)) {
+				PlayLayer::updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##stimePos", &setting().sessionTimePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}

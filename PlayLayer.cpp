@@ -310,10 +310,13 @@ void updateAttemptsLabel() {
 			prefix.clear();
 		}
 
-		int attempts = playLayer->m_attempts;
+		int attempts = 1;
 
 		if (setting().onShowTotalAttempts) {
 			attempts = playLayer->m_level->m_attempts + 1;
+		}
+		else {
+			attempts = playLayer->m_attempts;
 		}
 
 		m_attemptsLabel->setString((prefix + std::to_string(attempts)).c_str());
@@ -436,34 +439,86 @@ void PlayLayer::updateStatusLabels() {
 
 	auto director = CCDirector::sharedDirector();
 
-	auto tlStatusXPos = director->getScreenLeft() + 5;
-	if (setting().labelsScale < 1.f) {
-		tlStatusXPos = director->getScreenLeft() + setting().labelsScale * 5;
-	}
+	auto leftStatusXPos = (setting().labelsScale < 1.f) ? director->getScreenLeft() + setting().labelsScale * 5 : director->getScreenLeft() + 5;
+	auto rightStatusXPos = (setting().labelsScale < 1.f) ? director->getScreenRight() - setting().labelsScale * 5 : director->getScreenRight() - 5;
 
 	m_labelsNode->setVisible(!setting().onHideLabels);
 
 	m_cheatIndicatorLabel->setVisible(setting().onCheatIndicator);
-	m_messageLabel->setVisible(setting().onMessageLabel);
-	m_attemptsLabel->setVisible(setting().onAttemptsLabel);
-	m_fpsCounterLabel->setVisible(setting().onFPSCounter);
-	m_cpsCounterLabel->setVisible(setting().onCPSCounter);
-	m_jumpsLabel->setVisible(setting().onJumpsLabel);
-	m_sessionTimeLabel->setVisible(setting().onSessionTime);
-	m_bestRunLabel->setVisible(setting().onBestRunLabel);
-	m_clockLabel->setVisible(setting().onClockLabel);
+	m_cheatIndicatorLabel->setTag(setting().cheatIndicatorPos);
 
-	int labelsCount = 0;
+	m_messageLabel->setVisible(setting().onMessageLabel);
+	m_messageLabel->setTag(setting().messagePos);
+
+	m_attemptsLabel->setVisible(setting().onAttemptsLabel);
+	m_attemptsLabel->setTag(setting().attemptsPos);
+
+	m_fpsCounterLabel->setVisible(setting().onFPSCounter);
+	m_fpsCounterLabel->setTag(setting().fpsCounterPos);
+
+	m_cpsCounterLabel->setVisible(setting().onCPSCounter);
+	m_cpsCounterLabel->setTag(setting().cpsCounterPos);
+
+	m_jumpsLabel->setVisible(setting().onJumpsLabel);
+	m_jumpsLabel->setTag(setting().jumpsPos);
+
+	m_sessionTimeLabel->setVisible(setting().onSessionTime);
+	m_sessionTimeLabel->setTag(setting().sessionTimePos);
+
+	m_bestRunLabel->setVisible(setting().onBestRunLabel);
+	m_bestRunLabel->setTag(setting().bestRunPos);
+
+	m_clockLabel->setVisible(setting().onClockLabel);
+	m_clockLabel->setTag(setting().clockPos);
+
+	int topLeftLabelsCount = 0;
+	int topRightLabelsCount = 0;
+	int bottomRightLabelsCount = 0;
+	int bottomLeftLabelsCount = 0;
 
 	for (int i = 0; i < m_labelsNode->getChildrenCount(); i++) {
 		auto label = static_cast<CCLabelBMFont*>(m_labelsNode->getChildren()->objectAtIndex(i));
-		if (label->isVisible()) {
-			label->setPosition(tlStatusXPos, director->getScreenTop() - (labelsCount * (setting().labelsScale * 13.f)));
+		if (label && label->isVisible()) {
 			label->setScale((1.f - .6f) * setting().labelsScale);
 			if (label != m_cheatIndicatorLabel) {
 				label->setOpacity((255 - 191) * setting().labelsOpacity);
 			}
-			labelsCount++;
+
+			if (label->getTag() == 0) { // Top-Left
+				label->setAnchorPoint(ccp(0.f, 1.f));
+				if (label != m_cheatIndicatorLabel) {
+					label->m_pAlignment = kCCTextAlignmentLeft;
+				}
+				label->setPosition(leftStatusXPos, (director->getScreenTop() - 2.f) - (topLeftLabelsCount * setting().labelsScale * 13.f));
+				topLeftLabelsCount++;
+			}
+
+			if (label->getTag() == 1) { // Top-Right
+				label->setAnchorPoint(ccp(1.f, 1.f));
+				if (label != m_cheatIndicatorLabel) {
+					label->m_pAlignment = kCCTextAlignmentRight;
+				}
+				label->setPosition(rightStatusXPos, (director->getScreenTop() - 2.f) - (topRightLabelsCount * setting().labelsScale * 13.f));
+				topRightLabelsCount++;
+			}
+
+			if (label->getTag() == 2) { // Bottom-Right
+				label->setAnchorPoint(ccp(1.f, 0.f));
+				if (label != m_cheatIndicatorLabel) {
+					label->m_pAlignment = kCCTextAlignmentRight;
+				}
+				label->setPosition(rightStatusXPos, (director->getScreenBottom() + 2.f) + (bottomRightLabelsCount * setting().labelsScale * 13.f));
+				bottomRightLabelsCount++;
+			}
+
+			if (label->getTag() == 3) { // Bottom-Left
+				label->setAnchorPoint(ccp(0.f, 0.f));
+				if (label != m_cheatIndicatorLabel) {
+					label->m_pAlignment = kCCTextAlignmentLeft;
+				}
+				label->setPosition(leftStatusXPos, (director->getScreenBottom() + 2.f) + (bottomLeftLabelsCount * setting().labelsScale * 13.f));
+				bottomLeftLabelsCount++;
+			}
 		}
 	}
 
@@ -598,60 +653,36 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	}
 
 	m_labelsNode = CCNode::create();
-	m_labelsNode->setPositionY(-2.f);
 	self->addChild(m_labelsNode, 99);
-
-	auto tlStatusXPos = director->getScreenLeft() + 5;
-	if (setting().labelsScale < 1.f) {
-		tlStatusXPos = director->getScreenLeft() + setting().labelsScale * 5;
-	}
 
 	m_cheatIndicatorLabel = CCLabelBMFont::create(". ", "bigFont.fnt");
 	static_cast<CCSprite*>(m_cheatIndicatorLabel->getChildren()->objectAtIndex(0))->setScale(3.f);
 	static_cast<CCSprite*>(m_cheatIndicatorLabel->getChildren()->objectAtIndex(0))->setAnchorPoint(ccp(.25f, .25f));
-	m_cheatIndicatorLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_cheatIndicatorLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_cheatIndicatorLabel);
 
 	m_messageLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_messageLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_messageLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_messageLabel);
 
+	m_bestRunLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_labelsNode->addChild(m_bestRunLabel);
+
 	m_attemptsLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_attemptsLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_attemptsLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_attemptsLabel);
 
 	m_fpsCounterLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_fpsCounterLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_fpsCounterLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_fpsCounterLabel);
 
 	m_cpsCounterLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_cpsCounterLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_cpsCounterLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_cpsCounterLabel);
 
 	m_jumpsLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_jumpsLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_jumpsLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_jumpsLabel);
 
-	m_sessionTimeLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_sessionTimeLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_sessionTimeLabel->setAnchorPoint(ccp(0.f, 1.f));
-	m_labelsNode->addChild(m_sessionTimeLabel);
-
-	m_bestRunLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_bestRunLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_bestRunLabel->setAnchorPoint(ccp(0.f, 1.f));
-	m_labelsNode->addChild(m_bestRunLabel);
-
 	m_clockLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	m_clockLabel->m_pAlignment = kCCTextAlignmentLeft;
-	m_clockLabel->setAnchorPoint(ccp(0.f, 1.f));
 	m_labelsNode->addChild(m_clockLabel);
+
+	m_sessionTimeLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_labelsNode->addChild(m_sessionTimeLabel);
 
 	PlayLayer::updateStatusLabels();
 
