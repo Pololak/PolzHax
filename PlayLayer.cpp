@@ -36,6 +36,11 @@ CCLabelBMFont* m_cheatIndicatorLabel = nullptr;
 CCLabelBMFont* m_messageLabel = nullptr;
 CCLabelBMFont* m_attemptsLabel = nullptr;
 CCLabelBMFont* m_fpsCounterLabel = nullptr;
+float fps;
+float _updateInterval = .5f;
+float _timeLeft = _updateInterval;
+float _accum = 0;
+int _frames = 0;
 CCLabelBMFont* m_cpsCounterLabel = nullptr;
 bool m_hasClicked;
 bool m_isHolding;
@@ -49,6 +54,14 @@ int m_bestRunPercentage;
 CCLabelBMFont* m_clockLabel = nullptr;
 std::time_t clockTime;
 SYSTEMTIME st;
+CCLabelBMFont* m_noclipAccuracyLabel = nullptr;
+float m_noclipAccuracy;
+float m_deathPos;
+float m_deathDifference;
+CCLabelBMFont* m_noclipDeathsLabel = nullptr;
+int m_deaths;
+bool m_wasDead;
+bool m_isPlayerDead;
 
 bool m_cheatingBeforeRestart;
 
@@ -68,6 +81,7 @@ bool PlayLayer::isCheating() {
 		setting().onJumpHack ||
 		setting().onNoclip ||
 		setting().onWaveSlide ||
+		setting().onShowLayout ||
 		setting().onSpeedhack;
 }
 
@@ -312,11 +326,11 @@ void updateAttemptsLabel() {
 
 		int attempts = 1;
 
-		if (setting().onShowTotalAttempts) {
-			attempts = playLayer->m_level->m_attempts + 1;
+		if (!setting().onShowTotalAttempts) {
+			attempts = playLayer->m_attempts;
 		}
 		else {
-			attempts = playLayer->m_attempts;
+			attempts = playLayer->m_level->m_attempts + 1;
 		}
 
 		m_attemptsLabel->setString((prefix + std::to_string(attempts)).c_str());
@@ -334,7 +348,7 @@ void updateFPSLabel() {
 			prefix.clear();
 		}
 
-		m_fpsCounterLabel->setString((std::to_string(static_cast<int>(ImGui::GetIO().Framerate)) + prefix).c_str());
+		m_fpsCounterLabel->setString((std::to_string(static_cast<int>(fps)) + prefix).c_str());
 	}
 }
 
@@ -402,8 +416,6 @@ void updateSessionTimeLabel() {
 
 void updateBestRunLabel() {
 	if (m_bestRunLabel && m_bestRunLabel->isVisible()) {
-		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
-
 		std::string prefix;
 
 		if (setting().bestRunPrefix) {
@@ -429,6 +441,42 @@ void updateClockLabel() {
 		std::ostringstream s;
 		s << std::put_time(&tm, "%H:%M:%S");
 		m_clockLabel->setString(s.str().c_str());
+	}
+}
+
+void updateNoclipAccuracyLabel(bool tintRed = false) {
+	if (m_noclipAccuracyLabel && m_noclipAccuracyLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+		std::string prefix;
+
+		if (setting().nocAccPrefix) {
+			prefix = "Accuracy: ";
+		}
+		else {
+			prefix.clear();
+		}
+
+		m_noclipAccuracy = ((playLayer->m_player->getPositionX() - m_deathDifference) / playLayer->m_player->getPositionX()) * 100.f;
+
+		if (!playLayer->m_endTriggered) {
+			m_noclipAccuracyLabel->setString(CCString::createWithFormat((prefix + "%.2f%%").c_str(), m_noclipAccuracy)->getCString());
+		}
+	}
+}
+
+void updateNoclipDeathsLabel(bool tintRed = false) {
+	if (m_noclipDeathsLabel && m_noclipDeathsLabel->isVisible()) {
+		std::string prefix;
+
+		if (setting().nocDeathsPrefix) {
+			prefix = " Deaths";
+		}
+		else {
+			prefix.clear();
+		}
+
+		m_noclipDeathsLabel->setString((std::to_string(m_deaths) + prefix).c_str());
 	}
 }
 
@@ -470,6 +518,12 @@ void PlayLayer::updateStatusLabels() {
 
 	m_clockLabel->setVisible(setting().onClockLabel);
 	m_clockLabel->setTag(setting().clockPos);
+
+	m_noclipAccuracyLabel->setVisible(setting().onNoclipAccuracy);
+	m_noclipAccuracyLabel->setTag(setting().nocAccPos);
+
+	m_noclipDeathsLabel->setVisible(setting().onNoclipDeaths);
+	m_noclipDeathsLabel->setTag(setting().nocDeathsPos);
 
 	int topLeftLabelsCount = 0;
 	int topRightLabelsCount = 0;
@@ -531,6 +585,8 @@ void PlayLayer::updateStatusLabels() {
 	updateSessionTimeLabel();
 	updateBestRunLabel();
 	updateClockLabel();
+	updateNoclipAccuracyLabel();
+	updateNoclipDeathsLabel();
 }
 
 CCLabelBMFont* m_debugLabel = nullptr;
@@ -557,6 +613,12 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	m_deathObject = nullptr;
 
+	fps = ImGui::GetIO().Framerate;
+	_updateInterval = .5f;
+	_timeLeft = _updateInterval;
+	_accum = 0;
+	_frames = 0;
+
 	m_hasClicked = false;
 	m_clickFrames.clear();
 	m_totalClicks = 0;
@@ -564,6 +626,14 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	m_lastRun = 0;
 	m_bestRunPercentage = 0;
+
+	m_noclipAccuracy = 0.f;
+	m_deathPos = 0.f;
+	m_deathDifference = 0.f;
+
+	m_isPlayerDead = false;
+	m_deaths = 0;
+	m_wasDead = false;
 
 	setting().beforeRestartCheatsCount = setting().cheatsCount;
 
@@ -684,6 +754,12 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_sessionTimeLabel = CCLabelBMFont::create("", "bigFont.fnt");
 	m_labelsNode->addChild(m_sessionTimeLabel);
 
+	m_noclipAccuracyLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_labelsNode->addChild(m_noclipAccuracyLabel);
+
+	m_noclipDeathsLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_labelsNode->addChild(m_noclipDeathsLabel);
+
 	PlayLayer::updateStatusLabels();
 
 	return true;
@@ -702,7 +778,22 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		}
 	}
 
+	_timeLeft -= dt;
+	_accum += 1 / dt;
+	_frames++;
+
+	if (_timeLeft <= 0) {
+		fps = _accum / _frames;
+		_timeLeft = _updateInterval;
+		_accum = 0;
+		_frames = 0;
+	}
+
+	m_isPlayerDead = false;
+
 	PlayLayer::update(self, dt);
+
+	if (!m_isPlayerDead) m_wasDead = false;
 
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";
@@ -789,9 +880,12 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	updateAttemptsLabel();
 	updateFPSLabel();
 	updateCPSLabel();
+	updateBestRunLabel();
 	updateJumpsLabel();
 	updateSessionTimeLabel();
 	updateClockLabel();
+	updateNoclipAccuracyLabel();
+	updateNoclipDeathsLabel();
 }
 
 void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
@@ -811,6 +905,13 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 
 	m_clickFrames.clear();
 	m_totalClicks = 0;
+
+	if (!self->m_practiceMode) {
+		m_deaths = 0;
+		m_deathDifference = 0.f;
+		m_deathPos = 0.f;
+	}
+	m_wasDead = false;
 
 	PlayLayer::resetLevel(self);
 
@@ -978,6 +1079,18 @@ void __fastcall PlayLayer::processItemsH(gd::PlayLayer* self) {
 }
 
 void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
+	m_isPlayerDead = true;
+	if (setting().onNoclip) {
+		if (!m_wasDead) {
+			m_deaths++;
+		}
+		else {
+			m_deathDifference += player->getPositionX() - m_deathPos;
+		}
+	}
+	m_deathPos = player->getPositionX();
+	m_wasDead = true;
+
 	PlayLayer::destroyPlayer(self, player);
 
 	if (setting().onNoclipTint && setting().onNoclip) {
@@ -1027,6 +1140,8 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 	}
 
 	updateBestRunLabel();
+
+	std::cout << "Deaths: " << m_deaths << std::endl;
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
@@ -1151,6 +1266,8 @@ void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	m_jumpsLabel = nullptr;
 	m_sessionTimeLabel = nullptr;
 	m_clockLabel = nullptr;
+	m_noclipAccuracyLabel = nullptr;
+	m_noclipDeathsLabel = nullptr;
 }
 
 void PlayLayer::mem_init() {

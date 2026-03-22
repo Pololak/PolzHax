@@ -1,6 +1,7 @@
 #include "Setting.hpp"
 #include "utils.hpp"
 #include <fstream>
+#include <imgui.h>
 
 SettingStruct& setting() {
 	static SettingStruct ret;
@@ -72,4 +73,6 @@ void SettingStruct::save() {
 		}
 		file << std::endl;
 	});
+
+	ImGui::SaveIniSettingsToDisk(ImGui::GetIO().IniFilename);
 }

@@ -211,3 +211,17 @@ bool ImGui::CheckboxF(const char* label, bool* v) {
 
 	return checkbox;
 }
+
+bool ImGui::ButtonAligned(const char* label, float alignment) {
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	float size = ImGui::CalcTextSize(label).x + style.FramePadding.x * 2.f;
+	float avail = ImGui::GetContentRegionAvail().x;
+
+	float off = (avail - size) * alignment;
+	if (off > 0.f) {
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+	}
+
+	return ImGui::Button(label);
+}

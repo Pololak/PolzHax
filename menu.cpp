@@ -967,7 +967,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (180326-1)");
+			ImGui::Text("1.920 - v1.3.0-beta.1");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -1042,6 +1042,11 @@ void imgui_render() {
 
 				colorSet();
 			}
+
+			//ImGui::SetNextItemWidth(135.f);
+			//if (ImGui::DragFloat("UI Size", &setting().UISize, .1f, .5f, 3.f, "%.1f")) {
+
+			//}
 
 			if (ImGui::Button("Sort Tabs", ImVec2(185.f, 0.f))) {
 				sortTabs();
@@ -2676,25 +2681,41 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
-			ImGui::BeginDisabled();
-			ImGui::CheckboxF("Noclip Accuracy", &setting().onNoclipAccuracy);
+			if (ImGui::CheckboxF("Noclip Accuracy", &setting().onNoclipAccuracy)) {
+				PlayLayer::updateStatusLabels();
+			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##naccSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##naccPos", &setting().nocAccPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
 
-
+				if (ImGui::CheckboxF("Show Prefix", &setting().nocAccPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}
 
-			ImGui::CheckboxF("Noclip Deaths", &setting().onNoclipDeaths);
+			if (ImGui::CheckboxF("Noclip Deaths", &setting().onNoclipDeaths)) {
+				PlayLayer::updateStatusLabels();
+			}
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##ndthsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##ndthsPos", &setting().nocDeathsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
 
-
+				if (ImGui::CheckboxF("Show Prefix", &setting().nocDeathsPrefix)) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}
 
+			ImGui::BeginDisabled();
 			ImGui::CheckboxF("Meta", &setting().onMetaLabel);
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##metaSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {

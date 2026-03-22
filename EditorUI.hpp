@@ -82,6 +82,9 @@ namespace EditorUI {
 	inline void(__thiscall* updateGridNodeSize)(gd::EditorUI*);
 	void __fastcall updateGridNodeSizeH(gd::EditorUI*);
 
+	inline bool(__thiscall* editButtonUsable)(gd::EditorUI*);
+	bool __fastcall editButtonUsableH(gd::EditorUI*);
+
 	std::string colorToShortString(int);
 
 	gd::EditorUI* get();
