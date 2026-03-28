@@ -63,18 +63,18 @@ bool FindLevelPopup::init(gd::LevelBrowserLayer* parent) {
 	return true;
 }
 
-//auto ci_equal = [](char a, char b)
-//	{
-//		return std::tolower(static_cast<unsigned char>(a)) ==
-//			std::tolower(static_cast<unsigned char>(b));
-//	};
-//
-//bool ci_contains(const std::string& haystack, const std::string& needle)
-//{
-//	return std::search(haystack.begin(), haystack.end(),
-//		needle.begin(), needle.end(),
-//		ci_equal) != haystack.end();
-//}
+auto ci_equal = [](char a, char b)
+	{
+		return std::tolower(static_cast<unsigned char>(a)) ==
+			std::tolower(static_cast<unsigned char>(b));
+	};
+
+bool ci_contains(const std::string& haystack, const std::string& needle)
+{
+	return std::search(haystack.begin(), haystack.end(),
+		needle.begin(), needle.end(),
+		ci_equal) != haystack.end();
+}
 
 void FindLevelPopup::onSearch(CCObject*) {
 	//if (m_parent) {

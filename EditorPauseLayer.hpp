@@ -25,6 +25,8 @@ namespace EditorPauseLayer {
 		void onSelectAllLeft(CCObject*);
 		void onSelectAllRight(CCObject*);
 		void onPasteString(CCObject*);
+		void onAlignY(CCObject*);
+		void onAlignX(CCObject*);
 
 		void onSmallEditorStep(CCObject*);
 		void onSelectFilter(CCObject*);

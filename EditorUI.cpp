@@ -808,15 +808,33 @@ void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
 
 static std::unordered_set<int> colorTriggerIds = { 29, 30, 104, 105, 221, 717, 718, 743, 744 };
 
-bool __fastcall EditorUI::editButtonUsableH(gd::EditorUI* self) {
-	for (int i = 0; i < self->m_selectedObjects->count(); i++) {
-		auto object = reinterpret_cast<gd::GameObject*>(self->m_selectedObjects->objectAtIndex(i));
+bool EditorUI::isColorTriggersSelected(gd::EditorUI* editorUI) {
+	for (int i = 0; i < editorUI->m_selectedObjects->count(); i++) {
+		auto object = reinterpret_cast<gd::GameObject*>(editorUI->m_selectedObjects->objectAtIndex(i));
 		if (colorTriggerIds.contains(object->m_objectID)) {
 			return true;
 		}
 	}
 
+	return false;
+}
+
+bool __fastcall EditorUI::editButtonUsableH(gd::EditorUI* self) {
+	if (isColorTriggersSelected(self)) {
+		return true;
+	}
+
 	return EditorUI::editButtonUsable(self);
+}
+
+void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* sender) {
+	if (isColorTriggersSelected(self)) {
+		
+
+		return;
+	}
+
+	EditorUI::editObject(self, sender);
 }
 
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
@@ -856,6 +874,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49680), EditorUI::editButtonUsableH, reinterpret_cast<void**>(&EditorUI::editButtonUsable));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));

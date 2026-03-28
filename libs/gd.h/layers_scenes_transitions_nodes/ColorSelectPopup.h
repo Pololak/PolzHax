@@ -26,8 +26,24 @@ namespace gd {
 		int m_custom; // 0x1f0
 		int m_custom2; // 0x1f4
 
+		static ColorSelectPopup* create(GameObject* object, int p0, int p1, int p2) {
+			return reinterpret_cast<ColorSelectPopup*(__fastcall*)(gd::GameObject*, int, int, int)>(base + 0x29cf0)(object, p0, p1, p2);
+		}
+
+		static ColorSelectPopup* create(GameObject* object) {
+			return ColorSelectPopup::create(object, 0, 0, 0);
+		}
+
 		void closeColorSelect(cocos2d::CCObject* sender) {
 			reinterpret_cast<void(__thiscall*)(ColorSelectPopup*, cocos2d::CCObject*)>(base + 0x2aec0)(this, sender);
+		}
+
+		cocos2d::ccColor3B getColorValue() {
+			return this->m_colorPicker->getColorValue();
+		}
+
+		void selectColor(cocos2d::ccColor3B color) {
+			this->m_colorPicker->setColorValue(color);
 		}
 	};
 }

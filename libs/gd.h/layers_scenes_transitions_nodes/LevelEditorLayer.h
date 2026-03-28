@@ -12,6 +12,7 @@ namespace gd {
 	class GJGameLevel;
 	class LevelSettingsObject;
 	class PlayerObject;
+	class UndoObject;
 
 	class LevelEditorLayer : public cocos2d::CCLayer, LevelSettingsDelegate, GameplayDelegate {
 	public:
@@ -89,6 +90,10 @@ namespace gd {
 				}
 				this->m_startPosObject = startPos;
 			}
+		}
+
+		void addToUndoList(UndoObject* p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, UndoObject*, bool)>(base + 0x8ea60)(this, p0, p1);
 		}
 	};
 }

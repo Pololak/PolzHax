@@ -112,6 +112,89 @@ void selectAllWithDirection(bool rightDir) {
 	}
 }
 
+void alignObjects(bool alignY) {
+	auto editorUI = EditorUI::get();
+
+	if (editorUI) {
+		auto selectedObjects = editorUI->m_selectedObjects;
+		int objectCount = selectedObjects->count();
+		auto randomKid = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(0));
+
+		if (objectCount < 3) return;
+
+		editorUI->m_editorLayer->addToUndoList(gd::UndoObject::createWithTransformObjects(selectedObjects, gd::UndoCommand::Transform), false);
+
+		std::vector<gd::GameObject*> sortedArray;
+		for (int i = 0; i < selectedObjects->count(); i++) {
+			auto object = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(i));
+			if (object) {
+				sortedArray.push_back(object);
+			}
+		}
+
+		if (!alignY) {
+			float minX = randomKid->getPositionX();
+			float maxX = randomKid->getPositionX();
+
+			for (int i = 0; i < selectedObjects->count(); i++) {
+				auto object = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(i));
+				if (object) {
+					float compareX = object->getPositionX();
+					if (compareX < minX) {
+						minX = compareX;
+					}
+					if (compareX > maxX) {
+						maxX = compareX;
+					}
+				}
+			}
+
+			std::sort(sortedArray.begin(), sortedArray.end(), [](gd::GameObject* a, gd::GameObject* b) {
+				return a->getPositionX() < b->getPositionX();
+				});
+			float step = (maxX - minX) / (objectCount - 1);
+			float currentStep = 0.f;
+
+			for (auto obj : sortedArray) {
+				if (obj) {
+					editorUI->moveObject(obj, ccp(minX + currentStep - obj->getPositionX(), 0));
+					currentStep += step;
+				}
+			}
+		}
+		else {
+			float minY = randomKid->getPositionY();
+			float maxY = randomKid->getPositionY();
+
+			for (int i = 0; i < selectedObjects->count(); i++) {
+				auto object = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(i));
+				if (object) {
+					float compareY = object->getPositionY();
+					if (compareY < minY) {
+						minY = compareY;
+					}
+					if (compareY > maxY) {
+						maxY = compareY;
+					}
+				}
+			}
+
+			std::sort(sortedArray.begin(), sortedArray.end(), [](gd::GameObject* a, gd::GameObject* b) {
+				return a->getPositionY() < b->getPositionY();
+				});
+			float step = (maxY - minY) / (objectCount - 1);
+			float currentStep = 0.f;
+
+			for (auto obj : sortedArray) {
+				if (obj) {
+					editorUI->moveObject(obj, ccp(0, minY + currentStep - obj->getPositionY()));
+					currentStep += step;
+				}
+			}
+		}
+	}
+}
+
 void EditorPauseLayer::Callback::onSelectAllLeft(CCObject*) {
 	selectAllWithDirection(false);
 }
@@ -126,6 +209,14 @@ void EditorPauseLayer::Callback::onPasteString(CCObject*) {
 		editorUI->pasteObjects(clipboard::read());
 		editorUI->updateButtons();
 	}
+}
+
+void EditorPauseLayer::Callback::onAlignY(CCObject*) {
+	alignObjects(true);
+}
+
+void EditorPauseLayer::Callback::onAlignX(CCObject*) {
+	alignObjects(false);
 }
 
 void EditorPauseLayer::Callback::onEditorOptions(CCObject*) {
@@ -205,10 +296,20 @@ void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 	onPasteString->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 135.f }));
 	bottom_menu->addChild(onPasteString);
 
+	auto onAlignYSpr = gd::ButtonSprite::create("Align Y", 0x1e, 0, 1.f, true, "bigFont.fnt", "GJ_button_04.png", 30.f);
+	auto onAlignY = gd::CCMenuItemSpriteExtra::create(onAlignYSpr, self, menu_selector(EditorPauseLayer::Callback::onAlignY));
+	onAlignY->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 170.f }));
+	bottom_menu->addChild(onAlignY);
+
+	auto onAlignXSpr = gd::ButtonSprite::create("Align X", 0x1e, 0, 1.f, true, "bigFont.fnt", "GJ_button_04.png", 30.f);
+	auto onAlignX = gd::CCMenuItemSpriteExtra::create(onAlignXSpr, self, menu_selector(EditorPauseLayer::Callback::onAlignX));
+	onAlignX->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 205.f }));
+	bottom_menu->addChild(onAlignX);
+
 	auto onOptionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
 	onOptionsSpr->setScale(.8f);
 	auto onOptions = gd::CCMenuItemSpriteExtra::create(onOptionsSpr, self, menu_selector(EditorPauseLayer::Callback::onEditorOptions));
-	onOptions->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 170.f }));
+	onOptions->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 240.f }));
 	bottom_menu->addChild(onOptions);
 
 	gd::GameToolbox::createToggleButton(

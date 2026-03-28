@@ -14,7 +14,7 @@ namespace gd {
 		std::string m_userName; // 0xe8
 		std::string m_userUDID; // 0x100
 		GJScoreType m_scoreType; // 0x118
-		int m_userID; // 0x11ñ
+		int m_userID; // 0x11c
 		int m_accountID; // 0x120
 		int m_stars; // 0x124
 		int m_demons; // 0x128

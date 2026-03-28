@@ -175,9 +175,24 @@ void __fastcall AppDelegate_trySaveGameH(gd::AppDelegate* self) {
     std::cout << "Saved state..." << std::endl;
 }
 
+bool debugCheck() {
+    if (!(GetAsyncKeyState(VK_SHIFT) & (1 << 15))) {
+        return false;
+    }
+
+    auto choice = MessageBoxW(
+        NULL,
+        L"(This has been triggered because you were holding SHIFT)\n"
+        L"Do you want to activate Debug Mode?",
+        L"Attention",
+        MB_YESNO | MB_ICONINFORMATION
+    );
+    return choice == IDYES;
+}
+
 DWORD WINAPI my_thread(void* hModule) {
-    AllocConsole();
-    freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+	/*AllocConsole();
+	freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);*/
 
     if (MH_Initialize() != MH_OK) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);

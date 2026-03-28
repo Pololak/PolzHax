@@ -85,12 +85,17 @@ namespace EditorUI {
 	inline bool(__thiscall* editButtonUsable)(gd::EditorUI*);
 	bool __fastcall editButtonUsableH(gd::EditorUI*);
 
+	inline void(__thiscall* editObject)(gd::EditorUI*, CCObject*);
+	void __fastcall editObjectH(gd::EditorUI*, void*, CCObject*);
+
 	std::string colorToShortString(int);
 
 	gd::EditorUI* get();
 
 	void updateObjectInfoLabel(gd::EditorUI*);
 	void updateGuideTogglePosition(gd::EditorUI*);
+
+	bool isColorTriggersSelected(gd::EditorUI*);
 
 	class Callback : public gd::EditorUI {
 	public:
