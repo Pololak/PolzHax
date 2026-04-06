@@ -31,8 +31,12 @@ namespace gd {
 		cocos2d::CCArray* m_objects; // 0x20
 		bool m_isLinked; // 0x24
 
+		static UndoObject* createWithArray(cocos2d::CCArray* objects, UndoCommand command) {
+			return reinterpret_cast<UndoObject*(__fastcall*)(cocos2d::CCArray*, UndoCommand)>(base + 0x92970)(objects, command);
+		}
+
 		static UndoObject* createWithTransformObjects(cocos2d::CCArray* objects, UndoCommand command) {
-			return reinterpret_cast<UndoObject* (__fastcall*)(cocos2d::CCArray*, UndoCommand)>(base + 0x92770)(objects, command);
+			return reinterpret_cast<UndoObject*(__fastcall*)(cocos2d::CCArray*, UndoCommand)>(base + 0x92770)(objects, command);
 		}
 	};
 }

@@ -13,7 +13,7 @@ void LevelInfoLayer::Callback::onExportLevel(CCObject*) {
 	}
 
 	nfdchar_t* path = nullptr;
-	if (NFD_SaveDialog("gmd", CCFileUtils::sharedFileUtils()->getWritablePath2().c_str(), &path) == NFD_OKAY) {
+	if (NFD_SaveDialog("gmd", std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + this->m_level->m_levelName).c_str(), &path) == NFD_OKAY) {
 		std::ofstream file(path);
 		dumpLevel(this->m_level, file);
 		free(path);
@@ -35,6 +35,7 @@ void LevelInfoLayer::Callback::onMoveToTop(CCObject*) {
 }
 
 bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGameLevel* level) {
+	m_songWidget = nullptr;
 	if (!LevelInfoLayer::init(self, level)) return false;
 
 	if (m_songWidget) {

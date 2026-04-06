@@ -339,9 +339,9 @@ void LevelEditorLayer::updatePreviewMode() {
 
 		auto lbgColor = calculateLbg(bgColor, p1Color);
 
-		CCARRAY_FOREACH_B_TYPE(m_editorLayer->m_levelSections, section, CCArray) {
+		for (auto section : CCArrayExt<CCArray*>(m_editorLayer->m_levelSections)) {
 			if (section) {
-				CCARRAY_FOREACH_B_TYPE(section, object, gd::GameObject) {
+				for (auto object : CCArrayExt<gd::GameObject*>(section)) {
 					if (!object || !object->getParent() || object->m_isSelected) continue;
 
 					if (object->m_isTintObject)
@@ -389,9 +389,9 @@ void LevelEditorLayer::resetColors() {
 	if (m_editorLayer) {
 		m_editorLayer->m_backgroundSprite->setColor(ccGRAY);
 
-		CCARRAY_FOREACH_B_TYPE(m_editorLayer->m_levelSections, section, CCArray) {
+		for (auto section : CCArrayExt<CCArray*>(m_editorLayer->m_levelSections)) {
 			if (section) {
-				CCARRAY_FOREACH_B_TYPE(section, object, gd::GameObject) {
+				for (auto object : CCArrayExt<gd::GameObject*>(section)) {
 					if (!object || object->m_isSelected) continue;
 
 					if (object->m_isTintObject)

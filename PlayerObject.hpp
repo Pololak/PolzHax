@@ -8,8 +8,17 @@ namespace PlayerObject {
 	inline void(__thiscall* updatePlayerFrame)(gd::PlayerObject*, int);
 	void __fastcall updatePlayerFrameH(gd::PlayerObject*, void*, int);
 
+	inline void(__thiscall* updatePlayerShipFrame)(gd::PlayerObject*, int);
+	void __fastcall updatePlayerShipFrameH(gd::PlayerObject*, void*, int);
+
 	inline void(__thiscall* updatePlayerRollFrame)(gd::PlayerObject*, int);
 	void __fastcall updatePlayerRollFrameH(gd::PlayerObject*, void*, int);
+
+	inline void(__thiscall* updatePlayerBirdFrame)(gd::PlayerObject*, int);
+	void __fastcall updatePlayerBirdFrameH(gd::PlayerObject*, void*, int);
+
+	inline void(__thiscall* updatePlayerDartFrame)(gd::PlayerObject*);
+	void __fastcall updatePlayerDartFrameH(gd::PlayerObject*);
 
 	inline void(__thiscall* toggleFlyMode)(gd::PlayerObject*, bool);
 	void __fastcall toggleFlyModeH(gd::PlayerObject*, void*, bool);
@@ -34,6 +43,8 @@ namespace PlayerObject {
 
 	inline void(__thiscall* loadFromCheckpoint)(gd::PlayerObject*, gd::PlayerCheckpoint*);
 	void __fastcall loadFromCheckpointH(gd::PlayerObject*, void*, gd::PlayerCheckpoint*);
+
+	void newExtraFrame(gd::PlayerObject*, const char*, const char*);
 
 	void setCubeIcon(int);
 	void setShipIcon(int);

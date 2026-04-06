@@ -166,6 +166,7 @@
     <ClInclude Include="FindLevelPopup.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameObject.hpp" />
+    <ClInclude Include="GDPSSwitcher.hpp" />
     <ClInclude Include="GJGarageLayer.hpp" />
     <ClInclude Include="GJRotationControl.hpp" />
     <ClInclude Include="GJScoreCell.hpp" />
@@ -707,6 +708,7 @@
     <ClInclude Include="RGBColorInputWidget.hpp" />
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
+    <ClInclude Include="SimplePlayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
     <ClInclude Include="SURVEY_PROGRAM.hpp" />
     <ClInclude Include="utils.hpp" />
@@ -731,6 +733,7 @@
     <ClCompile Include="EndLevelLayer.cpp" />
     <ClCompile Include="FindLevelPopup.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GDPSSwitcher.cpp" />
     <ClCompile Include="GJGarageLayer.cpp" />
     <ClCompile Include="GJRotationControl.cpp" />
     <ClCompile Include="GJScoreCell.cpp" />
@@ -790,6 +793,7 @@
     <ClCompile Include="RGBColorInputWidget.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
+    <ClCompile Include="SimplePlayer.cpp" />
     <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="SURVEY_PROGRAM.cpp" />
     <ClCompile Include="UILayer.cpp" />

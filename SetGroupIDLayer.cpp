@@ -70,7 +70,7 @@ void SetGroupIDLayer::Callback::onNextFree(CCObject*) {
 
 	std::set<int> layers;
 
-	CCARRAY_FOREACH_B_TYPE(objs, obj, gd::GameObject) {
+	for (auto obj : CCArrayExt<gd::GameObject*>(objs)) {
 		layers.insert(obj->m_editorGroup);
 	}
 

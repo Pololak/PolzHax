@@ -119,8 +119,10 @@ namespace gd {
 		cocos2d::CCArray* m_createButtonArray; // 0x224
 		int m_editMode; // 0x228
 		LevelEditorLayer* m_editorLayer; // 0x22c
-		cocos2d::CCPoint m_lastClickPos; // 0x230
-		PAD(32)
+		cocos2d::CCPoint m_swipeStart; // 0x230
+		cocos2d::CCPoint m_swipeEnd; // 0x238
+		cocos2d::CCPoint m_swipePosition; // 0x240
+		PAD(16)
 		GameObject* m_selectedObject; // 0x258
 		GameObject* m_movingObject; // 0x25c // free move object
 		PAD(4)
@@ -221,6 +223,10 @@ namespace gd {
 
 		void updateGridNodeSize() {
 			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41ae0)(this);
+		}
+
+		void createUndoSelectObject(bool p0) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, bool)>(base + 0x48240)(this, p0);
 		}
 	};
 }

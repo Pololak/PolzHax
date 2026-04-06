@@ -1626,9 +1626,6 @@
     <ClInclude Include="ColorSelectPopup.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="Icons.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="GJGarageLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
@@ -1754,6 +1751,15 @@
     </ClInclude>
     <ClInclude Include="LeaderboardsLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="GDPSSwitcher.hpp">
+      <Filter>Файлы заголовков\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Icons.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SimplePlayer.hpp">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1983,6 +1989,12 @@
       <Filter>Исходные файлы\Utils</Filter>
     </ClCompile>
     <ClCompile Include="LeaderboardsLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="GDPSSwitcher.cpp">
+      <Filter>Исходные файлы\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="SimplePlayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>

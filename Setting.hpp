@@ -54,6 +54,7 @@ struct SettingStruct {
 	bool onNoBackgroundFlash;
 	bool onNoDeathEffect;
 	bool onNoEffectCircle;
+	bool onNoEndShake;
 	bool onNoForcePlayerGlow; // This thing still breaks gd lmao
 	bool onNoGhostTrail;
 	bool onNoObjectGlow;
@@ -199,6 +200,10 @@ struct SettingStruct {
 	int colorFilterOrder = 0;
 	int selectedDartIdx = 1;
 	float m_customEditorGridSize = 30.f;
+
+	// GDPS Switcher
+	std::string originalServerURL;
+	bool onGDPSSwitcher, onEnableSwitcher; int m_serverIndex = 0; std::string m_customServerURL;
 };
 
 SettingStruct& setting();
@@ -242,6 +247,7 @@ DEF_SCHEMA(
 	onNoBackgroundFlash,
 	onNoDeathEffect,
 	onNoEffectCircle,
+	onNoEndShake,
 	onNoForcePlayerGlow,
 	onNoGhostTrail,
 	onNoObjectGlow,
@@ -382,5 +388,7 @@ DEF_SCHEMA(
 	m_p1click,
 	m_p2click,
 	onShowPercentage,
-	selectedDartIdx
+	selectedDartIdx,
+
+	onEnableSwitcher, m_serverIndex, m_customServerURL
 )

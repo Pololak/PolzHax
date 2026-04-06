@@ -32,6 +32,7 @@
 #include "PlayerObject.hpp"
 #include "PlayLayer.hpp"
 #include "SetGroupIDLayer.hpp"
+#include "SimplePlayer.hpp"
 #include "UILayer.hpp"
 
 // Utils
@@ -42,7 +43,6 @@
 
 // Menu
 #include "Menu.hpp"
-
 #include "Setting.hpp"
 
 #include <imgui-hook.hpp>
@@ -53,7 +53,6 @@ void __fastcall hkMainLoop(cocos2d::CCDirector* self)
     ImGuiHook::poll(self->getOpenGLView());
     fpMainLoop(self);
 }
-
 
 inline void(__thiscall* CCTextInputNode_updateLabel)(gd::CCTextInputNode*, std::string);
 void __fastcall CCTextInputNode_updateLabelH(gd::CCTextInputNode* self, void*, std::string string) {
@@ -166,6 +165,84 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
     return ret;
 }
 
+std::string str_replace(std::string haystack, std::string needle, std::string replacement) {
+    std::string input = std::string(haystack.c_str());
+    std::string replace_word = needle;
+    std::string replace_by = replacement;
+
+    size_t pos = input.find(replace_word);
+
+    while (pos != std::string::npos) {
+        input.replace(pos, replace_word.size(), replace_by);
+
+        pos = input.find(replace_word,
+            pos + replace_by.size());
+    }
+
+    return input;
+}
+
+char originalServerURL[128];
+
+std::string keyToURL(int key) {
+    switch (key) {
+    case 0:
+        return "https://19gdps.com/gdapi/";
+    case 1:
+        return "https://rewind19.gdps.host/";
+    case 2:
+        return "https://nebulaps.ps.fhgdps.com/";
+    case 3:
+        return "https://www.boomlings.com/database/";
+    case 4:
+    default:
+        return setting().m_customServerURL;
+    }
+}
+
+inline void(__thiscall* CCHttpClient_send)(extension::CCHttpClient*, extension::CCHttpRequest*);
+void __fastcall CCHttpClient_sendH(extension::CCHttpClient* self, void*, extension::CCHttpRequest* request) {
+    if (!setting().onEnableSwitcher) {
+        return CCHttpClient_send(self, request);
+    }
+
+    auto new_request_url = std::string(request->getUrl());
+
+    new_request_url = str_replace(
+        new_request_url, originalServerURL,
+        keyToURL(setting().m_serverIndex)
+    );
+
+    new_request_url = str_replace(
+        new_request_url, originalServerURL,
+        keyToURL(setting().m_serverIndex)
+    );
+
+    if (setting().m_serverIndex == 3) { // if main gd
+        new_request_url = str_replace(
+            new_request_url, "getGJLevels19",
+            "getGJLevels21"
+        );
+
+        new_request_url = str_replace(
+            new_request_url, "downloadGJLevel19",
+            "downloadGJLevel22"
+        );
+
+        new_request_url = str_replace(
+            new_request_url, "getGJMapPacks",
+            "getGJMapPacks21"
+        );
+    }
+
+    request->setUrl(new_request_url.c_str());
+
+    std::cout << "Original URL: " << originalServerURL << std::endl;
+    std::cout << "Request sent: " << request->getUrl() << std::endl;
+
+    CCHttpClient_send(self, request);
+}
+
 inline void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate*);
 void __fastcall AppDelegate_trySaveGameH(gd::AppDelegate* self) {
     AppDelegate_trySaveGame(self);
@@ -191,13 +268,14 @@ bool debugCheck() {
 }
 
 DWORD WINAPI my_thread(void* hModule) {
-	/*AllocConsole();
-	freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);*/
+	//AllocConsole();
+	//freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     if (MH_Initialize() != MH_OK) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
     }
 
+    ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x11f338), &originalServerURL, 33, NULL);
     sequence_patch(gd::base + 0x28bd5, { 0x6a, 0x00 }); // RGBA8888 format.
     sequence_patch(gd::base + 0x3a49b, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90, 0x90 }); // Play Music Button.
     sequence_patch(gd::base + 0x145128, { 0x42, 0x61, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }); // Progress Bar -> Bar
@@ -219,6 +297,7 @@ DWORD WINAPI my_thread(void* hModule) {
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0xa4990), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
     MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
     MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x293f0), AppDelegate_trySaveGameH, reinterpret_cast<void**>(&AppDelegate_trySaveGame));
+    MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0x16ad0), CCHttpClient_sendH, reinterpret_cast<void**>(&CCHttpClient_send));
 
     CCSchedulerHook::mem_init();
     ColorSelectPopup::mem_init();
@@ -249,6 +328,7 @@ DWORD WINAPI my_thread(void* hModule) {
     PlayLayer::mem_init();
     RingObject::mem_init();
     SetGroupIDLayer::mem_init();
+    SimplePlayer::mem_init();
     UILayer::mem_init();
 
     setupImGuiMenu();

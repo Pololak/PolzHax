@@ -64,18 +64,18 @@ void EditorPauseLayer::Callback::onSelectAll(CCObject*) {
 	auto editorLayer = this->m_levelEditorLayer;
 	auto editorUI = editorLayer->m_uiLayer;
 
-	auto sections = CCArray::create();
-	for (int i = 0; i < editorLayer->m_levelSections->count(); i++) {
-		sections->addObjectsFromArray(static_cast<CCArray*>(editorLayer->m_levelSections->objectAtIndex(i)));
-	}
-	
 	auto objects = CCArray::create();
-	for (int i = 0; i < sections->count(); i++) {
-		if (reinterpret_cast<gd::GameObject*>(sections->objectAtIndex(i))->m_editorGroup == editorLayer->m_groupIDFilter || editorLayer->m_groupIDFilter == -1) {
-			objects->addObject(sections->objectAtIndex(i));
+	for (auto section : CCArrayExt<CCArray*>(editorLayer->m_levelSections)) {
+		if (section) {
+			for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+				if (object && object->m_editorGroup == editorLayer->m_groupIDFilter || editorLayer->m_groupIDFilter == -1) {
+					objects->addObject(object);
+				}
+			}
 		}
 	}
 
+	editorUI->createUndoSelectObject(false);
 	editorUI->selectObjects(objects);
 	editorUI->updateButtons();
 	editorUI->deactivateRotationControl();
@@ -91,21 +91,20 @@ void selectAllWithDirection(bool rightDir) {
 		auto cameraScale = editorLayer->m_gameLayer->getScale();
 		int centerX = -(cameraPos.x) / cameraScale + CCDirector::sharedDirector()->getWinSize().width / 2;
 
-		auto sections = CCArray::create();
-		for (int i = 0; i < editorLayer->m_levelSections->count(); i++) {
-			sections->addObjectsFromArray(static_cast<CCArray*>(editorLayer->m_levelSections->objectAtIndex(i)));
-		}
-
 		auto objects = CCArray::create();
-		for (int i = 0; i < sections->count(); i++) {
-			auto object = reinterpret_cast<gd::GameObject*>(sections->objectAtIndex(i));
-			if (object && (object->m_editorGroup == editorLayer->m_groupIDFilter) || editorLayer->m_groupIDFilter == -1) {
-				if ((rightDir && object->getPositionX() >= centerX) || (!rightDir && object->getPositionX() <= centerX)) {
-					objects->addObject(sections->objectAtIndex(i));
+		for (auto section : CCArrayExt<CCArray*>(editorLayer->m_levelSections)) {
+			if (section) {
+				for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+					if (object && (object->m_editorGroup == editorLayer->m_groupIDFilter) || editorLayer->m_groupIDFilter == -1) {
+						if ((rightDir && object->getPositionX() >= centerX) || (!rightDir && object->getPositionX() <= centerX)) {
+							objects->addObject(object);
+						}
+					}
 				}
 			}
 		}
 
+		editorUI->createUndoSelectObject(false);
 		editorUI->selectObjects(objects);
 		editorUI->updateButtons();
 		editorUI->deactivateRotationControl();
@@ -125,8 +124,7 @@ void alignObjects(bool alignY) {
 		editorUI->m_editorLayer->addToUndoList(gd::UndoObject::createWithTransformObjects(selectedObjects, gd::UndoCommand::Transform), false);
 
 		std::vector<gd::GameObject*> sortedArray;
-		for (int i = 0; i < selectedObjects->count(); i++) {
-			auto object = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(i));
+		for (auto object : CCArrayExt<gd::GameObject*>(selectedObjects)) {
 			if (object) {
 				sortedArray.push_back(object);
 			}
@@ -136,8 +134,7 @@ void alignObjects(bool alignY) {
 			float minX = randomKid->getPositionX();
 			float maxX = randomKid->getPositionX();
 
-			for (int i = 0; i < selectedObjects->count(); i++) {
-				auto object = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(i));
+			for (auto object : CCArrayExt<gd::GameObject*>(selectedObjects)) {
 				if (object) {
 					float compareX = object->getPositionX();
 					if (compareX < minX) {
@@ -166,8 +163,7 @@ void alignObjects(bool alignY) {
 			float minY = randomKid->getPositionY();
 			float maxY = randomKid->getPositionY();
 
-			for (int i = 0; i < selectedObjects->count(); i++) {
-				auto object = reinterpret_cast<gd::GameObject*>(selectedObjects->objectAtIndex(i));
+			for (auto object : CCArrayExt<gd::GameObject*>(selectedObjects)) {
 				if (object) {
 					float compareY = object->getPositionY();
 					if (compareY < minY) {

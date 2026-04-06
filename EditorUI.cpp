@@ -8,6 +8,7 @@
 #include "ColorFilterPopup.hpp"
 #include <unordered_set>
 #include <array>
+#include <numbers>
 
 gd::EditorUI* m_editorUI;
 
@@ -142,7 +143,7 @@ void EditorUI::Callback::onNextFreeGroup(CCObject* sender) {
 
 	std::set<int> layers;
 
-	CCARRAY_FOREACH_B_TYPE(objs, obj, gd::GameObject) {
+	for (auto obj : CCArrayExt<gd::GameObject*>(objs)) {
 		layers.insert(obj->m_editorGroup);
 	}
 
@@ -172,7 +173,7 @@ void EditorUI::Callback::onNextFreeGroup(CCObject* sender) {
 void EditorUI::Callback::onGoToGroup(CCObject*) {
 	auto objs = this->getSelectedObjects();
 
-	CCARRAY_FOREACH_B_TYPE(objs, obj, gd::GameObject) {
+	for (auto obj : CCArrayExt<gd::GameObject*>(objs)) {
 		if (obj) {
 			int objectGroup = obj->m_editorGroup;
 			this->m_editorLayer->m_groupIDFilter = objectGroup;
@@ -676,38 +677,26 @@ void __fastcall EditorUI::deselectAllH(gd::EditorUI* self) {
 	}
 }
 
-void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void* edx, float dy, float dx) { // From BEv4
+void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void* edx, float dy, float dx) { // From BEv6
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf8);
 
 	auto kb = CCDirector::sharedDirector()->m_pKeyboardDispatcher;
+	auto objectLayer = self->m_editorLayer->m_gameLayer;
+	auto prevScale = objectLayer->getScale();
+	auto swipeStart = objectLayer->convertToNodeSpace(self->m_swipeStart) * prevScale;
 
 	if (kb->getControlKeyPressed()) {
-		auto zoom = self->m_editorLayer->m_gameLayer->getScale();
-		zoom = static_cast<float>(std::pow(2.71828182845904523536, std::log(std::max(zoom, 0.001f)) - dy * 0.01f));
-		zoom = std::max(zoom, 0.1f);
-		zoom = std::min(zoom, 1000000.f);
+		auto zoom = objectLayer->getScale();
+
+		zoom = static_cast<float>(std::pow(std::numbers::e, std::log(std::max(zoom, .001f)) - dy * .01f));
+
+		zoom = std::clamp(zoom, .1f, 1000000.f);
+
+		auto mousePos = getMousePos();
+		auto prevPos = objectLayer->convertToNodeSpace(mousePos);
 		self->updateZoom(zoom);
-
-		auto winSize = CCDirector::sharedDirector()->getWinSize();
-		auto winSizePx = CCDirector::sharedDirector()->getOpenGLView()->getViewPortRect();
-		auto ratio_w = winSize.width / winSizePx.size.width;
-		auto ratio_h = winSize.height / winSizePx.size.height;
-
-		auto mpos = CCDirector::sharedDirector()->getOpenGLView()->getMousePosition();
-		mpos.y = winSizePx.size.height - mpos.y;
-
-		mpos.x *= ratio_w;
-		mpos.y *= ratio_h;
-
-		mpos = mpos - winSize / 2.f;
-
-		if (dy > 0.f) mpos = -mpos * .5f;
-
-		self->m_editorLayer->m_gameLayer->setPosition(
-			self->m_editorLayer->m_gameLayer->getPosition() - mpos / std::max(zoom, 5.f)
-		);
-
-		self->constrainGameLayerPosition(-3.f, -1.f);
+		auto newPos = objectLayer->convertToWorldSpace(prevPos);
+		objectLayer->setPosition(objectLayer->getPosition() + mousePos - newPos);
 	}
 	else if (kb->getShiftKeyPressed()) {
 		self->m_editorLayer->m_gameLayer->setPositionX(self->m_editorLayer->m_gameLayer->getPositionX() - dy * 1.f);
@@ -715,6 +704,11 @@ void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void* edx, float dy,
 	else {
 		EditorUI::scrollWheel(_self, dy, dx);
 	}
+
+	auto newSwipeStart = objectLayer->convertToNodeSpace(self->m_swipeStart) * prevScale;
+	auto rel = swipeStart - newSwipeStart;
+	rel = rel * (objectLayer->getScale()) / prevScale;
+	self->m_swipeStart = self->m_swipeStart + rel;
 }
 
 void __fastcall EditorUI::onCreateButtonH(gd::EditorUI* self, void*, CCObject* sender) {

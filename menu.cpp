@@ -7,6 +7,8 @@
 #include "shellapi.h"
 
 #include "CocosExplorer.hpp"
+#include "GDPSSwitcher.hpp"
+
 #include "EditorUI.hpp"
 #include "LevelEditorLayer.hpp"
 #include "PauseLayer.hpp"
@@ -375,6 +377,13 @@ void imgui_render() {
 		else {
 			sequence_patch(gd::base + 0xdde71, { 0x0f, 0x84, 0xd5, 0x01, 0x00, 0x00 });
 			sequence_patch(gd::base + 0xf05dc, { 0x74, 0x1b });
+		}
+
+		if (setting().onNoEndShake) {
+			sequence_patch(gd::base + 0xe5f46, { 0x00, 0x00, 0x00, 0x00 });
+		}
+		else {
+			sequence_patch(gd::base + 0xe5f46, { 0x00, 0x00, 0x40, 0x40 });
 		}
 
 		//if (setting().onNoForcePlayerGlow) {
@@ -964,10 +973,14 @@ void imgui_render() {
 		if (setting().onCocosExplorer) {
 			renderCocosExplorer(setting().onCocosExplorer);
 		}
+
+		if (setting().onGDPSSwitcher) {
+			renderGDPSSwitcher(setting().onGDPSSwitcher);
+		}
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (280326)");
+			ImGui::Text("1.920 - v1.3.0 (060426)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -1001,6 +1014,10 @@ void imgui_render() {
 			if (setting().onDeveloperMode) {
 				if (ImGui::Button("Cocos Explorer", ImVec2(185.f, 0.f))) {
 					setting().onCocosExplorer = !setting().onCocosExplorer;
+				}
+
+				if (ImGui::Button("GDPS Switcher", ImVec2(185.f, 0.f))) {
+					setting().onGDPSSwitcher = !setting().onGDPSSwitcher;
 				}
 			}
 
@@ -1384,6 +1401,16 @@ void imgui_render() {
 
 			ImGui::CheckboxF("No Effect Circle", &setting().onNoEffectCircle);
 			ImGui::Tooltip("Removes effect circles from orb, portal & pad activations.");
+
+			if (ImGui::CheckboxF("No End Shake", &setting().onNoEndShake)) {
+				if (setting().onNoEndShake) {
+					sequence_patch(gd::base + 0xe5f46, { 0x00, 0x00, 0x00, 0x00 });
+				}
+				else {
+					sequence_patch(gd::base + 0xe5f46, { 0x00, 0x00, 0x40, 0x40 });
+				}
+			}
+			ImGui::Tooltip("Removes camera shake from level complete animation.");
 
 			//if (ImGui::CheckboxF("No Force Player Glow", &setting().onNoForcePlayerGlow)) {
 			//	if (setting().onNoForcePlayerGlow) {
