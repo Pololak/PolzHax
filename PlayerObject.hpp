@@ -20,6 +20,12 @@ namespace PlayerObject {
 	inline void(__thiscall* updatePlayerDartFrame)(gd::PlayerObject*, int);
 	void __fastcall updatePlayerDartFrameH(gd::PlayerObject*, void*, int);
 
+	inline void(__thiscall* updateGlowColor)(gd::PlayerObject*);
+	void __fastcall updateGlowColorH(gd::PlayerObject*);
+
+	inline void(__thiscall* updatePlayerGlow)(gd::PlayerObject*);
+	void __fastcall updatePlayerGlowH(gd::PlayerObject*);
+
 	inline void(__thiscall* toggleFlyMode)(gd::PlayerObject*, bool);
 	void __fastcall toggleFlyModeH(gd::PlayerObject*, void*, bool);
 

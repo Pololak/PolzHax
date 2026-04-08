@@ -145,6 +145,18 @@ void __fastcall PlayerObject::updatePlayerDartFrameH(gd::PlayerObject* self, voi
 	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("dart_%02d_extra_001.png", setting().selectedDartIdx)->getCString());
 }
 
+void __fastcall PlayerObject::updateGlowColorH(gd::PlayerObject* self) {
+	PlayerObject::updateGlowColor(self);
+
+	
+}
+
+void __fastcall PlayerObject::updatePlayerGlowH(gd::PlayerObject* self) {
+	PlayerObject::updatePlayerGlow(self);
+
+	
+}
+
 void __fastcall PlayerObject::toggleFlyModeH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::toggleFlyMode(self, p0);
 
@@ -250,6 +262,8 @@ void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0290), PlayerObject::updatePlayerBirdFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerBirdFrame));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0580), PlayerObject::updatePlayerDartFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerDartFrame));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfc80), PlayerObject::updateGlowColorH, reinterpret_cast<void**>(&PlayerObject::updateGlowColor));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0f40), PlayerObject::updatePlayerGlowH, reinterpret_cast<void**>(&PlayerObject::updatePlayerGlow));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdea20), PlayerObject::toggleFlyModeH, reinterpret_cast<void**>(&PlayerObject::toggleFlyMode));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdf490), PlayerObject::toggleRollModeH, reinterpret_cast<void**>(&PlayerObject::toggleRollMode));

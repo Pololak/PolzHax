@@ -980,7 +980,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (070426-Extra)");
+			ImGui::Text("1.920 - v1.3.0 (070426-Glow)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 7.5f);
@@ -1547,6 +1547,32 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Show Total Attempts", &setting().onShowTotalAttempts);
 			ImGui::Tooltip("Shows the total attempt count in-level instead of the session attempt count.");
+
+			if (ImGui::CheckboxF("Solid Player Glow", &setting().onSolidPlayerGlow)) {
+				if (setting().onSolidPlayerGlow) {
+					if (playLayer) {
+						playLayer->m_batchNodeAddPlayer->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+					}
+					if (editorLayer) {
+						editorLayer->m_player->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+						editorLayer->m_player->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+						editorLayer->m_player2->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+						editorLayer->m_player2->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+					}
+				}
+				else {
+					if (playLayer) {
+						playLayer->m_batchNodeAddPlayer->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+					}
+					if (editorLayer) {
+						editorLayer->m_player->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+						editorLayer->m_player->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+						editorLayer->m_player2->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+						editorLayer->m_player2->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+					}
+				}
+			}
+			ImGui::Tooltip("Removes blending from player glow (like in 2.2).");
 
 			if (ImGui::CheckboxF("Solid Player Trail", &setting().onSolidPlayerTrail)) {
 				if (setting().onSolidPlayerTrail) {

@@ -74,6 +74,7 @@ struct SettingStruct {
 	bool onNoWaveTrailBehind;
 	bool onPracticePulse;
 	bool onShowTotalAttempts;
+	bool onSolidPlayerGlow;
 	bool onSolidPlayerTrail;
 	bool onSolidWaveTrail;
 	bool onTrailAlwaysOff;
@@ -267,6 +268,7 @@ DEF_SCHEMA(
 	onNoWaveTrailBehind,
 	onPracticePulse,
 	onShowTotalAttempts,
+	onSolidPlayerGlow,
 	onSolidPlayerTrail,
 	onSolidWaveTrail,
 	onTrailAlwaysOff,

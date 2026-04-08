@@ -762,6 +762,10 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	PlayLayer::updateStatusLabels();
 
+	if (setting().onSolidPlayerGlow) {
+		self->m_batchNodeAddPlayer->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+	}
+
 	return true;
 }
 

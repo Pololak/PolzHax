@@ -268,8 +268,8 @@ bool debugCheck() {
 }
 
 DWORD WINAPI my_thread(void* hModule) {
-	//AllocConsole();
-	//freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+    //AllocConsole();
+    //freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
     if (MH_Initialize() != MH_OK) {
         FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(hModule), 0);
