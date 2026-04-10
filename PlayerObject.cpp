@@ -2,8 +2,10 @@
 #include "PlayLayer.hpp"
 #include "Setting.hpp"
 #include "Icons.hpp"
+#include "LevelEditorLayer.hpp"
 
 int cubeIcon, shipIcon, rollIcon, birdIcon, dartIcon;
+int cubeFrameID;
 
 void PlayerObject::setCubeIcon(int val) {
 	cubeIcon = val;
@@ -40,15 +42,6 @@ void PlayerObject::newPlayerExtraFrame(gd::PlayerObject* playerObject, const cha
 		playerExtraSpr->setVisible(false);
 		std::cout << "noExtra" << std::endl;
 	}
-
-	if (setting().onNoMiniIcon) {
-		playerExtraSpr->setVisible(true);
-		return;
-	}
-	
-	if (setting().onMiniCubeIcon) {
-		playerExtraSpr->setVisible(false);
-	}
 }
 
 void PlayerObject::newVehicleExtraFrame(gd::PlayerObject* playerObject, const char* shipFrame) {
@@ -67,13 +60,15 @@ void PlayerObject::newVehicleExtraFrame(gd::PlayerObject* playerObject, const ch
 }
 
 bool __fastcall PlayerObject::initH(gd::PlayerObject* self, void*, int frameID, gd::IconType iconType, CCLayer* gameLayer) {
+	cubeFrameID = 0;
 	if (!PlayerObject::init(self, frameID, iconType, gameLayer)) return false;
+	cubeFrameID = frameID;
 
 	auto gm = gd::GameManager::sharedState();
 
-	if (setting().onNoMiniIcon || setting().onMiniCubeIcon) {
-		self->updatePlayerFrame(frameID);
-	}
+	//if (setting().onNoMiniIcon || setting().onMiniCubeIcon) {
+	//	self->updatePlayerFrame(frameID);
+	//}
 
 	CCSprite* playerExtraSprite = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("player_%02d_glow_001.png", frameID)->getCString());
 	playerExtraSprite->setTag(69);
@@ -96,9 +91,8 @@ bool __fastcall PlayerObject::initH(gd::PlayerObject* self, void*, int frameID, 
 }
 
 void __fastcall PlayerObject::updatePlayerFrameH(gd::PlayerObject* self, void*, int frameID) {
+	cubeFrameID = frameID;
 	auto gm = gd::GameManager::sharedState();
-
-	PlayerObject::updatePlayerFrame(self, frameID);
 
 	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_%02d_extra_001.png", frameID)->getCString());
 
@@ -107,6 +101,8 @@ void __fastcall PlayerObject::updatePlayerFrameH(gd::PlayerObject* self, void*, 
 	if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerFrame(self, 0);
 
 	if (setting().onNoMiniIcon) return PlayerObject::updatePlayerFrame(self, gm->m_playerFrame);
+
+	PlayerObject::updatePlayerFrame(self, frameID);
 }
 
 void __fastcall PlayerObject::updatePlayerShipFrameH(gd::PlayerObject* self, void*, int frameID) {
@@ -120,13 +116,13 @@ void __fastcall PlayerObject::updatePlayerShipFrameH(gd::PlayerObject* self, voi
 void __fastcall PlayerObject::updatePlayerRollFrameH(gd::PlayerObject* self, void*, int frameID) {
 	auto gm = gd::GameManager::sharedState();
 
-	PlayerObject::updatePlayerRollFrame(self, frameID);
-
 	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_ball_%02d_extra_001.png", frameID)->getCString());
 
 	if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerRollFrame(self, 0);
 
 	if (setting().onNoMiniIcon) return PlayerObject::updatePlayerRollFrame(self, gm->m_playerBall);
+
+	PlayerObject::updatePlayerRollFrame(self, frameID);
 }
 
 void __fastcall PlayerObject::updatePlayerBirdFrameH(gd::PlayerObject* self, void*, int frameID) {
@@ -206,13 +202,28 @@ void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, boo
 	}
 	else {
 		if (!p0 && !self->m_dartMode) {
-			self->updatePlayerFrame(gd::GameManager::sharedState()->m_playerFrame);
+			self->updatePlayerFrame(setting().onNoMiniIcon ? gd::GameManager::sharedState()->m_playerFrame : cubeFrameID);
 		}
 	}
 }
 
 void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::togglePlayerScale(self, p0);
+
+	std::cout << self << std::endl;
+	std::cout << std::boolalpha << self->m_flyMode << std::endl;
+	std::cout << std::boolalpha << self->m_rollMode << std::endl;
+	std::cout << std::boolalpha << self->m_birdMode << std::endl;
+	std::cout << std::boolalpha << self->m_dartMode << std::endl;
+
+	if (setting().onNoMiniIcon && p0) {
+		if (self->m_rollMode) {
+			self->updatePlayerRollFrame(gd::GameManager::sharedState()->m_playerBall);
+		}
+		if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
+			self->updatePlayerFrame(gd::GameManager::sharedState()->m_playerFrame);
+		}
+	}
 
 	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
 

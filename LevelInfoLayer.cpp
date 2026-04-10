@@ -91,6 +91,22 @@ void __fastcall LevelInfoLayer::FLAlert_ClickedH(gd::LevelInfoLayer* _self, void
 	LevelInfoLayer::FLAlert_Clicked(_self, layer, btn2);
 }
 
+void __fastcall LevelInfoLayer::onLevelInfoH(gd::LevelInfoLayer* self, void*, CCObject* sender) {
+	if (self->m_level->m_objectCount == 0) {
+		return LevelInfoLayer::onLevelInfo(self, sender);
+	}
+
+	auto info = CCString::createWithFormat("<cy>%s</c>\n<cg>Total Attempts</c>: %i\n<cl>Total Jumps</c>: %i\n<cp>Normal</c>: %i%%\n<co>Practice</c>: %i%%\n<cy>Objects</c>: %i",
+		self->m_level->m_levelName.c_str(),
+		self->m_level->m_attempts,
+		self->m_level->m_jumps,
+		self->m_level->m_normalPercent,
+		self->m_level->m_practicePercent,
+		self->m_level->m_objectCount)->getCString();
+
+	gd::FLAlertLayer::create("Level Info", info, "OK")->show();
+}
+
 void __fastcall LevelInfoLayer::songWidgetH() {
 	__asm {
 		mov m_songWidget, eax
@@ -107,6 +123,7 @@ void LevelInfoLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9bc10), LevelInfoLayer::initH, reinterpret_cast<void**>(&LevelInfoLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer::onCloneH, reinterpret_cast<void**>(&LevelInfoLayer::onClone));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9f2d0), LevelInfoLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&LevelInfoLayer::FLAlert_Clicked));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9ed10), LevelInfoLayer::onLevelInfoH, reinterpret_cast<void**>(&LevelInfoLayer::onLevelInfo));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9b940), LevelInfoLayer::destructorH, reinterpret_cast<void**>(&LevelInfoLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9cb06), LevelInfoLayer::songWidgetH, reinterpret_cast<void**>(&LevelInfoLayer::songWidget));
 }

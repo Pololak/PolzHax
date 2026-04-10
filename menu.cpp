@@ -22,6 +22,9 @@
 #include "SpeedHack.h"
 #include "PitchShifter.hpp"
 
+#include "portable-file-dialogs.h"
+#include <fstream>
+
 ImVec4 color1;
 ImVec4 color2;
 ImVec4 color3;
@@ -32,6 +35,8 @@ ImVec4 color6;
 bool oneX = true;
 
 std::vector<std::string> dllNames;
+std::vector<std::string> replayNames;
+int selectedReplay = 0;
 
 ImGuiTextFilter filter;
 
@@ -167,6 +172,7 @@ void colorSet() {
 void sortTabs() {
 	float polzhax_xPos = 5.f;
 	float addingInterfaceY = -1.f;
+	float addingReplayY = -1.f;
 	float bypass_xPos = -1.f;
 	{
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
@@ -179,6 +185,12 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Interface", nullptr);
 		ImGui::SetWindowPos(ImVec2(5.f, addingInterfaceY));
+		addingReplayY = addingInterfaceY + ImGui::GetWindowHeight() + 5.f;
+	}
+	{
+		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::Begin("Replay", nullptr);
+		ImGui::SetWindowPos(ImVec2(5.f, addingReplayY));
 	}
 	float addingUtilityY = -1.f;
 	float cosmetic_xPos = -1.f;
@@ -246,6 +258,9 @@ void sortTabs() {
 void imgui_render() {
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	auto editorLayer = LevelEditorLayer::get();
+
+	const float SHORT_ITEM_WIDTH = ((ImGui::GetWindowWidth() / 2.f) - (ImGui::GetStyle().WindowPadding.x * 1.25f));
+	const float LONG_ITEM_WIDTH = (ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x * 2.f) * setting().UISize;
 
 	if (oneX) {
 		setting().load();
@@ -968,8 +983,6 @@ void imgui_render() {
 	}
 
 	if (setting().show) {
-		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
-
 		if (setting().onCocosExplorer) {
 			renderCocosExplorer(setting().onCocosExplorer);
 		}
@@ -983,10 +996,11 @@ void imgui_render() {
 			ImGui::Text("1.920 - v1.3.0 (070426-Glow)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
-			ImGui::SameLine(0.f, 7.5f);
-			if (ImGui::Button("Save", ImVec2(90, 0))) {
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH, 0))) {
 				setting().save();
-				gd::FLAlertLayer::create("Saved!", "Your hack state is saved.", "OK")->show();
+				gd::FLAlertLayer::create("Saved", "Hack state is saved.", "OK")->show();
 			}
 
 			if (ImGui::CheckboxF("Thread Priority", &setting().onThreadPriority)) {
@@ -1012,11 +1026,11 @@ void imgui_render() {
 			filter.Draw("Search", 135.f);
 
 			if (setting().onDeveloperMode) {
-				if (ImGui::Button("Cocos Explorer", ImVec2(185.f, 0.f))) {
+				if (ImGui::Button("Cocos Explorer", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
 					setting().onCocosExplorer = !setting().onCocosExplorer;
 				}
 
-				if (ImGui::Button("GDPS Switcher", ImVec2(185.f, 0.f))) {
+				if (ImGui::Button("GDPS Switcher", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
 					setting().onGDPSSwitcher = !setting().onGDPSSwitcher;
 				}
 			}
@@ -1065,8 +1079,47 @@ void imgui_render() {
 
 			//}
 
-			if (ImGui::Button("Sort Tabs", ImVec2(185.f, 0.f))) {
+			if (ImGui::Button("Sort Tabs", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
 				sortTabs();
+			}
+		}
+
+		if (setting().onDeveloperMode) {
+			ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+			if (ImGui::Begin("Replay", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+				ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+				if (ImGui::Combo("##selectedMacro", &selectedReplay, replayNames, replayNames.size())) {
+					if (replayNames.size()) {
+						std::cout << "Selected Macro: " << replayNames[selectedReplay].c_str() << std::endl;
+					}
+				}
+
+				if (ImGui::CheckboxF("Record", &setting().onRecordMacro)) {
+					setting().onPlayMacro = false;
+					setting().onClassicMode = true;
+				}
+				ImGui::SameLine(0.f, 0.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+				if (ImGui::CheckboxF("Replay", &setting().onPlayMacro)) {
+					setting().onRecordMacro = false;
+					setting().onClassicMode = true;
+				}
+
+				ImGui::CheckboxF("Auto Save", &setting().onAutoSaveReplay);
+				ImGui::SameLine(0.f, 0.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+
+				}
+
+				if (ImGui::Button("Clear & New", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+
+				}
+				ImGui::SameLine(0.f, 0.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+				if (ImGui::Button("Delete", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+
+				}
 			}
 		}
 
@@ -1119,11 +1172,12 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Utility", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::HotKey("", setting().m_p1click, 0.f, ImVec2(90.f, 0.f), "P1 Click");
+			ImGui::HotKey("", setting().m_p1click, 0.f, ImVec2(SHORT_ITEM_WIDTH, 0.f), "P1 Click");
 			ImGui::SameLine(0.f, 0.f);
-			ImGui::HotKey("", setting().m_p2click, 0.f, ImVec2(90.f, 0.f), "P2 Click");
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			ImGui::HotKey("", setting().m_p2click, 0.f, ImVec2(SHORT_ITEM_WIDTH, 0.f), "P2 Click");
 
-			if (ImGui::Button("Uncomplete Level", ImVec2(185, 0))) {
+			if (ImGui::Button("Uncomplete Level", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
 				if (playLayer) {
 					auto gsm = gd::GameStatsManager::sharedState();
 					auto glm = gd::GameLevelManager::sharedState();
@@ -1155,15 +1209,15 @@ void imgui_render() {
 				}
 			}
 
-			if (ImGui::Button("Restart Level", ImVec2(185, 0))) {
+			if (ImGui::Button("Restart Level", ImVec2(LONG_ITEM_WIDTH, 0))) {
 				if (playLayer) playLayer->resetLevel();
 			}
 
-			if (ImGui::Button("Practice Mode", ImVec2(185, 0))) {
+			if (ImGui::Button("Practice Mode", ImVec2(LONG_ITEM_WIDTH, 0))) {
 				if (playLayer) playLayer->togglePracticeMode(!playLayer->m_practiceMode);
 			}
 
-			if (ImGui::Button("Settings", ImVec2(185, 0))) {
+			if (ImGui::Button("Settings", ImVec2(LONG_ITEM_WIDTH, 0))) {
 				//CCARRAY_FOREACH_B_TYPE(CCDirector::sharedDirector()->getRunningScene()->getChildren(), optionsLayer, gd::OptionsLayer) {
 				//	if (optionsLayer->getTag() == 0x725) {
 				//		
@@ -1179,7 +1233,7 @@ void imgui_render() {
 			static bool showFirstBtn = true;
 			static bool showSecondBtn = false;
 			if (showFirstBtn) {
-				if (ImGui::Button("Refresh Textures", ImVec2(185, 0))) {
+				if (ImGui::Button("Refresh Textures", ImVec2(LONG_ITEM_WIDTH, 0))) {
 					showFirstBtn = false;
 					showSecondBtn = true;
 				}
@@ -1198,11 +1252,22 @@ void imgui_render() {
 				}
 			}
 
-			if (ImGui::Button("Resources", ImVec2(90, 0))) {
+			if (ImGui::Button("Inject DLL", ImVec2(LONG_ITEM_WIDTH, 0))) {
+				auto selection = pfd::open_file("Select a file", CCFileUtils::sharedFileUtils()->getWritablePath2(), { "DLL File", "*.dll" }, pfd::opt::multiselect).result();
+				for (auto const& filename : selection) {
+					LoadLibrary(filename.c_str());
+					std::filesystem::path path = filename;
+					dllNames.push_back(path.filename().string());
+				}
+			}
+
+			if (ImGui::Button("Resources", ImVec2(SHORT_ITEM_WIDTH, 0))) {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/Resources").c_str(), NULL, NULL, SW_SHOW);
 			}
-			ImGui::SameLine(0.f, 5.f);
-			if (ImGui::Button("AppData", ImVec2(90, 0))) {
+			//ImGui::SameLine(0.f, 4.f);
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			if (ImGui::Button("AppData", ImVec2(SHORT_ITEM_WIDTH, 0))) {
 				ShellExecute(0, NULL, CCFileUtils::sharedFileUtils()->getWritablePath().c_str(), NULL, NULL, SW_SHOW);
 			}
 		}
@@ -2550,9 +2615,15 @@ void imgui_render() {
 				updateSpeedhack();
 			}
 
+			if (setting().onRecordMacro || setting().onPlayMacro)
+				ImGui::BeginDisabled();
+
 			if (ImGui::CheckboxF("Classic Mode", &setting().onClassicMode)) {
 				updateSpeedhack();
 			}
+
+			if (setting().onRecordMacro || setting().onPlayMacro)
+				ImGui::EndDisabled();
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
@@ -2560,7 +2631,7 @@ void imgui_render() {
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Currenty in works...");
 
-			ImGui::SetNextItemWidth(90.f);
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
 			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
 				if (setting().labelsScale > 3.f) {
 					setting().labelsScale = 3.f;
@@ -2571,8 +2642,9 @@ void imgui_render() {
 
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(0.f, 5.f);
-			ImGui::SetNextItemWidth(90.f);
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
 			if (ImGui::DragFloat("##labelsOpacity", &setting().labelsOpacity, .1f, .1f, 1.f, "Opacity: %.1fx")) {
 				if (setting().labelsOpacity > 1.f) {
 					setting().labelsOpacity = 1.f;
@@ -2858,15 +2930,24 @@ void setupImGuiMenu() {
 		std::filesystem::create_directory("PolzHax/replays");
 	}
 
-	auto path = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/extensions";
+	auto extensionsPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/extensions";
 
-	for (const auto& file : std::filesystem::directory_iterator(path))
+	for (const auto& file : std::filesystem::directory_iterator(extensionsPath))
 	{
 		if (file.path().extension() == ".dll")
 		{
 			auto dllname = file.path().filename().string();
 			dllNames.push_back(dllname);
 			LoadLibrary(file.path().string().c_str());
+		}
+	}
+
+	auto replaysPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/replays";
+
+	for (const auto& file : std::filesystem::directory_iterator(replaysPath)) {
+		if (file.path().extension() == ".pgdr") {
+			auto replayName = file.path().filename().string();
+			replayNames.push_back(replayName);
 		}
 	}
 

@@ -131,6 +131,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/GJScoreCell.h"
 #include "layers_scenes_transitions_nodes/InfoLayer.h"
 #include "layers_scenes_transitions_nodes/LeaderboardsLayer.h"
+#include "layers_scenes_transitions_nodes/MoreSearchLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
 

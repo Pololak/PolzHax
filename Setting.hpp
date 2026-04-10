@@ -201,10 +201,14 @@ struct SettingStruct {
 	int colorFilterOrder = 0;
 	int selectedDartIdx = 1;
 	float m_customEditorGridSize = 30.f;
+	bool onExtraLong;
 
 	// GDPS Switcher
 	std::string originalServerURL;
 	bool onGDPSSwitcher, onEnableSwitcher; int m_serverIndex = 0; std::string m_customServerURL;
+
+	// PolzBot
+	bool onPlayMacro, onRecordMacro, onAutoSaveReplay;
 };
 
 SettingStruct& setting();
@@ -391,6 +395,9 @@ DEF_SCHEMA(
 	m_p2click,
 	onShowPercentage,
 	selectedDartIdx,
+	onExtraLong,
 
-	onEnableSwitcher, m_serverIndex, m_customServerURL
+	onEnableSwitcher, m_serverIndex, m_customServerURL,
+
+	onAutoSaveReplay
 )

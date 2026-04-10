@@ -68,6 +68,10 @@ namespace gd {
 		void updateUserScore() {
 			reinterpret_cast<void(__thiscall*)(GameLevelManager*)>(base + 0x5c950)(this);
 		}
+
+		gd::string getLengthStr(bool isTiny, bool isShort, bool isMedium, bool isLong) {
+			return reinterpret_cast<gd::string(__thiscall*)(bool, bool, bool, bool)>(base + 0x599b0)(isTiny, isShort, isMedium, isLong);
+		}
 	};
 }
 

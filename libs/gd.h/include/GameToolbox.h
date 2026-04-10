@@ -8,14 +8,6 @@ namespace gd {
 
 	class GameToolbox {
 	public:
-		static CCMenuItemToggler* createToggleButton(cocos2d::SEL_MenuHandler callback, bool isActive, cocos2d::CCMenu* targetMenu, cocos2d::CCPoint position, cocos2d::CCNode* callbackObject, cocos2d::CCNode* targetNode, float toggleScale, float labelMaxScale, float labelMaxWidth, cocos2d::CCPoint labelOffset, char const* font, bool verticalLayout, std::string label) {
-			auto ret = reinterpret_cast<CCMenuItemToggler * (__fastcall*)(cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, cocos2d::CCPoint, cocos2d::CCNode*, cocos2d::CCNode*, float, float, float, cocos2d::CCPoint, char const*, bool, std::string)>(base + 0x184c0)(callback, isActive, targetMenu, position, callbackObject, targetNode, toggleScale, labelMaxScale, labelMaxWidth, labelOffset, font, verticalLayout, label);
-
-			__asm add esp, 0x48
-
-			return ret;
-		}
-
 		static CCMenuItemToggler* createToggleButton(
 			cocos2d::SEL_MenuHandler callback,
 			bool isActive,

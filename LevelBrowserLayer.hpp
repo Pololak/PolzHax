@@ -8,6 +8,8 @@ namespace LevelBrowserLayer {
 	inline void(__thiscall* loadPage)(gd::LevelBrowserLayer*, gd::GJSearchObject*);
 	void __fastcall loadPageH(gd::LevelBrowserLayer*, void*, gd::GJSearchObject*);
 
+	void updatePageButton(gd::LevelBrowserLayer*);
+
 	class Callback : public gd::LevelBrowserLayer {
 	public:
 		void onImportLevel(CCObject*);
@@ -15,6 +17,7 @@ namespace LevelBrowserLayer {
 
 		void onFirstPage(CCObject*);
 		void onLastPage(CCObject*);
+		void onGoToPage(CCObject*);
 
 		void onSearch(CCObject*);
 	};

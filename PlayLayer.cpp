@@ -949,6 +949,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	if (setting().onIconRandomizer) {
 		auto gm = gd::GameManager::sharedState();
 
+		srand(time(0));
+
 		auto randColor1 = rand() % (31 - 0 + 1) + 0;
 		auto randColor2 = rand() % (31 - 0 + 1) + 0;
 

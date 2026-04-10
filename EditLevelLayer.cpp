@@ -2,7 +2,6 @@
 #include "Setting.hpp"
 #include "LevelShare.hpp"
 #include "nfd.h"
-#include "libs/portable-file-dialogs.h"
 #include <fstream>
 
 bool m_noRotationPass;
@@ -13,14 +12,6 @@ void EditLevelLayer::Callback::onExportLevel(CCObject*) {
 		gd::FLAlertLayer::create("Error", "Level string is empty!", "OK")->show();
 		return;
 	}
-
-	//auto dialog = pfd::save_file("Select a file", std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/" + this->m_level->m_levelName), {"Level Files (*.gmd)", "*.gmd"});
-	//if (!dialog.result().empty()) {
-	//	std::ofstream file(dialog.result());
-	//	dumpLevel(this->m_level, file);
-	//	std::cout << "Saved file: " << dialog.result() << std::endl;
-	//	gd::FLAlertLayer::create("Success", "The level has been saved.", "OK")->show();
-	//}
 
 	nfdchar_t* path = nullptr;
 	if (NFD_SaveDialog("gmd", std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + this->m_level->m_levelName).c_str(), &path) == NFD_OKAY) {

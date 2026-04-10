@@ -3,6 +3,22 @@
 #include "nfd.h"
 #include <fstream>
 #include "FindLevelPopup.hpp"
+#include "GoToPagePopup.hpp"
+
+void LevelBrowserLayer::updatePageButton(gd::LevelBrowserLayer* self) {
+	auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
+	if (menu) {
+		auto onGoToPage = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(13));
+		if (onGoToPage) {
+			auto sprite = static_cast<CCSprite*>(onGoToPage->getChildren()->objectAtIndex(0));
+			auto label = static_cast<CCLabelBMFont*>(sprite->getChildren()->objectAtIndex(0));
+			if (label) {
+				label->setString(CCString::createWithFormat("%i", self->m_searchObject->m_page + 1)->getCString());
+				label->limitLabelWidth(32.f, .8f, 0.f);
+			}
+		}
+	}
+}
 
 void LevelBrowserLayer::Callback::onSearch(CCObject*) {
 	FindLevelPopup::create(this)->show();
@@ -19,6 +35,10 @@ void LevelBrowserLayer::Callback::onLastPage(CCObject* sender) {
 	this->m_searchObject->m_page = (totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10;
 
 	this->loadPage(this->m_searchObject);
+}
+
+void LevelBrowserLayer::Callback::onGoToPage(CCObject* sender) {
+	GoToPagePopup::create(this)->show();
 }
 
 void LevelBrowserLayer::Callback::onRefresh(CCObject* sender) {
@@ -89,10 +109,17 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		onLastPage->setVisible(self->m_rightArrow->isVisible());
 		menu->addChild(onLastPage, 0, 12);
 
-		//auto onSearchSpr = CCSprite::create("GJ_button_04.png");
-		//auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
-		//onSearch->setPositionX(-100);
-		//menu->addChild(onSearch);
+		auto onGoToPageSpr = CCSprite::create("GJ_button_02.png");
+		onGoToPageSpr->setScale(.7f);
+		auto onGoToPageSpr2 = CCLabelBMFont::create("", "bigFont.fnt");
+		onGoToPageSpr2->setPosition(20.f, 21.f);
+		onGoToPageSpr2->setScale(.8f);
+		onGoToPageSpr->addChild(onGoToPageSpr2);
+		auto onGoToPage = gd::CCMenuItemSpriteExtra::create(onGoToPageSpr, self, menu_selector(LevelBrowserLayer::Callback::onGoToPage));
+		onGoToPage->setPosition(menu->convertToNodeSpace({ director->getScreenRight() - 20.f, director->getScreenTop() - 40.f }));
+		menu->addChild(onGoToPage, 0, 13);
+
+		updatePageButton(self);
 	}
 
 	return true;
@@ -110,6 +137,8 @@ void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*,
 			onLastPage->setVisible(self->m_rightArrow->isVisible());
 		}
 	}
+
+	updatePageButton(self);
 }
 
 void LevelBrowserLayer::mem_init() {

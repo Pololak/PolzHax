@@ -1569,9 +1569,6 @@
     <ClInclude Include="LevelShare.hpp">
       <Filter>Файлы заголовков\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="libs\portable-file-dialogs.h">
-      <Filter>Файлы заголовков\Libraries</Filter>
-    </ClInclude>
     <ClInclude Include="libs\nfd\src\common.h">
       <Filter>Файлы заголовков\Libraries\nfd</Filter>
     </ClInclude>
@@ -1760,6 +1757,18 @@
     </ClInclude>
     <ClInclude Include="SimplePlayer.hpp">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MoreSearchLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MoreSearchLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="portable-file-dialogs.h">
+      <Filter>Файлы заголовков\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="GoToPagePopup.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1996,6 +2005,12 @@
     </ClCompile>
     <ClCompile Include="SimplePlayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="MoreSearchLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="GoToPagePopup.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

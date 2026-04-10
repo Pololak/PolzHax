@@ -11,6 +11,9 @@ namespace LevelInfoLayer {
 	inline void(__thiscall* FLAlert_Clicked)(gd::LevelInfoLayer*, gd::FLAlertLayer*, bool);
 	void __fastcall FLAlert_ClickedH(gd::LevelInfoLayer*, void*, gd::FLAlertLayer*, bool);
 
+	inline void(__thiscall* onLevelInfo)(gd::LevelInfoLayer*, CCObject*);
+	void __fastcall onLevelInfoH(gd::LevelInfoLayer*, void*, CCObject*);
+
 	inline void(__thiscall* destructor)(gd::LevelInfoLayer*);
 	void __fastcall destructorH(gd::LevelInfoLayer*);
 

@@ -677,7 +677,7 @@ void __fastcall EditorUI::deselectAllH(gd::EditorUI* self) {
 	}
 }
 
-void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void* edx, float dy, float dx) { // From BEv6
+void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void*, float dy, float dx) { // From BEv6
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf8);
 
 	auto kb = CCDirector::sharedDirector()->m_pKeyboardDispatcher;
@@ -743,6 +743,10 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 
 void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key) {
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf4);
+	auto kb = CCDirector::sharedDirector()->getKeyboardDispatcher();
+	bool ctrlAltPressed = kb->getControlKeyPressed() && kb->getAltKeyPressed();
+	bool shiftPressed = kb->getShiftKeyPressed();
+
 	if ((key == KEY_Up) || (key == setting().m_p1click)) {
 		if (self->m_editorLayer->m_playerState == 1) {
 			self->m_editorLayer->pushButton(1, true);
@@ -753,6 +757,33 @@ void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key)
 			self->m_editorLayer->pushButton(1, false);
 		}
 	}
+	else if (key == KEY_W && ctrlAltPressed) {
+		self->moveObjectCall(static_cast<gd::EditCommand>(103));
+	}	
+	else if (key == KEY_A && ctrlAltPressed) {
+		self->moveObjectCall(static_cast<gd::EditCommand>(101));
+	}
+	else if (key == KEY_S && ctrlAltPressed) {
+		self->moveObjectCall(static_cast<gd::EditCommand>(104));
+	}
+	else if (key == KEY_D && ctrlAltPressed) {
+		self->moveObjectCall(static_cast<gd::EditCommand>(102));
+	}
+	else if (key == KEY_Q && shiftPressed) {
+		self->transformObjectCall(static_cast<gd::EditCommand>(122));
+	}
+	else if (key == KEY_E && shiftPressed) {
+		self->transformObjectCall(static_cast<gd::EditCommand>(121));
+	}
+	else if (key == KEY_F3) {
+		setting().onPreviewMode = !setting().onPreviewMode;
+		if (setting().onPreviewMode) {
+			LevelEditorLayer::updatePreviewMode();
+		}
+		else {
+			LevelEditorLayer::resetColors();
+		}
+	}
 	else {
 		EditorUI::keyDown(_self, key);
 	}
@@ -760,6 +791,7 @@ void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key)
 
 void __fastcall EditorUI::keyUpH(gd::EditorUI* _self, void*, enumKeyCodes key) {
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf4);
+
 	if ((key == KEY_Up) || (key == setting().m_p1click)) {
 		if (self->m_editorLayer->m_playerState == 1) {
 			self->m_editorLayer->releaseButton(1, true);

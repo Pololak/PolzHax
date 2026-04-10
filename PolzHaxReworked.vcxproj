@@ -171,6 +171,7 @@
     <ClInclude Include="GJRotationControl.hpp" />
     <ClInclude Include="GJScoreCell.hpp" />
     <ClInclude Include="GlobalClipboard.hpp" />
+    <ClInclude Include="GoToPagePopup.hpp" />
     <ClInclude Include="Hitboxes.hpp" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="IconPreviewPopup.hpp" />
@@ -629,6 +630,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingCircle.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LoadingLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MenuLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\MoreSearchLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\OptionsLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\PauseLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\PlayLayer.h" />
@@ -690,12 +692,12 @@
     <ClInclude Include="libs\nfd\src\ftg_core.h" />
     <ClInclude Include="libs\nfd\src\include\nfd.h" />
     <ClInclude Include="libs\nfd\src\nfd_common.h" />
-    <ClInclude Include="libs\portable-file-dialogs.h" />
     <ClInclude Include="LiveColorEdit.hpp" />
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="MenuGameLayer.hpp" />
     <ClInclude Include="MenuLayer.hpp" />
+    <ClInclude Include="MoreSearchLayer.hpp" />
     <ClInclude Include="ObjectToolbox.hpp" />
     <ClInclude Include="patching.hpp" />
     <ClInclude Include="PauseLayer.hpp" />
@@ -703,6 +705,7 @@
     <ClInclude Include="PitchShifter.hpp" />
     <ClInclude Include="PlayerObject.hpp" />
     <ClInclude Include="PlayLayer.hpp" />
+    <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="PracticeFix.hpp" />
     <ClInclude Include="PulseBuilderPopup.hpp" />
     <ClInclude Include="RGBColorInputWidget.hpp" />
@@ -738,6 +741,7 @@
     <ClCompile Include="GJRotationControl.cpp" />
     <ClCompile Include="GJScoreCell.cpp" />
     <ClCompile Include="GlobalClipboard.cpp" />
+    <ClCompile Include="GoToPagePopup.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
     <ClCompile Include="IconPreviewPopup.cpp" />
     <ClCompile Include="ImGuiUtils.cpp" />
@@ -777,6 +781,7 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuGameLayer.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
+    <ClCompile Include="MoreSearchLayer.cpp" />
     <ClCompile Include="ObjectToolbox.cpp" />
     <ClCompile Include="patching.cpp" />
     <ClCompile Include="PauseLayer.cpp" />
