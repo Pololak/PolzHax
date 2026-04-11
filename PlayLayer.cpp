@@ -82,6 +82,8 @@ bool PlayLayer::isCheating() {
 		setting().onNoclip ||
 		setting().onWaveSlide ||
 		setting().onShowLayout ||
+		setting().onPlayMacro ||
+		setting().onRecordMacro ||
 		setting().onSpeedhack;
 }
 
@@ -324,13 +326,17 @@ void updateAttemptsLabel() {
 			prefix.clear();
 		}
 
-		int attempts = 1;
+		int attempts;
 
 		if (!setting().onShowTotalAttempts) {
 			attempts = playLayer->m_attempts;
 		}
 		else {
 			attempts = playLayer->m_level->m_attempts + 1;
+		}
+
+		if (attempts < 1) {
+			attempts = 1;
 		}
 
 		m_attemptsLabel->setString((prefix + std::to_string(attempts)).c_str());
@@ -657,6 +663,13 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	}
 
 	if (setting().onAutoPracticeMode) self->togglePracticeMode(true);
+
+	self->m_player->m_trailingParticles->setVisible(!setting().onNoVehicleParticles);
+	self->m_player2->m_trailingParticles->setVisible(!setting().onNoVehicleParticles);
+	self->m_player->m_shipClickParticles->setVisible(!setting().onNoVehicleParticles);
+	self->m_player2->m_shipClickParticles->setVisible(!setting().onNoVehicleParticles);
+	self->m_player->m_ufoClickParticles->setVisible(!setting().onNoVehicleParticles);
+	self->m_player2->m_ufoClickParticles->setVisible(!setting().onNoVehicleParticles);
 	//
 
 	auto director = CCDirector::sharedDirector();
@@ -825,9 +838,6 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		setting().isSafeMode = false;
 	}
 
-	//if ((setting().onAutoSafeMode || setting().onSafeMode) && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
-	//else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
-
 	if (setting().onLockCursor && !setting().show && !self->m_showingEndLayer && !self->m_isDead) {
 		HWND hwnd = WindowFromDC(wglGetCurrentDC());
 		RECT winSize; GetWindowRect(hwnd, &winSize);
@@ -859,19 +869,6 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		keybd_event(setting().m_autoDeafenKey, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
-
-	//if (setting().onDeveloperMode) {
-	//	if (m_debugLabel) {
-	//		m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
-	//			ImGui::GetIO().Framerate,
-	//			self->m_player->getPositionX(),
-	//			self->m_player->getPositionY(),
-	//			setting().isSafeMode,
-	//			PlayLayer::isCheating(),
-	//			m_cheatingBeforeRestart
-	//		)->getCString());
-	//	}
-	//}
 
 	time_t currentTick = time::getTime();
 	m_clickFrames.erase(std::remove_if(m_clickFrames.begin(), m_clickFrames.end(), [currentTick](float tick) {

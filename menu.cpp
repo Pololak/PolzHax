@@ -401,15 +401,6 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xe5f46, { 0x00, 0x00, 0x40, 0x40 });
 		}
 
-		//if (setting().onNoForcePlayerGlow) {
-		//	sequence_patch(gd::base + 0xdfcd9, { 0xeb });
-		//	sequence_patch(gd::base + 0xdfcef, { 0xeb });
-		//}
-		//else {
-		//	sequence_patch(gd::base + 0xdfcd9, { 0x75 });
-		//	sequence_patch(gd::base + 0xdfcef, { 0x75 });
-		//}
-
 		if (setting().onNoGhostTrail) {
 			sequence_patch(gd::base + 0xf3374, { 0x6a, 0x00, 0x90 });
 			sequence_patch(gd::base + 0xf338d, { 0x6a, 0x00, 0x90 });
@@ -1583,6 +1574,17 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Disables the disappearing effect on invisible blocks and etc.");
+
+			if (ImGui::CheckboxF("No Vehicle Particles", &setting().onNoVehicleParticles)) {
+				if (playLayer) {
+					playLayer->m_player->m_trailingParticles->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player2->m_trailingParticles->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player->m_shipClickParticles->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player2->m_shipClickParticles->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player->m_ufoClickParticles->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player2->m_ufoClickParticles->setVisible(!setting().onNoVehicleParticles);
+				}
+			}
 
 			ImGui::CheckboxF("No Wave Pulse", &setting().onNoWavePulse);
 			ImGui::Tooltip("Disables wave trail pulsing.");

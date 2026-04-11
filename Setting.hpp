@@ -69,6 +69,7 @@ struct SettingStruct {
 	bool onNoPulse;
 	bool onNoRespawnFlash;
 	bool onNoShadeEffect;
+	bool onNoVehicleParticles;
 	bool onNoWavePulse;
 	bool onNoWaveTrail;
 	bool onNoWaveTrailBehind;

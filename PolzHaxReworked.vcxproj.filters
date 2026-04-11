@@ -1755,9 +1755,6 @@
     <ClInclude Include="Icons.hpp">
       <Filter>Файлы заголовков\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="SimplePlayer.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="MoreSearchLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
@@ -1769,6 +1766,12 @@
     </ClInclude>
     <ClInclude Include="GoToPagePopup.hpp">
       <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="CircleToolPopup.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="SimplePlayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2010,6 +2013,9 @@
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="GoToPagePopup.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="CircleToolPopup.cpp">
       <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
   </ItemGroup>

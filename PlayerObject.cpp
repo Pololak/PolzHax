@@ -190,18 +190,18 @@ void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, boo
 		self->m_playerStreak->stopStroke();
 	}
 
-	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
+	if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
 
 	if (setting().onIconRandomizer) {
 		if (setting().onRandomizeDart && p0) {
 			self->updatePlayerDartFrame(dartIcon);
 		}
-		else if (!self->m_dartMode) {
+		else if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
 			self->updatePlayerFrame(cubeIcon);
 		}
 	}
 	else {
-		if (!p0 && !self->m_dartMode) {
+		if (!p0 && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
 			self->updatePlayerFrame(setting().onNoMiniIcon ? gd::GameManager::sharedState()->m_playerFrame : cubeFrameID);
 		}
 	}
@@ -209,12 +209,6 @@ void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, boo
 
 void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::togglePlayerScale(self, p0);
-
-	std::cout << self << std::endl;
-	std::cout << std::boolalpha << self->m_flyMode << std::endl;
-	std::cout << std::boolalpha << self->m_rollMode << std::endl;
-	std::cout << std::boolalpha << self->m_birdMode << std::endl;
-	std::cout << std::boolalpha << self->m_dartMode << std::endl;
 
 	if (setting().onNoMiniIcon && p0) {
 		if (self->m_rollMode) {
@@ -225,7 +219,11 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 		}
 	}
 
-	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
+	if (setting().onWaveTrailBugFix) {
+		self->placeStreakPoint();
+	}
+
+	if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
 
 	if (setting().onIconRandomizer && setting().onRandomizeCube && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
 		if (!p0) {
@@ -237,10 +235,6 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 		else if (p0 && !setting().onNoMiniIcon) {
 			self->updatePlayerFrame(0);
 		}
-	}
-
-	if (setting().onWaveTrailBugFix) {
-		self->placeStreakPoint();
 	}
 }
 

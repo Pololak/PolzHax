@@ -14,7 +14,11 @@ namespace gd {
 	class PlayerObject : public GameObject {
 	public:
 		double m_slopeTime; // 0x328
-		PAD(24)
+		PAD(8)
+		cocos2d::CCDictionary* m_collisionLogTop; // 0x338
+		cocos2d::CCDictionary* m_collisionLogBottom; // 0x33c
+		int m_lastCollisionIdBottom; // 0x340
+		int m_lastCollisionIdTop; // 0x344
 		bool m_isRotating; // 0x348
 		PAD(3)
 		GameObject* m_nextSlope; // 0x34c
@@ -45,30 +49,31 @@ namespace gd {
 		bool m_flyFallParticlesActive; // 0x3be
 		bool m_inBallFall; // 0x3bf
 		PAD(12)
-		double m_lastJumpTime; // 0x3cc
-		PAD(26)
+		double m_lastJumpTime; // 0x3d0
+		PAD(32)
 		GameObject* m_snapToObject; // 0x3f8
 		CheckpointObject* m_pendingCheckpoint; // 0x3fc
 		PAD(4)
 		cocos2d::CCPoint m_lastUpdatePos; // 0x404
-		cocos2d::CCParticleSystemQuad* m_dragParticle; // 0x40c
-		cocos2d::CCParticleSystemQuad* m_birdDragParticle; // 0x410
-		cocos2d::CCParticleSystemQuad* m_dragParticle2; // 0x414
-		cocos2d::CCParticleSystemQuad* m_shipDragParticle; // 0x418
-		cocos2d::CCParticleSystemQuad* m_burstParticle; // 0x41c
+		cocos2d::CCParticleSystemQuad* m_playerGroundParticles; // 0x40c
+		cocos2d::CCParticleSystemQuad* m_trailingParticles; // 0x410
+		cocos2d::CCParticleSystemQuad* m_shipClickParticles; // 0x414
+		cocos2d::CCParticleSystemQuad* m_vehicleGroundParticles; // 0x418
+		cocos2d::CCParticleSystemQuad* m_ufoClickParticles; // 0x41c
 		PAD(4)
 		cocos2d::CCParticleSystemQuad* m_landParticle; // 0x424
-		cocos2d::CCParticleSystemQuad* m_landParticle2; // 0x424
+		cocos2d::CCParticleSystemQuad* m_landParticle2; // 0x428
 		PAD(8)
 		int m_streakType; // 0x434
 		PAD(12)
 		bool m_inBoost; // 0x444
-		PAD(12)
+		PAD(11)
 		bool m_hardStreakActive; // 0x450
 		PAD(1)
 		bool m_tookDamage; // 0x452
 		bool m_upKeyDown; // 0x453
 		bool m_upKeyPressed; // 0x454
+		PAD(3)
 		double m_yVelocity; // 0x458
 		bool m_onSlope; // 0x460
 		bool m_wasOnSlope; // 0x461

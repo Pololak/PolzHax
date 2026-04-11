@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CCSchedulerHook.hpp" />
+    <ClInclude Include="CircleToolPopup.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
     <ClInclude Include="ColorFilterPopup.hpp" />
     <ClInclude Include="ColorSelectPopup.hpp" />
@@ -718,6 +719,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCSchedulerHook.cpp" />
+    <ClCompile Include="CircleToolPopup.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />
     <ClCompile Include="ColorFilterPopup.cpp" />
     <ClCompile Include="ColorSelectPopup.cpp" />
