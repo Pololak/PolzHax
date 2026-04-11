@@ -268,6 +268,7 @@ DEF_SCHEMA(
 	onNoPulse,
 	onNoRespawnFlash,
 	onNoShadeEffect,
+	onNoVehicleParticles,
 	onNoWavePulse,
 	onNoWaveTrail,
 	onNoWaveTrailBehind,
