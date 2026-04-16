@@ -152,6 +152,7 @@ struct SettingStruct {
 	bool onRetryKeybind; int m_retryKeybind = 0x52;
 	bool onSafeMode, isSafeMode;
 	bool onShowRestartButton;
+	bool onTransitionCustomizer; int selectedTransition;
 	bool onTransparentBG;
 	bool onTransparentLists;
 	bool onZeroDelay;
@@ -210,6 +211,9 @@ struct SettingStruct {
 
 	// PolzBot
 	bool onPlayMacro, onRecordMacro, onAutoSaveReplay;
+
+	// Screenshot
+	bool onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard;
 };
 
 SettingStruct& setting();
@@ -351,6 +355,7 @@ DEF_SCHEMA(
 	onRetryKeybind, m_retryKeybind,
 	onSafeMode,
 	onShowRestartButton,
+	onTransitionCustomizer, selectedTransition,
 	onTransparentBG,
 	onTransparentLists,
 	onZeroDelay,
@@ -401,5 +406,7 @@ DEF_SCHEMA(
 
 	onEnableSwitcher, m_serverIndex, m_customServerURL,
 
-	onAutoSaveReplay
+	onAutoSaveReplay,
+
+	onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard
 )

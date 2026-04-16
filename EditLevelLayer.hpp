@@ -20,10 +20,14 @@ namespace EditLevelLayer {
 	inline void(__thiscall* destructor)(gd::EditLevelLayer*);
 	void __fastcall destructorH(gd::EditLevelLayer*);
 
+	void updateLevelOrderLabel(gd::EditLevelLayer*);
+
 	class Callback : public gd::EditLevelLayer {
 	public:
 		void onMoveToTop(CCObject*);
 		void onExportLevel(CCObject*);
+		void onLevelOrderUp(CCObject*);
+		void onLevelOrderDown(CCObject*);
 	};
 
 	void mem_init();

@@ -7,6 +7,68 @@
 bool m_noRotationPass;
 CCMenu* m_levelActionsMenu;
 
+void EditLevelLayer::Callback::onLevelOrderUp(CCObject* sender) {
+	auto btn = static_cast<gd::CCMenuItemSpriteExtra*>(sender);
+	auto localLevelManager = gd::LocalLevelManager::sharedState();
+	auto levelOrder = localLevelManager->m_localLevels->indexOfObject(this->m_level);
+	if (levelOrder > 0) {
+		levelOrder--;
+		localLevelManager->m_localLevels->removeObject(this->m_level);
+		localLevelManager->m_localLevels->insertObject(this->m_level, levelOrder);
+		localLevelManager->updateLevelOrder();
+	}
+
+	if (levelOrder == 0) {
+		if (btn) {
+			btn->setEnabled(false);
+			btn->setOpacity(175);
+			btn->setColor(ccGRAY);
+		}
+	}
+
+	if (auto orderDownBtn = static_cast<gd::CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(this->getChildByTag(11))->getChildByTag(2))) {
+		orderDownBtn->setEnabled(true);
+		orderDownBtn->setOpacity(255);
+		orderDownBtn->setColor(ccWHITE);
+	}
+	updateLevelOrderLabel(this);
+}
+
+void EditLevelLayer::Callback::onLevelOrderDown(CCObject* sender) {
+	auto btn = static_cast<gd::CCMenuItemSpriteExtra*>(sender);
+	auto localLevelManager = gd::LocalLevelManager::sharedState();
+	auto levelOrder = localLevelManager->m_localLevels->indexOfObject(this->m_level);
+	if (levelOrder < (localLevelManager->m_localLevels->count() - 1)) {
+		levelOrder++;
+		localLevelManager->m_localLevels->removeObject(this->m_level);
+		localLevelManager->m_localLevels->insertObject(this->m_level, levelOrder);
+		localLevelManager->updateLevelOrder();
+	}
+
+	if (levelOrder == (localLevelManager->m_localLevels->count() - 1)) {
+		if (btn) {
+			btn->setEnabled(false);
+			btn->setOpacity(175);
+			btn->setColor(ccGRAY);
+		}
+	}
+
+	if (auto orderUpBtn = static_cast<gd::CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(this->getChildByTag(11))->getChildByTag(1))) {
+		orderUpBtn->setEnabled(true);
+		orderUpBtn->setOpacity(255);
+		orderUpBtn->setColor(ccWHITE);
+	}
+
+	updateLevelOrderLabel(this);
+}
+
+void EditLevelLayer::updateLevelOrderLabel(gd::EditLevelLayer* self) {
+	auto label = static_cast<CCLabelBMFont*>(self->getChildByTag(12));
+	if (label) {
+		label->setString(CCString::createWithFormat("%i", gd::LocalLevelManager::sharedState()->m_localLevels->indexOfObject(self->m_level) + 1)->getCString());
+	}
+}
+
 void EditLevelLayer::Callback::onExportLevel(CCObject*) {
 	if (!this->m_level->m_levelString.size()) {
 		gd::FLAlertLayer::create("Error", "Level string is empty!", "OK")->show();
@@ -34,6 +96,7 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
+	auto localLevels = gd::LocalLevelManager::sharedState()->m_localLevels;
 
 	if (m_levelActionsMenu) {
 		auto onCopy = static_cast<gd::CCMenuItemSpriteExtra*>(m_levelActionsMenu->getChildren()->objectAtIndex(2));
@@ -61,6 +124,36 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 	onExportLevel->setPosition(-30.f, 30.f);
 	shareMenu->addChild(onExportLevel);
 
+	auto orderMenu = CCMenu::create();
+	self->addChild(orderMenu, 1, 11);
+
+	auto orderLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	orderLabel->setScale(.75f);
+	orderLabel->setPosition(director->getScreenLeft() + 70.f, director->getScreenTop() - 55.f);
+	self->addChild(orderLabel, 0, 12);
+	updateLevelOrderLabel(self);
+
+	auto onLevelOrderUpSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+	auto onLevelOrderUp = gd::CCMenuItemSpriteExtra::create(onLevelOrderUpSpr, self, menu_selector(EditLevelLayer::Callback::onLevelOrderUp));
+	onLevelOrderUp->setPosition(orderMenu->convertToNodeSpace({ orderLabel->getPositionX(), orderLabel->getPositionY() + 22.5f }));
+	onLevelOrderUp->setSizeMult(1.5f);
+	if (localLevels->indexOfObject(level) == 0) {
+		onLevelOrderUp->setEnabled(false);
+		onLevelOrderUp->setOpacity(175);
+		onLevelOrderUp->setColor(ccGRAY);
+	}
+	orderMenu->addChild(onLevelOrderUp, 0, 1);
+
+	auto onLevelOrderDownSpr = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+	auto onLevelOrderDown = gd::CCMenuItemSpriteExtra::create(onLevelOrderDownSpr, self, menu_selector(EditLevelLayer::Callback::onLevelOrderDown));
+	onLevelOrderDown->setPosition(orderMenu->convertToNodeSpace({ orderLabel->getPositionX(), orderLabel->getPositionY() - 22.5f }));
+	onLevelOrderDown->setSizeMult(1.5f);
+	if (localLevels->indexOfObject(level) == (gd::LocalLevelManager::sharedState()->m_localLevels->count() - 1)) {
+		onLevelOrderDown->setEnabled(false);
+		onLevelOrderDown->setOpacity(175);
+		onLevelOrderDown->setColor(ccGRAY);
+	}
+	orderMenu->addChild(onLevelOrderDown, 0, 2);
 
 	return true;
 }
@@ -76,6 +169,7 @@ void __fastcall EditLevelLayer::FLAlert_ClickedH(gd::EditLevelLayer* _self, void
 		gd::LocalLevelManager::sharedState()->m_localLevels->removeObject(self->m_level, true);
 		gd::LocalLevelManager::sharedState()->m_localLevels->insertObject(self->m_level, 0);
 		gd::LocalLevelManager::sharedState()->updateLevelOrder();
+		updateLevelOrderLabel(self);
 	}
 	EditLevelLayer::FLAlert_Clicked(_self, layer, btn2);
 }

@@ -79,7 +79,7 @@ bool PlayLayer::isCheating() {
 		setting().onHitboxes ||
 		setting().onInstantComplete ||
 		setting().onJumpHack ||
-		setting().onNoclip ||
+		setting().onNoclip || setting().onNoclipUnstuck ||
 		setting().onWaveSlide ||
 		setting().onShowLayout ||
 		setting().onPlayMacro ||
@@ -736,7 +736,7 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	//}
 
 	m_labelsNode = CCNode::create();
-	self->addChild(m_labelsNode, 99);
+	self->addChild(m_labelsNode, 99, 72615);
 
 	m_cheatIndicatorLabel = CCLabelBMFont::create(". ", "bigFont.fnt");
 	static_cast<CCSprite*>(m_cheatIndicatorLabel->getChildren()->objectAtIndex(0))->setScale(3.f);

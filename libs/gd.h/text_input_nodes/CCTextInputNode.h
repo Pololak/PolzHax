@@ -13,7 +13,7 @@ namespace gd {
 		bool m_keyboardPresent; // 0x13d
 		std::string m_allowedChars; // 0x140
 		float m_maxLabelWidth; // 0x158
-		float m_maxLabelScale; // 0x15ñ
+		float m_maxLabelScale; // 0x15c
 		float m_placeholderScale; // 0x160
 		cocos2d::ccColor3B m_placeholderColor; // 0x164
 		cocos2d::ccColor3B m_textColor; // 0x168

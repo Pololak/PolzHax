@@ -62,6 +62,10 @@ const char* statusLabelsPosition[] = {
 	"Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left"
 };
 
+const char* cocosTransitions[] = {
+	"Zoom Flip X", "Zoom Flip Y", "Zoom Flip Angular"
+};
+
 void updatePriority() {
 	switch (setting().priority) {
 	case 0:
@@ -193,6 +197,7 @@ void sortTabs() {
 		ImGui::SetWindowPos(ImVec2(5.f, addingReplayY));
 	}
 	float addingUtilityY = -1.f;
+	float addingScreenshotY = -1.f;
 	float cosmetic_xPos = -1.f;
 	{
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
@@ -205,6 +210,12 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Utility", nullptr);
 		ImGui::SetWindowPos(ImVec2(bypass_xPos, addingUtilityY));
+		addingScreenshotY = addingUtilityY + ImGui::GetWindowHeight() + 5.f;
+	}
+	{
+		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::Begin("Screenshot", nullptr);
+		ImGui::SetWindowPos(ImVec2(bypass_xPos, addingScreenshotY));
 	}
 	float creator_xPos = -1.f;
 	{
@@ -984,7 +995,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (110426)");
+			ImGui::Text("1.920 - v1.3.0 (160426)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1260,6 +1271,98 @@ void imgui_render() {
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			if (ImGui::Button("AppData", ImVec2(SHORT_ITEM_WIDTH, 0))) {
 				ShellExecute(0, NULL, CCFileUtils::sharedFileUtils()->getWritablePath().c_str(), NULL, NULL, SW_SHOW);
+			}
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Screenshot", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			if (ImGui::Button("Screenshot", ImVec2(LONG_ITEM_WIDTH, 0))) {
+				bool pauseMenuVisibility = false;
+				bool labelsVisibility = false;
+				bool backgroundVisibility = false;
+				bool player1Visibility = false;
+				bool player2Visibility = false;
+
+				if (playLayer) {
+					if (PauseLayer::get()) {
+						pauseMenuVisibility = PauseLayer::get()->isVisible();
+						if (setting().onHidePauseMenuOnShot) {
+							PauseLayer::get()->setVisible(false);
+						}
+					}
+
+					auto labelsNode = static_cast<CCNode*>(playLayer->getChildByTag(72615));
+					if (labelsNode) {
+						labelsVisibility = labelsNode->isVisible();
+						if (setting().onHideStatusLabelsOnShot) {
+							labelsNode->setVisible(false);
+						}
+					}
+
+					backgroundVisibility = playLayer->m_backgroundSprite->isVisible();
+					if (setting().onHideBackgroundOnShot) {
+						playLayer->m_backgroundSprite->setVisible(false);
+					}
+
+					player1Visibility = playLayer->m_player->isVisible();
+					player2Visibility = playLayer->m_player2->isVisible();
+					if (setting().onHidePlayerOnShot) {
+						playLayer->m_player->setVisible(false);
+						playLayer->m_player2->setVisible(false);
+					}
+				}
+
+				auto winSize = CCDirector::sharedDirector()->getWinSize();
+				CCRenderTexture* tex = CCRenderTexture::create(winSize.width, winSize.height, kTexture2DPixelFormat_RGBA8888);
+				tex->beginWithClear(0.f, 0.f, 0.f, 0.f);
+				tex->setPosition(winSize / 2.f);
+				CCDirector::sharedDirector()->getRunningScene()->visit();
+				tex->end();
+
+				std::time_t t = std::time(0);
+				std::tm* m = std::localtime(&t);
+
+				std::string day = (m->tm_mday < 10) ? "0" + std::to_string(m->tm_mday) : std::to_string(m->tm_mday);
+				std::string month = (m->tm_mon + 1 < 10) ? "0" + std::to_string(m->tm_mon + 1) : std::to_string(m->tm_mon + 1);
+				std::string date = std::to_string(m->tm_year + 1900) + "-" + month + "-" + std::to_string(m->tm_mday);
+
+				std::string hours = (m->tm_hour < 10) ? "0" + std::to_string(m->tm_hour) : std::to_string(m->tm_hour);
+				std::string minutes = (m->tm_min < 10) ? "0" + std::to_string(m->tm_min) : std::to_string(m->tm_min);
+				std::string seconds = (m->tm_sec < 10) ? "0" + std::to_string(m->tm_sec) : std::to_string(m->tm_sec);
+				std::string time = hours + "-" + minutes + "-" + seconds;
+
+				tex->newCCImage()->saveToFile(std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/screenshots/" + date + " " + time + ".png").c_str(), false);
+				tex->clear(0.f, 0.f, 0.f, 0.f);
+
+				if (playLayer) {
+					if (PauseLayer::get()) {
+						PauseLayer::get()->setVisible(pauseMenuVisibility);
+					}
+
+					auto labelsNode = static_cast<CCNode*>(playLayer->getChildByTag(72615));
+					if (labelsNode) {
+						labelsNode->setVisible(labelsVisibility);
+					}
+
+					if (setting().onHideBackgroundOnShot) {
+						playLayer->m_backgroundSprite->setVisible(backgroundVisibility);
+					}
+
+					if (setting().onHidePlayerOnShot) {
+						playLayer->m_player->setVisible(player1Visibility);
+						playLayer->m_player2->setVisible(player2Visibility);
+					}
+				}
+			}
+
+			ImGui::CheckboxF("Hide Pause Menu", &setting().onHidePauseMenuOnShot);
+			ImGui::CheckboxF("Hide Status Labels", &setting().onHideStatusLabelsOnShot);
+			ImGui::CheckboxF("Hide Background", &setting().onHideBackgroundOnShot);
+			ImGui::CheckboxF("Hide Player", &setting().onHidePlayerOnShot);
+			//ImGui::CheckboxF("Copy To Clipboard", &setting().onCopyShotToClipboard);
+
+			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH, 0))) {
+				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/screenshots").c_str(), NULL, NULL, SW_SHOW);
 			}
 		}
 
@@ -2528,6 +2631,17 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Shows the restart button in pause menu.");
 
+			//ImGui::CheckboxF("Transition Customizer", &setting().onTransitionCustomizer);
+			//ImGui::Tooltip("Lets you change the page transition.");
+			//ImGui::SameLine(170.f);
+			//if (ImGui::TreeNodeEx("##transitionCustomizerSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			//	ImGui::SetNextItemWidth(163.f);
+			//	ImGui::Combo("##decimalPlaces", &setting().selectedTransition, cocosTransitions, IM_ARRAYSIZE(cocosTransitions));
+
+			//	ImGui::TreePop();
+			//}
+
+
 			if (ImGui::CheckboxF("Transparent BG", &setting().onTransparentBG)) {
 				if (setting().onTransparentBG) {
 					sequence_patch(gd::base + 0x2cf96, { 0x90, 0xb1, 0xff }); // CreatorLayer
@@ -2930,6 +3044,10 @@ void setupImGuiMenu() {
 	if (!std::filesystem::is_directory("PolzHax/replays") || !std::filesystem::exists("PolzHax/replays"))
 	{
 		std::filesystem::create_directory("PolzHax/replays");
+	}
+	if (!std::filesystem::is_directory("PolzHax/screenshots") || !std::filesystem::exists("PolzHax/screenshots"))
+	{
+		std::filesystem::create_directory("PolzHax/screenshots");
 	}
 
 	auto extensionsPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/extensions";

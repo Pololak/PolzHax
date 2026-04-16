@@ -72,6 +72,10 @@ namespace gd {
 		gd::string getLengthStr(bool isTiny, bool isShort, bool isMedium, bool isLong) {
 			return reinterpret_cast<gd::string(__thiscall*)(bool, bool, bool, bool)>(base + 0x599b0)(isTiny, isShort, isMedium, isLong);
 		}
+
+		cocos2d::CCArray* getSavedLevels() {
+			return reinterpret_cast<cocos2d::CCArray * (__fastcall*)(GameLevelManager*)>(base + 0x57640)(this);
+		}
 	};
 }
 

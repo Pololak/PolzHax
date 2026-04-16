@@ -35,6 +35,10 @@ namespace gd {
 		void setupLevelBrowser(cocos2d::CCArray* levels) {
 			reinterpret_cast<void(__thiscall*)(LevelBrowserLayer*, cocos2d::CCArray*)>(base + 0x8a680)(this, levels);
 		}
+
+		void updateLevelsLabel() {
+			reinterpret_cast<void(__fastcall*)(LevelBrowserLayer*)>(base + 0x8ac10)(this);
+		}
 	};
 }
 

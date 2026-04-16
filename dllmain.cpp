@@ -132,10 +132,10 @@ extension::RGBA __cdecl CCControlUtils_RGBfromHSVH(extension::HSV hsv) {
 	return CCControlUtils_RGBfromHSV(hsv);
 }
 
-inline void(__thiscall* CCTransitionScene_initWithDuration)(CCTransitionScene*, float, CCScene*);
-void __fastcall CCTransitionScene_initWithDurationH(CCTransitionScene* self, void*, float duration, CCScene* scene) {
+inline bool(__thiscall* CCTransitionScene_initWithDuration)(CCTransitionScene*, float, CCScene*);
+bool __fastcall CCTransitionScene_initWithDurationH(CCTransitionScene* self, void*, float duration, CCScene* scene) {
 	if (setting().onNoTransition) return CCTransitionScene_initWithDuration(self, 0.f, scene);
-	else CCTransitionScene_initWithDuration(self, duration, scene);
+	else return CCTransitionScene_initWithDuration(self, duration, scene);
 }
 
 inline bool(__thiscall* CCKeyboardDispatcher_dispatchKeyboardMSG)(CCKeyboardDispatcher*, enumKeyCodes, bool);
@@ -347,7 +347,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	LevelBrowserLayer::mem_init();
 	LevelEditorLayer::mem_init();
 	LevelInfoLayer::mem_init();
-	//LevelSearchLayer::mem_init();
+	LevelSearchLayer::mem_init();
 	LevelSettingsLayer::mem_init();
 	//MenuGameLayer::mem_init();
 	MenuLayer::mem_init();

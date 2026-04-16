@@ -5,6 +5,12 @@
 #include "FindLevelPopup.hpp"
 #include "GoToPagePopup.hpp"
 
+std::string m_customSearchQuery;
+
+void LevelBrowserLayer::setCustomSearchQuery(std::string query) {
+	m_customSearchQuery = query;
+}
+
 void LevelBrowserLayer::updatePageButton(gd::LevelBrowserLayer* self) {
 	auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
 	if (menu) {
@@ -17,6 +23,13 @@ void LevelBrowserLayer::updatePageButton(gd::LevelBrowserLayer* self) {
 				label->limitLabelWidth(32.f, .8f, 0.f);
 			}
 		}
+	}
+}
+
+void LevelBrowserLayer::Callback::onCancelSearch(CCObject*) {
+	if (!m_customSearchQuery.empty()) {
+		m_customSearchQuery.clear();
+		this->loadPage(this->m_searchObject);
 	}
 }
 
@@ -67,20 +80,6 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
-
-	if (searchObject->m_searchType == gd::SearchType::MyLevels) {
-		auto shareMenu = CCMenu::create();
-		shareMenu->setPosition(director->getScreenRight(), director->getScreenBottom());
-		self->addChild(shareMenu, 2);
-
-		auto onExportLevelSpr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
-		if (!onExportLevelSpr->initWithFile("BE_Import_File.png")) {
-			onExportLevelSpr->createWithSpriteFrameName("GJ_downloadBtn_001.png");
-		}
-		auto onExportLevel = gd::CCMenuItemSpriteExtra::create(onExportLevelSpr, self, menu_selector(LevelBrowserLayer::Callback::onImportLevel));
-		onExportLevel->setPosition(-30.f, 90.f);
-		shareMenu->addChild(onExportLevel);
-	}
 	
 	if (!(searchObject->m_searchType == gd::SearchType::MyLevels || searchObject->m_searchType == gd::SearchType::SavedLevels || searchObject->m_searchType == gd::SearchType::MapPack || searchObject->m_searchType == gd::SearchType::MapPackOnClick)) {
 		auto refreshMenu = CCMenu::create();
@@ -122,11 +121,91 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		updatePageButton(self);
 	}
 
+	if (searchObject->m_searchType == gd::SearchType::MyLevels) {
+		auto shareMenu = CCMenu::create();
+		shareMenu->setPosition(director->getScreenRight(), director->getScreenBottom());
+		self->addChild(shareMenu, 2);
+
+		auto onExportLevelSpr = CCSprite::createWithSpriteFrameName("GJ_downloadBtn_001.png");
+		if (!onExportLevelSpr->initWithFile("BE_Import_File.png")) {
+			onExportLevelSpr->createWithSpriteFrameName("GJ_downloadBtn_001.png");
+		}
+		auto onExportLevel = gd::CCMenuItemSpriteExtra::create(onExportLevelSpr, self, menu_selector(LevelBrowserLayer::Callback::onImportLevel));
+		onExportLevel->setPosition(-30.f, 90.f);
+		shareMenu->addChild(onExportLevel);
+
+		//auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
+		//if (menu) {
+		//	auto onSearchSpr = CCSprite::create("gj_findBtn_001.png");
+		//	auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
+		//	onSearch->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 55.f, director->getScreenTop() - 70.f }));
+		//	onSearch->setVisible(m_customSearchQuery.empty());
+		//	menu->addChild(onSearch, 0, 14);
+
+		//	auto onCancelSearchSpr = CCSprite::create("gj_findBtnOff_001.png");
+		//	auto onCancelSearch = gd::CCMenuItemSpriteExtra::create(onCancelSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onCancelSearch));
+		//	onCancelSearch->setPosition(onSearch->getPosition());
+		//	onCancelSearch->setVisible(!m_customSearchQuery.empty());
+		//	menu->addChild(onCancelSearch, 0, 15);
+		//}
+	}
+
 	return true;
 }
 
 void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* searchObject) {
 	LevelBrowserLayer::loadPage(self, searchObject);
+
+	//std::cout << "1\n";
+
+	//if (!m_customSearchQuery.empty() && (searchObject->m_searchType == gd::SearchType::MyLevels)) {
+	//	std::cout << "2\n";
+	//	std::cout << "SearchType: " << (int)searchObject->m_searchType << std::endl;
+	//	std::cout << "SearchQuery: " << m_customSearchQuery << std::endl;
+	//	std::cout << "3\n";
+
+	//	CCArray* levels = gd::LocalLevelManager::sharedState()->m_localLevels;
+
+	//	std::cout << "4\n";
+	//	auto filteredLevels = CCArray::create();
+	//	for (auto level : CCArrayExt<gd::GJGameLevel*>(levels)) {
+	//		if (level && ci_contains(level->m_levelName, m_customSearchQuery)) {
+	//			filteredLevels->addObject(level);
+	//		}
+	//	}
+	//	std::cout << "5\n";
+
+	//	int page = searchObject->m_page;
+	//	int uVar12 = page * 10; // I don't really know how to name it
+
+	//	std::cout << "6\n";
+	//	auto filteredLevelsPerPage = CCArray::create();
+	//	if (filteredLevels->count()) {
+	//		self->m_itemCount = filteredLevels->count();
+
+	//		for (int i = uVar12; i != uVar12 + 10 && i <= filteredLevels->count() - 1; ++i) {
+	//			auto level = static_cast<gd::GJGameLevel*>(filteredLevels->objectAtIndex(i));
+	//			filteredLevelsPerPage->addObject(level);
+	//		}
+	//	}
+	//	std::cout << "7\n";
+
+	//	if (filteredLevelsPerPage->count()) {
+	//		std::cout << "8\n";
+	//		self->m_array = filteredLevelsPerPage;
+	//		self->setupLevelBrowser(filteredLevelsPerPage);
+	//		self->updateLevelsLabel();
+	//	}
+	//	
+	//	std::cout << "9\n";
+	//	int totalItems = self->m_itemCount;
+	//	if (self->m_searchObject->m_page == ((totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10)) {
+	//		self->m_rightArrow->setVisible(false);
+	//	}
+	//	if (self->m_searchObject->m_page == 0) {
+	//		self->m_leftArrow->setVisible(false);
+	//	}
+	//}
 
 	auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
 	if (menu) {
@@ -136,6 +215,13 @@ void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*,
 			onFirstPage->setVisible(self->m_leftArrow->isVisible());
 			onLastPage->setVisible(self->m_rightArrow->isVisible());
 		}
+
+		//if (auto onSearchBtn = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(14))) {
+		//	onSearchBtn->setVisible(m_customSearchQuery.empty());
+		//}
+		//if (auto onCancelSearch = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(15))) {
+		//	onCancelSearch->setVisible(!m_customSearchQuery.empty());
+		//}
 	}
 
 	updatePageButton(self);

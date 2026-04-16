@@ -347,6 +347,19 @@ public:
 	}
 };
 
+inline auto ci_equal = [](char a, char b)
+	{
+		return std::tolower(static_cast<unsigned char>(a)) ==
+			std::tolower(static_cast<unsigned char>(b));
+	};
+
+inline bool ci_contains(const std::string& haystack, const std::string& needle)
+{
+	return std::search(haystack.begin(), haystack.end(),
+		needle.begin(), needle.end(),
+		ci_equal) != haystack.end();
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

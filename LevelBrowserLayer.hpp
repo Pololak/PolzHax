@@ -10,6 +10,8 @@ namespace LevelBrowserLayer {
 
 	void updatePageButton(gd::LevelBrowserLayer*);
 
+	void setCustomSearchQuery(std::string);
+
 	class Callback : public gd::LevelBrowserLayer {
 	public:
 		void onImportLevel(CCObject*);
@@ -20,6 +22,7 @@ namespace LevelBrowserLayer {
 		void onGoToPage(CCObject*);
 
 		void onSearch(CCObject*);
+		void onCancelSearch(CCObject*);
 	};
 
 	void mem_init();

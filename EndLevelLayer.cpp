@@ -38,30 +38,10 @@ void EndLevelLayer::Callback::onHideEndLayer(CCObject* sender) {
 void EndLevelLayer::Callback::onLastCheckpoint(CCObject*) {
 	if (auto pl = gd::GameManager::sharedState()->getPlayLayer()) {
 		this->removeFromParent();
+		pl->m_showingEndLayer = false;
+		pl->m_endTriggered = false;
 		pl->resetLevel();
 		CCEGLView::sharedOpenGLView()->showCursor(gd::GameManager::sharedState()->getGameVariable("0024"));
-	}
-}
-
-void EndLevelLayer::Callback::updateCheatIndicator(float) {
-	bool isCheating = PlayLayer::isCheating();
-	bool cheatingBeforeRestart = PlayLayer::getCheatingBeforeRestart();
-
-	auto cheatIndicator = static_cast<CCLabelBMFont*>(this->m_mainLayer->getChildByTag(507));
-
-	if (cheatIndicator) {
-		if (!cheatingBeforeRestart && !setting().isSafeMode) {
-			cheatIndicator->setColor(ccGREEN);
-		}
-		else if (!cheatingBeforeRestart && setting().isSafeMode) {
-			cheatIndicator->setColor(ccYELLOW);
-		}
-		else if ((!isCheating || isCheating) && cheatingBeforeRestart && setting().isSafeMode) {
-			cheatIndicator->setColor(ccORANGE);
-		}
-		else if (isCheating || cheatingBeforeRestart && !setting().isSafeMode) {
-			cheatIndicator->setColor(ccRED);
-		}
 	}
 }
 
@@ -92,6 +72,7 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 
 	auto practiceButton = gd::CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png"), self, menu_selector(EndLevelLayer::Callback::onLastCheckpoint));
 	practiceButton->setPositionY(-125.f);
@@ -145,7 +126,10 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	self->m_mainLayer->addChild(cheatIndicator, 15, 507);
 
 	updateCheatIndicator2(self);
-	//self->schedule(schedule_selector(EndLevelLayer::Callback::updateCheatIndicator));
+
+	if (playLayer->m_testMode && !playLayer->m_practiceMode) {
+		
+	}
 }
 
 void __fastcall EndLevelLayer::completeSpriteH() {
