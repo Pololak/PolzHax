@@ -5,6 +5,7 @@
 #include "hsv.hpp"
 #include "utils.hpp"
 #include "Hitboxes.hpp"
+#include "RotateSaws.hpp"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -247,6 +248,11 @@ void updateObjectColor(gd::GameObject* object, const GDColor& color) {
 				node->removeFromParent();
 				m_editorLayer->m_objectBatchNode->addChild(node);
 			}
+		}
+
+		if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) {
+			object->stopActionByTag(9957);
+			if (object->m_myAction) object->runAction(object->m_myAction);
 		}
 	}
 }
@@ -512,11 +518,15 @@ bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::G
 		self->m_player2->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
 	}
 
+	auto clicksDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(clicksDrawNode, 1000, 126);
+
 	return true;
 }
 
 void __fastcall LevelEditorLayer::addSpecialH(gd::LevelEditorLayer* self, void*, gd::GameObject* object) {
 	LevelEditorLayer::addSpecial(self, object);
+	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::beginRotateSaw(object);
 	if (isColorTrigger(object)) insertTrigger(object);
 }
 
@@ -525,8 +535,33 @@ void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, voi
 	if (isColorTrigger(object)) removeTrigger(object);
 }
 
+void __fastcall LevelEditorLayer::removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* object, bool p0) {
+	LevelEditorLayer::removeObject(self, object, p0);
+	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
+}
+
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
 	LevelEditorLayer::updateVisibility(self, dt);
+
+	//for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
+	//	if (section) {
+	//		for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+	//			if (!object) continue;
+
+	//			auto fme = gd::FMODAudioEngine::sharedEngine();
+	//			float pulse = fme->m_pulse1;
+
+	//			if (object && object->m_useAudioScale) {
+	//				if ((self->m_playerState == 1) || self->m_uiLayer->m_playtestMusic) {
+	//					object->setScale(pulse);
+	//				}
+	//				else {
+	//					object->setScale(1.f);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	LevelEditorLayer::updateShowHitboxes();
 
@@ -597,15 +632,76 @@ void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* _self, void
 }
 
 void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
+	gd::StartPosObject* selectedPlaytestStartPos = self->m_startPosObject;
+	std::cout << "Playtest StartPos: " << self->m_startPosObject << std::endl;
+
 	LevelEditorLayer::onPlaytest(self);
 
+	if (selectedPlaytestStartPos) {
+		self->m_player->setPosition(selectedPlaytestStartPos->getOrientedBox()->m_center);
+		self->m_player2->setPosition(selectedPlaytestStartPos->getOrientedBox()->m_center);
+
+		self->setupLevelStart(selectedPlaytestStartPos->m_settings);
+
+		self->m_player->resumeSchedulerAndActions();
+		self->m_player2->resumeSchedulerAndActions();
+
+		self->m_playerState = 1;
+
+		self->scheduleUpdate();
+
+		self->playMusic();
+	}
+
+	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
+	if (clicksDrawNode) {
+		clicksDrawNode->clear();
+	}
+
 	LevelEditorLayer::updateOrientedHitboxes(self);
+
+	if (setting().onPreviewRotations) RotateSaws::beginRotations(self);
 }
 
 void __fastcall LevelEditorLayer::onResumePlaytestH(gd::LevelEditorLayer* self) {
 	LevelEditorLayer::onResumePlaytest(self);
 
 	LevelEditorLayer::updateOrientedHitboxes(self);
+
+	if (setting().onPreviewRotations) RotateSaws::resumeRotations(self);
+}
+
+void __fastcall LevelEditorLayer::onPausePlaytestH(gd::LevelEditorLayer* self) {
+	LevelEditorLayer::onPausePlaytest(self);
+
+	if (setting().onPreviewRotations) RotateSaws::pauseRotations(self);
+}
+
+void __fastcall LevelEditorLayer::onStopPlaytestH(gd::LevelEditorLayer* self) {
+	LevelEditorLayer::onStopPlaytest(self);
+
+	if (setting().onPreviewRotations) {
+		RotateSaws::pauseRotations(self);
+		RotateSaws::resumeRotations(self);
+	}
+}
+
+void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*, int p0, bool p1) {
+	LevelEditorLayer::pushButton(self, p0, p1);
+
+	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
+	if (clicksDrawNode && setting().onShowClicks) {
+		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
+	}
+}
+
+void __fastcall LevelEditorLayer::releaseButtonH(gd::LevelEditorLayer* self, void*, int p0, bool p1) {
+	LevelEditorLayer::releaseButton(self, p0, p1);
+
+	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
+	if (clicksDrawNode && setting().onShowClicks) {
+		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+	}
 }
 
 void __fastcall LevelEditorLayer::drawH(gd::LevelEditorLayer* self) {
@@ -649,11 +745,17 @@ void LevelEditorLayer::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ed10), LevelEditorLayer::addSpecialH, reinterpret_cast<void**>(&LevelEditorLayer::addSpecial));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ee30), LevelEditorLayer::removeSpecialH, reinterpret_cast<void**>(&LevelEditorLayer::removeSpecial));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8e180), LevelEditorLayer::removeObjectH, reinterpret_cast<void**>(&LevelEditorLayer::removeObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ef20), LevelEditorLayer::updateVisibilityH, reinterpret_cast<void**>(&LevelEditorLayer::updateVisibility));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x91620), LevelEditorLayer::updateH, reinterpret_cast<void**>(&LevelEditorLayer::update));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x909f0), LevelEditorLayer::onPlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onPlaytest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90fc0), LevelEditorLayer::onResumePlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onResumePlaytest));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90f10), LevelEditorLayer::onPausePlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onPausePlaytest));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x91170), LevelEditorLayer::onStopPlaytestH, reinterpret_cast<void**>(&LevelEditorLayer::onStopPlaytest));
+
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90800), LevelEditorLayer::pushButtonH, reinterpret_cast<void**>(&LevelEditorLayer::pushButton));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x908f0), LevelEditorLayer::releaseButtonH, reinterpret_cast<void**>(&LevelEditorLayer::releaseButton));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x926b0), LevelEditorLayer::drawH, reinterpret_cast<void**>(&LevelEditorLayer::draw));
 

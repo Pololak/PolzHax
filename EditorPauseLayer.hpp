@@ -14,6 +14,9 @@ namespace EditorPauseLayer {
 	inline void(__thiscall* keyDown)(gd::EditorPauseLayer*, enumKeyCodes);
 	void __fastcall keyDownH(gd::EditorPauseLayer*, void*, enumKeyCodes);
 
+	inline void(__thiscall* saveLevel)(gd::EditorPauseLayer*);
+	void __fastcall saveLevelH(gd::EditorPauseLayer*);
+
 	inline void(__thiscall* destructor)(gd::EditorPauseLayer*);
 	void __fastcall destructorH(gd::EditorPauseLayer*);
 

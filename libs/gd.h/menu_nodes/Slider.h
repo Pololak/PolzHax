@@ -27,7 +27,7 @@ namespace gd {
 	class Slider : public cocos2d::CCLayer {
 	public:
 		SliderTouchLogic* m_touchLogic; // 0x118
-		cocos2d::CCSprite* m_groove; // 0x11c
+		cocos2d::CCSprite* m_sliderBar; // 0x11c
 		float m_width; // 0x120
 		float m_height; // 0x124
 
@@ -51,6 +51,10 @@ namespace gd {
 			__asm movss xmm1, value
 
 			reinterpret_cast<void(__fastcall*)(Slider*)>(base + 0x1d270)(this);
+		}
+
+		void updateBar() {
+			reinterpret_cast<void(__fastcall*)(Slider*)>(base + 0x1d310)(this);
 		}
 	};
 }

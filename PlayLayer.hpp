@@ -79,6 +79,7 @@ namespace PlayLayer {
 	void prevStartPos();
 	void updatePlayerColors();
 	void updateStatusLabels();
+	void updateStartPosSwitcherLabel();
 
 	void mem_init();
 }

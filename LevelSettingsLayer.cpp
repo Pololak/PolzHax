@@ -7,6 +7,15 @@ gd::LevelSettingsLayer* LevelSettingsLayer::get() {
 	return m_levelSettingsLayer;
 }
 
+void LevelSettingsLayer::Callback::onPlaytestStartPos(CCObject*) {
+	auto editorLayer = LevelEditorLayer::get();
+	if (editorLayer) {
+		this->onClose(nullptr);
+		editorLayer->setStartPosObject(static_cast<gd::StartPosObject*>(editorLayer->m_uiLayer->m_selectedObject));
+		editorLayer->m_uiLayer->onPlaytest(nullptr);
+	}
+}
+
 bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, gd::LevelSettingsObject* settingsObject) {
 	m_levelSettingsLayer = self;
 	if (!LevelSettingsLayer::init(self, settingsObject)) return false;
@@ -69,6 +78,18 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 		col2_blending->setVisible(self->m_settingsObject->m_customColor02->m_blending);
 		col3_blending->setVisible(self->m_settingsObject->m_customColor03->m_blending);
 		col4_blending->setVisible(self->m_settingsObject->m_customColor04->m_blending);
+	}
+	
+	if (settingsObject->m_startsWithStartPos) {
+		auto playtestLabel = CCLabelBMFont::create("Playtest", "goldFont.fnt");
+		playtestLabel->setScale(.6f);
+		playtestLabel->setPosition(winSize.width / 2.f + 185.f, winSize.height / 2.f + 130.f);
+		self->m_mainLayer->addChild(playtestLabel);
+
+		auto onPlaytestStartPosSpr = CCSprite::createWithSpriteFrameName("GJ_playEditorBtn_001.png");
+		auto onPlaytestStartPos = gd::CCMenuItemSpriteExtra::create(onPlaytestStartPosSpr, self, menu_selector(LevelSettingsLayer::Callback::onPlaytestStartPos));
+		onPlaytestStartPos->setPosition(185.f, 95.f);
+		self->m_buttonMenu->addChild(onPlaytestStartPos);
 	}
 
 	return true;

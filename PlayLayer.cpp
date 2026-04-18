@@ -3,6 +3,7 @@
 #include "Hitboxes.hpp"
 #include "PracticeFix.hpp"
 #include "PlayerObject.hpp"
+#include "UILayer.hpp"
 #include "Icons.hpp"
 #include "utils.hpp"
 #include "imgui.h"
@@ -110,6 +111,8 @@ void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 	}
 
 	playLayer->resetLevel();
+
+	PlayLayer::updateStartPosSwitcherLabel();
 }
 
 void PlayLayer::nextStartPos() {
@@ -595,11 +598,41 @@ void PlayLayer::updateStatusLabels() {
 	updateNoclipDeathsLabel();
 }
 
-CCLabelBMFont* m_debugLabel = nullptr;
+void PlayLayer::updateStartPosSwitcherLabel() {
+	if (startPosObjects.empty()) return;
+
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+	if (!self) return;
+
+	auto startPosSwitcherMenu = static_cast<CCMenu*>(self->m_uiLayer->getChildByTag(125));
+	if (!startPosSwitcherMenu) return;
+
+	auto gm = gd::GameManager::sharedState();
+
+	auto startPosSwitcherLabel = static_cast<CCLabelBMFont*>(startPosSwitcherMenu->getChildByTag(1));
+	auto onPrevStartPos = static_cast<gd::CCMenuItemSpriteExtra*>(startPosSwitcherMenu->getChildByTag(2));
+	auto onNextStartPos = static_cast<gd::CCMenuItemSpriteExtra*>(startPosSwitcherMenu->getChildByTag(3));
+
+	if (!startPosSwitcherLabel || !onPrevStartPos || !onNextStartPos) return;
+
+	startPosSwitcherLabel->setString(CCString::createWithFormat("%i/%i", currentStartPos + 1, startPosObjects.size())->getCString());
+	startPosSwitcherLabel->setVisible(true);
+	startPosSwitcherLabel->setOpacity(255);
+	startPosSwitcherLabel->stopAllActions();
+	startPosSwitcherLabel->runAction(CCSequence::create(CCDelayTime::create(1.f), CCFadeOut::create(.5f), nullptr));
+
+	onPrevStartPos->setVisible(gm->getGameVariable("0024"));
+	onPrevStartPos->setOpacity(255);
+	onPrevStartPos->stopAllActions();
+	onPrevStartPos->runAction(CCSequence::create(CCDelayTime::create(1.f), CCFadeOut::create(.5f), CCHide::create(), nullptr));
+
+	onNextStartPos->setVisible(gm->getGameVariable("0024"));
+	onNextStartPos->setOpacity(255);
+	onNextStartPos->stopAllActions();
+	onNextStartPos->runAction(CCSequence::create(CCDelayTime::create(1.f), CCFadeOut::create(.5f), CCHide::create(), nullptr));
+}
 
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
-	m_debugLabel = nullptr;
-
 	m_coinsToPickup.clear();
 	m_checkpoints.clear();
 
@@ -712,28 +745,11 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 		setting().isSafeMode = false;
 	}
 
-	//if (setting().onAutoSafeMode && setting().cheatsCount > 0) safeModeON(), setting().isSafeMode = true;
-	//else if (!setting().onSafeMode) safeModeOFF(), setting().isSafeMode = false;
+	updateStartPosSwitcherLabel();
 
 	auto noclipTint = CCLayerColor::create(ccc4(setting().noclipTintR, setting().noclipTintG, setting().noclipTintB, 255), winSize.width, winSize.height);
 	noclipTint->setOpacity(0);
 	self->addChild(noclipTint, 11, 875);
-
-	//if (setting().onDeveloperMode) {
-	//	m_debugLabel = CCLabelBMFont::create("", "chatFont.fnt");
-	//	m_debugLabel->setAnchorPoint({ 0.f, 0.f });
-	//	m_debugLabel->setScale(.5f);
-	//	m_debugLabel->setOpacity(100);
-	//	m_debugLabel->setString(CCString::createWithFormat("FPS: %.0f X: %.2f Y: %.2f isSafeMode: %d isCheating: %d m_cheatingBeforeRestart: %d",
-	//		ImGui::GetIO().Framerate,
-	//		self->m_player->getPositionX(),
-	//		self->m_player->getPositionY(),
-	//		setting().isSafeMode,
-	//		PlayLayer::isCheating(),
-	//		m_cheatingBeforeRestart
-	//	)->getCString());
-	//	self->addChild(m_debugLabel, 9999);
-	//}
 
 	m_labelsNode = CCNode::create();
 	self->addChild(m_labelsNode, 99, 72615);
@@ -1143,8 +1159,6 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 	}
 
 	updateBestRunLabel();
-
-	std::cout << "Deaths: " << m_deaths << std::endl;
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {

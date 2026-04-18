@@ -1773,6 +1773,12 @@
     <ClInclude Include="SimplePlayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="RotateSaws.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugModule.hpp">
+      <Filter>Файлы заголовков\Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2017,6 +2023,12 @@
     </ClCompile>
     <ClCompile Include="CircleToolPopup.cpp">
       <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="RotateSaws.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugModule.cpp">
+      <Filter>Исходные файлы\Menu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

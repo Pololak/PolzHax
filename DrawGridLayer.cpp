@@ -24,9 +24,13 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 					auto triggerDuration = self->xPosForTime(self->timeForXPos(effectObject->getPositionX()) + effectObject->m_triggerDuration);
 
 					glLineWidth(2);
-					ccDrawColor4F(1.f, 1.f, 1.f, .05f);
-					if (effectObject->m_triggerDuration > 0) {
-						ccDrawLine(effectObject->getPosition(), { triggerDuration, effectObject->getPositionY() });
+					ccDrawColor4F(1.f, 1.f, 1.f, 1.f);
+					switch (effectObject->m_objectID) {
+						case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743: {
+							if (effectObject->m_triggerDuration > 0) {
+								ccDrawLine(effectObject->getPosition(), { triggerDuration, effectObject->getPositionY() });
+							}
+						}
 					}
 				}
 			}

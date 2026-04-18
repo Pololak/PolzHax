@@ -88,8 +88,8 @@ bool LiveColorEdit::init(gd::GameObject* obj, int tag) {
 	this->addChild(hueBar);
 
 	m_hueSlider = gd::Slider::create(this, menu_selector(LiveColorEdit::sliderChanged), "sliderBar.png", "slidergroove_02.png", "GJ_colorThumbBtn.png", "GJ_colorThumbSBtn.png", 1.f);
-	m_hueSlider->m_groove->setVisible(false);
-	m_hueSlider->m_groove->getParent()->setVisible(false);
+	m_hueSlider->m_sliderBar->setVisible(false);
+	m_hueSlider->m_sliderBar->getParent()->setVisible(false);
 
 	m_hueSlider->setScale(.55f);
 	from<CCSprite*>(m_hueSlider->m_touchLogic->m_thumb, 0x108)->setScale(1.45f);
@@ -116,8 +116,8 @@ bool LiveColorEdit::init(gd::GameObject* obj, int tag) {
 	this->addChild(m_saturationBar);
 
 	m_saturationSlider = gd::Slider::create(this, menu_selector(LiveColorEdit::sliderChanged), "sliderBar.png", "slidergroove_02.png", "GJ_colorThumbBtn.png", "GJ_colorThumbSBtn.png", 1.f);
-	m_saturationSlider->m_groove->setVisible(false);
-	m_saturationSlider->m_groove->getParent()->setVisible(false);
+	m_saturationSlider->m_sliderBar->setVisible(false);
+	m_saturationSlider->m_sliderBar->getParent()->setVisible(false);
 
 	m_saturationSlider->setScale(.55f);
 	from<CCSprite*>(m_saturationSlider->m_touchLogic->m_thumb, 0x108)->setScale(1.45f);
@@ -142,8 +142,8 @@ bool LiveColorEdit::init(gd::GameObject* obj, int tag) {
 	this->addChild(m_valueBar);
 
 	m_valueSlider = gd::Slider::create(this, menu_selector(LiveColorEdit::sliderChanged), "sliderBar.png", "slidergroove_02.png", "GJ_colorThumbBtn.png", "GJ_colorThumbSBtn.png", 1.f);
-	m_valueSlider->m_groove->setVisible(false);
-	m_valueSlider->m_groove->getParent()->setVisible(false);
+	m_valueSlider->m_sliderBar->setVisible(false);
+	m_valueSlider->m_sliderBar->getParent()->setVisible(false);
 
 	m_valueSlider->setScale(.55f);
 	from<CCSprite*>(m_valueSlider->m_touchLogic->m_thumb, 0x108)->setScale(1.45f);

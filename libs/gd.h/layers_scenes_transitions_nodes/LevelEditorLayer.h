@@ -95,6 +95,14 @@ namespace gd {
 		void addToUndoList(UndoObject* p0, bool p1) {
 			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, UndoObject*, bool)>(base + 0x8ea60)(this, p0, p1);
 		}
+
+		void setupLevelStart(LevelSettingsObject* p0) {
+			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, LevelSettingsObject*)>(base + 0x912e0)(this, p0);
+		}
+
+		void playMusic() {
+			reinterpret_cast<void(__fastcall*)(LevelEditorLayer*)>(base + 0x90d70)(this);
+		}
 	};
 }
 

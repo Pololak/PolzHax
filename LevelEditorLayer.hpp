@@ -11,11 +11,11 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* removeSpecial)(gd::LevelEditorLayer*, gd::GameObject*);
 	void __fastcall removeSpecialH(gd::LevelEditorLayer*, void*, gd::GameObject*);
 
+	inline void(__thiscall* removeObject)(gd::LevelEditorLayer*, gd::GameObject*, bool);
+	void __fastcall removeObjectH(gd::LevelEditorLayer*, void*, gd::GameObject*, bool);
+
 	inline void(__thiscall* updateVisibility)(gd::LevelEditorLayer*, float);
 	void __fastcall updateVisibilityH(gd::LevelEditorLayer*, void*, float);
-
-	inline void(__thiscall* destructor)(gd::LevelEditorLayer*);
-	void __fastcall destructorH(gd::LevelEditorLayer*);
 
 	inline gd::GameObject*(__thiscall* addObjectFromString)(gd::LevelEditorLayer*, std::string);
 	gd::GameObject* __fastcall addObjectFromStringH(gd::LevelEditorLayer*, void*, std::string);
@@ -32,11 +32,26 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* onResumePlaytest)(gd::LevelEditorLayer*);
 	void __fastcall onResumePlaytestH(gd::LevelEditorLayer*);
 
+	inline void(__thiscall* onPausePlaytest)(gd::LevelEditorLayer*);
+	void __fastcall onPausePlaytestH(gd::LevelEditorLayer*);
+
+	inline void(__thiscall* onStopPlaytest)(gd::LevelEditorLayer*);
+	void __fastcall onStopPlaytestH(gd::LevelEditorLayer*);
+
 	inline void(__thiscall* update)(gd::LevelEditorLayer*, float);
 	void __fastcall updateH(gd::LevelEditorLayer*, void*, float);
 
+	inline void(__thiscall* pushButton)(gd::LevelEditorLayer*, int, bool);
+	void __fastcall pushButtonH(gd::LevelEditorLayer*, void*, int, bool);
+
+	inline void(__thiscall* releaseButton)(gd::LevelEditorLayer*, int, bool);
+	void __fastcall releaseButtonH(gd::LevelEditorLayer*, void*, int, bool);
+
 	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
 	void __fastcall drawH(gd::LevelEditorLayer*);
+
+	inline void(__thiscall* destructor)(gd::LevelEditorLayer*);
+	void __fastcall destructorH(gd::LevelEditorLayer*);
 
 	void updatePreviewMode();
 	void resetColors();

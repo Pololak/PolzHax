@@ -36,11 +36,9 @@ void PlayerObject::newPlayerExtraFrame(gd::PlayerObject* playerObject, const cha
 		playerExtraSpr->setPosition(playerObject->m_playerFrameSecondary->getPosition());
 		playerExtraSpr->setDisplayFrame(spriteFrameCache->spriteFrameByName(playerFrame));
 		playerExtraSpr->setVisible(true);
-		std::cout << "isExtra" << std::endl;
 	}
 	else {
 		playerExtraSpr->setVisible(false);
-		std::cout << "noExtra" << std::endl;
 	}
 }
 

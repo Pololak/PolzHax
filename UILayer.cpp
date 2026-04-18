@@ -1,19 +1,13 @@
 #include "UILayer.hpp"
+#include "PlayLayer.hpp"
 #include "Setting.hpp"
 
-void UILayer::updateLabels() {
-	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-	if (!gd::GameManager::sharedState()->getPlayLayer()->m_uiLayer) return;
+void UILayer::Callback::onPrevStartPos(CCObject*) {
+	PlayLayer::prevStartPos();
+}
 
-	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
-	auto uiLayer = playLayer->m_uiLayer;
-
-	if (CCLabelBMFont* messageLabel = static_cast<CCLabelBMFont*>(uiLayer->getChildByTag(502))) {
-		messageLabel->setVisible(!setting().onHideLabels);
-		messageLabel->setOpacity(setting().labelsOpacity * 255.f);
-		messageLabel->setScale(setting().labelsScale);
-		messageLabel->setString(setting().message.c_str());
-	}
+void UILayer::Callback::onNextStartPos(CCObject*) {
+	PlayLayer::nextStartPos();
 }
 
 bool __fastcall UILayer::initH(gd::UILayer* self) {
@@ -22,10 +16,32 @@ bool __fastcall UILayer::initH(gd::UILayer* self) {
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
 
-	/*auto messageLabel = CCLabelBMFont::create("", "bigFont.fnt");
-	self->addChild(messageLabel, 105, 502);
+	auto startPosSwitcherMenu = CCMenu::create();
+	self->addChild(startPosSwitcherMenu, 0, 125);
 
-	UILayer::updateLabels();*/
+	auto startPosSwitcherLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	startPosSwitcherLabel->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f, director->getScreenBottom() + 20.f }));
+	startPosSwitcherLabel->setScale(.5f);
+	startPosSwitcherLabel->setOpacity(0);
+	startPosSwitcherLabel->setVisible(false);
+	startPosSwitcherMenu->addChild(startPosSwitcherLabel, 0, 1);
+
+	auto onPrevStartPosSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+	onPrevStartPosSpr->setScale(.4f);
+	auto onPrevStartPos = gd::CCMenuItemSpriteExtra::create(onPrevStartPosSpr, self, menu_selector(UILayer::Callback::onPrevStartPos));
+	onPrevStartPos->setOpacity(0);
+	onPrevStartPos->setVisible(false);
+	onPrevStartPos->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f - 35.f, director->getScreenBottom() + 20.f }));
+	startPosSwitcherMenu->addChild(onPrevStartPos, 0, 2);
+
+	auto onNextStartPosSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+	onNextStartPosSpr->setScale(.4f);
+	onNextStartPosSpr->setFlipX(true);
+	auto onNextStartPos = gd::CCMenuItemSpriteExtra::create(onNextStartPosSpr, self, menu_selector(UILayer::Callback::onNextStartPos));
+	onNextStartPos->setOpacity(0);
+	onNextStartPos->setVisible(false);
+	onNextStartPos->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f + 35.f, director->getScreenBottom() + 20.f }));
+	startPosSwitcherMenu->addChild(onNextStartPos, 0, 3);
 
 	return true;
 }

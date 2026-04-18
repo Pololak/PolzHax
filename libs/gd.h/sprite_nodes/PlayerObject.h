@@ -115,6 +115,10 @@ namespace gd {
 		float m_audioScale; // 0x4c8
 		float m_groundHeight; // 0x4cc
 
+		virtual void setPosition(cocos2d::CCPoint const& position) {
+			return reinterpret_cast<void(__thiscall*)(PlayerObject*, cocos2d::CCPoint const&)>(base + 0xdf8c0)(this, position);
+		}
+
 		void flipGravity(bool flip, bool effect) {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool, bool)>(base + 0xde660)(this, flip, effect);
 		}

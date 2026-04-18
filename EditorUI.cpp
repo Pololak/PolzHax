@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <array>
 #include <numbers>
+#include "RotateSaws.hpp"
 
 gd::EditorUI* m_editorUI;
 
@@ -579,7 +580,12 @@ void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void*, gd::GameOb
 }
 
 void __fastcall EditorUI::onCopyH(gd::EditorUI* self, void*, CCObject* sender) {
+	if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_editorLayer);
+
 	EditorUI::onCopy(self, sender);
+
+	if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_editorLayer);
+
 	if (setting().onCopyString) {
 		clipboard::write(self->m_clipboard);
 	}
@@ -813,7 +819,11 @@ void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* send
 
 	self->m_editorLayer->m_groupIDFilter = -1;
 
+	if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_editorLayer);
+
 	EditorUI::onDuplicate(self, sender);
+
+	if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_editorLayer);
 
 	self->m_editorLayer->m_groupIDFilter = currentEditorLayer;
 }

@@ -150,6 +150,10 @@ namespace gd {
 		cocos2d::CCPoint m_storedPosition; // 0x31c
 		int m_editorGroup; // 0x324
 
+		virtual void setScale(float scale) {
+			return reinterpret_cast<void(__thiscall*)(GameObject*, float)>(base + 0x72840)(this, scale);
+		}
+
 		GJCustomColorMode getColorMode() {
 			GJCustomColorMode customColor = this->m_customColorMode;
 			if ((this->m_defaultColorMode == customColor) || this->m_canChangeCustomColor || (customColor == GJCustomColorMode::Default)) {
@@ -192,6 +196,12 @@ namespace gd {
 
 		OBB2D* getOrientedBox() {
 			return reinterpret_cast<OBB2D * (__thiscall*)(GameObject*)>(base + 0x759e0)(this);
+		}
+
+		cocos2d::CCRepeatForever* createRotateAction(float p0) {
+			__asm movss xmm1, p0
+
+			return reinterpret_cast<cocos2d::CCRepeatForever*(__thiscall*)(GameObject*)>(base + 0x72230)(this);
 		}
 	};
 

@@ -16,5 +16,10 @@ namespace LevelSettingsLayer {
 
 	gd::LevelSettingsLayer* get();
 
+	class Callback : public gd::LevelSettingsLayer {
+	public:
+		void onPlaytestStartPos(CCObject*);
+	};
+
 	void mem_init();
 }

@@ -27,8 +27,6 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	auto director = CCDirector::sharedDirector();
 	auto winSize = director->getWinSize();
 
-	std::cout << director << std::endl;
-
 	auto gm = gd::GameManager::sharedState();
 
 	Icons::patchCube(Icons::getCount("player", "001"));
@@ -37,16 +35,7 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	Icons::patchBird(Icons::getCount("bird", "001"));
 	Icons::patchDart(Icons::getCount("dart", "001"), setting().selectedDartIdx);
 
-	std::cout << gm << "\n";
-	std::cout << gm->m_playerName << "\n";
-
-	std::cout << gd::GameLevelManager::sharedState() << std::endl;
-	std::cout << gd::GameLevelManager::sharedState()->m_mainLevels << std::endl;
-
-	std::cout << gd::LocalLevelManager::sharedState() << std::endl;
-
 	setting().save();
-
 	//auto checkpoint = CCSprite::createWithSpriteFrameName("checkpoint_01_001.png");
 	//auto achi = gd::AchievementBar::create("PolzHax", "Welcome to PolzHax: <cg>Reworked</c> beta (010226).", nullptr);
 	//auto iconSprite = achi->m_layerColor->getChildByType<CCSprite*>(0);

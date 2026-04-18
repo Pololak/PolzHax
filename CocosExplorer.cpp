@@ -282,6 +282,20 @@ void render_node_properties(CCNode* node) {
 		if (value[1] != node->getSkewY()) node->setSkewY(value[1]);
 	}
 
+	if (auto item = dynamic_cast<CCSprite*>(node)) {
+		{
+			auto value = item->isFlipX();
+			ImGui::Checkbox("FlipX", &value);
+			if (value != item->isFlipX()) item->setFlipX(value);
+		}
+		ImGui::SameLine();
+		{
+			auto value = item->isFlipY();
+			ImGui::Checkbox("FlipY", &value);
+			if (value != item->isFlipY()) item->setFlipY(value);
+		}
+	}
+
 	if (auto item = dynamic_cast<CCMenuItemSprite*>(node)) {
 		ImGui::NewLine();
 		ImGui::Separator();

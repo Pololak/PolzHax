@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "support/base64.h"
 #include "patching.hpp"
+#include <ShlObj.h>
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -358,6 +359,41 @@ inline bool ci_contains(const std::string& haystack, const std::string& needle)
 	return std::search(haystack.begin(), haystack.end(),
 		needle.begin(), needle.end(),
 		ci_equal) != haystack.end();
+}
+
+inline void copyFileToClipboard(char szFileName[]) {
+	UINT uDropEffect;
+	HGLOBAL hGblEffect;
+	LPDWORD lpdDropEffect;
+	DROPFILES stDrop;
+
+	HGLOBAL hGblFiles;
+	LPSTR lpData;
+
+	uDropEffect = RegisterClipboardFormat("Preferred DropEffect");
+	hGblEffect = GlobalAlloc(GMEM_ZEROINIT | GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(DWORD));
+	lpdDropEffect = (LPDWORD)GlobalLock(hGblEffect);
+	*lpdDropEffect = DROPEFFECT_COPY;//copy;  Clipart DU DU DROPEFFECT_MOVE
+	GlobalUnlock(hGblEffect);
+
+	stDrop.pFiles = sizeof(DROPFILES);
+	stDrop.pt.x = 0;
+	stDrop.pt.y = 0;
+	stDrop.fNC = FALSE;
+	stDrop.fWide = FALSE;
+
+	hGblFiles = GlobalAlloc(GMEM_ZEROINIT | GMEM_MOVEABLE | GMEM_DDESHARE, \
+		sizeof(DROPFILES) + strlen(szFileName) + 2);
+	lpData = (LPSTR)GlobalLock(hGblFiles);
+	memcpy(lpData, &stDrop, sizeof(DROPFILES));
+	strcpy(lpData + sizeof(DROPFILES), szFileName);
+	GlobalUnlock(hGblFiles);
+
+	OpenClipboard(NULL);
+	EmptyClipboard();
+	SetClipboardData(CF_HDROP, hGblFiles);
+	SetClipboardData(uDropEffect, hGblEffect);
+	CloseClipboard();
 }
 
 inline void safeModeON() {

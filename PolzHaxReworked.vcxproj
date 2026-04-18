@@ -155,6 +155,7 @@
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="CustomizeObjectLayer.hpp" />
     <ClInclude Include="CustomSongWidget.hpp" />
+    <ClInclude Include="DebugModule.hpp" />
     <ClInclude Include="DrawGridLayer.hpp" />
     <ClInclude Include="EditButtonBar.hpp" />
     <ClInclude Include="EditLevelLayer.hpp" />
@@ -710,6 +711,7 @@
     <ClInclude Include="PracticeFix.hpp" />
     <ClInclude Include="PulseBuilderPopup.hpp" />
     <ClInclude Include="RGBColorInputWidget.hpp" />
+    <ClInclude Include="RotateSaws.hpp" />
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
     <ClInclude Include="SimplePlayer.hpp" />
@@ -726,6 +728,7 @@
     <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="CustomizeObjectLayer.cpp" />
     <ClCompile Include="CustomSongWidget.cpp" />
+    <ClCompile Include="DebugModule.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DrawGridLayer.cpp" />
     <ClCompile Include="EditButtonBar.cpp" />
@@ -798,6 +801,7 @@
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="PulseBuilderPopup.cpp" />
     <ClCompile Include="RGBColorInputWidget.cpp" />
+    <ClCompile Include="RotateSaws.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />

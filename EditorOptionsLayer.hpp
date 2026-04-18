@@ -11,6 +11,8 @@ protected:
 	void onDurationLines(CCObject*);
 	void onExperimentalLayering(CCObject*);
 	void onUnusedObjects(CCObject*);
+	void onPreviewRotations(CCObject*);
+	void onShowClicks(CCObject*);
 public:
 	static EditorOptionsLayer* create() {
 		EditorOptionsLayer* ret = new EditorOptionsLayer();

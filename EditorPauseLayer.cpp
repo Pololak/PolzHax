@@ -4,14 +4,7 @@
 #include "Setting.hpp"
 #include "EditorOptionsLayer.hpp"
 #include "LevelEditorLayer.hpp"
-
-std::string lengthToString(float time) { // Math in GD is fucking ass, what's wrong with it??? // Also I guess timeForXPos is horrible func...
-	if (time <= 8.88696f) return "Tiny";
-	if (time < 28.8561f) return "Short";
-	if (time < 58.8f) return "Medium";
-	if (time <= 118.683f) return "Long";
-	else return "Extra-Long";
-}
+#include "RotateSaws.hpp"
 
 bool __fastcall EditorPauseLayer::initH(gd::EditorPauseLayer* self, void*, gd::LevelEditorLayer* editorLayer) {
 	if (!EditorPauseLayer::init(self, editorLayer)) return false;
@@ -377,6 +370,14 @@ void __fastcall EditorPauseLayer::keyDownH(gd::EditorPauseLayer* _self, void*, e
 		EditorPauseLayer::keyDown(_self, key);
 }
 
+void __fastcall EditorPauseLayer::saveLevelH(gd::EditorPauseLayer* self) {
+	if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_levelEditorLayer);
+	
+	EditorPauseLayer::saveLevel(self);
+
+	if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_levelEditorLayer);
+}
+
 void __fastcall EditorPauseLayer::destructorH(gd::EditorPauseLayer* self) {
 	LevelEditorLayer::setIsEditorPaused(false);
 	EditorPauseLayer::destructor(self);
@@ -387,5 +388,6 @@ void EditorPauseLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3e3d0), EditorPauseLayer::customSetupH, reinterpret_cast<void**>(&EditorPauseLayer::customSetup));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3f480), EditorPauseLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&EditorPauseLayer::FLAlert_Clicked));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3f570), EditorPauseLayer::keyDownH, reinterpret_cast<void**>(&EditorPauseLayer::keyDown));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3eec0), EditorPauseLayer::saveLevelH, reinterpret_cast<void**>(&EditorPauseLayer::saveLevel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3e280), EditorPauseLayer::destructorH, reinterpret_cast<void**>(&EditorPauseLayer::destructor));
 }

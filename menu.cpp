@@ -8,6 +8,7 @@
 
 #include "CocosExplorer.hpp"
 #include "GDPSSwitcher.hpp"
+#include "DebugModule.hpp"
 
 #include "EditorUI.hpp"
 #include "LevelEditorLayer.hpp"
@@ -182,7 +183,7 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("PolzHax", nullptr);
 		ImGui::SetWindowPos(ImVec2(5.f, 5.f));
-		bypass_xPos = polzhax_xPos + ImGui::GetWindowWidth() + 10.f;
+		bypass_xPos = polzhax_xPos + ImGui::GetWindowWidth() + 5.f;
 		addingInterfaceY = ImGui::GetWindowHeight() + 10.f;
 	}
 	{
@@ -203,7 +204,7 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Bypass", nullptr);
 		ImGui::SetWindowPos(ImVec2(bypass_xPos, 5.f));
-		cosmetic_xPos = bypass_xPos + ImGui::GetWindowWidth() + 10.f;
+		cosmetic_xPos = bypass_xPos + ImGui::GetWindowWidth() + 5.f;
 		addingUtilityY = ImGui::GetWindowHeight() + 10.f;
 	}
 	{
@@ -222,21 +223,21 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Cosmetic", nullptr);
 		ImGui::SetWindowPos(ImVec2(cosmetic_xPos, 5.f));
-		creator_xPos = cosmetic_xPos + ImGui::GetWindowWidth() + 10.f;
+		creator_xPos = cosmetic_xPos + ImGui::GetWindowWidth() + 5.f;
 	}
 	float level_xPos = -1.f;
 	{
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Creator", nullptr);
 		ImGui::SetWindowPos(ImVec2(creator_xPos, 5.f));
-		level_xPos = creator_xPos + ImGui::GetWindowWidth() + 10.f;
+		level_xPos = creator_xPos + ImGui::GetWindowWidth() + 5.f;
 	}
 	float universal_xPos = -1.f;
 	{
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Level", nullptr);
 		ImGui::SetWindowPos(ImVec2(level_xPos, 5.f));
-		universal_xPos = level_xPos + ImGui::GetWindowWidth() + 10.f;
+		universal_xPos = level_xPos + ImGui::GetWindowWidth() + 5.f;
 	}
 	float addingSpeedhackY = -1.f;
 	float status_xPos = -1.f;
@@ -244,7 +245,7 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Universal", nullptr);
 		ImGui::SetWindowPos(ImVec2(universal_xPos, 5.f));
-		status_xPos = universal_xPos + ImGui::GetWindowWidth() + 10.f;
+		status_xPos = universal_xPos + ImGui::GetWindowWidth() + 5.f;
 		addingSpeedhackY = ImGui::GetWindowHeight() + 10.f;
 	}
 	{
@@ -992,10 +993,14 @@ void imgui_render() {
 		if (setting().onGDPSSwitcher) {
 			renderGDPSSwitcher(setting().onGDPSSwitcher);
 		}
+
+		if (setting().onDeveloperMode) {
+			renderDebugModule();
+		}
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (160426)");
+			ImGui::Text("1.920 - v1.3.0 (180426)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1331,7 +1336,12 @@ void imgui_render() {
 				std::string seconds = (m->tm_sec < 10) ? "0" + std::to_string(m->tm_sec) : std::to_string(m->tm_sec);
 				std::string time = hours + "-" + minutes + "-" + seconds;
 
-				tex->newCCImage()->saveToFile(std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/screenshots/" + date + " " + time + ".png").c_str(), false);
+				CCImage* img = tex->newCCImage();
+				if (img->saveToFile(std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/screenshots/" + date + " " + time + ".png").c_str(), false)) {
+					if (setting().onCopyShotToClipboard) {
+						copyFileToClipboard(std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/screenshots/" + date + " " + time + ".png").data());
+					}
+				}
 				tex->clear(0.f, 0.f, 0.f, 0.f);
 
 				if (playLayer) {
@@ -1359,7 +1369,7 @@ void imgui_render() {
 			ImGui::CheckboxF("Hide Status Labels", &setting().onHideStatusLabelsOnShot);
 			ImGui::CheckboxF("Hide Background", &setting().onHideBackgroundOnShot);
 			ImGui::CheckboxF("Hide Player", &setting().onHidePlayerOnShot);
-			//ImGui::CheckboxF("Copy To Clipboard", &setting().onCopyShotToClipboard);
+			ImGui::CheckboxF("Copy To Clipboard", &setting().onCopyShotToClipboard);
 
 			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH, 0))) {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/screenshots").c_str(), NULL, NULL, SW_SHOW);

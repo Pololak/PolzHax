@@ -228,6 +228,10 @@ namespace gd {
 		void createUndoSelectObject(bool p0) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, bool)>(base + 0x48240)(this, p0);
 		}
+
+		void onPlaytest(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x489c0)(this, sender);
+		}
 	};
 }
 

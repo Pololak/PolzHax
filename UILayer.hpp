@@ -11,7 +11,11 @@ namespace UILayer {
 	inline void(__thiscall* keyUp)(gd::UILayer*, enumKeyCodes);
 	void __fastcall keyUpH(gd::UILayer*, void*, enumKeyCodes);
 
-	void updateLabels();
+	class Callback : public gd::UILayer {
+	public:
+		void onPrevStartPos(CCObject*);
+		void onNextStartPos(CCObject*);
+	};
 
 	void mem_init();
 }

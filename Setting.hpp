@@ -193,6 +193,8 @@ struct SettingStruct {
 	bool onCopyString;
 	bool onDurationLines;
 	bool onExperimentalLayering;
+	bool onPreviewRotations;
+	bool onShowClicks;
 	bool onUnusedObjects;
 
 	// Other stuff
@@ -395,6 +397,8 @@ DEF_SCHEMA(
 	onCopyString,
 	onDurationLines,
 	onExperimentalLayering,
+	onShowClicks,
+	onPreviewRotations,
 	onUnusedObjects,
 
 	// Other menu things

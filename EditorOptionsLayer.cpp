@@ -1,5 +1,7 @@
 #include "EditorOptionsLayer.hpp"
 #include "Setting.hpp"
+#include "LevelEditorLayer.hpp"
+#include "RotateSaws.hpp"
 
 void EditorOptionsLayer::onCopyString(CCObject*) {
 	setting().onCopyString = !setting().onCopyString;
@@ -15,6 +17,20 @@ void EditorOptionsLayer::onExperimentalLayering(CCObject*) {
 
 void EditorOptionsLayer::onUnusedObjects(CCObject*) {
 	setting().onUnusedObjects = !setting().onUnusedObjects;
+}
+
+void EditorOptionsLayer::onPreviewRotations(CCObject*) {
+	setting().onPreviewRotations = !setting().onPreviewRotations;
+	if (setting().onPreviewRotations) {
+		RotateSaws::beginRotations(LevelEditorLayer::get());
+	}
+	else {
+		RotateSaws::stopRotations(LevelEditorLayer::get());
+	}
+}
+
+void EditorOptionsLayer::onShowClicks(CCObject*) {
+	setting().onShowClicks = !setting().onShowClicks;
 }
 
 bool EditorOptionsLayer::init() {
@@ -83,14 +99,34 @@ bool EditorOptionsLayer::init() {
 	onExperimentalLayeringLabel->setPosition(winSize.width / 2.f - 138.f, winSize.height / 2.f + 40.f);
 	layer->addChild(onExperimentalLayeringLabel);
 
+	auto onPreviewRotations = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onPreviewRotations));
+	onPreviewRotations->toggle(setting().onPreviewRotations);
+	onPreviewRotations->setPosition(32.f, 40.f);
+	menu->addChild(onPreviewRotations);
+	auto onPreviewRotationsLabel = CCLabelBMFont::create("Preview Rotations", "bigFont.fnt");
+	onPreviewRotationsLabel->limitLabelWidth(130.f, .5f, 0.f);
+	onPreviewRotationsLabel->setAnchorPoint({ 0.f, .5f });
+	onPreviewRotationsLabel->setPosition(winSize.width / 2.f + 54.f, winSize.height / 2.f + 40.f);
+	layer->addChild(onPreviewRotationsLabel);
+
+	auto onShowClicks = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onShowClicks));
+	onShowClicks->toggle(setting().onShowClicks);
+	onShowClicks->setPosition(-160.f, 0.f);
+	menu->addChild(onShowClicks);
+	auto onShowClicksLabel = CCLabelBMFont::create("Show Clicks", "bigFont.fnt");
+	onShowClicksLabel->limitLabelWidth(130.f, .5f, 0.f);
+	onShowClicksLabel->setAnchorPoint({ 0.f, .5f });
+	onShowClicksLabel->setPosition(winSize.width / 2.f - 138.f, winSize.height / 2.f);
+	layer->addChild(onShowClicksLabel);
+
 	auto onUnusedObjects = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onUnusedObjects));
 	onUnusedObjects->toggle(setting().onUnusedObjects);
-	onUnusedObjects->setPosition(32.f, 40.f);
+	onUnusedObjects->setPosition(32.f, 0.f);
 	menu->addChild(onUnusedObjects);
 	auto onUnusedObjectsLabel = CCLabelBMFont::create("Show Unused Objects", "bigFont.fnt");
 	onUnusedObjectsLabel->limitLabelWidth(130.f, .5f, 0.f);
 	onUnusedObjectsLabel->setAnchorPoint({ 0.f, .5f });
-	onUnusedObjectsLabel->setPosition(winSize.width / 2.f + 54.f, winSize.height / 2.f + 40.f);
+	onUnusedObjectsLabel->setPosition(winSize.width / 2.f + 54.f, winSize.height / 2.f);
 	layer->addChild(onUnusedObjectsLabel);
 
 	this->setKeypadEnabled(true);
