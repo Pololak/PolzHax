@@ -6,4 +6,5 @@ void setupImGuiMenu();
 
 namespace PolzHax {
 	ImGuiTextFilter getTextFilter();
+	void updateFPSBypass();
 }

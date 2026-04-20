@@ -65,6 +65,8 @@ namespace LevelEditorLayer {
 	void updateShowHitboxes();
 
 	gd::LevelEditorLayer* get();
+	gd::StartPosObject* getPlaytestStartPos();
+	void setPlaytestStartPos(gd::StartPosObject* val);
 
 	void mem_init();
 }

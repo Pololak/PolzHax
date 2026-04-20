@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "LevelEditorLayer.hpp"
+#include "EditorUI.hpp"
 #include "EditorObjectLayering.hpp"
 #include "Setting.hpp"
 #include "hsv.hpp"
@@ -13,6 +14,7 @@
 gd::LevelEditorLayer* m_editorLayer;
 bool isEditorPaused = false;
 bool wasPreviewModeEnabled = false;
+gd::StartPosObject* m_playtestStartPos;
 
 gd::LevelEditorLayer* LevelEditorLayer::get() {
 	return m_editorLayer;
@@ -24,6 +26,14 @@ bool LevelEditorLayer::getIsEditorPaused() {
 
 void LevelEditorLayer::setIsEditorPaused(bool val) {
 	isEditorPaused = val;
+}
+
+gd::StartPosObject* LevelEditorLayer::getPlaytestStartPos() {
+	return m_playtestStartPos;
+}
+
+void LevelEditorLayer::setPlaytestStartPos(gd::StartPosObject* val) {
+	m_playtestStartPos = val;
 }
 
 void LevelEditorLayer::updateShowHitboxes() {
@@ -156,10 +166,6 @@ void LevelEditorLayer::moveTrigger(gd::GameObject* object) {
 	if (isColorTrigger(object)) {
 		removeTrigger(object);
 		insertTrigger(object);
-
-		if (setting().onPreviewMode) {
-			LevelEditorLayer::updatePreviewMode();
-		}
 	}
 }
 
@@ -431,55 +437,33 @@ void LevelEditorLayer::resetColors() {
 
 void LevelEditorLayer::updateOrientedHitboxes(gd::LevelEditorLayer* self) {
 	if (setting().onHitboxBugFix) {
-		/*CCARRAY_FOREACH_B_TYPE(self->getAllObjects(), object, gd::GameObject) {
-			if (object && object->canRotateFree()) {
-				if ((object->getRotation() / 90.f) != 0.f) {
-					object->calculateOrientedBox();
-				}
-			}
-		}*/
-
-		//CCARRAY_FOREACH_B_TYPE(self->m_levelSections, section, CCArray) {
-		//	if (section) {
-		//		CCARRAY_FOREACH_B_TYPE(section, object, gd::GameObject) {
-		//			if (object && object->canRotateFree()) {
-		//				if ((object->getRotation() / 90.f) != 0.f) {
-		//					object->calculateOrientedBox();
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-
-		auto sections = CCArray::create();
-		for (int i = 0; i < self->m_levelSections->count(); i++) {
-			sections->addObjectsFromArray(static_cast<CCArray*>(self->m_levelSections->objectAtIndex(i)));
-		}
-
-		for (int i = 0; i < sections->count(); i++) {
-			auto object = reinterpret_cast<gd::GameObject*>(sections->objectAtIndex(i));
-			if (object && object->canRotateFree()) {
-				switch (object->m_objectType) {
-				case gd::GameObjectType::Hazard:
-				case gd::GameObjectType::InverseGravityPortal:
-				case gd::GameObjectType::NormalGravityPortal:
-				case gd::GameObjectType::ShipPortal:
-				case gd::GameObjectType::CubePortal:
-				case gd::GameObjectType::YellowJumpPad:
-				case gd::GameObjectType::PinkJumpPad:
-				case gd::GameObjectType::GravityPad:
-				case gd::GameObjectType::YellowJumpRing:
-				case gd::GameObjectType::PinkJumpRing:
-				case gd::GameObjectType::GravityRing:
-				case gd::GameObjectType::BallPortal:
-				case gd::GameObjectType::RegularSizePortal:
-				case gd::GameObjectType::MiniSizePortal:
-				case gd::GameObjectType::UfoPortal:
-				case gd::GameObjectType::Modifier:
-				case gd::GameObjectType::DualPortal:
-				case gd::GameObjectType::SoloPortal:
-				case gd::GameObjectType::WavePortal:
-					object->calculateOrientedBox();
+		for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
+			if (section) {
+				for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+					if (object && object->canRotateFree()) {
+						switch (object->m_objectType) {
+						case gd::GameObjectType::Hazard:
+						case gd::GameObjectType::InverseGravityPortal:
+						case gd::GameObjectType::NormalGravityPortal:
+						case gd::GameObjectType::ShipPortal:
+						case gd::GameObjectType::CubePortal:
+						case gd::GameObjectType::YellowJumpPad:
+						case gd::GameObjectType::PinkJumpPad:
+						case gd::GameObjectType::GravityPad:
+						case gd::GameObjectType::YellowJumpRing:
+						case gd::GameObjectType::PinkJumpRing:
+						case gd::GameObjectType::GravityRing:
+						case gd::GameObjectType::BallPortal:
+						case gd::GameObjectType::RegularSizePortal:
+						case gd::GameObjectType::MiniSizePortal:
+						case gd::GameObjectType::UfoPortal:
+						case gd::GameObjectType::Modifier:
+						case gd::GameObjectType::DualPortal:
+						case gd::GameObjectType::SoloPortal:
+						case gd::GameObjectType::WavePortal:
+							object->calculateOrientedBox();
+						}
+					}
 				}
 			}
 		}
@@ -565,21 +549,23 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 
 	LevelEditorLayer::updateShowHitboxes();
 
-	if (isEditorPaused) return;
-	if (!setting().onPreviewMode) {
-		if (wasPreviewModeEnabled) resetColors();
-		wasPreviewModeEnabled = false;
-		return;
-	}
-	else {
-		const auto pos = getPreviewPos();
-
-		if (wasPreviewModeEnabled && pos == m_lastPos) return;
-		m_lastPos = pos;
-		wasPreviewModeEnabled = true;
-
+	if (!isEditorPaused && setting().onPreviewMode) {
 		LevelEditorLayer::updatePreviewMode();
 	}
+	//if (!setting().onPreviewMode) {
+	//	if (wasPreviewModeEnabled) resetColors();
+	//	wasPreviewModeEnabled = false;
+	//	return;
+	//}
+	//else {
+	//	const auto pos = getPreviewPos();
+
+	//	if (wasPreviewModeEnabled && pos == m_lastPos) return;
+	//	m_lastPos = pos;
+	//	wasPreviewModeEnabled = true;
+
+	//	
+	//}
 }
 
 void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, float dt) {
@@ -631,26 +617,39 @@ void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* _self, void
 	otherPlayer->flipGravity(!isFlipped, showEffect);
 }
 
+//CCArray* m_hideableUIElements = nullptr;
+
+void runCustomPlaytest(gd::LevelEditorLayer* self, gd::StartPosObject* startPos) {
+	self->m_player->setPosition(startPos->getOrientedBox()->m_center);
+	self->m_player2->setPosition(startPos->getOrientedBox()->m_center);
+
+	self->setupLevelStart(startPos->m_settings);
+
+	self->m_player->resumeSchedulerAndActions();
+	self->m_player2->resumeSchedulerAndActions();
+
+	self->m_playerState = 1;
+
+	self->scheduleUpdate();
+
+	self->playMusic();
+}
+
 void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
 	gd::StartPosObject* selectedPlaytestStartPos = self->m_startPosObject;
-	std::cout << "Playtest StartPos: " << self->m_startPosObject << std::endl;
-
 	LevelEditorLayer::onPlaytest(self);
 
+	bool fromSelectedStartPos = false;
+
 	if (selectedPlaytestStartPos) {
-		self->m_player->setPosition(selectedPlaytestStartPos->getOrientedBox()->m_center);
-		self->m_player2->setPosition(selectedPlaytestStartPos->getOrientedBox()->m_center);
-
-		self->setupLevelStart(selectedPlaytestStartPos->m_settings);
-
-		self->m_player->resumeSchedulerAndActions();
-		self->m_player2->resumeSchedulerAndActions();
-
-		self->m_playerState = 1;
-
-		self->scheduleUpdate();
-
-		self->playMusic();
+		runCustomPlaytest(self, selectedPlaytestStartPos);
+		fromSelectedStartPos = true;
+	}
+	
+	if (m_playtestStartPos) {
+		if (!fromSelectedStartPos) {
+			runCustomPlaytest(self, m_playtestStartPos);
+		}
 	}
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
@@ -684,6 +683,16 @@ void __fastcall LevelEditorLayer::onStopPlaytestH(gd::LevelEditorLayer* self) {
 		RotateSaws::pauseRotations(self);
 		RotateSaws::resumeRotations(self);
 	}
+
+	//if (m_hideableUIElements) {
+	//	for (auto node : CCArrayExt<CCNode*>(m_hideableUIElements)) {
+	//		if (node) {
+	//			node->setVisible(true);
+	//		}
+	//	}
+
+	//	m_hideableUIElements = nullptr;
+	//}
 }
 
 void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*, int p0, bool p1) {
@@ -733,6 +742,7 @@ void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	m_currentColor.clear();
 	m_lastPos = 0.f;
 	m_blendingBatchNode = nullptr;
+	m_playtestStartPos = nullptr;
 	m_editorLayer = nullptr;
 }
 

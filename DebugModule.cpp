@@ -60,6 +60,29 @@ void renderDebugModule() {
 		ImGui::Text("Pulse Counter: %i", fme->m_pulseCounter);
 		ImGui::Text("Metering: %d", fme->m_metering);
 		ImGui::Checkbox("m_metering", &fme->m_metering);
+
+		auto pl = gd::GameManager::sharedState()->getPlayLayer();
+		if (pl) {
+			static int colorID = 0;
+			ImGui::InputInt("ColorID", &colorID);
+			if (ImGui::Button("Update Color")) {
+				pl->updateColor({0, 0, 0}, 1.f, colorID);
+			}
+
+			ImGui::Text("m_fromColor: %i %i %i", pl->m_activeBGColorAction->m_fromColor.r, pl->m_activeBGColorAction->m_fromColor.g, pl->m_activeBGColorAction->m_fromColor.b);
+			ImGui::Text("m_toColor: %i %i %i", pl->m_activeBGColorAction->m_toColor.r, pl->m_activeBGColorAction->m_toColor.g, pl->m_activeBGColorAction->m_toColor.b);
+		}
+
+		ImGui::Text("VSync: %i", CCApplication::sharedApplication()->getVerticalSyncEnabled());
+		if (ImGui::Button("Toggle VSync")) {
+			CCApplication::sharedApplication()->toggleVerticalSync(!CCApplication::sharedApplication()->getVerticalSyncEnabled());
+		}
+		if (ImGui::Button("Update VSync")) {
+			CCApplication::sharedApplication()->updateVerticalSync();
+		}
+		if (ImGui::Button("Setup VSync")) {
+			CCApplication::sharedApplication()->setupVerticalSync();
+		}
 	}
 	ImGui::End();
 }

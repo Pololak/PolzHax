@@ -676,13 +676,6 @@ void __fastcall EditorUI::onPlaytestH(gd::EditorUI* self, void*, CCObject* obj) 
 	if (!m_isHoldingInEditor) EditorUI::onPlaytest(self, obj);
 }
 
-void __fastcall EditorUI::deselectAllH(gd::EditorUI* self) {
-	EditorUI::deselectAll(self);
-	if (setting().onPreviewMode) {
-		LevelEditorLayer::updatePreviewMode();
-	}
-}
-
 void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void*, float dy, float dx) { // From BEv6
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf8);
 
@@ -903,7 +896,6 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4d5e0), EditorUI::ccTouchBeganH, reinterpret_cast<void**>(&EditorUI::ccTouchBegan));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4de40), EditorUI::ccTouchEndedH, reinterpret_cast<void**>(&EditorUI::ccTouchEnded));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x489c0), EditorUI::onPlaytestH, reinterpret_cast<void**>(&EditorUI::onPlaytest));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48380), EditorUI::deselectAllH, reinterpret_cast<void**>(&EditorUI::deselectAll));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee90), EditorUI::scrollWheelH, reinterpret_cast<void**>(&EditorUI::scrollWheel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47400), EditorUI::onCreateButtonH, reinterpret_cast<void**>(&EditorUI::onCreateButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x42080), EditorUI::setupDeleteMenuH, reinterpret_cast<void**>(&EditorUI::setupDeleteMenu));

@@ -95,6 +95,7 @@ namespace gd {
 #include "sprite_nodes/GameObject.h"
 #include "other_nodes/StartPosObject.h"
 
+#include "layers_scenes_transitions_nodes/LevelCell.h"
 #include "layers_scenes_transitions_nodes/FLAlertLayer.h"
 #include "layers_scenes_transitions_nodes/GJDropDownLayer.h"
 #include "layers_scenes_transitions_nodes/GJListLayer.h"
@@ -104,6 +105,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/LoadingCircle.h"
 #include "layers_scenes_transitions_nodes/CCBlockLayer.h"
 #include "layers_scenes_transitions_nodes/PauseLayer.h"
+#include "layers_scenes_transitions_nodes/GJGroundLayer.h"
 #include "layers_scenes_transitions_nodes/PlayLayer.h"
 #include "layers_scenes_transitions_nodes/EditorUI.h"
 #include "layers_scenes_transitions_nodes/LevelEditorLayer.h"
@@ -115,7 +117,6 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/ButtonPage.h"
 #include "layers_scenes_transitions_nodes/EditorPauseLayer.h"
 #include "layers_scenes_transitions_nodes/AudioEffectsLayer.h"
-#include "layers_scenes_transitions_nodes/GJGroundLayer.h"
 #include "layers_scenes_transitions_nodes/UILayer.h"
 #include "layers_scenes_transitions_nodes/CustomSongWidget.h"
 #include "layers_scenes_transitions_nodes/LevelSettingsLayer.h"

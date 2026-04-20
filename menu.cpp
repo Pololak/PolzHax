@@ -82,9 +82,23 @@ void updatePriority() {
 	}
 }
 
-void updateFPSBypass() {
-	float value = 1.f / (setting().onFPSBypass ? setting().fpsValue : 60.f);
-	CCDirector::sharedDirector()->setAnimationInterval(value);
+void PolzHax::updateFPSBypass() {
+	auto currentFps = setting().fpsValue;
+
+	if (currentFps == 0.f) {
+		currentFps = 60.f;
+	}
+
+	if (setting().onFPSBypass) {
+		CCApplication::sharedApplication()->toggleVerticalSync(false);
+		CCDirector::sharedDirector()->setAnimationInterval(1 / static_cast<double>(currentFps));
+	}
+	else {
+		CCDirector::sharedDirector()->setAnimationInterval(1 / 60.0);
+		if (gd::GameManager::sharedState()->getGameVariable("0030")) {
+			CCApplication::sharedApplication()->toggleVerticalSync(true);
+		}
+	}
 }
 
 void updateSpeedhack() {
@@ -288,6 +302,8 @@ void imgui_render() {
 			updatePriority();
 		}
 
+		PolzHax::updateFPSBypass();
+
 		// Bypass
 
 		if (setting().onIcons) {
@@ -395,6 +411,13 @@ void imgui_render() {
 		else {
 			sequence_patch(gd::base + 0xe6c92, { 0x6a, 0x01 });
 			sequence_patch(gd::base + 0xe6ca8, { 0xc7, 0x04, 0x24, 0x8f, 0xc2, 0xf5, 0x3d });
+		}
+
+		if (setting().onNoCompletionEffect) {
+			sequence_patch(gd::base + 0xe5667, { 0xeb, 0x1a });
+		}
+		else {
+			sequence_patch(gd::base + 0xe5667, { 0x75, 0x1a });
 		}
 
 		if (setting().onNoDeathEffect) {
@@ -761,6 +784,13 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
 		}
 
+		if (setting().onFreezePlayer) {
+			sequence_patch(gd::base + 0xe9dd3, { 0xe9, 0x3f, 0x01, 0x00, 0x00, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xe9dd3, { 0x0f, 0x85, 0x3e, 0x01, 0x00, 0x00 });
+		}
+
 		if (setting().onHighFPSRotationFix) {
 			sequence_patch(gd::base + 0xdc13b, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 		}
@@ -1000,7 +1030,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (180426)");
+			ImGui::Text("1.920 - v1.3.0 (200426)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1555,6 +1585,26 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Disables size portal background flash.");
+
+			if (ImGui::CheckboxF("No Completion Effect", &setting().onNoCompletionEffect)) {
+				if (setting().onNoCompletionEffect) {
+					sequence_patch(gd::base + 0xe5667, { 0xeb, 0x1a });
+				}
+				else {
+					sequence_patch(gd::base + 0xe5667, { 0x75, 0x1a });
+				}
+			}
+			ImGui::Tooltip("Disables the completion effect (like in practice mode).");
+
+			//if (ImGui::CheckboxF("No Completion Popup", &setting().onNoCompletionPopup)) {
+			//	if (setting().onNoCompletionPopup) {
+			//		
+			//	}
+			//	else {
+
+			//	}
+			//}
+			//ImGui::Tooltip("Disables the level complete popup (also makes completion animation faster).");
 
 			if (ImGui::CheckboxF("No Death Effect", &setting().onNoDeathEffect)) {
 				if (setting().onNoDeathEffect) {
@@ -2201,6 +2251,16 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Owie.");
 
+			if (ImGui::Checkbox("Freeze Player", &setting().onFreezePlayer)) {
+				if (setting().onFreezePlayer) {
+					sequence_patch(gd::base + 0xe9dd3, { 0xe9, 0x3f, 0x01, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xe9dd3, { 0x0f, 0x85, 0x3e, 0x01, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Freezes player movement.");
+
 			if (ImGui::CheckboxF("High FPS Rotation Fix", &setting().onHighFPSRotationFix)) {
 				if (setting().onHighFPSRotationFix) {
 					sequence_patch(gd::base + 0xdc13b, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
@@ -2494,11 +2554,11 @@ void imgui_render() {
 		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextItemWidth(80.f);
 			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
-				updateFPSBypass();
+				PolzHax::updateFPSBypass();
 			}
 			ImGui::SameLine();
 			if (ImGui::CheckboxF("Unlock FPS", &setting().onFPSBypass)) {
-				updateFPSBypass();
+				PolzHax::updateFPSBypass();
 			}
 
 			ImGui::SetNextItemWidth(80.f);
@@ -3019,12 +3079,8 @@ void imgui_render() {
 		}
 	}
 
-	updateFPSBypass();
 	updateSpeedhack();
 
-	if (setting().onFPSBypass) {
-		updateFPSBypass();
-	}
 	if (setting().onSpeedhack) {
 		updateSpeedhack();
 	}

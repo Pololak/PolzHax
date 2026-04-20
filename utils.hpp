@@ -396,6 +396,38 @@ inline void copyFileToClipboard(char szFileName[]) {
 	CloseClipboard();
 }
 
+namespace cocos2d {
+	typedef struct _hashElement {
+		struct _ccArray* actions;
+		CCObject* target;
+		unsigned int                actionIndex;
+		CCAction* currentAction;
+		bool                        currentActionSalvaged;
+		bool                        paused;
+		UT_hash_handle                hh;
+	} tHashElement;
+
+	static std::vector<CCAction*> getAllActions(CCNode* target) {
+		std::vector<CCAction*> out;
+
+		auto am = target->m_pActionManager;
+
+		tHashElement* pElement = nullptr;
+		HASH_FIND_INT(am->m_pTargets, &target, pElement);
+
+		if (pElement) {
+			if (pElement->actions != nullptr) {
+				unsigned int limit = pElement->actions->num;
+				for (unsigned int i = 0; i < limit; ++i) {
+					out.push_back((CCAction*)pElement->actions->arr[i]);
+				}
+			}
+		}
+
+		return out;
+	}
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

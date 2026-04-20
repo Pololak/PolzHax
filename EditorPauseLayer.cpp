@@ -242,6 +242,12 @@ void EditorPauseLayer::Callback::onSmallEditorStep(CCObject*) {
 	gd::GameManager::sharedState()->toggleGameVariable("0035");
 }
 
+void EditorPauseLayer::Callback::onResetStartPos(CCObject*) {
+	if (LevelEditorLayer::getPlaytestStartPos()) {
+		LevelEditorLayer::setPlaytestStartPos(nullptr);
+	}
+}
+
 void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 	EditorPauseLayer::customSetup(self);
 
@@ -352,6 +358,11 @@ void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 		ccp(30.f, director->getScreenBottom() + 210.f),
 		ccp(8.f, 0.f)
 	);
+
+	auto onResetStartPosSpr = gd::ButtonSprite::create("Reset\nStartPos", 0x32, 0, .4f, true, "bigFont.fnt", "GJ_button_04.png", 30.f);
+	auto onResetStartPos = gd::CCMenuItemSpriteExtra::create(onResetStartPosSpr, self, menu_selector(EditorPauseLayer::Callback::onResetStartPos));
+	onResetStartPos->setPosition(bottom_menu->convertToNodeSpace({ director->getScreenRight() - 50.f, director->getScreenBottom() + 65.f }));
+	bottom_menu->addChild(onResetStartPos);
 }
 
 void __fastcall EditorPauseLayer::FLAlert_ClickedH(gd::EditorPauseLayer* _self, void*, gd::FLAlertLayer* layer, bool btn2) {

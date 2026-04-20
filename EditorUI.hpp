@@ -55,9 +55,6 @@ namespace EditorUI {
 	inline void(__thiscall* onPlaytest)(gd::EditorUI*, CCObject*);
 	void __fastcall onPlaytestH(gd::EditorUI*, void*, CCObject*);
 
-	inline void(__thiscall* deselectAll)(gd::EditorUI*);
-	void __fastcall deselectAllH(gd::EditorUI*);
-
 	inline void(__thiscall* updateZoom)(gd::EditorUI*, float);
 	void __fastcall updateZoomH(gd::EditorUI*, void*, float);
 

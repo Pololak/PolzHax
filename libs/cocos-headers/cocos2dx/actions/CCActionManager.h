@@ -120,7 +120,7 @@ public:
      */
     void resumeTargets(CCSet *targetsToResume);
 
-protected:
+public:
     // declared in CCActionManager.m
 
     void removeActionAtIndex(unsigned int uIndex, struct _hashElement *pElement);
@@ -128,7 +128,7 @@ protected:
     void actionAllocWithHashElement(struct _hashElement *pElement);
     void update(float dt);
 
-protected:
+public:
     struct _hashElement    *m_pTargets;
     struct _hashElement    *m_pCurrentTarget;
     bool            m_bCurrentTargetSalvaged;

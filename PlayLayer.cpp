@@ -77,6 +77,7 @@ bool PlayLayer::isCheating() {
 		setting().onNoShadeEffect ||
 		setting().onAutoPickupCoins ||
 		setting().onEverythingHurts ||
+		setting().onFreezePlayer ||
 		setting().onHitboxes ||
 		setting().onInstantComplete ||
 		setting().onJumpHack ||
@@ -122,6 +123,8 @@ void PlayLayer::nextStartPos() {
 void PlayLayer::prevStartPos() {
 	pickStartPos(gd::GameManager::sharedState()->getPlayLayer(), currentStartPos - 1);
 }
+
+std::vector<gd::GameObject*> m_colorTriggers;
 
 static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
 	gd::GameObject* closest = nullptr;
@@ -234,8 +237,8 @@ void PlayLayer::updateShowHitboxes() {
 	if (self == nullptr) return;
 
 	auto playerDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(124));
-	playerDrawNode->clear();
 	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
+	playerDrawNode->clear();
 	objectDrawNode->clear();
 
 	if ((self->m_player->m_isDead && setting().onHitboxesOnDeath) || setting().onHitboxes) {
@@ -632,6 +635,46 @@ void PlayLayer::updateStartPosSwitcherLabel() {
 	onNextStartPos->runAction(CCSequence::create(CCDelayTime::create(1.f), CCFadeOut::create(.5f), CCHide::create(), nullptr));
 }
 
+void fixInitColorTriggers() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+	if (!self) return;
+	
+	std::vector<gd::GameObject*> m_bgColorTriggers, m_gColorTriggers, m_lineColorTriggers, m_objColorTriggers, m_col1ColorTriggers, m_col2ColorTriggers, m_col3ColorTriggers, m_col4ColorTriggers, m_dlColorTriggers;
+
+	for (auto obj : m_colorTriggers) {
+		if (obj) {
+			switch (obj->m_objectID) {
+			case 29: m_bgColorTriggers.push_back(obj); break;
+			case 30: m_gColorTriggers.push_back(obj); break;
+			case 104: m_lineColorTriggers.push_back(obj); break;
+			case 105: m_objColorTriggers.push_back(obj); break;
+			case 221: m_col1ColorTriggers.push_back(obj); break;
+			case 717: m_col2ColorTriggers.push_back(obj); break;
+			case 718: m_col3ColorTriggers.push_back(obj); break;
+			case 743: m_col4ColorTriggers.push_back(obj); break;
+			case 744: m_dlColorTriggers.push_back(obj); break;
+			default: break;
+			}
+		}
+	}
+
+	std::sort(m_bgColorTriggers.begin(), m_bgColorTriggers.end(), [](gd::GameObject* a, gd::GameObject* b) {
+		return a->getPositionX() < b->getPositionX();
+		});
+
+	gd::GameObject* closestBGTrigger = nullptr;
+
+	for (auto obj : m_bgColorTriggers) {
+		if (obj->getPositionX() < self->m_player->getPositionX()) {
+			closestBGTrigger = obj;
+		}
+	}
+
+	if (closestBGTrigger) {
+		//if ()
+	}
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpoints.clear();
@@ -644,6 +687,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_startPositions.clear();
 	startPosObjects.clear();
 	currentStartPos = 0;
+
+	m_colorTriggers.clear();
 
 	m_portalRef = nullptr;
 	m_dualPortalRef = nullptr;
@@ -930,6 +975,13 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	}
 	m_wasDead = false;
 
+	if (self->m_endTriggered) {
+		self->m_endTriggered = false;
+		self->stopAllActions();
+		self->m_player->stopAllActions();
+		self->m_player2->stopAllActions();
+	}
+
 	PlayLayer::resetLevel(self);
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
@@ -1000,6 +1052,12 @@ void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObj
 
 	if (object->m_objectID == 31) {
 		startPosObjects.push_back(static_cast<gd::StartPosObject*>(object));
+	}
+
+	switch (object->m_objectID) {
+	case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
+		m_colorTriggers.push_back(object); break;
+	default: break;
 	}
 
 	switch (object->m_objectID) {
@@ -1201,8 +1259,10 @@ void __fastcall PlayLayer::loadLastCheckpointH(gd::PlayLayer* self) {
 	PlayLayer::loadLastCheckpoint(self);
 
 	if (setting().onPracticeFix) {
-		self->m_cameraPortal = m_portalRef;
-		self->m_dualModeCamera = m_dualPortalRef;
+		if (self->m_checkpoints->count() > 0) {
+			self->m_cameraPortal = m_portalRef;
+			self->m_dualModeCamera = m_dualPortalRef;
+		}
 	}
 }
 

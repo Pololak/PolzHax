@@ -213,6 +213,48 @@ namespace gd {
 		void delayedResetLevel() {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f10)(this);
 		}
+
+		void updateColor(cocos2d::ccColor3B const& toColor, float duration, int colorID) {
+			__asm movss xmm2, duration
+
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, cocos2d::ccColor3B const&, int)>(base + 0xeca90)(this, toColor, colorID);
+		}
+
+		cocos2d::ccColor3B getBGColor() {
+			return this->m_backgroundSprite->getColor();
+		}
+
+		cocos2d::ccColor3B getGColor() {
+			return this->m_bottomGround->m_groundSprite->getColor();
+		}
+
+		cocos2d::ccColor3B getLineColor() {
+			return this->m_bottomGround->m_line->getColor();
+		}
+
+		cocos2d::ccColor3B getObjColor() {
+			return this->m_objColorRef->getColor();
+		}
+
+		cocos2d::ccColor3B getCustom01Color() {
+			return this->m_custom01ColorRef->getColor();
+		}
+
+		cocos2d::ccColor3B getCustom02Color() {
+			return this->m_custom02ColorRef->getColor();
+		}
+
+		cocos2d::ccColor3B getCustom03Color() {
+			return this->m_custom03ColorRef->getColor();
+		}
+
+		cocos2d::ccColor3B getCustom04Color() {
+			return this->m_custom04ColorRef->getColor();
+		}
+
+		cocos2d::ccColor3B get3DLineColor() {
+			return this->m_3DLineColorRef->getColor();
+		}
 	};
 }
 

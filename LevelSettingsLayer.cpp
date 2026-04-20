@@ -7,6 +7,18 @@ gd::LevelSettingsLayer* LevelSettingsLayer::get() {
 	return m_levelSettingsLayer;
 }
 
+void LevelSettingsLayer::Callback::togglePlaytestStartPos(CCObject*) {
+	auto editorLayer = LevelEditorLayer::get();
+	if (editorLayer) {
+		if (LevelEditorLayer::getPlaytestStartPos() == static_cast<gd::StartPosObject*>(editorLayer->m_uiLayer->m_selectedObject)) {
+			LevelEditorLayer::setPlaytestStartPos(nullptr);
+		}
+		else {
+			LevelEditorLayer::setPlaytestStartPos(static_cast<gd::StartPosObject*>(editorLayer->m_uiLayer->m_selectedObject));
+		}
+	}
+}
+
 void LevelSettingsLayer::Callback::onPlaytestStartPos(CCObject*) {
 	auto editorLayer = LevelEditorLayer::get();
 	if (editorLayer) {
@@ -90,6 +102,14 @@ bool __fastcall LevelSettingsLayer::initH(gd::LevelSettingsLayer* self, void*, g
 		auto onPlaytestStartPos = gd::CCMenuItemSpriteExtra::create(onPlaytestStartPosSpr, self, menu_selector(LevelSettingsLayer::Callback::onPlaytestStartPos));
 		onPlaytestStartPos->setPosition(185.f, 95.f);
 		self->m_buttonMenu->addChild(onPlaytestStartPos);
+
+		auto playtestFromLabel = CCLabelBMFont::create("Play from", "goldFont.fnt");
+		playtestFromLabel->setScale(.6f);
+		playtestFromLabel->setPosition(winSize.width / 2.f + 185.f, winSize.height / 2.f + 60.f);
+		self->m_mainLayer->addChild(playtestFromLabel);
+
+		bool playtestStartPosSelected = LevelEditorLayer::getPlaytestStartPos() != LevelEditorLayer::get()->m_uiLayer->m_selectedObject;
+		self->createToggleButton("", menu_selector(LevelSettingsLayer::Callback::togglePlaytestStartPos), playtestStartPosSelected, self->m_buttonMenu, ccp(winSize.width / 2.f + 185.f, winSize.height / 2.f + 25.f));
 	}
 
 	return true;
@@ -114,11 +134,6 @@ void __fastcall LevelSettingsLayer::colorSelectClosedH(gd::LevelSettingsLayer* _
 	}
 }
 
-void __fastcall LevelSettingsLayer::selectArtClosedH(gd::LevelSettingsLayer* _self, void*, gd::SelectArtLayer* selectArtLayer) {
-	LevelSettingsLayer::selectArtClosed(_self, selectArtLayer);
-	LevelEditorLayer::updatePreviewMode();
-}
-
 void __fastcall LevelSettingsLayer::destructorH(gd::LevelSettingsLayer* self) {
 	LevelSettingsLayer::destructor(self);
 	m_levelSettingsLayer = nullptr;
@@ -127,6 +142,5 @@ void __fastcall LevelSettingsLayer::destructorH(gd::LevelSettingsLayer* self) {
 void LevelSettingsLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x97050), LevelSettingsLayer::initH, reinterpret_cast<void**>(&LevelSettingsLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9a0c0), LevelSettingsLayer::colorSelectClosedH, reinterpret_cast<void**>(&LevelSettingsLayer::colorSelectClosed));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9a890), LevelSettingsLayer::selectArtClosedH, reinterpret_cast<void**>(&LevelSettingsLayer::selectArtClosed));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x96e90), LevelSettingsLayer::destructorH, reinterpret_cast<void**>(&LevelSettingsLayer::destructor));
 }

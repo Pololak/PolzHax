@@ -8,6 +8,9 @@ namespace LevelBrowserLayer {
 	inline void(__thiscall* loadPage)(gd::LevelBrowserLayer*, gd::GJSearchObject*);
 	void __fastcall loadPageH(gd::LevelBrowserLayer*, void*, gd::GJSearchObject*);
 
+	inline void(__thiscall* FLAlert_Clicked)(gd::LevelBrowserLayer*, gd::FLAlertLayer*, bool);
+	void __fastcall FLAlert_ClickedH(gd::LevelBrowserLayer*, void*, gd::FLAlertLayer*, bool);
+
 	void updatePageButton(gd::LevelBrowserLayer*);
 
 	void setCustomSearchQuery(std::string);
@@ -23,6 +26,9 @@ namespace LevelBrowserLayer {
 
 		void onSearch(CCObject*);
 		void onCancelSearch(CCObject*);
+
+		void onDeleteSelected(CCObject*);
+		void onSelectAll(CCObject*);
 	};
 
 	void mem_init();

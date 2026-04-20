@@ -1,5 +1,6 @@
 #include "LevelBrowserLayer.hpp"
 #include "LevelShare.hpp"
+#include "LevelCell.hpp"
 #include "nfd.h"
 #include <fstream>
 #include "FindLevelPopup.hpp"
@@ -23,6 +24,51 @@ void LevelBrowserLayer::updatePageButton(gd::LevelBrowserLayer* self) {
 				label->limitLabelWidth(32.f, .8f, 0.f);
 			}
 		}
+	}
+}
+
+void LevelBrowserLayer::Callback::onSelectAll(CCObject* sender) {
+	return;
+	//auto btn = static_cast<gd::CCMenuItemToggler*>(sender);
+
+	//auto selectedLevels = LevelCell::getSelectedLevels();
+	//selectedLevels.clear();
+
+	//auto customListView = static_cast<gd::CustomListView*>(this->m_list->getChildByTag(9));
+	//if (customListView) {
+	//	auto tableView = customListView->m_tableView;
+	//	if (tableView) {
+	//		auto contentLayer = tableView->m_contentLayer;
+	//		if (contentLayer) {
+	//			for (auto levelCell : CCArrayExt<gd::LevelCell*>(contentLayer->getChildren())) {
+	//				if (levelCell) {
+	//					auto menu = static_cast<CCMenu*>(levelCell->m_mainLayer->getChildByTag(120));
+	//					if (menu) {
+	//						auto toggle = static_cast<gd::CCMenuItemToggler*>(menu->getChildByTag(1));
+	//						if (toggle) {
+	//							toggle->toggle(!btn->m_toggled);
+	//						}
+	//					}
+
+	//					selectedLevels.push_back(levelCell->m_level);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+}
+
+void LevelBrowserLayer::Callback::onDeleteSelected(CCObject*) {
+	auto selectedLevels = LevelCell::getSelectedLevels();
+
+	if (selectedLevels.empty()) {
+		gd::FLAlertLayer::create("Nothing here...", "No levels selected.", "OK")->show();
+	}
+	else {
+		auto desc = CCString::createWithFormat("Are you sure you want to <cr>delete</c> the <cy>%i</c> selected <cg>levels</c>?", selectedLevels.size())->getCString();
+		auto layer = gd::FLAlertLayer::create(this, "Delete", desc, "Back", "Delete");
+		layer->setTag(0x3);
+		layer->show();
 	}
 }
 
@@ -134,6 +180,25 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		onExportLevel->setPosition(-30.f, 90.f);
 		shareMenu->addChild(onExportLevel);
 
+		auto deleteMenu = CCMenu::create();
+		self->addChild(deleteMenu, 2, 570);
+
+		auto deleteSprite = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
+		auto onDeleteSelectedSpr = gd::ButtonSprite::create(deleteSprite, 0x22, false, 1.f, 0, "GJ_button_04.png", true, 36.f);
+		onDeleteSelectedSpr->setScale(.4f);
+		auto onDeleteSelected = gd::CCMenuItemSpriteExtra::create(onDeleteSelectedSpr, self, menu_selector(LevelBrowserLayer::Callback::onDeleteSelected));
+		onDeleteSelected->setPosition(-145.f, -122.f);
+		deleteMenu->addChild(onDeleteSelected);
+
+		//auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+		//toggleOff->setScale(.5f);
+		//auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+		//toggleOn->setScale(.5f);
+
+		//auto onSelectAll = gd::CCMenuItemToggler::create(toggleOff, toggleOn, self, menu_selector(LevelBrowserLayer::Callback::onSelectAll));
+		//onSelectAll->setPosition(-125.f, -122.f);
+		//deleteMenu->addChild(onSelectAll, 0, 1);
+
 		//auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
 		//if (menu) {
 		//	auto onSearchSpr = CCSprite::create("gj_findBtn_001.png");
@@ -224,10 +289,36 @@ void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*,
 		//}
 	}
 
+	//auto deleteMenu = static_cast<CCMenu*>(self->getChildByTag(570));
+	//if (deleteMenu) {
+	//	auto onSelectAll = static_cast<gd::CCMenuItemToggler*>(deleteMenu->getChildByTag(1));
+	//	if (onSelectAll) {
+	//		onSelectAll->toggle(false);
+	//	}
+	//}
+
 	updatePageButton(self);
+}
+
+void __fastcall LevelBrowserLayer::FLAlert_ClickedH(gd::LevelBrowserLayer* _self, void*, gd::FLAlertLayer* layer, bool btn2) {
+	auto self = reinterpret_cast<gd::LevelBrowserLayer*>(reinterpret_cast<uintptr_t>(_self) - 0x11c);
+	if ((layer->getTag() == 3) && btn2) {
+		auto selectedLevels = LevelCell::getSelectedLevels();
+		for (auto level : selectedLevels) {
+			if (level) {
+				auto localLevelManager = gd::LocalLevelManager::sharedState();
+				localLevelManager->m_localLevels->removeObject(level, true);
+				localLevelManager->updateLevelOrder();
+				selectedLevels.clear();
+				self->loadPage(self->m_searchObject);
+			}
+		}
+	}
+	LevelBrowserLayer::FLAlert_Clicked(_self, layer, btn2);
 }
 
 void LevelBrowserLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x89590), LevelBrowserLayer::initH, reinterpret_cast<void**>(&LevelBrowserLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8a000), LevelBrowserLayer::loadPageH, reinterpret_cast<void**>(&LevelBrowserLayer::loadPage));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8b450), LevelBrowserLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&LevelBrowserLayer::FLAlert_Clicked));
 }

@@ -46,6 +46,10 @@ namespace gd {
 		void onClose(CCObject* sender) {
 			reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, CCObject*)>(base + 0x99dc0)(this, sender);
 		}
+
+		void createToggleButton(std::string label, cocos2d::SEL_MenuHandler callback, bool value, cocos2d::CCMenu* menu, cocos2d::CCPoint pos) {
+			return reinterpret_cast<void(__thiscall*)(LevelSettingsLayer*, cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, std::string, cocos2d::CCPoint)>(base + 0x99830)(this, callback, value, menu, label, pos);
+		}
 	};
 }
 

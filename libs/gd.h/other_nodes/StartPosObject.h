@@ -8,7 +8,7 @@ namespace gd {
 
 	class StartPosObject : public GameObject {
 	public:
-		LevelSettingsObject* m_settings;
+		LevelSettingsObject* m_settings; // 0x328
 	};
 }
 

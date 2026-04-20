@@ -1779,6 +1779,15 @@
     <ClInclude Include="DebugModule.hpp">
       <Filter>Файлы заголовков\Menu</Filter>
     </ClInclude>
+    <ClInclude Include="LevelCell.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelCell.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="RemapTriggerWidget.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2029,6 +2038,12 @@
     </ClCompile>
     <ClCompile Include="DebugModule.cpp">
       <Filter>Исходные файлы\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCell.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="RemapTriggerWidget.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

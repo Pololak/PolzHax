@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cocos2d.h>
 #include "imgui-hook.hpp"
+#include "../../Menu.hpp"
 
 using namespace cocos2d;
 
@@ -152,6 +153,8 @@ void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bo
     // auto hwnd = windowToHWND(self->getWindow());
     // ImGui_ImplWin32_Init(hwnd);
     // ImGui_ImplOpenGL3_Init();
+
+    PolzHax::updateFPSBypass();
 }
 
 void (__thiscall* AppDelegate_applicationWillEnterForeground)(void*);

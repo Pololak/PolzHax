@@ -10,6 +10,7 @@ protected:
 	void onCopyString(CCObject*);
 	void onDurationLines(CCObject*);
 	void onExperimentalLayering(CCObject*);
+	void onHideUIOnPlaytest(CCObject*);
 	void onUnusedObjects(CCObject*);
 	void onPreviewRotations(CCObject*);
 	void onShowClicks(CCObject*);

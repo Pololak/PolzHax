@@ -29,11 +29,11 @@ namespace gd {
 			return ret;
 		}
 
-		static ButtonSprite* create(cocos2d::CCSprite* topSprite, int buttonWidth, int widthLimit, float height, float scale, bool limitWidth, char const* sprite) {
+		static ButtonSprite* create(cocos2d::CCSprite* topSprite, int buttonWidth, bool absolute, float scale, int p0, const char* sprite, bool p1, float height) {
 			__asm movss xmm3, height
-			auto ret = reinterpret_cast<ButtonSprite * (__fastcall*)(cocos2d::CCSprite*, int, int, float, bool, char const*)>(base + 0x9510)(topSprite, buttonWidth, widthLimit, scale, limitWidth, sprite);
+			auto ret = reinterpret_cast<ButtonSprite * (__fastcall*)(cocos2d::CCSprite*, int, bool, float, int, const char*, bool)>(base + 0x9510)(topSprite, buttonWidth, absolute, scale, p0, sprite, p1);
 
-			__asm add esp, 0xc
+			__asm add esp, 0x14
 
 			return ret;
 		}

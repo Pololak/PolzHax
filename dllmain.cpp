@@ -21,6 +21,7 @@
 #include "InfoLayer.hpp"
 #include "LeaderboardsLayer.hpp"
 #include "LevelBrowserLayer.hpp"
+#include "LevelCell.hpp"
 #include "LevelEditorLayer.hpp"
 #include "LevelInfoLayer.hpp"
 #include "LevelSearchLayer.hpp"
@@ -144,7 +145,7 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
 
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	if (playLayer && isDown) {
-		if (!playLayer->m_endTriggered) {
+		if (!setting().onPauseDuringCompletion ? !playLayer->m_endTriggered : true) {
 			if ((key == setting().m_retryKeybind) && setting().onRetryKeybind) {
 				if (PauseLayer::get()) {
 					PauseLayer::get()->onResume(nullptr);
@@ -308,6 +309,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	sequence_patch(gd::base + 0x3a49b, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90, 0x90 }); // Play Music Button.
 	sequence_patch(gd::base + 0x145128, { 0x42, 0x61, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }); // Progress Bar -> Bar
 	sequence_patch(gd::base + 0x3a669, { 0x00, 0x00, 0x00, 0x43 }); // CustomSongWidget m_artistLabel->limitLabelWidth(120.f, ...)
+	sequence_patch(gd::base + 0x3e9e1, { 0x00, 0x00, 0x8c, 0x42 }); // EditorPauseLayer keysButton y pos 70
 
 	SpeedHack::Setup();
 
@@ -345,6 +347,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	InfoLayer::mem_init();
 	LeaderboardsLayer::mem_init();
 	LevelBrowserLayer::mem_init();
+	LevelCell::mem_init();
 	LevelEditorLayer::mem_init();
 	LevelInfoLayer::mem_init();
 	LevelSearchLayer::mem_init();

@@ -52,6 +52,8 @@ struct SettingStruct {
 	bool onMiniCubeIcon;
 	bool onNoAnimations;
 	bool onNoBackgroundFlash;
+	bool onNoCompletionEffect;
+	bool onNoCompletionPopup;
 	bool onNoDeathEffect;
 	bool onNoEffectCircle;
 	bool onNoEndShake;
@@ -117,6 +119,7 @@ struct SettingStruct {
 	bool onConfirmExit;
 	bool onCorrectiveMusicSync;
 	bool onEverythingHurts;
+	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
 	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0;
 	bool onHitboxesOnDeath;
@@ -193,6 +196,7 @@ struct SettingStruct {
 	bool onCopyString;
 	bool onDurationLines;
 	bool onExperimentalLayering;
+	bool onHideUIOnPlaytest;
 	bool onPreviewRotations;
 	bool onShowClicks;
 	bool onUnusedObjects;
@@ -257,6 +261,8 @@ DEF_SCHEMA(
 	onMiniCubeIcon,
 	onNoAnimations,
 	onNoBackgroundFlash,
+	onNoCompletionEffect,
+	onNoCompletionPopup,
 	onNoDeathEffect,
 	onNoEffectCircle,
 	onNoEndShake,
@@ -322,6 +328,7 @@ DEF_SCHEMA(
 	onConfirmExit,
 	onCorrectiveMusicSync,
 	onEverythingHurts,
+	onFreezePlayer,
 	onHighFPSRotationFix,
 	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB,
 	onHitboxesOnDeath,
@@ -397,6 +404,7 @@ DEF_SCHEMA(
 	onCopyString,
 	onDurationLines,
 	onExperimentalLayering,
+	onHideUIOnPlaytest,
 	onShowClicks,
 	onPreviewRotations,
 	onUnusedObjects,

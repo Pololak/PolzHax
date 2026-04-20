@@ -10,7 +10,7 @@ namespace gd {
 	class GJSearchObject;
 	class LoadingCircle;
 
-	class LevelBrowserLayer : public cocos2d::CCLayer, LevelManagerDelegate, FLAlertLayerProtocol {
+	class LevelBrowserLayer : public cocos2d::CCLayer, LevelManagerDelegate, public FLAlertLayerProtocol {
 	public:
 		TextArea* m_noInternet; // 0x120
 		GJListLayer* m_list; // 0x124

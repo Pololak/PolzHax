@@ -4,6 +4,7 @@
 #include "RGBColorInputWidget.hpp"
 #include "LiveColorEdit.hpp"
 #include "LevelSettingsLayer.hpp"
+#include "RemapTriggerWidget.hpp"
 #include "hsv.hpp"
 
 class FadeTimeInput : public cocos2d::CCLayer, gd::TextInputDelegate {
@@ -148,6 +149,10 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 		auto onPulseHelper = gd::CCMenuItemSpriteExtra::create(onPulseSpr, self, menu_selector(ColorSelectPopup::Callback::onPulseHelper));
 		onPulseHelper->setPosition(self->m_buttonMenu->convertToNodeSpace({ director->getScreenRight() - 50.f, director->getScreenTop() - 150.f }));
 		self->m_buttonMenu->addChild(onPulseHelper);
+
+		auto remapWidget = RemapTriggerWidget::create(self);
+		remapWidget->setPosition(winSize.width / 2.f + 175.f, winSize.height / 2.f);
+		self->m_mainLayer->addChild(remapWidget);
 	}
 
 	auto colorInputWidget = RGBColorInputWidget::create(self);

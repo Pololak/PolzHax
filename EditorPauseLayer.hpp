@@ -37,6 +37,8 @@ namespace EditorPauseLayer {
 		void onPreviewMode(CCObject*);
 
 		void onEditorOptions(CCObject*);
+
+		void onResetStartPos(CCObject*);
 	};
 
 	void mem_init();

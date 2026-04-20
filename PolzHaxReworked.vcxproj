@@ -182,6 +182,7 @@
     <ClInclude Include="InfoLayer.hpp" />
     <ClInclude Include="LeaderboardsLayer.hpp" />
     <ClInclude Include="LevelBrowserLayer.hpp" />
+    <ClInclude Include="LevelCell.hpp" />
     <ClInclude Include="LevelEditorLayer.hpp" />
     <ClInclude Include="LevelInfoLayer.hpp" />
     <ClInclude Include="LevelSearchLayer.hpp" />
@@ -625,6 +626,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LeaderboardsLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelBrowserLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelCell.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelEditorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelInfoLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LevelSearchLayer.h" />
@@ -710,6 +712,7 @@
     <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="PracticeFix.hpp" />
     <ClInclude Include="PulseBuilderPopup.hpp" />
+    <ClInclude Include="RemapTriggerWidget.hpp" />
     <ClInclude Include="RGBColorInputWidget.hpp" />
     <ClInclude Include="RotateSaws.hpp" />
     <ClInclude Include="schema.hpp" />
@@ -753,6 +756,7 @@
     <ClCompile Include="InfoLayer.cpp" />
     <ClCompile Include="LeaderboardsLayer.cpp" />
     <ClCompile Include="LevelBrowserLayer.cpp" />
+    <ClCompile Include="LevelCell.cpp" />
     <ClCompile Include="LevelEditorLayer.cpp" />
     <ClCompile Include="LevelInfoLayer.cpp" />
     <ClCompile Include="LevelSearchLayer.cpp" />
@@ -800,6 +804,7 @@
     <ClCompile Include="PlayerObject.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="PulseBuilderPopup.cpp" />
+    <ClCompile Include="RemapTriggerWidget.cpp" />
     <ClCompile Include="RGBColorInputWidget.cpp" />
     <ClCompile Include="RotateSaws.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />

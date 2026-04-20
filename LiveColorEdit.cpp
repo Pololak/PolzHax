@@ -242,7 +242,6 @@ void LiveColorEdit::sliderChanged(CCObject* sender) { // in geode version this f
 		m_valueBar->setColor(ccc3(valueColor.r, valueColor.g, valueColor.b));
 
 		this->updateDevLabel();
-		LevelEditorLayer::updatePreviewMode();
 	}
 }
 
