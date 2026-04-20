@@ -620,8 +620,8 @@ void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* _self, void
 //CCArray* m_hideableUIElements = nullptr;
 
 void runCustomPlaytest(gd::LevelEditorLayer* self, gd::StartPosObject* startPos) {
-	self->m_player->setPosition(startPos->getOrientedBox()->m_center);
-	self->m_player2->setPosition(startPos->getOrientedBox()->m_center);
+	self->m_player->setPosition(startPos->getPosition());
+	self->m_player2->setPosition(startPos->getPosition());
 
 	self->setupLevelStart(startPos->m_settings);
 
