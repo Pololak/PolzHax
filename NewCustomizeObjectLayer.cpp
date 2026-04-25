@@ -143,9 +143,14 @@ bool NewCustomizeObjectLayer::init(gd::GameObject* object, CCArray* objects) {
 	liveColorsLabel->setPosition(winSize.width / 2.f - 78.f, winSize.height / 2.f - 75.f);
 	layer->addChild(liveColorsLabel);
 	auto toggleLiveColor = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(NewCustomizeObjectLayer::toggleLiveColor));
-	toggleLiveColor->toggle(setting().onPreviewMode ? setting().m_liveColorEnabled : false);
+	toggleLiveColor->toggle(setting().m_liveColorEnabled);
 	toggleLiveColor->setPositionX(-96.f);
 	menu->addChild(toggleLiveColor);
+
+	toggleOff->setColor(setting().onPreviewMode ? ccWHITE : ccGRAY);
+	toggleOn->setColor(setting().onPreviewMode ? ccWHITE : ccGRAY);
+	toggleLiveColor->setEnabled(setting().onPreviewMode);
+	liveColorsLabel->setColor(setting().onPreviewMode ? ccWHITE : ccGRAY);
 
 	m_buttonsArray = CCArray::create();
 	m_buttonsArray->retain();
@@ -161,9 +166,6 @@ bool NewCustomizeObjectLayer::init(gd::GameObject* object, CCArray* objects) {
 	menu->addChild(onDefault, 0, 0);
 
 	auto onLightBGSpr = ColorChannelSprite::create("LBG");
-	if (editorLayer) {
-		onLightBGSpr->updateValues(getLightBGColor(editorLayer->m_levelSettings->m_backgroundColor->m_color, gm->colorForIdx(gm->m_playerColor)), true);
-	}
 	auto onLightBG = gd::CCMenuItemSpriteExtra::create(onLightBGSpr, this, menu_selector(NewCustomizeObjectLayer::onSelectColor));
 	onLightBG->setPosition(-25.f, 110.f);
 	menu->addChild(onLightBG, 0, 5);
@@ -394,7 +396,7 @@ void NewCustomizeObjectLayer::updateColorSprites() {
 					switch (colorSprite->getTag()) {
 					case 3: colorSprite->updateValues(levelSettings->m_customColor01->m_color, levelSettings->m_customColor01->m_blending); break;
 					case 4: colorSprite->updateValues(levelSettings->m_customColor02->m_color, levelSettings->m_customColor02->m_blending); break;
-					case 5: colorSprite->updateValues(getLightBGColor(editorLayer->m_levelSettings->m_backgroundColor->m_color, gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor)), true);
+					case 5: colorSprite->updateValues(getLightBGColor(editorLayer->m_levelSettings->m_backgroundColor->m_color, gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor)), true); break;
 					case 6: colorSprite->updateValues(levelSettings->m_customColor03->m_color, levelSettings->m_customColor03->m_blending); break;
 					case 7: colorSprite->updateValues(levelSettings->m_customColor04->m_color, levelSettings->m_customColor04->m_blending); break;
 					case 8: colorSprite->updateValues(levelSettings->m_3DLineColor->m_color, levelSettings->m_3DLineColor->m_blending); break;
