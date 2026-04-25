@@ -150,6 +150,7 @@
     <ClInclude Include="CCSchedulerHook.hpp" />
     <ClInclude Include="CircleToolPopup.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
+    <ClInclude Include="ColorChannelSprite.hpp" />
     <ClInclude Include="ColorFilterPopup.hpp" />
     <ClInclude Include="ColorSelectPopup.hpp" />
     <ClInclude Include="CrashLogger.hpp" />
@@ -702,6 +703,7 @@
     <ClInclude Include="MenuGameLayer.hpp" />
     <ClInclude Include="MenuLayer.hpp" />
     <ClInclude Include="MoreSearchLayer.hpp" />
+    <ClInclude Include="NewCustomizeObjectLayer.hpp" />
     <ClInclude Include="ObjectToolbox.hpp" />
     <ClInclude Include="patching.hpp" />
     <ClInclude Include="PauseLayer.hpp" />
@@ -726,6 +728,7 @@
     <ClCompile Include="CCSchedulerHook.cpp" />
     <ClCompile Include="CircleToolPopup.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />
+    <ClCompile Include="ColorChannelSprite.cpp" />
     <ClCompile Include="ColorFilterPopup.cpp" />
     <ClCompile Include="ColorSelectPopup.cpp" />
     <ClCompile Include="CrashLogger.cpp" />
@@ -791,6 +794,7 @@
     <ClCompile Include="MenuGameLayer.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
     <ClCompile Include="MoreSearchLayer.cpp" />
+    <ClCompile Include="NewCustomizeObjectLayer.cpp" />
     <ClCompile Include="ObjectToolbox.cpp" />
     <ClCompile Include="patching.cpp" />
     <ClCompile Include="PauseLayer.cpp" />

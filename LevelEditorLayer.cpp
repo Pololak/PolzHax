@@ -15,6 +15,11 @@ gd::LevelEditorLayer* m_editorLayer;
 bool isEditorPaused = false;
 bool wasPreviewModeEnabled = false;
 gd::StartPosObject* m_playtestStartPos;
+GDColor m_color01;
+GDColor m_color02;
+GDColor m_color03;
+GDColor m_color04;
+GDColor m_color3DL;
 
 gd::LevelEditorLayer* LevelEditorLayer::get() {
 	return m_editorLayer;
@@ -34,6 +39,26 @@ gd::StartPosObject* LevelEditorLayer::getPlaytestStartPos() {
 
 void LevelEditorLayer::setPlaytestStartPos(gd::StartPosObject* val) {
 	m_playtestStartPos = val;
+}
+
+GDColor LevelEditorLayer::getColor01() {
+	return m_color01;
+}
+
+GDColor LevelEditorLayer::getColor02() {
+	return m_color02;
+}
+
+GDColor LevelEditorLayer::getColor03() {
+	return m_color03;
+}
+
+GDColor LevelEditorLayer::getColor04() {
+	return m_color04;
+}
+
+GDColor LevelEditorLayer::getColor3DL() {
+	return m_color3DL;
 }
 
 void LevelEditorLayer::updateShowHitboxes() {
@@ -91,20 +116,6 @@ T lerp(float amt, T a, T b) {
 	return static_cast<T>(static_cast<float>(a) * (1.f - amt) + static_cast<float>(b) * amt);
 }
 
-struct GDColor {
-	uint8_t r, g, b;
-	bool blending = false;
-
-	GDColor() {}
-	constexpr GDColor(uint8_t r, uint8_t g, uint8_t b, bool blending) : r(r), g(g), b(b), blending(blending) {}
-	constexpr GDColor(const ccColor3B color, bool blending = false) : r(color.r), g(color.g), b(color.b), blending(blending) {}
-	GDColor(gd::GameObject* object) : GDColor(object->m_triggerColor, object->m_triggerBlending) {}
-	GDColor(gd::SettingsColorObject* color) : GDColor(color->m_color, color->m_blending) {}
-	operator ccColor3B() const { return { r, g, b }; }
-
-	bool operator==(const GDColor& other) { return std::tie(r, g, b, blending) == std::tie(other.r, other.g, other.b, other.blending); }
-};
-
 GDColor mix_color(float value, GDColor a, GDColor b) {
 	return GDColor{
 		lerp<uint8_t>(value, a.r, b.r),
@@ -141,7 +152,7 @@ void LevelEditorLayer::setLastPos(float val) {
 	m_lastPos = val;
 }
 
-void insertTrigger(gd::GameObject* object) {
+void LevelEditorLayer::insertTrigger(gd::GameObject* object) {
 	auto& triggers = (m_colorTriggers)[ColorTriggers(object->m_objectID)];
 	for (size_t i = 0; i < triggers.size(); ++i) {
 		if (CompareTriggers()(object, triggers[i])) {
@@ -152,7 +163,7 @@ void insertTrigger(gd::GameObject* object) {
 	triggers.push_back(object);
 }
 
-void removeTrigger(gd::GameObject* object) {
+void LevelEditorLayer::removeTrigger(gd::GameObject* object) {
 	auto& triggers = (m_colorTriggers)[ColorTriggers(object->m_objectID)];
 	for (size_t i = 0; i < triggers.size(); ++i) {
 		if (triggers[i] == object) {
@@ -193,7 +204,6 @@ GDColor calculateColor(std::vector<gd::GameObject*> triggers, const float pos, c
 		auto color_from = starting_color;
 		if (bound > 1) {
 			auto trigger = triggers[bound - 2];
-			if (trigger->m_triggerDuration < 0) trigger->m_triggerDuration = 0;
 			auto dist = timeBetweenPos(trigger->getPosition().x, pos) / trigger->m_triggerDuration;
 			color_from = trigger;
 			if (dist < 1.f)
@@ -285,6 +295,12 @@ float getPreviewPos() {
 void LevelEditorLayer::updatePreviewMode() {
 	if (m_editorLayer) {
 		GDColor bgColor, gColor, lColor, objColor, dlColor, color1, color2, color3, color4;
+		GDColor white(ccc3(255, 255, 255));
+
+		auto gm = gd::GameManager::sharedState();
+
+		GDColor p1Color(gm->colorForIdx(gm->m_playerColor), true);
+		GDColor p2Color(gm->colorForIdx(gm->m_playerColor2), true);
 
 		const auto pos = getPreviewPos();
 
@@ -295,39 +311,111 @@ void LevelEditorLayer::updatePreviewMode() {
 
 			switch (type) {
 			case ColorTriggers::BG:
-				startingColor = settings->m_backgroundColor;
+				if (settings->m_backgroundColor->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_backgroundColor->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_backgroundColor;
+				}
 				color = &bgColor;
 				break;
 			case ColorTriggers::G:
-				startingColor = settings->m_groundColor;
+				if (settings->m_groundColor->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_groundColor->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_groundColor;
+				}
 				color = &gColor;
 				break;
 			case ColorTriggers::Line:
-				startingColor = settings->m_lineColor;
+				if (settings->m_lineColor->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_lineColor->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_lineColor;
+				}
 				color = &lColor;
 				break;
 			case ColorTriggers::Obj:
-				startingColor = settings->m_objectColor;
+				if (settings->m_objectColor->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_objectColor->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_objectColor;
+				}
 				color = &objColor;
 				break;
 			case ColorTriggers::DLine:
-				startingColor = settings->m_3DLineColor;
+				if (settings->m_3DLineColor->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_3DLineColor->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_3DLineColor;
+				}
 				color = &dlColor;
 				break;
 			case ColorTriggers::Col1:
-				startingColor = settings->m_customColor01;
+				if (settings->m_customColor01->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_customColor01->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_customColor01;
+				}
 				color = &color1;
 				break;
 			case ColorTriggers::Col2:
-				startingColor = settings->m_customColor02;
+				if (settings->m_customColor02->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_customColor02->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_customColor02;
+				}
 				color = &color2;
 				break;
 			case ColorTriggers::Col3:
-				startingColor = settings->m_customColor03;
+				if (settings->m_customColor03->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_customColor03->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_customColor03;
+				}
 				color = &color3;
 				break;
 			case ColorTriggers::Col4:
-				startingColor = settings->m_customColor04;
+				if (settings->m_customColor04->m_playerColor == 1) {
+					startingColor = p1Color;
+				}
+				else if (settings->m_customColor04->m_playerColor == 2) {
+					startingColor = p2Color;
+				}
+				else {
+					startingColor = settings->m_customColor04;
+				}
 				color = &color4;
 				break;
 			default: continue;
@@ -343,11 +431,11 @@ void LevelEditorLayer::updatePreviewMode() {
 
 		m_editorLayer->m_backgroundSprite->setColor(bgColor);
 
-		auto gm = gd::GameManager::sharedState();
-
-		GDColor p1Color(gm->colorForIdx(gm->m_playerColor), true);
-		GDColor p2Color(gm->colorForIdx(gm->m_playerColor2), true);
-		GDColor white(ccc3(255, 255, 255));
+		m_color01 = color1;
+		m_color02 = color2;
+		m_color03 = color3;
+		m_color04 = color4;
+		m_color3DL = dlColor;
 
 		auto lbgColor = calculateLbg(bgColor, p1Color);
 
@@ -522,6 +610,9 @@ void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, voi
 void __fastcall LevelEditorLayer::removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* object, bool p0) {
 	LevelEditorLayer::removeObject(self, object, p0);
 	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
+	if (m_playtestStartPos == object) {
+		m_playtestStartPos = nullptr;
+	}
 }
 
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
@@ -552,20 +643,6 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 	if (!isEditorPaused && setting().onPreviewMode) {
 		LevelEditorLayer::updatePreviewMode();
 	}
-	//if (!setting().onPreviewMode) {
-	//	if (wasPreviewModeEnabled) resetColors();
-	//	wasPreviewModeEnabled = false;
-	//	return;
-	//}
-	//else {
-	//	const auto pos = getPreviewPos();
-
-	//	if (wasPreviewModeEnabled && pos == m_lastPos) return;
-	//	m_lastPos = pos;
-	//	wasPreviewModeEnabled = true;
-
-	//	
-	//}
 }
 
 void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, float dt) {

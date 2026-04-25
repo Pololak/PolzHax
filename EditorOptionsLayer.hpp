@@ -13,6 +13,7 @@ protected:
 	void onHideUIOnPlaytest(CCObject*);
 	void onUnusedObjects(CCObject*);
 	void onPreviewRotations(CCObject*);
+	void onNewColorSelect(CCObject*);
 	void onShowClicks(CCObject*);
 public:
 	static EditorOptionsLayer* create() {

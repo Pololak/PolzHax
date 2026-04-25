@@ -384,6 +384,13 @@ void __fastcall EditorPauseLayer::keyDownH(gd::EditorPauseLayer* _self, void*, e
 void __fastcall EditorPauseLayer::saveLevelH(gd::EditorPauseLayer* self) {
 	if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_levelEditorLayer);
 	
+	if (setting().onResetPercentage) {
+		if (self->m_levelEditorLayer->m_level->m_levelType == gd::GJLevelType::Editor) {
+			self->m_levelEditorLayer->m_level->m_normalPercent = 0;
+			self->m_levelEditorLayer->m_level->m_practicePercent = 0;
+			self->m_levelEditorLayer->m_level->m_isVerified = false;
+		}
+	}
 	EditorPauseLayer::saveLevel(self);
 
 	if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_levelEditorLayer);

@@ -6,6 +6,7 @@
 #include "LevelSettingsLayer.hpp"
 #include "RemapTriggerWidget.hpp"
 #include "hsv.hpp"
+#include "NewCustomizeObjectLayer.hpp"
 
 class FadeTimeInput : public cocos2d::CCLayer, gd::TextInputDelegate {
 protected:
@@ -96,6 +97,10 @@ void ColorSelectPopup::Callback::onLiveEdit(CCObject*) {
 	if (LevelSettingsLayer::get()) {
 		LevelSettingsLayer::get()->onClose(nullptr);
 	}
+
+	if (NewCustomizeObjectLayer::get()) {
+		NewCustomizeObjectLayer::get()->onClose(nullptr);
+	}
 }
 
 ccColor3B getLightBGColor(ccColor3B bgColor) {
@@ -153,6 +158,16 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 		auto remapWidget = RemapTriggerWidget::create(self);
 		remapWidget->setPosition(winSize.width / 2.f + 175.f, winSize.height / 2.f);
 		self->m_mainLayer->addChild(remapWidget);
+
+		auto onTypeUpSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
+		auto onTypeUp = gd::CCMenuItemSpriteExtra::create(onTypeUpSpr, remapWidget, menu_selector(RemapTriggerWidget::onTypeUp));
+		onTypeUp->setPosition(self->m_buttonMenu->convertToNodeSpace({ winSize.width / 2.f + 175.f, winSize.height / 2.f + 30.f }));
+		self->m_buttonMenu->addChild(onTypeUp);
+
+		auto onTypeDownSpr = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
+		auto onTypeDown = gd::CCMenuItemSpriteExtra::create(onTypeDownSpr, remapWidget, menu_selector(RemapTriggerWidget::onTypeDown));
+		onTypeDown->setPosition(self->m_buttonMenu->convertToNodeSpace({ winSize.width / 2.f + 175.f, winSize.height / 2.f - 30.f }));
+		self->m_buttonMenu->addChild(onTypeDown);
 	}
 
 	auto colorInputWidget = RGBColorInputWidget::create(self);

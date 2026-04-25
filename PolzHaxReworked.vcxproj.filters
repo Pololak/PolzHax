@@ -1788,6 +1788,12 @@
     <ClInclude Include="RemapTriggerWidget.hpp">
       <Filter>Файлы заголовков\Layers</Filter>
     </ClInclude>
+    <ClInclude Include="NewCustomizeObjectLayer.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorChannelSprite.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2043,6 +2049,12 @@
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="RemapTriggerWidget.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="NewCustomizeObjectLayer.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorChannelSprite.cpp">
       <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
   </ItemGroup>

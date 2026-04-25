@@ -10,8 +10,9 @@ protected:
 	virtual bool init(gd::ColorSelectPopup*);
 	void updateLabel();
 	void remapTrigger();
-	void onTypeUp(CCObject*);
-	void onTypeDown(CCObject*);
+	void setType(int id);
+
+	std::string intToColorString(int);
 
 public:
 	static RemapTriggerWidget* create(gd::ColorSelectPopup* parent) {
@@ -23,4 +24,7 @@ public:
 		CC_SAFE_DELETE(ret);
 		return nullptr;
 	}
+
+	void onTypeUp(CCObject*);
+	void onTypeDown(CCObject*);
 };

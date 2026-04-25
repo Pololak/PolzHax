@@ -86,6 +86,7 @@ bool PlayLayer::isCheating() {
 		setting().onShowLayout ||
 		setting().onPlayMacro ||
 		setting().onRecordMacro ||
+		setting().onShipcopter ||
 		setting().onSpeedhack;
 }
 
@@ -1220,6 +1221,10 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
+	if (setting().onZeroPracticeComplete && self->m_lastRunPercent == 0) {
+		self->m_practiceMode = false;
+	}
+
 	PlayLayer::levelComplete(self);
 
 	if (m_deafenPressed) {

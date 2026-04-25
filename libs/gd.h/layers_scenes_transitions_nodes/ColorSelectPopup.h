@@ -26,8 +26,16 @@ namespace gd {
 		int m_custom; // 0x1f0
 		int m_custom2; // 0x1f4
 
-		static ColorSelectPopup* create(GameObject* object, int p0, int p1, int p2) {
-			return reinterpret_cast<ColorSelectPopup*(__fastcall*)(gd::GameObject*, int, int, int)>(base + 0x29cf0)(object, p0, p1, p2);
+		virtual void show() {
+			return reinterpret_cast<void(__thiscall*)(ColorSelectPopup*)>(base + 0x2afc0)(this);
+		}
+
+		static ColorSelectPopup* create(GameObject* object, int colorID, int playerColor, int blending) {
+			auto ret = reinterpret_cast<ColorSelectPopup * (__fastcall*)(GameObject*, int, int, int)>(base + 0x29cf0)(object, colorID, playerColor, blending);
+
+			__asm add esp, 0x8
+
+			return ret;
 		}
 
 		static ColorSelectPopup* create(GameObject* object) {

@@ -1,6 +1,20 @@
 #pragma once
 #include "pch.h"
 
+struct GDColor {
+	uint8_t r, g, b;
+	bool blending = false;
+
+	GDColor() {}
+	constexpr GDColor(uint8_t r, uint8_t g, uint8_t b, bool blending) : r(r), g(g), b(b), blending(blending) {}
+	constexpr GDColor(const ccColor3B color, bool blending = false) : r(color.r), g(color.g), b(color.b), blending(blending) {}
+	GDColor(gd::GameObject* object) : GDColor(object->m_triggerColor, object->m_triggerBlending) {}
+	GDColor(gd::SettingsColorObject* color) : GDColor(color->m_color, color->m_blending) {}
+	operator ccColor3B() const { return { r, g, b }; }
+
+	bool operator==(const GDColor& other) { return std::tie(r, g, b, blending) == std::tie(other.r, other.g, other.b, other.blending); }
+};
+
 namespace LevelEditorLayer {
 	inline bool(__thiscall* init)(gd::LevelEditorLayer*, gd::GJGameLevel*);
 	bool __fastcall initH(gd::LevelEditorLayer*, void*, gd::GJGameLevel*);
@@ -60,6 +74,8 @@ namespace LevelEditorLayer {
 	bool isColorBlending(gd::GJCustomColorMode);
 	void setLastPos(float);
 	void moveTrigger(gd::GameObject*);
+	void removeTrigger(gd::GameObject*);
+	void insertTrigger(gd::GameObject*);
 	void updateOrientedHitboxes(gd::LevelEditorLayer*);
 
 	void updateShowHitboxes();
@@ -67,6 +83,11 @@ namespace LevelEditorLayer {
 	gd::LevelEditorLayer* get();
 	gd::StartPosObject* getPlaytestStartPos();
 	void setPlaytestStartPos(gd::StartPosObject* val);
+	GDColor getColor01();
+	GDColor getColor02();
+	GDColor getColor03();
+	GDColor getColor04();
+	GDColor getColor3DL();
 
 	void mem_init();
 }

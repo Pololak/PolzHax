@@ -258,6 +258,37 @@ void __fastcall PlayerObject::loadFromCheckpointH(gd::PlayerObject* self, void*,
 	}
 }
 
+void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // https://github.com/adafcaefc/SwingCopter/blob/master/SwingCopter/main.cpp
+	std::cout << "updateSwing()" << std::endl;
+
+	const auto direction = self->m_gravityFlipped ? -1.f : 1.f;
+
+	const auto size = (self->getScale() != 1.f) ? .85f : 1.f;
+
+	const auto gravity = (std::fabs(self->m_yVelocity) > 6.) ? self->m_gravity + 1. : self->m_gravity;
+
+	const auto modifier = -.5 * gravity * delta * direction / size;
+	const auto yAcceleration = self->m_yVelocity + modifier;
+
+	if (std::fabs(self->m_yVelocity) <= 6. || std::fabs(yAcceleration) <= std::fabs(self->m_yVelocity)) {
+		self->m_yVelocity = yAcceleration;
+	}
+
+	if (self->m_upKeyDown && self->m_upKeyPressed) {
+		self->m_upKeyPressed = false;
+		self->flipGravity(!self->m_gravityFlipped, true);
+	}
+}
+
+void __fastcall PlayerObject::updateJumpH(gd::PlayerObject* self, void*) {
+	auto delta = 0.f;
+	__asm movss[delta], xmm1;
+
+	if (!self->m_flyMode || !setting().onShipcopter) return PlayerObject::updateJump(self, delta);
+
+	return updateSwing(self, delta);
+}
+
 void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd8ca0), PlayerObject::initH, reinterpret_cast<void**>(&PlayerObject::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
@@ -276,5 +307,6 @@ void PlayerObject::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdad10), PlayerObject::runBallRotation2H, reinterpret_cast<void**>(&PlayerObject::runBallRotation2));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe19c0), PlayerObject::loadFromCheckpointH, reinterpret_cast<void**>(&PlayerObject::loadFromCheckpoint));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xda1a0), PlayerObject::updateJumpH, reinterpret_cast<void**>(&PlayerObject::updateJump));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayerObject::collidedWithObjectH, reinterpret_cast<void**>(&PlayerObject::collidedWithObject));
 }

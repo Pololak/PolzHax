@@ -41,9 +41,9 @@ void __fastcall LevelCell::loadLocalLevelCellH(gd::LevelCell* self) {
 	toggleOn->setScale(.6f);
 
 	auto menu = CCMenu::create();
+	menu->setPosition(270.f, 35.f);
 	self->m_mainLayer->addChild(menu, 0, 120);
 	auto onSelectLevel = gd::CCMenuItemToggler::create(toggleOff, toggleOn, self, menu_selector(LevelCell::Callback::onSelectLevel));
-	onSelectLevel->setPosition(-18.f, -125.f);
 	menu->addChild(onSelectLevel, 0, 1);
 }
 

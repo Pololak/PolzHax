@@ -103,12 +103,14 @@ struct SettingStruct {
 	bool onNoEditorTrail;
 	bool onObjectBypass;
 	bool onPlaceOver;
+	bool onResetPercentage;
 	bool onRotationHack;
 	bool onSmoothEditorTrail;
 	bool onVerifyHack;
 	bool onZoomBypass;
 
 	// Level
+	bool onZeroPracticeComplete;
 	bool onAutoDeafen; bool onPauseUndeafen; bool onPracticeDeafen; bool onTestmodeDeafen; float deafenPercent = 50; float undeafenPercent = 100; int m_autoDeafenKey;
 	bool onAutoKill; float killPercentage = 50;
 	bool onAutoPickupCoins;
@@ -132,6 +134,7 @@ struct SettingStruct {
 	bool onPracticeMusic;
 	bool onReplayLastCheckpoint;
 	bool onRespawnTime; float respawnValue = 1000.f;
+	bool onShipcopter;
 	bool onShowLayout; int layoutBGR = 40, layoutBGG = 125, layoutBGB = 255; int layoutGR = 0, layoutGG = 102, layoutGB = 255;
 	bool onSmartStartPos;
 	bool onStartPosSwitcher; int m_previousStartPosKey = 0x25, m_nextStartPosKey = 0x27;
@@ -200,6 +203,7 @@ struct SettingStruct {
 	bool onPreviewRotations;
 	bool onShowClicks;
 	bool onUnusedObjects;
+	bool onNewColorSelectMenu;
 
 	// Other stuff
 	int m_p1click;
@@ -210,6 +214,8 @@ struct SettingStruct {
 	int selectedDartIdx = 1;
 	float m_customEditorGridSize = 30.f;
 	bool onExtraLong;
+	int m_openMenuKey;
+	bool m_liveColorEnabled; // newcustomizeobjectlayer
 
 	// GDPS Switcher
 	std::string originalServerURL;
@@ -312,12 +318,14 @@ DEF_SCHEMA(
 	onNoEditorTrail,
 	onObjectBypass,
 	onPlaceOver,
+	onResetPercentage,
 	onRotationHack,
 	onSmoothEditorTrail,
 	onVerifyHack,
 	onZoomBypass,
 
 	// Level
+	onZeroPracticeComplete,
 	onAutoDeafen, onPauseUndeafen, onPracticeDeafen, onTestmodeDeafen, deafenPercent, undeafenPercent, m_autoDeafenKey,
 	onAutoKill, killPercentage,
 	onAutoPickupCoins,
@@ -341,6 +349,7 @@ DEF_SCHEMA(
 	onPracticeMusic,
 	onReplayLastCheckpoint,
 	onRespawnTime, respawnValue,
+	onShipcopter,
 	onShowLayout, layoutBGR, layoutBGG, layoutBGB, layoutGR, layoutGG, layoutGB,
 	onSmartStartPos,
 	onStartPosSwitcher, m_previousStartPosKey, m_nextStartPosKey,
@@ -408,6 +417,7 @@ DEF_SCHEMA(
 	onShowClicks,
 	onPreviewRotations,
 	onUnusedObjects,
+	onNewColorSelectMenu,
 
 	// Other menu things
 	m_p1click,
@@ -415,6 +425,8 @@ DEF_SCHEMA(
 	onShowPercentage,
 	selectedDartIdx,
 	onExtraLong,
+	m_openMenuKey,
+	m_liveColorEnabled,
 
 	onEnableSwitcher, m_serverIndex, m_customServerURL,
 

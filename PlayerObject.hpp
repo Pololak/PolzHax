@@ -50,6 +50,11 @@ namespace PlayerObject {
 	inline void(__thiscall* loadFromCheckpoint)(gd::PlayerObject*, gd::PlayerCheckpoint*);
 	void __fastcall loadFromCheckpointH(gd::PlayerObject*, void*, gd::PlayerCheckpoint*);
 
+	inline void(__thiscall* updateJump)(gd::PlayerObject*, float);
+	void __fastcall updateJumpH(gd::PlayerObject*, void*);
+
+	inline void updateSwing(gd::PlayerObject* self, const float delta);
+
 	void newPlayerExtraFrame(gd::PlayerObject*, const char*);
 	void newVehicleExtraFrame(gd::PlayerObject*, const char*);
 

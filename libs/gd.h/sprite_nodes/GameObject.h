@@ -203,6 +203,22 @@ namespace gd {
 
 			return reinterpret_cast<cocos2d::CCRepeatForever*(__thiscall*)(GameObject*)>(base + 0x72230)(this);
 		}
+
+		bool canChangeCustomColor() {
+			return reinterpret_cast<bool(__fastcall*)(GameObject*)>(base + 0x710a0)(this);
+		}
+
+		void setDefaultColorMode(GJCustomColorMode color) {
+			reinterpret_cast<void(__thiscall*)(GameObject*, GJCustomColorMode)>(base + 0x710e0)(this, color);
+		}
+
+		void updateCustomColorMode(GJCustomColorMode color, bool p0) {
+			reinterpret_cast<void(__thiscall*)(GameObject*, GJCustomColorMode, bool)>(base + 0x71150)(this, color, p0);
+		}
+
+		void resetCustomColorMode() {
+			this->setDefaultColorMode(this->m_defaultColorMode);
+		}
 	};
 
 	class RingObject : public GameObject {

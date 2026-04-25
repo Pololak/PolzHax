@@ -232,6 +232,14 @@ namespace gd {
 		void onPlaytest(cocos2d::CCObject* sender) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x489c0)(this, sender);
 		}
+
+		void editObject(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x4ae20)(this, sender);
+		}
+
+		bool editButtonUsable() {
+			return reinterpret_cast<bool(__fastcall*)(EditorUI*)>(base + 0x49680)(this);
+		}
 	};
 }
 

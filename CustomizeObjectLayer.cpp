@@ -91,8 +91,8 @@ LAB_0024e1e8:
 	return true;
 }
 
-void __fastcall CustomizeObjectLayer::destructorH(gd::CustomizeObjectLayer* self) {
-	CustomizeObjectLayer::destructor(self);
+void __fastcall CustomizeObjectLayer::onSelectColorH(gd::CustomizeObjectLayer* self, void*, CCObject* sender) {
+	CustomizeObjectLayer::onSelectColor(self, sender);
 
 	if (EditorUI::get()) {
 		EditorUI::updateObjectInfoLabel(EditorUI::get());
@@ -101,5 +101,5 @@ void __fastcall CustomizeObjectLayer::destructorH(gd::CustomizeObjectLayer* self
 
 void CustomizeObjectLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x2dc70), CustomizeObjectLayer::initH, reinterpret_cast<void**>(&CustomizeObjectLayer::init));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x2daf0), CustomizeObjectLayer::destructorH, reinterpret_cast<void**>(&CustomizeObjectLayer::destructor));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x2e600), CustomizeObjectLayer::onSelectColorH, reinterpret_cast<void**>(&CustomizeObjectLayer::onSelectColor));
 }

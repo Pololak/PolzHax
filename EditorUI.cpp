@@ -10,6 +10,7 @@
 #include <array>
 #include <numbers>
 #include "RotateSaws.hpp"
+#include "NewCustomizeObjectLayer.hpp"
 
 gd::EditorUI* m_editorUI;
 
@@ -504,6 +505,8 @@ CCPoint* __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, int id) {
 	CCPoint* ret = EditorUI::offsetForKey(self, id);
 
 	switch (id) {
+	case 185:
+		*ret = ccp(-4.5f, 4.5f); return ret; break;
 	case 397:
 		*ret = ccp(0, -8.f); return ret; break;
 	case 398:
@@ -831,8 +834,6 @@ void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
 	self->m_selectedTab = 2;
 	EditorUI::updateGridNodeSize(self);
 	self->m_selectedTab = actualMode;
-
-	std::cout << size << std::endl;
 }
 
 static std::unordered_set<int> colorTriggerIds = { 29, 30, 104, 105, 221, 717, 718, 743, 744 };
@@ -849,20 +850,25 @@ bool EditorUI::isColorTriggersSelected(gd::EditorUI* editorUI) {
 }
 
 bool __fastcall EditorUI::editButtonUsableH(gd::EditorUI* self) {
-	if (isColorTriggersSelected(self)) {
-		return true;
-	}
-
 	return EditorUI::editButtonUsable(self);
 }
 
 void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* sender) {
-	if (isColorTriggersSelected(self)) {
-		
-
-		return;
+	if (setting().onNewColorSelectMenu) {
+		if (self->editButtonUsable()) {
+			if ((self->m_selectedObject == nullptr) || (self->m_selectedObject->m_objectType != gd::GameObjectType::SecretCoin)) {
+				if ((self->m_selectedObject == nullptr) || (self->m_selectedObject->m_objectID != 31)) {
+					if ((self->m_selectedObject == nullptr) || self->m_selectedObject->canChangeCustomColor()) {
+						if ((self->m_selectedObjects->count() != 0) || self->m_selectedObject != nullptr && self->m_selectedObject->canChangeCustomColor()) {
+							NewCustomizeObjectLayer::create(self->m_selectedObject, self->m_selectedObjects)->show();
+							return;
+						}
+					}
+				}
+			}
+		}
 	}
-
+	
 	EditorUI::editObject(self, sender);
 }
 
@@ -902,7 +908,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x48e70), EditorUI::onDuplicateH, reinterpret_cast<void**>(&EditorUI::onDuplicate));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49680), EditorUI::editButtonUsableH, reinterpret_cast<void**>(&EditorUI::editButtonUsable));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));

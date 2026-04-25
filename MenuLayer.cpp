@@ -1,6 +1,7 @@
 #include "MenuLayer.hpp"
 #include "Setting.hpp"
 #include "Icons.hpp"
+#include "ColorChannelSprite.hpp"
 //#include <discord.h>
 //
 //class DiscordManager {

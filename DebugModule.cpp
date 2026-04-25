@@ -1,4 +1,6 @@
 #include "DebugModule.hpp"
+#include "ColorChannelSprite.hpp"
+#include "LevelEditorLayer.hpp"
 
 #include <imgui-hook.hpp>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -45,6 +47,14 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", CCDirector::sharedDirector())->getCString());
 		}
 
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("ObjectToolbox: 0x%p", gd::ObjectToolbox::sharedState());
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - 50.f);
+		if (ImGui::Button("Copy##objectToolbox", ImVec2(50.f, 0.f))) {
+			clipboard::write(CCString::createWithFormat("%p", gd::ObjectToolbox::sharedState())->getCString());
+		}
+
 		auto fme = gd::FMODAudioEngine::sharedEngine();
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("FMODAudioEngine: 0x%p", fme);
@@ -82,6 +92,21 @@ void renderDebugModule() {
 		}
 		if (ImGui::Button("Setup VSync")) {
 			CCApplication::sharedApplication()->setupVerticalSync();
+		}
+
+		auto editorLayer = LevelEditorLayer::get();
+		if (editorLayer) {
+			static int colorID = 0;
+			static int idk = 0;
+			static int idk2 = 0;
+
+			ImGui::InputInt("ColorID", &colorID);
+			ImGui::InputInt("IDK", &idk);
+			ImGui::InputInt("IDK2", &idk2);
+
+			if (ImGui::Button("Open ColorSelectPopup")) {
+				gd::ColorSelectPopup::create(editorLayer->m_uiLayer->m_selectedObject)->show();
+			}
 		}
 	}
 	ImGui::End();

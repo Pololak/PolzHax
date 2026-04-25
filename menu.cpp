@@ -67,6 +67,43 @@ const char* cocosTransitions[] = {
 	"Zoom Flip X", "Zoom Flip Y", "Zoom Flip Angular"
 };
 
+const char* variablesCategory[] = {
+	"Player", "Creator"
+};
+
+const char* playerVariables[] = {
+	"X Pos", "Y Pos", "Speed", "Size", "Gravity"
+};
+
+const char* creatorVariables[] = {
+	"Object ID", "Editor Layer", "Object X", "Object Y", "Object Z", "Object Rotation", "Object Scale", "Object Group", "Object Z Order"
+};
+
+static int selectedCategory = 0;
+static int selectedPlayerVariable = -1;
+static int selectedCreatorVariable = -1;
+
+float getVariableValue() {
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+	auto editorLayer = LevelEditorLayer::get();
+
+	if (selectedCategory == 0 && playLayer) {
+		switch (selectedPlayerVariable) {
+		case 4: return playLayer->m_player->m_gravity; break;
+		default: return 0.f; break;
+		}
+	}
+	else if (selectedCategory == 1 && editorLayer) {
+		switch (selectedCreatorVariable) {
+		case 0: return editorLayer->m_uiLayer->m_selectedCreateObjectID; break;
+		case 1: return editorLayer->m_groupIDFilter; break;
+		default: return 0.f; break;
+		}
+	}
+
+	return 0.f;
+}
+
 void updatePriority() {
 	switch (setting().priority) {
 	case 0:
@@ -239,12 +276,19 @@ void sortTabs() {
 		ImGui::SetWindowPos(ImVec2(cosmetic_xPos, 5.f));
 		creator_xPos = cosmetic_xPos + ImGui::GetWindowWidth() + 5.f;
 	}
+	float addingVariablesY = -1.f;
 	float level_xPos = -1.f;
 	{
 		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
 		ImGui::Begin("Creator", nullptr);
 		ImGui::SetWindowPos(ImVec2(creator_xPos, 5.f));
 		level_xPos = creator_xPos + ImGui::GetWindowWidth() + 5.f;
+		addingVariablesY = ImGui::GetWindowHeight() + 10.f;
+	}
+	{
+		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::Begin("Variables", nullptr);
+		ImGui::SetWindowPos(ImVec2(creator_xPos, addingVariablesY));
 	}
 	float universal_xPos = -1.f;
 	{
@@ -1030,7 +1074,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (200426)");
+			ImGui::Text("1.920 - v1.3.0 (250426)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1039,6 +1083,8 @@ void imgui_render() {
 				setting().save();
 				gd::FLAlertLayer::create("Saved", "Hack state is saved.", "OK")->show();
 			}
+
+			ImGui::HotKey("Alt Hotkey", setting().m_openMenuKey, 0.f, ImVec2(SHORT_ITEM_WIDTH, 0));
 
 			if (ImGui::CheckboxF("Thread Priority", &setting().onThreadPriority)) {
 				if (setting().onThreadPriority) {
@@ -2103,6 +2149,9 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Lets you place the same object over itself in editor.");
 
+			ImGui::CheckboxF("Reset Percentage", &setting().onResetPercentage);
+			ImGui::Tooltip("Resets normal percentage while saving level.");
+
 			if (ImGui::CheckboxF("Rotation Hack (Lags)", &setting().onRotationHack)) {
 				if (setting().onRotationHack) {
 					sequence_patch(gd::base + 0x49a5d, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
@@ -2156,8 +2205,67 @@ void imgui_render() {
 			ImGui::Tooltip("Lets you zoom fully in & out. (NOTE: Can crash with an edited grid size)");
 		}
 
+		if (setting().onDeveloperMode) {
+			ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+			if (ImGui::Begin("Variables", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+				ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+				ImGui::Combo("##variablesCategory", &selectedCategory, variablesCategory, IM_ARRAYSIZE(variablesCategory));
+
+				if (selectedCategory == 0) {
+					ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+					ImGui::Combo("##playerVariables", &selectedPlayerVariable, playerVariables, IM_ARRAYSIZE(playerVariables));
+				}
+				else {
+					ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+					ImGui::Combo("##creatorVariables", &selectedCreatorVariable, creatorVariables, IM_ARRAYSIZE(creatorVariables));
+				}
+
+				static float variableValue;
+
+				if (playLayer && selectedCategory == 0) {
+
+				}
+				if (editorLayer && selectedCategory == 1) {
+					switch (selectedCreatorVariable) {
+					case 0: variableValue = editorLayer->m_uiLayer->m_selectedCreateObjectID; break;
+					case 1: variableValue = editorLayer->m_groupIDFilter; break;
+					}
+				}
+
+				if ((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1)) {
+					ImGui::BeginDisabled();
+				}
+				ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+				ImGui::InputFloat("##variableValue", &variableValue);
+				ImGui::SameLine(0.f, 0.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+				if (ImGui::Button("Set", ImVec2(SHORT_ITEM_WIDTH, 0.f))) {
+
+				}
+
+				if (ImGui::Button("Reset", ImVec2(SHORT_ITEM_WIDTH, 0.f))) {
+
+				}
+				ImGui::SameLine(0.f, 0.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH, 0.f))) {
+
+				}
+				if ((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1)) {
+					ImGui::EndDisabled();
+				}
+
+				if (ImGui::Button("Reset All", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+
+				}
+			}
+		}
+
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::CheckboxF("0% Practice Complete", &setting().onZeroPracticeComplete);
+			ImGui::Tooltip("Completes a level if you beat it in 1 practice attempt.");
+
 			ImGui::CheckboxF("Auto Deafen", &setting().onAutoDeafen);
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
 				ImGui::SetTooltip("Deafens user in Discord after a certain %%.");
@@ -2483,6 +2591,9 @@ void imgui_render() {
 
 				ImGui::TreePop();
 			}
+
+			ImGui::CheckboxF("Shipcopter", &setting().onShipcopter);
+			ImGui::Tooltip("Changes Ship physics to be more like Swingcopter (inaccurate).");
 
 			if (ImGui::CheckboxF("Show Layout", &setting().onShowLayout)) {
 				if (setting().onShowLayout) {

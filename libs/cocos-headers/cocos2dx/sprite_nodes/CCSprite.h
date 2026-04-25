@@ -502,8 +502,7 @@ public:
     
 protected:
     void updateColor(void);
-    RT_REMOVE(  virtual void setTextureCoords(CCRect rect);         )
-    RT_ADD(     virtual void setTextureCoords(const CCRect& rect);  )
+    virtual void setTextureCoords(CCRect rect);
     virtual void updateBlendFunc(void);
     virtual void setReorderChildDirtyRecursively(void);
     virtual void setDirtyRecursively(bool bValue);

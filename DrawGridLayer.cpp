@@ -14,8 +14,6 @@
 //        return false;
 
 void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
-	DrawGridLayer::draw(self);
-
 	if (setting().onDurationLines) {
 		if (self->m_effectObjects->count() != 0) {
 			for (int i = 0; i < self->m_effectObjects->count(); i++) {
@@ -24,7 +22,7 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 					auto triggerDuration = self->xPosForTime(self->timeForXPos(effectObject->getPositionX()) + effectObject->m_triggerDuration);
 
 					glLineWidth(2);
-					ccDrawColor4F(1.f, 1.f, 1.f, 1.f);
+					ccDrawColor4B(100, 100, 100, 75);
 					switch (effectObject->m_objectID) {
 						case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743: {
 							if (effectObject->m_triggerDuration > 0) {
@@ -36,6 +34,8 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 			}
 		}
 	}
+
+	DrawGridLayer::draw(self);
 }
 
 void __fastcall DrawGridLayer::loadTimeMarkersH(gd::DrawGridLayer* self, void*, gd::string markers) { // taken from Zmx https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/src/modules/editor.cpp#L23

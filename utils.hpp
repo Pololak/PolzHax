@@ -3,6 +3,7 @@
 #include "support/base64.h"
 #include "patching.hpp"
 #include <ShlObj.h>
+#include "hsv.hpp"
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -425,6 +426,25 @@ namespace cocos2d {
 		}
 
 		return out;
+	}
+}
+
+inline cocos2d::ccColor3B getLightBGColor(ccColor3B bg, ccColor3B p1) {
+	auto hsv = color_utils::rgb_to_hsv({ bg.r / 255., bg.g / 255., bg.b / 255. });
+	hsv.s = (std::max)(hsv.s - 0.2, 0.0);
+	hsv.v = (std::min)(hsv.v + 0.2, 1.0);
+
+	const auto rgb = color_utils::hsv_to_rgb(hsv);
+
+	const ccColor3B lbg = { rgb.r * 255., rgb.g * 255., rgb.b * 255. };
+
+	const auto amt = (static_cast<float>(bg.r) + static_cast<float>(bg.g) + static_cast<float>(bg.b)) / 150.f;
+
+	if (amt < 1.f) {
+		return gd::GameToolbox::getMixedColor(lbg, p1, amt);
+	}
+	else {
+		return lbg;
 	}
 }
 
