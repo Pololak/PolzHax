@@ -125,17 +125,18 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 	shareMenu->addChild(onExportLevel);
 
 	auto orderMenu = CCMenu::create();
+	orderMenu->setPosition(director->getScreenRight() - 70.f, director->getScreenTop() - 210.f);
 	self->addChild(orderMenu, 1, 11);
 
 	auto orderLabel = CCLabelBMFont::create("", "bigFont.fnt");
 	orderLabel->setScale(.75f);
-	orderLabel->setPosition(director->getScreenLeft() + 70.f, director->getScreenTop() - 55.f);
+	orderLabel->setPosition(director->getScreenRight() - 70.f, director->getScreenTop() - 210.f);
 	self->addChild(orderLabel, 0, 12);
 	updateLevelOrderLabel(self);
 
 	auto onLevelOrderUpSpr = CCSprite::createWithSpriteFrameName("edit_upBtn_001.png");
 	auto onLevelOrderUp = gd::CCMenuItemSpriteExtra::create(onLevelOrderUpSpr, self, menu_selector(EditLevelLayer::Callback::onLevelOrderUp));
-	onLevelOrderUp->setPosition(orderMenu->convertToNodeSpace({ orderLabel->getPositionX(), orderLabel->getPositionY() + 22.5f }));
+	onLevelOrderUp->setPositionY(22.5f);
 	onLevelOrderUp->setSizeMult(1.5f);
 	if (localLevels->indexOfObject(level) == 0) {
 		onLevelOrderUp->setEnabled(false);
@@ -146,7 +147,7 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 
 	auto onLevelOrderDownSpr = CCSprite::createWithSpriteFrameName("edit_downBtn_001.png");
 	auto onLevelOrderDown = gd::CCMenuItemSpriteExtra::create(onLevelOrderDownSpr, self, menu_selector(EditLevelLayer::Callback::onLevelOrderDown));
-	onLevelOrderDown->setPosition(orderMenu->convertToNodeSpace({ orderLabel->getPositionX(), orderLabel->getPositionY() - 22.5f }));
+	onLevelOrderDown->setPositionY(-22.5f);
 	onLevelOrderDown->setSizeMult(1.5f);
 	if (localLevels->indexOfObject(level) == (gd::LocalLevelManager::sharedState()->m_localLevels->count() - 1)) {
 		onLevelOrderDown->setEnabled(false);

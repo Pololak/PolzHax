@@ -223,6 +223,7 @@ void colorSet() {
 	colors[ImGuiCol_ResizeGrip] = color2;
 	colors[ImGuiCol_ResizeGripActive] = color5;
 	colors[ImGuiCol_ResizeGripHovered] = color3;
+	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void sortTabs() {
@@ -325,11 +326,17 @@ void sortTabs() {
 	}
 }
 
+void updateUISize() {
+	ImGuiIO& io = ImGui::GetIO();
+	//io.FontGlobalScale = 1.f * setting().UISize;
+	ImGui::GetStyle().ScaleAllSizes(setting().UISize);
+}
+
 void imgui_render() {
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	auto editorLayer = LevelEditorLayer::get();
 
-	const float SHORT_ITEM_WIDTH = ((ImGui::GetWindowWidth() / 2.f) - (ImGui::GetStyle().WindowPadding.x * 1.25f));
+	const float SHORT_ITEM_WIDTH = (ImGui::GetWindowWidth() / 2.f - ImGui::GetStyle().WindowPadding.x * 1.25f) * setting().UISize;
 	const float LONG_ITEM_WIDTH = (ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x * 2.f) * setting().UISize;
 
 	if (oneX) {
@@ -828,6 +835,13 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
 		}
 
+		if (setting().onEverythingPulses) {
+			sequence_patch(gd::base + 0x52af0, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0x52af0, { 0x8a, 0x81, 0x95, 0x02, 0x00, 0x00 });
+		}
+
 		if (setting().onFreezePlayer) {
 			sequence_patch(gd::base + 0xe9dd3, { 0xe9, 0x3f, 0x01, 0x00, 0x00, 0x90 });
 		}
@@ -939,9 +953,11 @@ void imgui_render() {
 
 		if (setting().onFastAltTab) {
 			sequence_patch(gd::base + 0x28dfe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0x28f2e, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 		}
 		else {
 			sequence_patch(gd::base + 0x28dfe, { 0x8b, 0x03, 0x8b, 0xcb, 0xff, 0x50, 0x18 });
+			sequence_patch(gd::base + 0x28f2e, { 0x8b, 0xc8, 0x8b, 0x10, 0xff, 0x52, 0x2c });
 		}
 
 		if (setting().onForceVisibility) {
@@ -975,6 +991,13 @@ void imgui_render() {
 		}
 		else {
 			sequence_patch(libcocosbase + 0x60578, { 0xf3, 0x0f, 0x11, 0x41, 0x1c, 0xf3, 0x0f, 0x11, 0x41, 0x18 });
+		}
+
+		if (setting().onQuickCheckpointMode) {
+			sequence_patch(gd::base + 0x14a6f4, { 0x00, 0x00, 0x70, 0x42 });
+		}
+		else {
+			sequence_patch(gd::base + 0x14a6f4, { 0x00, 0x00, 0xe1, 0x43 });
 		}
 
 		if (setting().onSafeMode) {
@@ -1074,7 +1097,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (250426)");
+			ImGui::Text("1.920 - v1.3.0 (300426)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1159,7 +1182,8 @@ void imgui_render() {
 
 			//ImGui::SetNextItemWidth(135.f);
 			//if (ImGui::DragFloat("UI Size", &setting().UISize, .1f, .5f, 3.f, "%.1f")) {
-
+			//	//updateUISize();
+			//	//sortTabs();
 			//}
 
 			if (ImGui::Button("Sort Tabs", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
@@ -2263,8 +2287,8 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::CheckboxF("0% Practice Complete", &setting().onZeroPracticeComplete);
-			ImGui::Tooltip("Completes a level if you beat it in 1 practice attempt.");
+			//ImGui::CheckboxF("0% Practice Complete", &setting().onZeroPracticeComplete);
+			//ImGui::Tooltip("Completes a level if you beat it in 1 practice attempt.");
 
 			ImGui::CheckboxF("Auto Deafen", &setting().onAutoDeafen);
 			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
@@ -2292,7 +2316,6 @@ void imgui_render() {
 				ImGui::SetTooltip("Kills a player at a certain percentage.");
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##autoKillSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-
 				ImGui::SetNextItemWidth(80.f);
 				ImGui::DragFloat("Kill at", &setting().killPercentage, 1.f, 0.f, 100.f, "%.0f%%");
 
@@ -2359,7 +2382,17 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Owie.");
 
-			if (ImGui::Checkbox("Freeze Player", &setting().onFreezePlayer)) {
+			if (ImGui::CheckboxF("Everything Pulses", &setting().onEverythingPulses)) {
+				if (setting().onEverythingPulses) {
+					sequence_patch(gd::base + 0x52af0, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0x52af0, { 0x8a, 0x81, 0x95, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Enables pulsing on all objects.");
+
+			if (ImGui::CheckboxF("Freeze Player", &setting().onFreezePlayer)) {
 				if (setting().onFreezePlayer) {
 					sequence_patch(gd::base + 0xe9dd3, { 0xe9, 0x3f, 0x01, 0x00, 0x00, 0x90 });
 				}
@@ -2501,11 +2534,13 @@ void imgui_render() {
 					sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
 					cheatDec();
 				}
+
+				PlayLayer::updateStatusLabels();
 			}
 			ImGui::Tooltip("Makes the player invincible.");
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##noclipSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::Checkbox("Noclip Tint", &setting().onNoclipTint);
+				ImGui::CheckboxF("Noclip Tint", &setting().onNoclipTint);
 
 				static float noclipTintColor[3] = {
 					setting().noclipTintR / 255.f,
@@ -2707,12 +2742,14 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Fast Alt-Tab", &setting().onFastAltTab)) {
 				if (setting().onFastAltTab) {
 					sequence_patch(gd::base + 0x28dfe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0x28f2e, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 				}
 				else {
 					sequence_patch(gd::base + 0x28dfe, { 0x8b, 0x03, 0x8b, 0xcb, 0xff, 0x50, 0x18 });
+					sequence_patch(gd::base + 0x28f2e, { 0x8b, 0xc8, 0x8b, 0x10, 0xff, 0x52, 0x2c });
 				}
 			}
-			ImGui::Tooltip("Disables savefile saving on minimize.");
+			ImGui::Tooltip("Disables savefile saving on minimize and unminimize.");
 
 			if (ImGui::CheckboxF("Force Visibility", &setting().onForceVisibility)) {
 				if (setting().onForceVisibility) {
@@ -2780,6 +2817,16 @@ void imgui_render() {
 
 			//	ImGui::TreePop();
 			//}
+
+			if (ImGui::CheckboxF("Quick Checkpoint Mode", &setting().onQuickCheckpointMode)) {
+				if (setting().onQuickCheckpointMode) {
+					sequence_patch(gd::base + 0x14a6f4, { 0x00, 0x00, 0x70, 0x42 });
+				}
+				else {
+					sequence_patch(gd::base + 0x14a6f4, { 0x00, 0x00, 0xe1, 0x43 });
+				}
+			}
+			ImGui::Tooltip("Tries to place checkpoints more often (like in 2.1).");
 
 			ImGui::CheckboxF("Retry Keybind", &setting().onRetryKeybind);
 			ImGui::Tooltip("Lets you restart level by pressing R.");
@@ -3036,6 +3083,10 @@ void imgui_render() {
 					PlayLayer::updateStatusLabels();
 				}
 
+				if (ImGui::CheckboxF("Show ImGui FPS", &setting().useImGuiFps)) {
+					PlayLayer::updateStatusLabels();
+				}
+
 				ImGui::TreePop();
 			}
 
@@ -3200,8 +3251,10 @@ void imgui_render() {
 void imgui_init() {
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
-	io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
+	auto font = io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
 	io.Fonts->Build();
+	ImGui_ImplOpenGL3_CreateFontsTexture();
+	io.FontDefault = font;
 
 	ImGui::GetStyle().WindowTitleAlign = ImVec2(.5f, .5f);
 	ImGui::GetStyle().WindowBorderSize = 0;

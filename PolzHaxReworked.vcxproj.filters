@@ -1794,6 +1794,9 @@
     <ClInclude Include="ColorChannelSprite.hpp">
       <Filter>Файлы заголовков\Layers</Filter>
     </ClInclude>
+    <ClInclude Include="HardStreak.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2056,6 +2059,9 @@
     </ClCompile>
     <ClCompile Include="ColorChannelSprite.cpp">
       <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="HardStreak.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

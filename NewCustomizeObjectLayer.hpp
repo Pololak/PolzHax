@@ -25,6 +25,7 @@ protected:
 	void updateSelectedColorSprite();
 	void updateColorSprites();
 	void toggleLiveColor(CCObject*);
+	void updateColorsLive(float);
 
 public:
 	ColorChannelSprite* m_selectedColorSprite;

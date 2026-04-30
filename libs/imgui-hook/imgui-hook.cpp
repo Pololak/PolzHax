@@ -4,6 +4,7 @@
 #include "imgui-hook.hpp"
 #include "../../Menu.hpp"
 #include "../../Setting.hpp"
+#include "../../PauseLayer.hpp"
 
 using namespace cocos2d;
 
@@ -125,6 +126,9 @@ void __fastcall CCEGLView_pollEvents_H(CCEGLView* self) {
         else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F1 || msg.wParam == VK_OEM_3 || msg.wParam == VK_TAB || msg.wParam == setting().m_openMenuKey)) {
             // std::cout << "key is " << std::hex << static_cast<unsigned>(msg.wParam) << std::endl;
             g_toggleCallback();
+            if (!gd::GameManager::sharedState()->getGameVariable("0024") && gd::GameManager::sharedState()->getPlayLayer() && (PauseLayer::get() == nullptr)) {
+                CCEGLView::sharedOpenGLView()->showCursor(setting().show);
+            }
         }
 
         if (!blockInput)

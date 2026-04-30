@@ -276,12 +276,13 @@ void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // h
 
 	if (self->m_upKeyDown && self->m_upKeyPressed) {
 		self->m_upKeyPressed = false;
+		self->m_upKeyDown = false;
 		self->flipGravity(!self->m_gravityFlipped, true);
 	}
 }
 
 void __fastcall PlayerObject::updateJumpH(gd::PlayerObject* self, void*) {
-	auto delta = 0.f;
+	float delta = 0.f;
 	__asm movss[delta], xmm1;
 
 	if (!self->m_flyMode || !setting().onShipcopter) return PlayerObject::updateJump(self, delta);

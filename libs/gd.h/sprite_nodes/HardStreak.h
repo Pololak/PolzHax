@@ -12,6 +12,10 @@ namespace gd {
 		float m_waveSize; // 0x120
 		float m_pulseSize; // 0x124
 		bool m_disableDual; // 0x128
+
+		void updateStroke(float dt) {
+			reinterpret_cast<void(__fastcall*)(HardStreak*, float)>(base + 0x833e0)(this, dt);
+		}
 	};
 }
 

@@ -15,6 +15,7 @@ gd::LevelEditorLayer* m_editorLayer;
 bool isEditorPaused = false;
 bool wasPreviewModeEnabled = false;
 gd::StartPosObject* m_playtestStartPos;
+gd::GJGroundLayer* m_groundLayer;
 GDColor m_color01;
 GDColor m_color02;
 GDColor m_color03;
@@ -67,8 +68,8 @@ void LevelEditorLayer::updateShowHitboxes() {
 	if (self == nullptr) return;
 
 	auto playerDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(124));
-	playerDrawNode->clear();
 	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
+	if (!setting().m_clearHitboxes) playerDrawNode->clear();
 	objectDrawNode->clear();
 
 	if (setting().onHitboxes) {
@@ -558,6 +559,15 @@ void LevelEditorLayer::updateOrientedHitboxes(gd::LevelEditorLayer* self) {
 	}
 }
 
+void LevelEditorLayer::LevelEditorLayerExt::updateGroundWidth(float) {
+	if (m_groundLayer) {
+		m_groundLayer->setPositionX(this->m_gameLayer->convertToNodeSpace({ CCDirector::sharedDirector()->getScreenLeft(), 0.f }).x);
+		m_groundLayer->m_line->setPositionX(m_groundLayer->convertToNodeSpace({ CCDirector::sharedDirector()->getWinSize().width / 2.f, 0.f }).x);
+		m_groundLayer->m_isActive = true;
+		m_groundLayer->m_groundWidth = 256.f;
+	}
+}
+
 bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::GJGameLevel* level) {
 	m_editorLayer = self;
 	if (!LevelEditorLayer::init(self, level)) return false;
@@ -592,6 +602,14 @@ bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::G
 
 	auto clicksDrawNode = CCDrawNode::create();
 	self->m_gameLayer->addChild(clicksDrawNode, 1000, 126);
+
+	//m_groundLayer = gd::GJGroundLayer::create(self->m_levelSettings->m_groundIndex);
+	//m_groundLayer->getChildByType<CCSprite*>(2)->setVisible(false);
+	//m_groundLayer->getChildByType<CCSprite*>(3)->setVisible(false);
+	//self->m_gameLayer->addChild(m_groundLayer, 10);
+	////self->schedule(schedule_selector(LevelEditorLayer::LevelEditorLayerExt::updateGroundWidth));
+
+	//m_groundLayer->fadeInGround(5.f);
 
 	return true;
 }
@@ -697,10 +715,23 @@ void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* _self, void
 //CCArray* m_hideableUIElements = nullptr;
 
 void runCustomPlaytest(gd::LevelEditorLayer* self, gd::StartPosObject* startPos) {
+	self->setStartPosObject(startPos);
+
 	self->m_player->setPosition(startPos->getPosition());
 	self->m_player2->setPosition(startPos->getPosition());
 
 	self->setupLevelStart(startPos->m_settings);
+
+	if (startPos->m_settings->m_startMode == 0) {
+		self->m_player->toggleFlyMode(false);
+		self->m_player2->toggleFlyMode(false);
+		self->m_player->toggleRollMode(false);
+		self->m_player2->toggleRollMode(false);
+		self->m_player->toggleBirdMode(false);
+		self->m_player2->toggleBirdMode(false);
+		self->m_player->toggleDartMode(false);
+		self->m_player2->toggleDartMode(false);
+	}
 
 	self->m_player->resumeSchedulerAndActions();
 	self->m_player2->resumeSchedulerAndActions();
@@ -820,6 +851,7 @@ void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	m_lastPos = 0.f;
 	m_blendingBatchNode = nullptr;
 	m_playtestStartPos = nullptr;
+	m_groundLayer = nullptr;
 	m_editorLayer = nullptr;
 }
 

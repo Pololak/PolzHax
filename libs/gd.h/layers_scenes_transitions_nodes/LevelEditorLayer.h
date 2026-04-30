@@ -103,6 +103,10 @@ namespace gd {
 		void playMusic() {
 			reinterpret_cast<void(__fastcall*)(LevelEditorLayer*)>(base + 0x90d70)(this);
 		}
+
+		void updateDualGround(PlayerObject* player, int mode, bool instant) {
+			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, PlayerObject*, int, bool)>(base + 0x923a0)(this, player, mode, instant);
+		}
 	};
 }
 

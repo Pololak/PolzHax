@@ -167,8 +167,25 @@ namespace gd {
 		void pushButton(int p0) {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde080)(this, p0);
 		}
+
 		void releaseButton(int p0) {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, int)>(base + 0xde150)(this, p0);
+		}
+
+		void toggleFlyMode(bool p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(base + 0xdea20)(this, p0);
+		}
+
+		void toggleRollMode(bool p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(base + 0xdf490)(this, p0);
+		}
+
+		void toggleBirdMode(bool p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(base + 0xdec10)(this, p0);
+		}
+
+		void toggleDartMode(bool p0) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(base + 0xdee80)(this, p0);
 		}
 	};
 }

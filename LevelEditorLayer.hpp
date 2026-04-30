@@ -89,5 +89,10 @@ namespace LevelEditorLayer {
 	GDColor getColor04();
 	GDColor getColor3DL();
 
+	class LevelEditorLayerExt : public gd::LevelEditorLayer {
+	public:
+		void updateGroundWidth(float);
+	};
+
 	void mem_init();
 }

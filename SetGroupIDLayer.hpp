@@ -8,9 +8,6 @@ namespace SetGroupIDLayer {
 	inline void(__thiscall* updateGroupID)(gd::SetGroupIDLayer*);
 	void __fastcall updateGroupIDH(gd::SetGroupIDLayer*);
 
-	inline void(__thiscall* destructor)(gd::SetGroupIDLayer*);
-	void __fastcall destructorH(gd::SetGroupIDLayer*);
-
 	class Callback : public gd::SetGroupIDLayer {
 	public:
 		void onCurrentGroup(CCObject*);

@@ -18,6 +18,7 @@
 #include "GJGarageLayer.hpp"
 #include "GJRotationControl.hpp"
 #include "GJScoreCell.hpp"
+#include "HardStreak.hpp"
 #include "InfoLayer.hpp"
 #include "LeaderboardsLayer.hpp"
 #include "LevelBrowserLayer.hpp"
@@ -50,8 +51,7 @@
 #include <imgui-hook.hpp>
 
 void(__thiscall* fpMainLoop)(cocos2d::CCDirector*);
-void __fastcall hkMainLoop(cocos2d::CCDirector* self)
-{
+void __fastcall hkMainLoop(cocos2d::CCDirector* self) {
 	ImGuiHook::poll(self->getOpenGLView());
 	fpMainLoop(self);
 }
@@ -108,12 +108,6 @@ void __fastcall FMODAudioEngine_playBackgroundMusicH(gd::FMODAudioEngine* self, 
 	}
 }
 
-inline void(__thiscall* HardStreak_updateStroke)(gd::HardStreak*, float);
-void __fastcall HardStreak_updateStrokeH(gd::HardStreak* self, void*, float dt) {
-	if (setting().onWavePulseSize) self->m_pulseSize = setting().wavePulseSize;
-	HardStreak_updateStroke(self, dt);
-}
-
 inline extension::RGBA(__cdecl* CCControlUtils_RGBfromHSV)(extension::HSV);
 extension::RGBA __cdecl CCControlUtils_RGBfromHSVH(extension::HSV hsv) {
 	if (setting().onHUEFix) {
@@ -145,7 +139,7 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
 
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	if (playLayer && isDown) {
-		if (!setting().onPauseDuringCompletion ? !playLayer->m_endTriggered : true) {
+		if ((!setting().onPauseDuringCompletion ? !playLayer->m_endTriggered : true) && !playLayer->m_showingEndLayer) {
 			if ((key == setting().m_retryKeybind) && setting().onRetryKeybind) {
 				if (PauseLayer::get()) {
 					PauseLayer::get()->onResume(nullptr);
@@ -322,7 +316,6 @@ DWORD WINAPI my_thread(void* hModule) {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29ac0), AudioEffectsLayer_updateTweenActionH, reinterpret_cast<void**>(&AudioEffectsLayer_updateTweenAction));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x165f0), FMODAudioEngine_updateH, reinterpret_cast<void**>(&FMODAudioEngine_update));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x16850), FMODAudioEngine_playBackgroundMusicH, reinterpret_cast<void**>(&FMODAudioEngine_playBackgroundMusic));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x833e0), HardStreak_updateStrokeH, reinterpret_cast<void**>(&HardStreak_updateStroke));
 	MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0xcee0), CCControlUtils_RGBfromHSVH, reinterpret_cast<void**>(&CCControlUtils_RGBfromHSV));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0xa4990), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
@@ -344,6 +337,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	GJGarageLayer::mem_init();
 	//GJRotationControl::mem_init();
 	GJScoreCell::mem_init();
+	HardStreak::mem_init();
 	InfoLayer::mem_init();
 	LeaderboardsLayer::mem_init();
 	LevelBrowserLayer::mem_init();

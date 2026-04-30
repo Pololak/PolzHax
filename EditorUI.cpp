@@ -90,18 +90,26 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 
 	auto objectInfoLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(2701));
 	if (objectInfoLabel) {
-		if (self->m_selectedObject) {
+		if (self->m_selectedObject || self->m_selectedObjects->count() == 1) {
 			std::stringstream ss;
 
-			ss << "C: " << colorToString(static_cast<int>(self->m_selectedObject->getColorMode())) << " (" << static_cast<int>(self->m_selectedObject->getColorMode()) << ")" << "\n";
-			ss << "G: " << self->m_selectedObject->m_editorGroup << "\n";
-			ss << "Rot: " << self->m_selectedObject->getRotation() << "\n";
-			ss << "X: " << self->m_selectedObject->getPositionX() << "\n";
-			ss << "Y: " << self->m_selectedObject->getPositionY() << "\n";
-			ss << "ID: " << self->m_selectedObject->m_objectID << "\n";
-			ss << "Type: " << typeToString(self->m_selectedObject->m_objectType) << "\n";
-			ss << "Time: " << self->m_editorLayer->m_gridLayer->timeForXPos(self->m_selectedObject->getPositionX()) << "\n";
-			ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(self->m_selectedObject) << std::dec << "\n";
+			gd::GameObject* object;
+			if (self->m_selectedObjects->count() == 1) {
+				object = reinterpret_cast<gd::GameObject*>(self->m_selectedObjects->objectAtIndex(0));
+			}
+			else {
+				object = self->m_selectedObject;
+			}
+
+			ss << "C: " << colorToString(static_cast<int>(object->getColorMode())) << " (" << static_cast<int>(object->getColorMode()) << ")" << "\n";
+			ss << "G: " << object->m_editorGroup << "\n";
+			ss << "Rot: " << object->getRotation() << "\n";
+			ss << "X: " << object->getPositionX() << "\n";
+			ss << "Y: " << object->getPositionY() << "\n";
+			ss << "ID: " << object->m_objectID << "\n";
+			ss << "Type: " << typeToString(object->m_objectType) << "\n";
+			ss << "Time: " << self->m_editorLayer->m_gridLayer->timeForXPos(object->getPositionX()) << "\n";
+			ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(object) << std::dec << "\n";
 
 			objectInfoLabel->setString(ss.str().c_str());
 		}

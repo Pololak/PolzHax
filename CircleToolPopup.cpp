@@ -40,6 +40,12 @@
 //	arcLabel->setScale(.75f);
 //	layer->addChild(arcLabel);
 //
+//	auto angleBg = extension::CCScale9Sprite::create("square02_small.png");
+//	angleBg->setOpacity(100);
+//	angleBg->setContentSize({ 60, 35.f });
+//	angleBg->setPosition(winSize.width / 2.f - 60.f, winSize.height / 2.f + 38.f);
+//	layer->addChild(angleBg);
+//
 //	m_angleInput = gd::CCTextInputNode::create(60, 30, "Val", this, "bigFont.fnt");
 //	m_angleInput->setString(CCString::createWithFormat("%.0f", m_angle)->getCString());
 //	m_angleInput->m_delegate = this;

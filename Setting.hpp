@@ -121,6 +121,7 @@ struct SettingStruct {
 	bool onConfirmExit;
 	bool onCorrectiveMusicSync;
 	bool onEverythingHurts;
+	bool onEverythingPulses;
 	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
 	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0;
@@ -155,6 +156,7 @@ struct SettingStruct {
 	bool onNoRotation;
 	bool onNoTransition;
 	bool onPitchShifter; float pitchValue = 1.f;
+	bool onQuickCheckpointMode;
 	bool onRetryKeybind; int m_retryKeybind = 0x52;
 	bool onSafeMode, isSafeMode;
 	bool onShowRestartButton;
@@ -174,7 +176,7 @@ struct SettingStruct {
 	bool onHideLabels;
 	bool onCheatIndicator; int cheatIndicatorPos = 0;
 	bool onMessageLabel; std::string message; int messagePos = 0;
-	bool onFPSCounter, fpsPrefix = true; int fpsCounterPos = 0;
+	bool onFPSCounter, fpsPrefix = true, useImGuiFps = false; int fpsCounterPos = 0;
 	bool onCPSCounter, cpsPrefix = true, cpsMax = true, cpsTotal; int cpsCounterPos = 0;
 	bool onNoclipAccuracy, nocAccPrefix = true; int nocAccPos = 0;
 	bool onNoclipDeaths, nocDeathsPrefix = true; int nocDeathsPos = 0;
@@ -216,6 +218,7 @@ struct SettingStruct {
 	bool onExtraLong;
 	int m_openMenuKey;
 	bool m_liveColorEnabled; // newcustomizeobjectlayer
+	bool m_clearHitboxes;
 
 	// GDPS Switcher
 	std::string originalServerURL;
@@ -336,6 +339,7 @@ DEF_SCHEMA(
 	onConfirmExit,
 	onCorrectiveMusicSync,
 	onEverythingHurts,
+	onEverythingPulses,
 	onFreezePlayer,
 	onHighFPSRotationFix,
 	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB,
@@ -370,6 +374,7 @@ DEF_SCHEMA(
 	onNoRotation,
 	onNoTransition,
 	onPitchShifter, pitchValue,
+	onQuickCheckpointMode,
 	onRetryKeybind, m_retryKeybind,
 	onSafeMode,
 	onShowRestartButton,
@@ -389,7 +394,7 @@ DEF_SCHEMA(
 	onHideLabels,
 	onCheatIndicator, cheatIndicatorPos,
 	onMessageLabel, message, messagePos,
-	onFPSCounter, fpsPrefix, fpsCounterPos,
+	onFPSCounter, fpsPrefix, useImGuiFps, fpsCounterPos,
 	onCPSCounter, cpsPrefix, cpsMax, cpsTotal, cpsCounterPos,
 	onNoclipAccuracy, nocAccPrefix, nocAccPos,
 	onNoclipDeaths, nocDeathsPrefix, nocDeathsPos,

@@ -1,6 +1,7 @@
 #include "DebugModule.hpp"
 #include "ColorChannelSprite.hpp"
 #include "LevelEditorLayer.hpp"
+#include "Setting.hpp"
 
 #include <imgui-hook.hpp>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -70,6 +71,8 @@ void renderDebugModule() {
 		ImGui::Text("Pulse Counter: %i", fme->m_pulseCounter);
 		ImGui::Text("Metering: %d", fme->m_metering);
 		ImGui::Checkbox("m_metering", &fme->m_metering);
+
+		ImGui::Checkbox("No DrawNode Clear", &setting().m_clearHitboxes);
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {

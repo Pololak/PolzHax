@@ -4,10 +4,12 @@
 #include "PracticeFix.hpp"
 #include "PlayerObject.hpp"
 #include "UILayer.hpp"
+#include "PauseLayer.hpp"
 #include "Icons.hpp"
 #include "utils.hpp"
 #include "imgui.h"
 #include <numeric>
+#include <unordered_map>
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -23,11 +25,10 @@ int m_smoothFrames = 0; // https://github.com/qimiko/gdps-public/blob/238b71e9f3
 
 std::vector<Checkpoint> m_checkpoints;
 
+int currentStartPos = 0;
 std::vector<gd::StartPosObject*> m_startPositions;
 std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges, m_mirrorPortals;
-
-int currentStartPos = 0;
-std::vector<gd::StartPosObject*> startPosObjects;
+std::unordered_map<gd::StartPosObject*, std::pair<float, float>> m_startPositionsBestRun; // first = best run, second = compare best run
 
 gd::GameObject* m_portalRef;
 gd::GameObject* m_dualPortalRef;
@@ -50,8 +51,8 @@ int m_totalClicks;
 CCLabelBMFont* m_jumpsLabel = nullptr;
 CCLabelBMFont* m_sessionTimeLabel = nullptr;
 CCLabelBMFont* m_bestRunLabel = nullptr;
-int m_lastRun;
-int m_bestRunPercentage;
+float m_lastRun;
+float m_bestRunPercentage;
 CCLabelBMFont* m_clockLabel = nullptr;
 std::time_t clockTime;
 SYSTEMTIME st;
@@ -77,6 +78,7 @@ bool PlayLayer::isCheating() {
 		setting().onNoShadeEffect ||
 		setting().onAutoPickupCoins ||
 		setting().onEverythingHurts ||
+		setting().onEverythingPulses ||
 		setting().onFreezePlayer ||
 		setting().onHitboxes ||
 		setting().onInstantComplete ||
@@ -87,21 +89,22 @@ bool PlayLayer::isCheating() {
 		setting().onPlayMacro ||
 		setting().onRecordMacro ||
 		setting().onShipcopter ||
-		setting().onSpeedhack;
+		(setting().onSpeedhack && setting().speedhackValue != 1.f) ||
+		setting().onHidePauseMenu;
 }
 
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 	if (playLayer->m_practiceMode) return;
 
-	if (startPosObjects.empty()) return;
+	if (m_startPositions.empty()) return;
 
-	auto count = static_cast<int32_t>(startPosObjects.size());
+	auto count = static_cast<int32_t>(m_startPositions.size());
 	if (index >= count) index = -1;
 	else if (index < -1) index = count - 1;
 
 	currentStartPos = index;
 
-	auto* startPos = index >= 0 ? startPosObjects[index] : nullptr;
+	auto* startPos = index >= 0 ? m_startPositions[index] : nullptr;
 	playLayer->setStartPosObject(startPos);
 	playLayer->m_testMode = index >= 0;
 
@@ -114,7 +117,12 @@ void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 
 	playLayer->resetLevel();
 
+	if (PauseLayer::get()) {
+		gd::GameSoundManager::sharedState()->stopBackgroundMusic();
+	}
+
 	PlayLayer::updateStartPosSwitcherLabel();
+	PlayLayer::updateStatusLabels();
 }
 
 void PlayLayer::nextStartPos() {
@@ -361,7 +369,12 @@ void updateFPSLabel() {
 			prefix.clear();
 		}
 
-		m_fpsCounterLabel->setString((std::to_string(static_cast<int>(fps)) + prefix).c_str());
+		if (setting().useImGuiFps) {
+			m_fpsCounterLabel->setString((std::to_string(static_cast<int>(roundf(ImGui::GetIO().Framerate))) + prefix).c_str());
+		}
+		else {
+			m_fpsCounterLabel->setString((std::to_string(static_cast<int>(roundf(fps))) + prefix).c_str());
+		}
 	}
 }
 
@@ -438,11 +451,31 @@ void updateBestRunLabel() {
 			prefix.clear();
 		}
 
-		int newBest = m_lastRun;
+		float newBest = roundf(m_lastRun);
+
+		if (m_startPositions.size()) {
+			if (currentStartPos > -1) {
+				int startPosLevelPos = static_cast<int>(roundf(m_startPositions[currentStartPos]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
+				int newStartPosBest = static_cast<int>(roundf(m_startPositionsBestRun[m_startPositions[currentStartPos]].first));
+
+				if (newStartPosBest > 0) {
+					m_bestRunLabel->setString((prefix + std::to_string(startPosLevelPos) + "%-" + std::to_string(newStartPosBest) + "%").c_str());
+				}
+				else {
+					m_bestRunLabel->setString((prefix + "None").c_str());
+				}
+
+				return;
+			}
+		}
 
 		if (newBest >= m_bestRunPercentage) {
 			m_bestRunPercentage = newBest;
-			m_bestRunLabel->setString((prefix + std::to_string(newBest) + "%").c_str());
+			m_bestRunLabel->setString((prefix + std::to_string(static_cast<int>(newBest)) + "%").c_str());
+		}
+
+		if (newBest == 0) {
+			m_bestRunLabel->setString((prefix + "None").c_str());
 		}
 	}
 }
@@ -489,6 +522,12 @@ void updateNoclipDeathsLabel(bool tintRed = false) {
 			prefix.clear();
 		}
 
+		if (tintRed) {
+			m_noclipDeathsLabel->stopAllActions();
+			m_noclipDeathsLabel->setColor(ccc3(255, 64, 64));
+			m_noclipDeathsLabel->runAction(CCTintTo::create(.1f, 255, 255, 255));
+		}
+
 		m_noclipDeathsLabel->setString((std::to_string(m_deaths) + prefix).c_str());
 	}
 }
@@ -532,10 +571,10 @@ void PlayLayer::updateStatusLabels() {
 	m_clockLabel->setVisible(setting().onClockLabel);
 	m_clockLabel->setTag(setting().clockPos);
 
-	m_noclipAccuracyLabel->setVisible(setting().onNoclipAccuracy);
+	m_noclipAccuracyLabel->setVisible(setting().onNoclipAccuracy && setting().onNoclip);
 	m_noclipAccuracyLabel->setTag(setting().nocAccPos);
 
-	m_noclipDeathsLabel->setVisible(setting().onNoclipDeaths);
+	m_noclipDeathsLabel->setVisible(setting().onNoclipDeaths && setting().onNoclip);
 	m_noclipDeathsLabel->setTag(setting().nocDeathsPos);
 
 	int topLeftLabelsCount = 0;
@@ -603,7 +642,7 @@ void PlayLayer::updateStatusLabels() {
 }
 
 void PlayLayer::updateStartPosSwitcherLabel() {
-	if (startPosObjects.empty()) return;
+	if (m_startPositions.empty()) return;
 
 	auto self = gd::GameManager::sharedState()->getPlayLayer();
 	if (!self) return;
@@ -619,7 +658,7 @@ void PlayLayer::updateStartPosSwitcherLabel() {
 
 	if (!startPosSwitcherLabel || !onPrevStartPos || !onNextStartPos) return;
 
-	startPosSwitcherLabel->setString(CCString::createWithFormat("%i/%i", currentStartPos + 1, startPosObjects.size())->getCString());
+	startPosSwitcherLabel->setString(CCString::createWithFormat("%i/%i", currentStartPos + 1, m_startPositions.size())->getCString());
 	startPosSwitcherLabel->setVisible(true);
 	startPosSwitcherLabel->setOpacity(255);
 	startPosSwitcherLabel->stopAllActions();
@@ -672,7 +711,8 @@ void fixInitColorTriggers() {
 	}
 
 	if (closestBGTrigger) {
-		//if ()
+		self->m_activeBGColorAction->m_toColor = closestBGTrigger->m_triggerColor;
+		self->m_activeBGColorAction->m_duration = 0.f;
 	}
 }
 
@@ -686,8 +726,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_speedChanges.clear();
 	m_mirrorPortals.clear();
 	m_startPositions.clear();
-	startPosObjects.clear();
 	currentStartPos = 0;
+	m_startPositionsBestRun.clear();
 
 	m_colorTriggers.clear();
 
@@ -709,8 +749,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_totalClicks = 0;
 	m_isHolding = false;
 
-	m_lastRun = 0;
-	m_bestRunPercentage = 0;
+	m_lastRun = 0.f;
+	m_bestRunPercentage = 0.f;
 
 	m_noclipAccuracy = 0.f;
 	m_deathPos = 0.f;
@@ -1051,10 +1091,6 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObject* object) {
 	PlayLayer::addToSection(self, object);
 
-	if (object->m_objectID == 31) {
-		startPosObjects.push_back(static_cast<gd::StartPosObject*>(object));
-	}
-
 	switch (object->m_objectID) {
 	case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
 		m_colorTriggers.push_back(object); break;
@@ -1095,17 +1131,17 @@ void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObj
 
 void __fastcall PlayLayer::createObjectsFromSetupH(gd::PlayLayer* self, void*, gd::string objects) {
 	PlayLayer::createObjectsFromSetup(self, objects);
-	if (startPosObjects.empty()) return;
+	if (m_startPositions.empty()) return;
 
-	std::ranges::sort(startPosObjects, [](gd::GameObject* a, gd::GameObject* b) {
+	std::ranges::sort(m_startPositions, [](gd::GameObject* a, gd::GameObject* b) {
 		return a->getPositionX() < b->getPositionX();
 		});
 
 	currentStartPos = -1;
 	if (self->m_startPosObject) {
-		auto it = std::ranges::find(startPosObjects, self->m_startPosObject);
-		if (it != startPosObjects.end())
-			currentStartPos = static_cast<int32_t>(std::distance(startPosObjects.begin(), it));
+		auto it = std::ranges::find(m_startPositions, self->m_startPosObject);
+		if (it != m_startPositions.end())
+			currentStartPos = static_cast<int32_t>(std::distance(m_startPositions.begin(), it));
 	}
 }
 
@@ -1174,7 +1210,7 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 	if (setting().onNoclipTint && setting().onNoclip) {
 		auto noclipTint = static_cast<CCLayerColor*>(self->getChildByTag(875));
 		if (noclipTint) {
-			noclipTint->runAction(CCSequence::create(CCFadeTo::create(0.f, 65), CCFadeTo::create(.25f, 0), nullptr));
+			noclipTint->runAction(CCSequence::create(CCFadeTo::create(0.f, 65), CCFadeTo::create(.1f, 0), nullptr));
 		}
 	}
 
@@ -1188,7 +1224,7 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
 
-	//std::cout << "Death hazard: " << m_deathObject << std::endl;
+	std::cout << "Death hazard: " << m_deathObject << std::endl;
 	//if (m_deathObject) {
 	//	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
 
@@ -1213,19 +1249,50 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 		}
 	}
 
-	if (!self->m_practiceMode && !self->m_testMode) {
+	if (!self->m_practiceMode && !self->m_testMode && !setting().onNoclip) {
 		m_lastRun = self->m_player->getPositionX() / self->m_levelLength * 100.f;
+	}
+
+	if (!self->m_practiceMode && self->m_testMode && !setting().onNoclip) {
+		if (m_startPositions.size() && currentStartPos > -1) {
+			gd::StartPosObject* currentStartPosObject = m_startPositions[currentStartPos];
+			if (currentStartPosObject) {
+				float playerLastRun = self->m_player->getPositionX() / self->m_levelLength * 100.f;
+
+				if (playerLastRun >= m_startPositionsBestRun[currentStartPosObject].second) {
+					m_startPositionsBestRun[currentStartPosObject] = { playerLastRun, playerLastRun };
+				}
+			}
+		}
+	}
+
+	if (setting().onNoclip) {
+		updateNoclipDeathsLabel(true);
+		updateNoclipAccuracyLabel(true);
 	}
 
 	updateBestRunLabel();
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
-	if (setting().onZeroPracticeComplete && self->m_lastRunPercent == 0) {
-		self->m_practiceMode = false;
-	}
+	//if (self->m_practiceMode && setting().onZeroPracticeComplete && self->m_lastRunPercent == 0) {
+	//	self->m_practiceMode = false;
+	//}
 
 	PlayLayer::levelComplete(self);
+
+	if (!self->m_practiceMode && self->m_testMode) {
+		if (m_startPositions.size() && currentStartPos > -1) {
+			gd::StartPosObject* currentStartPosObject = m_startPositions[currentStartPos];
+			if (currentStartPosObject) {
+				m_startPositionsBestRun[currentStartPosObject] = { 100.f, 100.f };
+			}
+		}
+	}
+
+	if (!self->m_practiceMode && !self->m_testMode) {
+		m_lastRun = 100.f;
+	}
 
 	if (m_deafenPressed) {
 		m_deafenPressed = false;
@@ -1306,7 +1373,7 @@ void __fastcall PlayLayer::spawnPlayer2H(gd::PlayLayer* self) {
 //	hazardDeathObject();
 //}
 
-//inline bool(__thiscall* solidDeathObject)();
+//inline void(__thiscall* solidDeathObject)();
 //void __fastcall solidDeathObjectH() {
 //	__asm {
 //		mov m_deathObject, eax
@@ -1376,6 +1443,6 @@ void PlayLayer::mem_init() {
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayLayer::collidedWithObjectH, reinterpret_cast<void**>(&PlayLayer::collidedWithObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb28f), hazardDeathObjectH, reinterpret_cast<void**>(&hazardObject));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc52a), solidDeathObjectH, reinterpret_cast<void**>(&solidDeathObject));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdce60), solidDeathObjectH, reinterpret_cast<void**>(&solidDeathObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdb5e7), slopeDeathObjectH, reinterpret_cast<void**>(&slopeDeathObject));
 }

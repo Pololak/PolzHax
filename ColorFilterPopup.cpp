@@ -117,6 +117,7 @@ void ColorFilterPopup::onPrev(CCObject*) {
 void ColorFilterPopup::updateLabel() {
 	if (m_label) {
 		m_label->setString(this->colorToString(colors[m_color]).c_str());
+		m_label->setScale(1.f);
 		m_label->limitLabelWidth(45.f, .6f, .1f);
 	}
 
@@ -135,6 +136,7 @@ void ColorFilterPopup::keyBackClicked() {
 			auto buttonSprite = static_cast<gd::ButtonSprite*>(button->getChildren()->objectAtIndex(0));
 			if (buttonSprite) {
 				buttonSprite->m_label->setString(EditorUI::colorToShortString(colors[m_color]).c_str());
+				buttonSprite->m_label->setScale(1.f);
 				buttonSprite->m_label->limitLabelWidth(32.f, .75f, .1f);
 			}
 		}

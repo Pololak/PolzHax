@@ -175,6 +175,7 @@
     <ClInclude Include="GJScoreCell.hpp" />
     <ClInclude Include="GlobalClipboard.hpp" />
     <ClInclude Include="GoToPagePopup.hpp" />
+    <ClInclude Include="HardStreak.hpp" />
     <ClInclude Include="Hitboxes.hpp" />
     <ClInclude Include="hsv.hpp" />
     <ClInclude Include="IconPreviewPopup.hpp" />
@@ -753,6 +754,7 @@
     <ClCompile Include="GJScoreCell.cpp" />
     <ClCompile Include="GlobalClipboard.cpp" />
     <ClCompile Include="GoToPagePopup.cpp" />
+    <ClCompile Include="HardStreak.cpp" />
     <ClCompile Include="Hitboxes.cpp" />
     <ClCompile Include="IconPreviewPopup.cpp" />
     <ClCompile Include="ImGuiUtils.cpp" />

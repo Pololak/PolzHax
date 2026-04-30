@@ -31,6 +31,10 @@ namespace gd {
 						sName
 						);
 		}
+
+		void stopBackgroundMusic() {
+			reinterpret_cast<void(__fastcall*)(GameSoundManager*)>(base + 0x17940)(this);
+		}
 	};
 }
 

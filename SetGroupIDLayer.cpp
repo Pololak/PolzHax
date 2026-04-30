@@ -117,10 +117,6 @@ void __fastcall SetGroupIDLayer::updateGroupIDH(gd::SetGroupIDLayer* self) {
 	if (groupInput) {
 		groupInput->m_layerInput->setString(self->m_groupLabel->getString());
 	}
-}
-
-void __fastcall SetGroupIDLayer::destructorH(gd::SetGroupIDLayer* self) {
-	SetGroupIDLayer::destructor(self);
 
 	if (EditorUI::get()) {
 		EditorUI::updateObjectInfoLabel(EditorUI::get());
@@ -130,5 +126,4 @@ void __fastcall SetGroupIDLayer::destructorH(gd::SetGroupIDLayer* self) {
 void SetGroupIDLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf78d0), SetGroupIDLayer::initH, reinterpret_cast<void**>(&SetGroupIDLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf7e80), SetGroupIDLayer::updateGroupIDH, reinterpret_cast<void**>(&SetGroupIDLayer::updateGroupID));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf7760), SetGroupIDLayer::destructorH, reinterpret_cast<void**>(&SetGroupIDLayer::destructor));
 }
