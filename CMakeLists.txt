@@ -23,6 +23,9 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 setup_geode_mod(${PROJECT_NAME})
 
-set(IMGUI_VERSION "v1.90")
-CPMAddPackage("gh:qimiko/gd-imgui-cocos#8a84bae")
-target_link_libraries(${PROJECT_NAME} imgui-cocos)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    libs/imgui
+)
+
+add_subdirectory(libs/imgui)
+target_link_libraries(${PROJECT_NAME} imgui opengl32)

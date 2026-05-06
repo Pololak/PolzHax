@@ -2,7 +2,7 @@
 #include <string>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "ImGuiUtils.hpp"
-#include <imgui_internal.h>
+#include <../imgui/imgui_internal.h>
 
 namespace StringH {
 	std::string vkToString(int vk) {

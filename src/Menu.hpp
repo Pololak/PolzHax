@@ -1,5 +1,7 @@
 #pragma once
-#include <imgui.h>
+#include <../imgui/imgui.h>
+
+void setupImGuiMenu();
 
 namespace PolzHax {
     ImGuiTextFilter getTextFilter();

@@ -8,6 +8,9 @@
 	"version": "v1.3.0",
 	"developer": "Pololak",
 	"resources": {
+		"sprites": [
+			"resources/*.png"
+		],
 		"files": [
 			"resources/Muli-SemiBold.ttf"
 		]
