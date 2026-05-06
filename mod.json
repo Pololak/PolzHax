@@ -1,0 +1,16 @@
+{
+	"geode": "4.9.0",
+	"gd": {
+		"win": "1.920"
+	},
+	"id": "pololak.polzhax",
+	"name": "PolzHax",
+	"version": "v1.3.0",
+	"developer": "Pololak",
+	"resources": {
+		"files": [
+			"resources/Muli-SemiBold.ttf"
+		]
+	},
+	"description": ""
+}
