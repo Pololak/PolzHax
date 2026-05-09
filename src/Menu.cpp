@@ -1,17 +1,34 @@
 #include "Menu.hpp"
 #include <Geode/Geode.hpp>
+#include <Geode/loader/Hook.hpp>
 
 #include "imgui-hook.hpp"
 #include <../imgui/imgui.h>
 #include <../imgui/imgui_internal.h>
 #include <../imgui/misc/cpp/imgui_stdlib.h>
 
+#include "CocosExplorer.hpp"
+#include "GDPSSwitcher.hpp"
+#include "DebugModule.hpp"
+
+#include "LevelEditorLayer.hpp"
+#include "PauseLayer.hpp"
+#include "PlayLayer.hpp"
+
 #include "Setting.hpp"
 #include "patching.hpp"
 #include "ImGuiUtils.hpp"
 #include "utils.hpp"
+#include "SpeedHack.h"
 
 using namespace geode::prelude;
+
+geode::Hook* zeroDelayHook;
+
+void CCDisplayLinkDirector_mainLoop(cocos2d::CCDirector* self) {
+    ImGuiHook::poll(self->getOpenGLView());
+    reinterpret_cast<void(__thiscall*)(cocos2d::CCDirector*)>(geode::base::getCocos() + 0xfc240)(self); // Calling orig.
+}
 
 ImVec4 color1;
 ImVec4 color2;
@@ -60,7 +77,7 @@ void updatePriority() {
 }
 
 void PolzHax::updateFPSBypass() {
-	if (GameManager::sharedState()->getGameVariable("4080")) return; // If Zmx's FPS bypass turned on.
+	if (GameManager::sharedState()->getGameVariable("4080")) return;
 
 	auto currentFps = setting().fpsValue;
 
@@ -86,7 +103,7 @@ void updateSpeedhack() {
 	const auto value = setting().onSpeedhack ? setting().speedhackValue : 1.f;
 
 	CCDirector::sharedDirector()->m_pScheduler->setTimeScale(setting().onClassicMode ? 1.f : value);
-	//SpeedHack::SetSpeed(setting().onClassicMode ? value : 1.f);
+	SpeedHack::SetSpeed(setting().onClassicMode ? value : 1.f);
 
 	if (auto fme = FMODAudioEngine::sharedEngine()) {
 		if (auto sound = fme->m_globalChannel) {
@@ -261,7 +278,7 @@ void sortTabs() {
 
 void imgui_render() {
     auto playLayer = GameManager::sharedState()->getPlayLayer();
-    auto editorLayer = 0;
+    auto editorLayer = PolzLevelEditorLayer::get();
 
     const float SHORT_ITEM_WIDTH = (ImGui::GetWindowWidth() / 2.f - ImGui::GetStyle().WindowPadding.x * 1.25f);
 	const float LONG_ITEM_WIDTH = (ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x * 2.f);
@@ -954,33 +971,54 @@ void imgui_render() {
 		}
 
 		if (setting().onTransparentLists) {
-			sequence_patch((uint32_t)geode::base::get() + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
-			sequence_patch((uint32_t)geode::base::get() + 0x31c82, { 0x00 });
-			sequence_patch((uint32_t)geode::base::get() + 0x31c89, { 0x00, 0x00 });
-			sequence_patch((uint32_t)geode::base::get() + 0x31c8c, { 0x00 });
-			sequence_patch((uint32_t)geode::base::get() + 0x31cba, { 0x00 });
+			sequence_patch(geode::base::get() + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
+			sequence_patch(geode::base::get() + 0x31c82, { 0x00 });
+			sequence_patch(geode::base::get() + 0x31c89, { 0x00, 0x00 });
+			sequence_patch(geode::base::get() + 0x31c8c, { 0x00 });
+			sequence_patch(geode::base::get() + 0x31cba, { 0x00 });
 
-			sequence_patch((uint32_t)geode::base::get() + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
-			sequence_patch((uint32_t)geode::base::get() + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
+			sequence_patch(geode::base::get() + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
+			sequence_patch(geode::base::get() + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
 		}
 		else {
-			sequence_patch((uint32_t)geode::base::get() + 0x31c7f, { 0xc2, 0x72 });
-			sequence_patch((uint32_t)geode::base::get() + 0x31c82, { 0x3e });
-			sequence_patch((uint32_t)geode::base::get() + 0x31c89, { 0xa1, 0x58 });
-			sequence_patch((uint32_t)geode::base::get() + 0x31c8c, { 0x2c });
-			sequence_patch((uint32_t)geode::base::get() + 0x31cba, { 0xff });
+			sequence_patch(geode::base::get() + 0x31c7f, { 0xc2, 0x72 });
+			sequence_patch(geode::base::get() + 0x31c82, { 0x3e });
+			sequence_patch(geode::base::get() + 0x31c89, { 0xa1, 0x58 });
+			sequence_patch(geode::base::get() + 0x31c8c, { 0x2c });
+			sequence_patch(geode::base::get() + 0x31cba, { 0xff });
 
-			sequence_patch((uint32_t)geode::base::get() + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
-			sequence_patch((uint32_t)geode::base::get() + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+			sequence_patch(geode::base::get() + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
+			sequence_patch(geode::base::get() + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+		}
+
+		if (zeroDelayHook) {
+			if (setting().onZeroDelay) {
+				zeroDelayHook->enable();
+			}
+			else {
+				zeroDelayHook->disable();
+			}
 		}
 
         oneX = false;
     }
 
     if (setting().show) {
+		if (setting().onCocosExplorer) {
+			renderCocosExplorer(setting().onCocosExplorer);
+		}
+
+		// if (setting().onGDPSSwitcher) {
+		// 	renderGDPSSwitcher(setting().onGDPSSwitcher);
+		// }
+
+		// if (setting().onDeveloperMode) {
+		// 	renderDebugModule();
+		// }
+
         ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
         if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (Geode 060526)");
+			ImGui::Text("1.920 - v1.3.0-Geode (090526)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1018,9 +1056,9 @@ void imgui_render() {
 					setting().onCocosExplorer = !setting().onCocosExplorer;
 				}
 
-				if (ImGui::Button("GDPS Switcher", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
-					setting().onGDPSSwitcher = !setting().onGDPSSwitcher;
-				}
+				// if (ImGui::Button("GDPS Switcher", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+				// 	setting().onGDPSSwitcher = !setting().onGDPSSwitcher;
+				// }
 			}
 
 			if (GetAsyncKeyState(0x31) && GetAsyncKeyState(0x37) && GetAsyncKeyState(0x30) && GetAsyncKeyState(0x33)) { // Don't say anything about this
@@ -1168,16 +1206,9 @@ void imgui_render() {
 			}
 
 			if (ImGui::Button("Settings", ImVec2(LONG_ITEM_WIDTH, 0))) {
-				//CCARRAY_FOREACH_B_TYPE(CCDirector::sharedDirector()->getRunningScene()->getChildren(), optionsLayer, gd::OptionsLayer) {
-				//	if (optionsLayer->getTag() == 0x725) {
-				//		
-				//	}
-				//	else {
-						auto optionsLayer = OptionsLayer::create();
-						optionsLayer->showLayer(false);
-						CCDirector::sharedDirector()->getRunningScene()->addChild(optionsLayer, CCDirector::sharedDirector()->getRunningScene()->getHighestChildZ() + 1, 0x725);
-				//	}
-				//}
+				auto optionsLayer = OptionsLayer::create();
+				optionsLayer->showLayer(false);
+				CCDirector::sharedDirector()->getRunningScene()->addChild(optionsLayer, CCDirector::sharedDirector()->getRunningScene()->getHighestChildZ() + 1);
 			}
 
 			static bool showFirstBtn = true;
@@ -1211,7 +1242,1768 @@ void imgui_render() {
 				geode::utils::file::openFolder(geode::dirs::getSaveDir());
 			}
 		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Screenshot", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			if (ImGui::Button("Screenshot", ImVec2(LONG_ITEM_WIDTH, 0))) {
+				bool pauseMenuVisibility = false;
+				bool labelsVisibility = false;
+				bool backgroundVisibility = false;
+				bool player1Visibility = false;
+				bool player2Visibility = false;
+
+				if (playLayer) {
+					if (PolzPauseLayer::get()) {
+						pauseMenuVisibility = PolzPauseLayer::get()->isVisible();
+						if (setting().onHidePauseMenuOnShot) {
+							PolzPauseLayer::get()->setVisible(false);
+						}
+					}
+
+					auto labelsNode = static_cast<CCNode*>(playLayer->getChildByTag(72615));
+					if (labelsNode) {
+						labelsVisibility = labelsNode->isVisible();
+						if (setting().onHideStatusLabelsOnShot) {
+							labelsNode->setVisible(false);
+						}
+					}
+
+					backgroundVisibility = playLayer->m_bgSprite->isVisible();
+					if (setting().onHideBackgroundOnShot) {
+						playLayer->m_bgSprite->setVisible(false);
+					}
+
+					player1Visibility = playLayer->m_player->isVisible();
+					player2Visibility = playLayer->m_player2->isVisible();
+					if (setting().onHidePlayerOnShot) {
+						playLayer->m_player->setVisible(false);
+						playLayer->m_player2->setVisible(false);
+					}
+				}
+
+				auto winSize = CCDirector::sharedDirector()->getWinSize();
+				CCRenderTexture* tex = CCRenderTexture::create(winSize.width, winSize.height, kTexture2DPixelFormat_RGBA8888);
+				tex->beginWithClear(0.f, 0.f, 0.f, 0.f);
+				tex->setPosition(winSize / 2.f);
+				CCDirector::sharedDirector()->getRunningScene()->visit();
+				tex->end();
+
+				std::time_t t = std::time(0);
+				std::tm* m = std::localtime(&t);
+
+				std::string day = (m->tm_mday < 10) ? "0" + std::to_string(m->tm_mday) : std::to_string(m->tm_mday);
+				std::string month = (m->tm_mon + 1 < 10) ? "0" + std::to_string(m->tm_mon + 1) : std::to_string(m->tm_mon + 1);
+				std::string date = std::to_string(m->tm_year + 1900) + "-" + month + "-" + std::to_string(m->tm_mday);
+
+				std::string hours = (m->tm_hour < 10) ? "0" + std::to_string(m->tm_hour) : std::to_string(m->tm_hour);
+				std::string minutes = (m->tm_min < 10) ? "0" + std::to_string(m->tm_min) : std::to_string(m->tm_min);
+				std::string seconds = (m->tm_sec < 10) ? "0" + std::to_string(m->tm_sec) : std::to_string(m->tm_sec);
+				std::string time = hours + "-" + minutes + "-" + seconds;
+
+				CCImage* img = tex->newCCImage();
+				if (img->saveToFile((std::string(CCFileUtils::sharedFileUtils()->getWritablePath2()) + "PolzHax/screenshots/" + date + " " + time + ".png").c_str(), false)) {
+					if (setting().onCopyShotToClipboard) {
+						copyFileToClipboard((std::string(CCFileUtils::sharedFileUtils()->getWritablePath2()) + "PolzHax/screenshots/" + date + " " + time + ".png").data());
+					}
+				}
+				tex->clear(0.f, 0.f, 0.f, 0.f);
+
+				if (playLayer) {
+					if (PolzPauseLayer::get()) {
+						PolzPauseLayer::get()->setVisible(pauseMenuVisibility);
+					}
+
+					auto labelsNode = static_cast<CCNode*>(playLayer->getChildByTag(72615));
+					if (labelsNode) {
+						labelsNode->setVisible(labelsVisibility);
+					}
+
+					if (setting().onHideBackgroundOnShot) {
+						playLayer->m_bgSprite->setVisible(backgroundVisibility);
+					}
+
+					if (setting().onHidePlayerOnShot) {
+						playLayer->m_player->setVisible(player1Visibility);
+						playLayer->m_player2->setVisible(player2Visibility);
+					}
+				}
+			}
+
+			ImGui::CheckboxF("Hide Pause Menu", &setting().onHidePauseMenuOnShot);
+			ImGui::CheckboxF("Hide Status Labels", &setting().onHideStatusLabelsOnShot);
+			ImGui::CheckboxF("Hide Background", &setting().onHideBackgroundOnShot);
+			ImGui::CheckboxF("Hide Player", &setting().onHidePlayerOnShot);
+			ImGui::CheckboxF("Copy To Clipboard", &setting().onCopyShotToClipboard);
+
+			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH, 0))) {
+				ShellExecute(0, NULL, (std::string(CCFileUtils::sharedFileUtils()->getWritablePath2()) + "/PolzHax/screenshots").c_str(), NULL, NULL, SW_SHOW);
+			}
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Cosmetic", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			// ImGui::CheckboxF("Accurate Percentage", &setting().onAccuratePercentage);
+			// ImGui::SameLine(170.f);
+			// if (ImGui::TreeNodeEx("##accuratePercentageSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			// 	int index = 0;
+			// 	for (int i = 0; i < IM_ARRAYSIZE(decimalValues); i++) {
+			// 		if (setting().decimalPlaces == decimalValues[i]) {
+			// 			index = i;
+			// 			break;
+			// 		}
+			// 	}
+			// 	ImGui::SetNextItemWidth(163.f);
+			// 	if (ImGui::Combo("##decimalPlaces", &index, decimalPlaces, IM_ARRAYSIZE(decimalPlaces))) {
+			// 		setting().decimalPlaces = decimalValues[index];
+			// 	}
+
+			// 	ImGui::TreePop();
+			// }
+
+
+			if (ImGui::CheckboxF("Coins Show Uncollected", &setting().onCoinsShowUncollected)) {
+				if (setting().onCoinsShowUncollected) {
+					sequence_patch(geode::base::get() + 0x43368, { 0x8b, 0xc2, 0x90 });
+					sequence_patch(geode::base::get() + 0x735ce, { 0x8b, 0xd9, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x43368, { 0x0f, 0x44, 0xc2 });
+					sequence_patch(geode::base::get() + 0x735ce, { 0x0f, 0x44, 0xd9 });
+				}
+			}
+			ImGui::Tooltip("Forces coins show as uncollected.");
+
+			if (ImGui::CheckboxF("Coins in Practice", &setting().onCoinsInPractice)) {
+				if (setting().onCoinsInPractice) {
+					sequence_patch(geode::base::get() + 0xeb138, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xeb138, { 0x75, 0x4c });
+				}
+			}
+			ImGui::Tooltip("Allows for coins to be picked up in practice mode.");
+
+			if (ImGui::CheckboxF("Force Don't Enter", &setting().onForceDontEnter)) {
+				if (setting().onForceDontEnter) {
+					sequence_patch(geode::base::get() + 0xec51c, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xec51c, { 0x8b, 0xd9 });
+				}
+			}
+			ImGui::Tooltip("Disables effects when objects enter the viewable play area.");
+
+			if (ImGui::CheckboxF("Force Don't Fade", &setting().onForceDontFade)) {
+				if (setting().onForceDontFade) {
+					sequence_patch(geode::base::get() + 0xebddb, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xebe06, { 0xeb, 0x11 });
+					sequence_patch(geode::base::get() + 0xebe20, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xebdf6, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xebddb, { 0x74, 0x5d });
+					sequence_patch(geode::base::get() + 0xebe06, { 0x74, 0x11 });
+					sequence_patch(geode::base::get() + 0xebe20, { 0x75, 0x18 });
+					sequence_patch(geode::base::get() + 0xebdf6, { 0x75, 0x42 });
+				}
+			}
+			ImGui::Tooltip("Disables fading when objects leave the viewable play area.");
+
+			if (ImGui::CheckboxF("Force Objects Invisible", &setting().onForceObjectsInvisible)) {
+				if (setting().onForceObjectsInvisible) {
+					sequence_patch(geode::base::get() + 0xebece, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xebece, { 0x0f, 0x84, 0xd1, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Disables fading when objects leave the viewable play area.");
+
+			if (ImGui::CheckboxF("Hide Attempts", &setting().onHideAttempts)) {
+				if (playLayer) {
+					playLayer->m_attemptsLabel->setVisible(!setting().onHideAttempts);
+				}
+			}
+			ImGui::Tooltip("Hides the attempts counter in-game.");
+
+			if (ImGui::CheckboxF("Hide Pause Button", &setting().onHidePauseButton)) {
+				if (playLayer) {
+					if (GameManager::sharedState()->getGameVariable("0024")) {
+						playLayer->m_uiLayer->m_pauseBtn->setVisible(!setting().onHidePauseButton);
+					}
+				}
+			}
+			ImGui::Tooltip("Hides the pause button when the in-game cursor is enabled");
+
+			if (ImGui::CheckboxF("Hide Pause Menu", &setting().onHidePauseMenu)) {
+				if (PolzPauseLayer::get()) {
+					PolzPauseLayer::get()->setVisible(!setting().onHidePauseMenu);
+				}
+			}
+			ImGui::Tooltip("Hides the pause menu.");
+
+			if (ImGui::CheckboxF("Hide Player", &setting().onHidePlayer)) {
+				if (playLayer) {
+					playLayer->m_player->setVisible(!setting().onHidePlayer);
+					playLayer->m_player2->setVisible(!setting().onHidePlayer);
+				}
+			}
+			ImGui::Tooltip("Hides the player.");
+
+			if (ImGui::CheckboxF("Hide Practice Buttons", &setting().onHidePracticeButtons)) {
+				if (playLayer && playLayer->m_practiceMode) {
+					playLayer->m_uiLayer->m_checkpointMenu->setVisible(!setting().onHidePracticeButtons);
+				}
+			}
+			ImGui::Tooltip("Hides the practice buttons.");
+
+			if (ImGui::CheckboxF("Instant Mirror", &setting().onInstantMirror)) {
+				if (setting().onInstantMirror) {
+					sequence_patch(geode::base::get() + 0xf0d36, { 0x00, 0x00, 0x00, 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf0d36, { 0x00, 0x00, 0x00, 0x3f });
+				}
+			}
+			ImGui::Tooltip("Disables the mirror portal animation.");
+
+			if (ImGui::CheckboxF("Inversed Trail", &setting().onInversedTrail)) {
+				setting().onTrailAlwaysOff = false;
+				setting().onTrailAlwaysOn = false;
+				if (setting().onInversedTrail) {
+					sequence_patch(geode::base::getCocos() + 0xac6a6, { 0x0f, 0x85, 0x55, 0x02, 0x00, 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0xac6a6, { 0x0f, 0x84, 0x55, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Inverses the trail state.");
+
+			if (ImGui::CheckboxF("Max Particles", &setting().onMaxParticles)) {
+				if (setting().onMaxParticles) {
+					sequence_patch(geode::base::getCocos() + 0xb64d7, { 0x8b, 0x7d, 0x07 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0xb64d7, { 0x8b, 0x7d, 0x08 });
+				}
+			}
+			ImGui::Tooltip("Increases particles to the maximum.");
+
+			if (ImGui::CheckboxF("Mini Cube Icon", &setting().onMiniCubeIcon)) {
+				setting().onNoMiniIcon = false;
+			}
+			ImGui::Tooltip("Forces use of the mini cube icon.");
+
+			if (ImGui::CheckboxF("No Animations", &setting().onNoAnimations)) {
+				if (setting().onNoAnimations) {
+					sequence_patch(geode::base::getCocos() + 0x886be, { 0xc0 });
+					sequence_patch(geode::base::getCocos() + 0x88da0, { 0xc0 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0x886be, { 0xc1 });
+					sequence_patch(geode::base::getCocos() + 0x88da0, { 0xc1 });
+				}
+			}
+			ImGui::Tooltip("Makes game animations instant (e.g. buttons).");
+
+			if (ImGui::CheckboxF("No Background Flash", &setting().onNoBackgroundFlash)) {
+				if (setting().onNoBackgroundFlash) {
+					sequence_patch(geode::base::get() + 0xe6c92, { 0x6a, 0x00 });
+					sequence_patch(geode::base::get() + 0xe6ca8, { 0xc7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xe6c92, { 0x6a, 0x01 });
+					sequence_patch(geode::base::get() + 0xe6ca8, { 0xc7, 0x04, 0x24, 0x8f, 0xc2, 0xf5, 0x3d });
+				}
+			}
+			ImGui::Tooltip("Disables size portal background flash.");
+
+			if (ImGui::CheckboxF("No Completion Effect", &setting().onNoCompletionEffect)) {
+				if (setting().onNoCompletionEffect) {
+					sequence_patch(geode::base::get() + 0xe5667, { 0xeb, 0x1a });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xe5667, { 0x75, 0x1a });
+				}
+			}
+			ImGui::Tooltip("Disables the completion effect (like in practice mode).");
+
+			//if (ImGui::CheckboxF("No Completion Popup", &setting().onNoCompletionPopup)) {
+			//	if (setting().onNoCompletionPopup) {
+			//		
+			//	}
+			//	else {
+
+			//	}
+			//}
+			//ImGui::Tooltip("Disables the level complete popup (also makes completion animation faster).");
+
+			if (ImGui::CheckboxF("No Death Effect", &setting().onNoDeathEffect)) {
+				if (setting().onNoDeathEffect) {
+					sequence_patch(geode::base::get() + 0xdde71, { 0xe9, 0xe7, 0x01, 0x00, 0x00, 0x90 });
+					sequence_patch(geode::base::get() + 0xf05dc, { 0xeb, 0x1b });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xdde71, { 0x0f, 0x84, 0xd5, 0x01, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0xf05dc, { 0x74, 0x1b });
+				}
+			}
+			ImGui::Tooltip("No visual effects on death.");
+
+			ImGui::CheckboxF("No Effect Circle", &setting().onNoEffectCircle);
+			ImGui::Tooltip("Removes effect circles from orb, portal & pad activations.");
+
+			if (ImGui::CheckboxF("No End Shake", &setting().onNoEndShake)) {
+				if (setting().onNoEndShake) {
+					sequence_patch(geode::base::get() + 0xe5f46, { 0x00, 0x00, 0x00, 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xe5f46, { 0x00, 0x00, 0x40, 0x40 });
+				}
+			}
+			ImGui::Tooltip("Removes camera shake from level complete animation.");
+
+			if (ImGui::CheckboxF("No Ghost Trail", &setting().onNoGhostTrail)) {
+				if (setting().onNoGhostTrail) {
+					sequence_patch(geode::base::get() + 0xf3374, { 0x6a, 0x00, 0x90 });
+					sequence_patch(geode::base::get() + 0xf338d, { 0x6a, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf3374, { 0xff, 0x75, 0x08 });
+					sequence_patch(geode::base::get() + 0xf338d, { 0xff, 0x75, 0x08 });
+				}
+			}
+			ImGui::Tooltip("Disables player ghost trail triggers.");
+
+			if (ImGui::CheckboxF("No Glow", &setting().onNoObjectGlow)) {
+				if (setting().onNoObjectGlow) {
+					sequence_patch(geode::base::get() + 0x6d8a3, { 0xe9, 0x8f, 0x01, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x6d8a3, { 0x0f, 0x85, 0x8e, 0x01, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Disables objects glow.");
+
+			if (ImGui::CheckboxF("No Gravity Effect", &setting().onNoGravityEffect)) {
+				if (setting().onNoGravityEffect) {
+					sequence_patch(geode::base::get() + 0xf4586, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf4586, { 0x75, 0x07 });
+				}
+			}
+			ImGui::Tooltip("Disables gravity effect.");
+
+			if (ImGui::CheckboxF("No Mini Icon", &setting().onNoMiniIcon)) {
+				setting().onMiniCubeIcon = false;
+			}
+			ImGui::Tooltip("Replaces default mini icon with normal one.");
+
+			if (ImGui::CheckboxF("No Mirror", &setting().onNoMirror)) {
+				if (setting().onNoMirror) {
+					sequence_patch(geode::base::get() + 0xf0bf2, { 0xe9, 0x9b, 0x01, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf0bf2, { 0x0f, 0x84, 0x9a, 0x01, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Disables mirror portals.");
+
+			ImGui::CheckboxF("No New Best Popup", &setting().onNoNewBestPopup);
+			ImGui::Tooltip("Disables the new best popup.");
+
+			ImGui::CheckboxF("No Orb Ring", &setting().onNoOrbRing);
+			ImGui::Tooltip("Disables orb ring effect when touching it.");
+
+			ImGui::CheckboxF("No Particles", &setting().onNoParticles);
+			ImGui::Tooltip("Disables the particle system.");
+
+			if (ImGui::CheckboxF("No Portal Lightning", &setting().onNoPortalLightning)) {
+				if (setting().onNoPortalLightning) {
+					sequence_patch(geode::base::get() + 0xe6c19, { 0xeb, 0x71 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xe6c19, { 0x75, 0x71 });
+				}
+			}
+			ImGui::Tooltip("Disables portal lightning from size-changing portals.");
+
+			ImGui::CheckboxF("No Portal Shine", &setting().onNoPortalShine);
+			ImGui::Tooltip("Disables portal shine effect.");
+
+			ImGui::CheckboxF("No Pulse", &setting().onNoPulse);
+			ImGui::Tooltip("Disables pulsing on objects.");
+
+			if (ImGui::CheckboxF("No Respawn Flash", &setting().onNoRespawnFlash)) {
+				if (setting().onNoRespawnFlash) {
+					sequence_patch(geode::base::get() + 0xdd62f, { 0xe9, 0x99, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xdd62f, { 0x0f, 0x85, 0x98, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Disables the respawn flash & circle effect.");
+
+			if (ImGui::CheckboxF("No Shade Effect", &setting().onNoShadeEffect)) {
+				if (setting().onNoShadeEffect) {
+					sequence_patch(geode::base::get() + 0xebfe3, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xebfe3, { 0x77 });
+				}
+			}
+			ImGui::Tooltip("Disables the disappearing effect on invisible blocks and etc.");
+
+			if (ImGui::CheckboxF("No Vehicle Particles", &setting().onNoVehicleParticles)) {
+				if (playLayer) {
+					playLayer->m_player->m_birdDragParticle->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player2->m_birdDragParticle->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player->m_dragParticle2->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player2->m_dragParticle2->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player->m_burstParticle->setVisible(!setting().onNoVehicleParticles);
+					playLayer->m_player2->m_burstParticle->setVisible(!setting().onNoVehicleParticles);
+				}
+			}
+
+			ImGui::CheckboxF("No Wave Pulse", &setting().onNoWavePulse);
+			ImGui::Tooltip("Disables wave trail pulsing.");
+
+			if (ImGui::CheckboxF("No Wave Trail", &setting().onNoWaveTrail)) {
+				if (playLayer) {
+					playLayer->m_player->m_hardStreak->setVisible(!setting().onNoWaveTrail);
+					playLayer->m_player2->m_hardStreak->setVisible(!setting().onNoWaveTrail);
+				}
+			}
+			ImGui::Tooltip("Disables the hard wave trail.");
+
+			ImGui::CheckboxF("No Wave Trail Behind", &setting().onNoWaveTrailBehind);
+			ImGui::Tooltip("Disables default player trail behind the wave trail.");
+
+			if (ImGui::CheckboxF("Practice Pulse", &setting().onPracticePulse)) {
+				if (setting().onPracticePulse) {
+					sequence_patch(geode::base::get() + 0x29975, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xeb441, { 0xeb, 0x16 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x29975, { 0x75, 0x0c });
+					sequence_patch(geode::base::get() + 0xeb441, { 0x74, 0x16 });
+				}
+			}
+			ImGui::Tooltip("Enables pulses in practice mode.");
+
+			ImGui::CheckboxF("Show Total Attempts", &setting().onShowTotalAttempts);
+			ImGui::Tooltip("Shows the total attempt count in-level instead of the session attempt count.");
+
+			// if (ImGui::CheckboxF("Solid Player Glow", &setting().onSolidPlayerGlow)) {
+			// 	if (setting().onSolidPlayerGlow) {
+			// 		if (playLayer) {
+			// 			playLayer->m_batchNodeAddPlayer->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+			// 		}
+			// 		if (editorLayer) {
+			// 			editorLayer->m_player->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+			// 			editorLayer->m_player->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+			// 			editorLayer->m_player2->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+			// 			editorLayer->m_player2->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+			// 		}
+			// 	}
+			// 	else {
+			// 		if (playLayer) {
+			// 			playLayer->m_batchNodeAddPlayer->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+			// 		}
+			// 		if (editorLayer) {
+			// 			editorLayer->m_player->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+			// 			editorLayer->m_player->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+			// 			editorLayer->m_player2->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+			// 			editorLayer->m_player2->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+			// 		}
+			// 	}
+			// }
+			// ImGui::Tooltip("Removes blending from player glow (like in 2.2).");
+
+			if (ImGui::CheckboxF("Solid Player Trail", &setting().onSolidPlayerTrail)) {
+				if (setting().onSolidPlayerTrail) {
+					sequence_patch(geode::base::getCocos() + 0xac3dc, { 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0xac3dc, { 0x89, 0x41, 0x10 });
+				}
+			}
+			ImGui::Tooltip("No blending on player trail.");
+
+			if (ImGui::CheckboxF("Solid Wave Trail", &setting().onSolidWaveTrail)) {
+				if (setting().onSolidWaveTrail) {
+					sequence_patch(geode::base::get() + 0xd9ade, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xd9ade, { 0x75, 0x0c });
+				}
+			}
+			ImGui::Tooltip("No blending on the wave trail.");
+
+			if (ImGui::CheckboxF("Trail Always Off", &setting().onTrailAlwaysOff)) {
+				setting().onInversedTrail = false;
+				setting().onTrailAlwaysOn = false;
+				if (setting().onTrailAlwaysOff) {
+					sequence_patch(geode::base::getCocos() + 0xac6a6, { 0xe9, 0x56, 0x02, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0xac6a6, { 0x0f, 0x84, 0x55, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Forces player trail to be always off.");
+
+			if (ImGui::CheckboxF("Trail Always On", &setting().onTrailAlwaysOn)) {
+				setting().onInversedTrail = false;
+				setting().onTrailAlwaysOff = false;
+				if (setting().onTrailAlwaysOn) {
+					sequence_patch(geode::base::getCocos() + 0xac6a6, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0xac6a6, { 0x0f, 0x84, 0x55, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Forces player trail to be always on.");
+
+			if (ImGui::CheckboxF("Trail Bug Fix", &setting().onTrailBugFix)) {
+				if (setting().onTrailBugFix) {
+					sequence_patch(geode::base::getCocos() + 0xac29d, { 0xbb, 0xff, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0xac29d, { 0xf3, 0x0f, 0x2c, 0xc1, 0x2b, 0xd8 });
+				}
+			}
+			ImGui::Tooltip("Fixes trail cutting on high refresh rates.");
+
+			ImGui::CheckboxF("Wave Pulse Size", &setting().onWavePulseSize);
+			ImGui::Tooltip("Changes the wave pulse size multiplier.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##wavePulseSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Size", &setting().wavePulseSize, .1f, .1f, 2.3f, "%.1fx");
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Wave Trail Bug Fix", &setting().onWaveTrailBugFix);
+			ImGui::Tooltip("Fixes wave trail not being visible until you click after a checkpoint/startpos.");
+
+			if (ImGui::CheckboxF("Wave Trail on Death", &setting().onWaveTrailOnDeath)) {
+				if (setting().onWaveTrailOnDeath) {
+					sequence_patch(geode::base::get() + 0xdddfa, { 0xeb, 0x0f });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xdddfa, { 0x74, 0x0f });
+				}
+			}
+			ImGui::Tooltip("Keeps wave trail visible on death.");
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Creator", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			if (ImGui::CheckboxF("Absolute Position", &setting().onAbsolutePosition)) {
+				if (setting().onAbsolutePosition) {
+					sequence_patch(geode::base::get() + 0x4b49d, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x4b49d, { 0x51, 0x8b, 0xcf, 0xff, 0x50, 0x5c });
+				}
+			}
+			ImGui::Tooltip("Locks object position for rotation.");
+
+			if (ImGui::CheckboxF("Copy Hack", &setting().onCopyHack)) {
+				if (setting().onCopyHack) {
+					sequence_patch(geode::base::get() + 0x9c7ed, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9dfe5, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9c80f, { 0x8b, 0xcf, 0x90 }); // replaces passworded copy button sprite with normal one
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x9c7ed, { 0x0f, 0x84, 0x2e, 0x01, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0x9dfe5, { 0x75, 0x0e });
+					sequence_patch(geode::base::get() + 0x9c80f, { 0x0f, 0x44, 0xcf });
+				}
+			}
+			ImGui::Tooltip("Lets you copy any level, without a password.");
+
+			if (ImGui::CheckboxF("Default Song Bypass", &setting().onDefaultSongBypass)) {
+				if (setting().onDefaultSongBypass) {
+					sequence_patch(geode::base::get() + 0x9a37f, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9a391, { 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9a3a0, { 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9a3fe, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9a410, { 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x9a41f, { 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x9a37f, { 0x74, 0x4e });
+					sequence_patch(geode::base::get() + 0x9a391, { 0x0f, 0x4f, 0xf0 });
+					sequence_patch(geode::base::get() + 0x9a3a0, { 0x0f, 0x48, 0xf1 });
+					sequence_patch(geode::base::get() + 0x9a3fe, { 0x74, 0x4e });
+					sequence_patch(geode::base::get() + 0x9a410, { 0x0f, 0x4f, 0xf0 });
+					sequence_patch(geode::base::get() + 0x9a41f, { 0x0f, 0x48, 0xf1 });
+				}
+			}
+			ImGui::Tooltip("Lets you use hidden default songs in the editor."); // Actually the most useless hack in 1.9
+
+			if (ImGui::CheckboxF("Editor Extension", &setting().onEditorExtension)) {
+				if (setting().onEditorExtension) {
+					sequence_patch(geode::base::get() + 0x14a74c, { 0x00, 0x60, 0xea, 0x4a }); // 60000 to 7680000
+
+					sequence_patch(geode::base::get() + 0x4b513, { 0xeb }); // EditorUI::getLimitedPosition
+					sequence_patch(geode::base::get() + 0x4b525, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4b53e, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4b562, { 0xeb });
+
+					sequence_patch(geode::base::get() + 0x4b445, { 0xeb }); // EditorUI::moveObject
+					sequence_patch(geode::base::get() + 0x4b457, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4b470, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4b482, { 0xeb });
+
+					sequence_patch(geode::base::get() + 0x4779c, { 0xeb }); // EditorUI::onCreateObject
+					sequence_patch(geode::base::get() + 0x477b9, { 0xeb });
+					sequence_patch(geode::base::get() + 0x477d2, { 0xeb });
+					sequence_patch(geode::base::get() + 0x477e8, { 0xeb });
+
+					sequence_patch(geode::base::get() + 0x93861, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x9399b, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x939d3, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x93aed, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x93c72, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x94073, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x94112, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x94667, { 0x24, 0xa3, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x946f3, { 0x24, 0xa3, 0x54, 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x14a74c, { 0x00, 0x60, 0x6a, 0x47 });
+
+					sequence_patch(geode::base::get() + 0x4b513, { 0x76 });
+					sequence_patch(geode::base::get() + 0x4b525, { 0x76 });
+					sequence_patch(geode::base::get() + 0x4b53e, { 0x76 });
+					sequence_patch(geode::base::get() + 0x4b562, { 0x76 });
+
+					sequence_patch(geode::base::get() + 0x4b445, { 0x76 });
+					sequence_patch(geode::base::get() + 0x4b457, { 0x76 });
+					sequence_patch(geode::base::get() + 0x4b470, { 0x76 });
+					sequence_patch(geode::base::get() + 0x4b482, { 0x76 });
+
+					sequence_patch(geode::base::get() + 0x4779c, { 0x77 });
+					sequence_patch(geode::base::get() + 0x477b9, { 0x77 });
+					sequence_patch(geode::base::get() + 0x477d2, { 0x76 });
+					sequence_patch(geode::base::get() + 0x477e8, { 0x76 });
+
+					sequence_patch(geode::base::get() + 0x93861, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x9399b, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x939d3, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x93aed, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x93c72, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x94073, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x94112, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x94667, { 0xb8, 0xa6, 0x54, 0x00 });
+					sequence_patch(geode::base::get() + 0x946f3, { 0xb8, 0xa6, 0x54, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Increases the editor length by a factor of 128.");
+
+			if (ImGui::CheckboxF("Free Scroll", &setting().onFreeScroll)) {
+				if (setting().onFreeScroll) {
+					sequence_patch(geode::base::get() + 0x4ca45, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4ca5c, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4ca75, { 0xeb });
+					sequence_patch(geode::base::get() + 0x4ca8c, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x4ca45, { 0x77 });
+					sequence_patch(geode::base::get() + 0x4ca5c, { 0x77 });
+					sequence_patch(geode::base::get() + 0x4ca75, { 0x77 });
+					sequence_patch(geode::base::get() + 0x4ca8c, { 0x77 });
+				}
+			}
+			ImGui::Tooltip("Allows scrolling out of the editor.");
+
+			if (ImGui::CheckboxF("Hide Grid", &setting().onHideGrid)) {
+				if (setting().onHideGrid) {
+					sequence_patch(geode::base::get() + 0x939ba, { 0x00 });
+					sequence_patch(geode::base::get() + 0x93b6e, { 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x939ba, { 0x96 });
+					sequence_patch(geode::base::get() + 0x93b6e, { 0x96 });
+				}
+			}
+			ImGui::Tooltip("Hide the editor grid.");
+
+			if (ImGui::CheckboxF("Hide Trigger Lines", &setting().onHideTriggerLines)) {
+				if (setting().onHideTriggerLines) {
+					sequence_patch(geode::base::get() + 0x93e08, { 0xe9, 0xce, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x93e08, { 0x0f, 0x84, 0xcd, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Hides trigger lines.");
+
+			if (ImGui::CheckboxF("Hide UI", &setting().onHideUI)) {
+				if (editorLayer) {
+					editorLayer->m_uiLayer->setVisible(!setting().onHideUI);
+				}
+			}
+			ImGui::Tooltip("Hide the editor UI.");
+
+			ImGui::CheckboxF("Hitbox Bug Fix", &setting().onHitboxBugFix);
+			ImGui::Tooltip("Fixes oriented hitboxes in the editor.");
+
+			if (ImGui::CheckboxF("Level Edit", &setting().onLevelEdit)) {
+				if (setting().onLevelEdit) {
+					sequence_patch(geode::base::get() + 0xd62ef, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xd62ef, { 0x75, 0x62 });
+				}
+			}
+			ImGui::Tooltip("Lets you edit any level through the pause menu.");
+
+			if (ImGui::CheckboxF("No (C) Mark", &setting().onNoCopyMark)) {
+				if (setting().onNoCopyMark) {
+					sequence_patch(geode::base::get() + 0x54aa0, { 0xb8, 0x00, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x54aa0, { 0x8b, 0x81, 0x04, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Removes the (C) mark when uploading copied levels.");
+
+			if (ImGui::CheckboxF("No Death X", &setting().onNoDeathX)) {
+				if (setting().onNoDeathX) {
+					sequence_patch(geode::base::get() + 0x91254, { 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x91254, { 0x01 });
+				}
+			}
+			ImGui::Tooltip("Removes big annoying red X when dying whilst playtesting.");
+
+			if (ImGui::CheckboxF("No Editor Trail", &setting().onNoEditorTrail)) {
+				if (setting().onNoEditorTrail) {
+					sequence_patch(geode::base::get() + 0x94305, { 0x00 });
+					sequence_patch(geode::base::get() + 0x9442c, { 0x00 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x94305, { 0xff });
+					sequence_patch(geode::base::get() + 0x9442c, { 0xff });
+				}
+			}
+			ImGui::Tooltip("Remove the editor trail.");
+
+			if (ImGui::CheckboxF("Object Bypass", &setting().onObjectBypass)) {
+				if (setting().onObjectBypass) {
+					sequence_patch(geode::base::get() + 0x3e30f, { 0xff, 0xff, 0xff, 0x7f });
+					sequence_patch(geode::base::get() + 0x476b3, { 0xff, 0xff, 0xff, 0x7f });
+					sequence_patch(geode::base::get() + 0x48ed6, { 0xff, 0xff, 0xff, 0x7f });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x3e30f, { 0x20, 0x4e, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0x476b3, { 0x20, 0x4e, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0x48ed6, { 0x20, 0x4e, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Uncaps the object limit.");
+
+			if (ImGui::CheckboxF("Place Over", &setting().onPlaceOver)) {
+				if (setting().onPlaceOver) {
+					sequence_patch(geode::base::get() + 0x8d37f, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x8d37f, { 0x77 });
+				}
+			}
+			ImGui::Tooltip("Lets you place the same object over itself in editor.");
+
+			ImGui::CheckboxF("Reset Percentage", &setting().onResetPercentage);
+			ImGui::Tooltip("Resets normal percentage while saving level.");
+
+			if (ImGui::CheckboxF("Rotation Hack (Lags)", &setting().onRotationHack)) {
+				if (setting().onRotationHack) {
+					sequence_patch(geode::base::get() + 0x49a5d, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+					sequence_patch(geode::base::get() + 0x49a92, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+					sequence_patch(geode::base::get() + 0x74751, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+					sequence_patch(geode::base::get() + 0xe84c5, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x49a5d, { 0x8b, 0x80, 0x68, 0x02, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0x49a92, { 0x8b, 0x80, 0x68, 0x02, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0x74751, { 0x8b, 0x83, 0x68, 0x02, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0xe84c5, { 0x8b, 0x83, 0x68, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Allows you to rotate any object. Only works locally.");
+
+			if (ImGui::CheckboxF("Smooth Editor Trail", &setting().onSmoothEditorTrail)) {
+				if (setting().onSmoothEditorTrail) {
+					sequence_patch(geode::base::get() + 0x91a34, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x91a34, { 0x72, 0x79 });
+				}
+			}
+			ImGui::Tooltip("Makes the editor trail smoother by updating it every frame instead of at 30fps.");
+
+			if (ImGui::CheckboxF("Verify Hack", &setting().onVerifyHack)) {
+				if (setting().onVerifyHack) {
+					sequence_patch(geode::base::get() + 0x3d760, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x3d760, { 0x75 });
+				}
+			}
+			ImGui::Tooltip("Lets you upload unverified levels.");
+
+			if (ImGui::CheckboxF("Zoom Bypass", &setting().onZoomBypass)) {
+				if (setting().onZoomBypass) {
+					sequence_patch(geode::base::get() + 0x48bb5, { 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x48bba, { 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x48c15, { 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x48c1a, { 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x48bb5, { 0x0f, 0x2f, 0xc8 });
+					sequence_patch(geode::base::get() + 0x48bba, { 0x0f, 0x28, 0xc8 });
+					sequence_patch(geode::base::get() + 0x48c15, { 0x0f, 0x2f, 0xc8 });
+					sequence_patch(geode::base::get() + 0x48c1a, { 0x0f, 0x28, 0xc8 });
+				}
+			}
+			ImGui::Tooltip("Lets you zoom fully in & out. (NOTE: Can crash with an edited grid size)");
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			//ImGui::CheckboxF("0% Practice Complete", &setting().onZeroPracticeComplete);
+			//ImGui::Tooltip("Completes a level if you beat it in 1 practice attempt.");
+
+			ImGui::CheckboxF("Auto Deafen", &setting().onAutoDeafen);
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Deafens user in Discord after a certain %%.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##autodeafenSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::CheckboxF("Undeafen On Pause", &setting().onPauseUndeafen);
+
+				ImGui::CheckboxF("Deafen in Practice", &setting().onPracticeDeafen);
+
+				ImGui::CheckboxF("Deafen with StartPos", &setting().onTestmodeDeafen);
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Deafen at", &setting().deafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Undeafen at", &setting().undeafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
+
+				ImGui::HotKey("Shortcut", setting().m_autoDeafenKey, 0.f, ImVec2(80.f, 0.f));
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Auto Kill", &setting().onAutoKill);
+			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
+				ImGui::SetTooltip("Kills a player at a certain percentage.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##autoKillSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Kill at", &setting().killPercentage, 1.f, 0.f, 100.f, "%.0f%%");
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Auto Pickup Coins", &setting().onAutoPickupCoins);
+			ImGui::Tooltip("Automatically collects gold coins.");
+
+			ImGui::CheckboxF("Auto Practice Mode", &setting().onAutoPracticeMode);
+			ImGui::Tooltip("Auto-enables practice mode.");
+
+			ImGui::CheckboxF("Auto Song Download", &setting().onAutoSongDownload);
+			ImGui::Tooltip("Automatically starts downloading songs when you open the level page.");
+
+			ImGui::CheckboxF("Ball Rotation Bug Fix", &setting().onBallRotationBugFix);
+			ImGui::Tooltip("Fixes that ball rotation bug when entering a portal mid ball animation.");
+
+			// ImGui::CheckboxF("Checkpoint Lag Fix", &setting().onCheckpointLagFix);
+			// ImGui::Tooltip("Fixes lag caused by starting from a checkpoint/startpos.");
+
+			if (ImGui::CheckboxF("Confirm Exit", &setting().onConfirmExit)) {
+				if (setting().onConfirmExit) {
+					sequence_patch(geode::base::get() + 0xd7f80, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xd7f8d, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xd7f9d, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xd7fa5, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xd7f80, { 0xe8, 0xfb, 0xbb, 0x01, 0x00 });
+					sequence_patch(geode::base::get() + 0xd7f8d, { 0x6a, 0x10 });
+					sequence_patch(geode::base::get() + 0xd7f9d, { 0x68, 0x7c, 0x42, 0x51, 0x00 });
+					sequence_patch(geode::base::get() + 0xd7fa5, { 0xe8, 0xc6, 0xd7, 0xf2, 0xff });
+				}
+			}
+			ImGui::Tooltip("Requires confirmation when exiting a level.");
+
+			if (ImGui::CheckboxF("Corrective Music Sync", &setting().onCorrectiveMusicSync)) {
+				if (setting().onCorrectiveMusicSync) {
+					sequence_patch(geode::base::get() + 0xee59e, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xee59e, { 0x75 });
+				}
+			}
+			ImGui::Tooltip("Syncs music to checked speed-portals, instead of only ones the player hit.");
+
+			if (ImGui::CheckboxF("Everything Hurts", &setting().onEverythingHurts)) {
+				if (setting().onEverythingHurts) {
+					sequence_patch(geode::base::get() + 0xeaa42, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xeaa42, { 0x75, 0x0b });
+				}
+			}
+			ImGui::Tooltip("Owie.");
+
+			if (ImGui::CheckboxF("Everything Pulses", &setting().onEverythingPulses)) {
+				if (setting().onEverythingPulses) {
+					sequence_patch(geode::base::get() + 0x52af0, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x52af0, { 0x8a, 0x81, 0x95, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Enables pulsing on all objects.");
+
+			if (ImGui::CheckboxF("Freeze Player", &setting().onFreezePlayer)) {
+				if (setting().onFreezePlayer) {
+					sequence_patch(geode::base::get() + 0xe9dd3, { 0xe9, 0x3f, 0x01, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xe9dd3, { 0x0f, 0x85, 0x3e, 0x01, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Freezes player movement.");
+
+			if (ImGui::CheckboxF("High FPS Rotation Fix", &setting().onHighFPSRotationFix)) {
+				if (setting().onHighFPSRotationFix) {
+					sequence_patch(geode::base::get() + 0xdc13b, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xdc13b, { 0x0f, 0x82, 0xd6, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Fixed vehicles rotation on high fps (affects hitboxes).");
+
+			if (ImGui::CheckboxF("Hitboxes", &setting().onHitboxes)) {
+				if (setting().onHitboxes) {
+					if (playLayer) {
+						static_cast<PolzPlayLayer*>(playLayer)->updateShowHitboxes();
+					}
+				}
+				else {
+					if (playLayer) {
+						if (!playLayer->m_isDead && !setting().onHitboxesOnDeath) {
+							static_cast<PolzPlayLayer*>(playLayer)->clearHitboxes();
+						}
+					}
+				}
+			}
+			ImGui::Tooltip("Visualizes level hitboxes.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##hitboxesSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				// Solids
+
+				ImGui::CheckboxF("Solids", &setting().onSolidHitboxes);
+
+				static float solidsColor[3] = {
+					setting().solidR / 255.f,
+					setting().solidG / 255.f,
+					setting().solidB / 255.f
+				};
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				if (ImGui::ColorEdit3("##solidsColor", solidsColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().solidR = solidsColor[0] * 255;
+					setting().solidG = solidsColor[1] * 255;
+					setting().solidB = solidsColor[2] * 255;
+				}
+
+				// Hazards
+
+				ImGui::CheckboxF("Hazards", &setting().onHazardHitboxes);
+
+				static float hazardsColor[3] = {
+					setting().hazardR / 255.f,
+					setting().hazardG / 255.f,
+					setting().hazardB / 255.f
+				};
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				if (ImGui::ColorEdit3("##hazardsColor", hazardsColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().hazardR = hazardsColor[0] * 255;
+					setting().hazardG = hazardsColor[1] * 255;
+					setting().hazardB = hazardsColor[2] * 255;
+				}
+
+				// Specials
+
+				ImGui::CheckboxF("Specials", &setting().onSpecialHitboxes);
+
+				static float specialsColor[3] = {
+					setting().specialR / 255.f,
+					setting().specialG / 255.f,
+					setting().specialB / 255.f
+				};
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				if (ImGui::ColorEdit3("##specialsColor", specialsColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().specialR = specialsColor[0] * 255;
+					setting().specialG = specialsColor[1] * 255;
+					setting().specialB = specialsColor[2] * 255;
+				}
+
+				ImGui::CheckboxF("Player", &setting().onPlayerHitboxes);
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragInt("Opacity", &setting().hitboxesOpacity, 1.f, 0, 255);
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Hitboxes on Death", &setting().onHitboxesOnDeath);
+			ImGui::Tooltip("Visualizes level hitboxes, only on death");
+
+			if (ImGui::CheckboxF("Instant Complete", &setting().onInstantComplete)) {
+				if (setting().onInstantComplete) {
+					sequence_patch(geode::base::get() + 0xe16f6, { 0xc7, 0x87, 0x74, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xe16f6, { 0xf3, 0x0f, 0x11, 0x8f, 0x74, 0x04, 0x00, 0x00, 0x9f, 0xf6, 0xc4, 0x44 });
+				}
+			}
+			ImGui::Tooltip("Teleports the player to the end of a level.");
+
+			ImGui::CheckboxF("Invisible Dual Fix", &setting().onInvisibleDualFix);
+			ImGui::Tooltip("Fixes where your 2nd player sometimes becomes invisible.");
+
+			if (ImGui::CheckboxF("Jump Hack", &setting().onJumpHack)) {
+				if (setting().onJumpHack) {
+					sequence_patch(geode::base::get() + 0xda510, { 0x01 });
+					sequence_patch(geode::base::get() + 0xda295, { 0x01 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xda510, { 0x00 });
+					sequence_patch(geode::base::get() + 0xda295, { 0x00 });
+				}
+			}
+			ImGui::Tooltip("Allows you to jump in mid-air.");
+
+			if (ImGui::CheckboxF("Noclip", &setting().onNoclip)) {
+				if (setting().onNoclip) {
+					sequence_patch(geode::base::get() + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
+				}
+
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::Tooltip("Makes the player invincible.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##noclipSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::CheckboxF("Noclip Tint", &setting().onNoclipTint);
+
+				static float noclipTintColor[3] = {
+					setting().noclipTintR / 255.f,
+					setting().noclipTintG / 255.f,
+					setting().noclipTintB / 255.f
+				};
+
+				ImGui::SameLine();
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				if (ImGui::ColorEdit3("##noclipTintColor", noclipTintColor, ImGuiColorEditFlags_NoInputs)) {
+					setting().noclipTintR = noclipTintColor[0] * 255;
+					setting().noclipTintG = noclipTintColor[1] * 255;
+					setting().noclipTintB = noclipTintColor[2] * 255;
+
+					if (playLayer) {
+						auto noclipTint = static_cast<CCLayerColor*>(playLayer->getChildByTag(875));
+						if (noclipTint) {
+							noclipTint->setColor(ccc3(setting().noclipTintR, setting().noclipTintG, setting().noclipTintB));
+						}
+					}
+				}
+
+				if (ImGui::CheckboxF("Experimental (buggy)", &setting().onNoclipUnstuck)) {
+					if (setting().onNoclipUnstuck) {
+						sequence_patch(geode::base::get() + 0xdae16, { 0xe9, 0x00, 0x02, 0x00, 0x00, 0x90 });
+						sequence_patch(geode::base::get() + 0xdb02d, { 0xe9, 0x10, 0x01, 0x00, 0x00, 0x90 });
+					}
+					else {
+						sequence_patch(geode::base::get() + 0xdae16, { 0x0f, 0x84, 0xff, 0x01, 0x00, 0x00 });
+						sequence_patch(geode::base::get() + 0xdb02d, { 0x0f, 0x8b, 0x0f, 0x01, 0x00, 0x00 });
+					}
+				}
+				ImGui::Tooltip("Prevents player from getting stuck.");
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Pause During Completion", &setting().onPauseDuringCompletion)) {
+				if (setting().onPauseDuringCompletion) {
+					sequence_patch(geode::base::get() + 0xf38cf, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf38cf, { 0x0f, 0x85, 0xc7, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Lets you pause during the level complete animation.");
+
+			ImGui::CheckboxF("Practice Bug Fix", &setting().onPracticeFix);
+			ImGui::Tooltip("Saves & restores player velocity and object blending in practice mode.");
+
+			if (ImGui::CheckboxF("Practice Music", &setting().onPracticeMusic)) {
+				if (setting().onPracticeMusic) {
+					sequence_patch(geode::base::get() + 0xf284f, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xf3663, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xf0699, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xf06cb, { 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xf3691, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xf3943, { 0xeb });
+					sequence_patch(geode::base::get() + 0xf3a96, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xf284f, { 0x0f, 0x85, 0x4d, 0x07, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0xf3663, { 0x75, 0x41 });
+					sequence_patch(geode::base::get() + 0xf0699, { 0x75, 0x3e });
+					sequence_patch(geode::base::get() + 0xf06cb, { 0x75, 0x0c });
+					sequence_patch(geode::base::get() + 0xf3691, { 0xe8, 0xaa, 0x42, 0xf2, 0xff });
+					sequence_patch(geode::base::get() + 0xf3943, { 0x74 });
+					sequence_patch(geode::base::get() + 0xf3a96, { 0x0f, 0x85, 0xb5, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Plays the level's song in-sync with your position.");
+
+			// ImGui::CheckboxF("Replay Last Checkpoint", &setting().onReplayLastCheckpoint);
+			// ImGui::Tooltip("Respawn from your last practice mode checkpoint after completing a level.");
+
+			ImGui::CheckboxF("Respawn Time", &setting().onRespawnTime);
+			ImGui::Tooltip("Changes player respawn time.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##respawnTimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+
+				ImGui::SetNextItemWidth(80.f);
+				ImGui::DragFloat("Time", &setting().respawnValue, 100.f, 0.f, 10000.f, "%.0fms");
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Shipcopter", &setting().onShipcopter);
+			ImGui::Tooltip("Changes Ship physics to be more like Swingcopter (inaccurate).");
+
+			ImGui::CheckboxF("Show Layout", &setting().onShowLayout);
+			ImGui::Tooltip("Removes all decoration and color from levels.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##layoutSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				static float layoutBg[3] = {
+					setting().layoutBGR / 255.f,
+					setting().layoutBGG / 255.f,
+					setting().layoutBGB / 255.f
+				};
+
+				if (ImGui::ColorEdit3("Background Color##layout", layoutBg, ImGuiColorEditFlags_NoInputs)) {
+					setting().layoutBGR = layoutBg[0] * 255;
+					setting().layoutBGG = layoutBg[1] * 255;
+					setting().layoutBGB = layoutBg[2] * 255;
+				}
+
+				static float layoutG[3] = {
+					setting().layoutGR / 255.f,
+					setting().layoutGG / 255.f,
+					setting().layoutGB / 255.f
+				};
+
+				if (ImGui::ColorEdit3("Ground Color##layout", layoutG, ImGuiColorEditFlags_NoInputs)) {
+					setting().layoutGR = layoutG[0] * 255;
+					setting().layoutGG = layoutG[1] * 255;
+					setting().layoutGB = layoutG[2] * 255;
+				}
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Smart StartPos", &setting().onSmartStartPos);
+			ImGui::Tooltip("Automatically sets gamemode, speed, size & border for a startpos.");
+
+			ImGui::CheckboxF("StartPos Switcher", &setting().onStartPosSwitcher);
+			ImGui::Tooltip("Lets you switch between multiple start positions in-level.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##startPosSwitcherSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::HotKey("Previous", setting().m_previousStartPosKey, 0.f, ImVec2(80.f, 0.f));
+				ImGui::HotKey("Next", setting().m_nextStartPosKey, 0.f, ImVec2(80.f, 0.f));
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Wave Slide", &setting().onWaveSlide)) {
+				if (setting().onWaveSlide) {
+					sequence_patch(geode::base::get() + 0xdba98, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0xdc75a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xdba98, { 0x0f, 0x85, 0xe0, 0x02, 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0xdc75a, { 0x0f, 0x85, 0x91, 0x03, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Lets wave slide on blocks and slopes (like D blocks in 2.1).");
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextItemWidth(80.f);
+			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
+				PolzHax::updateFPSBypass();
+			}
+			ImGui::SameLine();
+			if (ImGui::CheckboxF("Unlock FPS", &setting().onFPSBypass)) {
+				PolzHax::updateFPSBypass();
+			}
+
+			ImGui::SetNextItemWidth(80.f);
+			ImGui::DragFloat("##tpsBypass", &setting().tpsValue, 1.f, 1.f, 480.f, "%.0f TPS");
+			ImGui::SameLine();
+			ImGui::CheckboxF("Unlock TPS", &setting().onTPSBypass);
+
+			if (ImGui::CheckboxF("Allow Low Volume", &setting().onAllowLowVolume)) {
+				if (setting().onAllowLowVolume) {
+					sequence_patch(geode::base::get() + 0xd772e, { 0xeb });
+					sequence_patch(geode::base::get() + 0xd0e0e, { 0xeb });
+					sequence_patch(geode::base::get() + 0xd0cb0, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xd772e, { 0x76 });
+					sequence_patch(geode::base::get() + 0xd0e0e, { 0x76 });
+					sequence_patch(geode::base::get() + 0xd0cb0, { 0x76 });
+				}
+			}
+			ImGui::Tooltip("Removes snapping to 0%% when setting volume to 3%% or below.");
+
+			ImGui::CheckboxF("Auto Safe Mode", &setting().onAutoSafeMode);
+			ImGui::Tooltip("Enables Safe Mode when cheats are enabled.");
+
+			if (ImGui::CheckboxF("Disable Song Alert", &setting().onDisableSongAlert)) {
+				if (setting().onDisableSongAlert) {
+					sequence_patch(geode::base::get() + 0x9dd2b, { 0xeb });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x9dd2b, { 0x75 });
+				}
+			}
+			ImGui::Tooltip("Disables song alert when trying to play a level without downloaded song.");
+
+			if (ImGui::CheckboxF("Fast Alt-Tab", &setting().onFastAltTab)) {
+				if (setting().onFastAltTab) {
+					sequence_patch(geode::base::get() + 0x28dfe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::get() + 0x28f2e, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x28dfe, { 0x8b, 0x03, 0x8b, 0xcb, 0xff, 0x50, 0x18 });
+					sequence_patch(geode::base::get() + 0x28f2e, { 0x8b, 0xc8, 0x8b, 0x10, 0xff, 0x52, 0x2c });
+				}
+			}
+			ImGui::Tooltip("Disables savefile saving on minimize and unminimize.");
+
+			if (ImGui::CheckboxF("Force Visibility", &setting().onForceVisibility)) {
+				if (setting().onForceVisibility) {
+					sequence_patch(geode::base::getCocos() + 0x60783, { 0xb0, 0x01, 0x90 });
+					sequence_patch(geode::base::getCocos() + 0x60c9a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0x60783, { 0x8a, 0x45, 0x08 });
+					sequence_patch(geode::base::getCocos() + 0x60c9a, { 0x0f, 0x84, 0xcb, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Sets all nodes to be visible.");
+
+			if (ImGui::CheckboxF("Free Window Resize", &setting().onFreeWindowResize)) {
+				if (setting().onFreeWindowResize) {
+					sequence_patch(geode::base::getCocos() + 0x10f48b, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+					sequence_patch(geode::base::getCocos() + 0x10ee81, { 0xe9, 0x2f, 0xff, 0xff, 0xff, 0x90 });
+					sequence_patch(geode::base::getCocos() + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0x10f48b, { 0xe8, 0xb0, 0xf3, 0xff, 0xff });
+					sequence_patch(geode::base::getCocos() + 0x10ee81, { 0x0f, 0x85, 0x2e, 0xff, 0xff, 0xff });
+				}
+			}
+			ImGui::Tooltip("Removes limits in place for window resizing.");
+
+			// ImGui::CheckboxF("HUE Fix", &setting().onHUEFix);
+			// ImGui::Tooltip("Fixes that yellow and purple color bug.");
+
+			if (ImGui::CheckboxF("Increase Max Levels", &setting().onIncreaseMaxLevels)) {
+				if (setting().onIncreaseMaxLevels) {
+					sequence_patch(geode::base::get() + 0x5875b, { 0x64 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x5875b, { 0x14 });
+				}
+			}
+			ImGui::Tooltip("Increases the maximum saved levels from 20 to 100.");
+
+			ImGui::CheckboxF("Lock Cursor", &setting().onLockCursor);
+			ImGui::Tooltip("Locks cursor position while playing."); // CURSOS
+
+			if (ImGui::CheckboxF("No Rotation", &setting().onNoRotation)) {
+				if (setting().onNoRotation) {
+					sequence_patch(geode::base::getCocos() + 0x60578, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::getCocos() + 0x60578, { 0xf3, 0x0f, 0x11, 0x41, 0x1c, 0xf3, 0x0f, 0x11, 0x41, 0x18 });
+				}
+			}
+			ImGui::Tooltip("Locks all rotation at 0 degrees.");
+
+			ImGui::CheckboxF("No Transition", &setting().onNoTransition);
+			ImGui::Tooltip("Shorterns scene transition time to 0s.");
+
+			//if (ImGui::CheckboxF("Pitch Shifter", &setting().onPitchShifter)) {
+			//	PitchShifter::setPitch(setting().onPitchShifter ? setting().pitchValue : 1.f);
+			//}
+			//ImGui::SameLine(170.f);
+			//if (ImGui::TreeNodeEx("##pitchShifterSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			//	ImGui::SetNextItemWidth(80.f);
+			//	if (ImGui::DragFloat("Pitch", &setting().pitchValue, .1f, .1f, 2.f, "%.1f")) {
+			//		PitchShifter::setPitch(setting().onPitchShifter ? setting().pitchValue : 1.f);
+			//	}
+
+			//	ImGui::TreePop();
+			//}
+
+			if (ImGui::CheckboxF("Quick Checkpoint Mode", &setting().onQuickCheckpointMode)) {
+				if (setting().onQuickCheckpointMode) {
+					sequence_patch(geode::base::get() + 0x14a6f4, { 0x00, 0x00, 0x70, 0x42 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x14a6f4, { 0x00, 0x00, 0xe1, 0x43 });
+				}
+			}
+			ImGui::Tooltip("Tries to place checkpoints more often (like in 2.1).");
+
+			ImGui::CheckboxF("Retry Keybind", &setting().onRetryKeybind);
+			ImGui::Tooltip("Lets you restart level by pressing R.");
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##retryKeySettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::HotKey("Keybind", setting().m_retryKeybind, 0.f, ImVec2(80.f, 0.f));
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Safe Mode", &setting().onSafeMode)) {
+				if (setting().onSafeMode) {
+					setting().isSafeMode = true;
+					safeModeON();
+				}
+				else {
+					setting().isSafeMode = false;
+					safeModeOFF();
+				}
+			}
+			ImGui::Tooltip("Disables progress and completion of levels.");
+
+			if (ImGui::CheckboxF("Show Restart Button", &setting().onShowRestartButton)) {
+				if (setting().onShowRestartButton) {
+					sequence_patch(geode::base::get() + 0xd64d9, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0xd64d9, { 0x75, 0x29 });
+				}
+			}
+			ImGui::Tooltip("Shows the restart button in pause menu.");
+
+			//ImGui::CheckboxF("Transition Customizer", &setting().onTransitionCustomizer);
+			//ImGui::Tooltip("Lets you change the page transition.");
+			//ImGui::SameLine(170.f);
+			//if (ImGui::TreeNodeEx("##transitionCustomizerSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			//	ImGui::SetNextItemWidth(163.f);
+			//	ImGui::Combo("##decimalPlaces", &setting().selectedTransition, cocosTransitions, IM_ARRAYSIZE(cocosTransitions));
+
+			//	ImGui::TreePop();
+			//}
+
+
+			if (ImGui::CheckboxF("Transparent BG", &setting().onTransparentBG)) {
+				if (setting().onTransparentBG) {
+					sequence_patch(geode::base::get() + 0x2cf96, { 0x90, 0xb1, 0xff }); // CreatorLayer
+					sequence_patch(geode::base::get() + 0x2cf9e, { 0xff, 0xff });
+					sequence_patch(geode::base::get() + 0x3b7db, { 0x90, 0xb1, 0xff }); // LevelBrowserLayer
+					sequence_patch(geode::base::get() + 0x3b7e3, { 0xff, 0xff });
+					sequence_patch(geode::base::get() + 0x88132, { 0x90, 0xb1, 0xff }); // LevelSearchLayer
+					sequence_patch(geode::base::get() + 0x8813a, { 0xff, 0xff });
+					sequence_patch(geode::base::get() + 0x8969e, { 0x90, 0xb1, 0xff }); // LevelInfoLayer
+					sequence_patch(geode::base::get() + 0x896a5, { 0xff, 0xff });
+					sequence_patch(geode::base::get() + 0x9bde1, { 0x90, 0xb1, 0xff }); // EditLevelLayer
+					sequence_patch(geode::base::get() + 0x9bde9, { 0xff, 0xff });
+					sequence_patch(geode::base::get() + 0x9f97c, { 0x90, 0xb1, 0xff }); // LeaderboardsLayer
+					sequence_patch(geode::base::get() + 0x9f984, { 0xff, 0xff });
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x2cf96, { 0x80, 0xc9, 0xff }); // CreatorLayer
+					sequence_patch(geode::base::get() + 0x2cf9e, { 0x00, 0x66 });
+					sequence_patch(geode::base::get() + 0x3b7db, { 0x80, 0xc9, 0xff }); // LevelBrowserLayer
+					sequence_patch(geode::base::get() + 0x3b7e3, { 0x00, 0x66 });
+					sequence_patch(geode::base::get() + 0x88132, { 0x80, 0xc9, 0xff }); // LevelSearchLayer
+					sequence_patch(geode::base::get() + 0x8813a, { 0x00, 0x66 });
+					sequence_patch(geode::base::get() + 0x8969e, { 0x80, 0xc9, 0xff }); // LevelInfoLayer
+					sequence_patch(geode::base::get() + 0x896a5, { 0x00, 0x66 });
+					sequence_patch(geode::base::get() + 0x9bde1, { 0x80, 0xc9, 0xff }); // EditLevelLayer
+					sequence_patch(geode::base::get() + 0x9bde9, { 0x00, 0x66 });
+					sequence_patch(geode::base::get() + 0x9f97c, { 0x80, 0xc9, 0xff }); // LeaderboardsLayer
+					sequence_patch(geode::base::get() + 0x9f984, { 0x00, 0x66 });
+				}
+			}
+			ImGui::Tooltip("Removes the blue filter from menu's backgrounds.");
+
+			if (ImGui::CheckboxF("Transparent Lists", &setting().onTransparentLists)) {
+				if (setting().onTransparentLists) {
+					sequence_patch(geode::base::get() + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
+					sequence_patch(geode::base::get() + 0x31c82, { 0x00 });
+					sequence_patch(geode::base::get() + 0x31c89, { 0x00, 0x00 });
+					sequence_patch(geode::base::get() + 0x31c8c, { 0x00 });
+					sequence_patch(geode::base::get() + 0x31cba, { 0x00 });
+
+					sequence_patch(geode::base::get() + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
+					sequence_patch(geode::base::get() + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
+				}
+				else {
+					sequence_patch(geode::base::get() + 0x31c7f, { 0xc2, 0x72 });
+					sequence_patch(geode::base::get() + 0x31c82, { 0x3e });
+					sequence_patch(geode::base::get() + 0x31c89, { 0xa1, 0x58 });
+					sequence_patch(geode::base::get() + 0x31c8c, { 0x2c });
+					sequence_patch(geode::base::get() + 0x31cba, { 0xff });
+
+					sequence_patch(geode::base::get() + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
+					sequence_patch(geode::base::get() + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+				}
+			}
+			ImGui::Tooltip("Makes the menu lists transparent.");
+
+			if (ImGui::CheckboxF("Zero Delay", &setting().onZeroDelay)) {
+				if (zeroDelayHook) {
+					if (setting().onZeroDelay) {
+						zeroDelayHook->enable();
+					}
+					else {
+						zeroDelayHook->disable();
+					}
+				}
+			}
+			ImGui::Tooltip("Reduces input delay.");
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextItemWidth(90.f);
+			if (ImGui::DragFloat("##speedhack", &setting().speedhackValue, .05f, 0.f, 10.f)) {
+				if (setting().speedhackValue < 0.f) setting().speedhackValue = 0.f;
+				updateSpeedhack();
+			}
+			ImGui::SameLine();
+			if (ImGui::CheckboxF("Enabled", &setting().onSpeedhack)) {
+				updateSpeedhack();
+			}
+
+			if (ImGui::CheckboxF("Speedhack Music", &setting().onSpeedhackAudio)) {
+				updateSpeedhack();
+			}
+
+			if (setting().onRecordMacro || setting().onPlayMacro)
+				ImGui::BeginDisabled();
+
+			if (ImGui::CheckboxF("Classic Mode", &setting().onClassicMode)) {
+				updateSpeedhack();
+			}
+
+			if (setting().onRecordMacro || setting().onPlayMacro)
+				ImGui::EndDisabled();
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
+				if (setting().labelsScale > 3.f) {
+					setting().labelsScale = 3.f;
+				}
+				if (setting().labelsScale < .1f) {
+					setting().labelsScale = .1f;
+				}
+
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+			if (ImGui::DragFloat("##labelsOpacity", &setting().labelsOpacity, .1f, .1f, 1.f, "Opacity: %.1fx")) {
+				if (setting().labelsOpacity > 1.f) {
+					setting().labelsOpacity = 1.f;
+				}
+				if (setting().labelsOpacity < .1f) {
+					setting().labelsOpacity = .1f;
+				}
+
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+
+			if (ImGui::CheckboxF("Hide All", &setting().onHideLabels)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+
+			if (ImGui::CheckboxF("Cheat Indicator", &setting().onCheatIndicator)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##ciSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##ciPos", &setting().cheatIndicatorPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Message", &setting().onMessageLabel)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##msgSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##msgCounterPos", &setting().messagePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::InputText("##message", &setting().message)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Best Run", &setting().onBestRunLabel)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##brunPos", &setting().bestRunPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().bestRunPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Attempt", &setting().onAttemptsLabel)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##attsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##attsCounterPos", &setting().attemptsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().attemptsPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("FPS Counter", &setting().onFPSCounter)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##fpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##fpsCounterPos", &setting().fpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().fpsPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show ImGui FPS", &setting().useImGuiFps)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("CPS Counter", &setting().onCPSCounter)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##cpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##cpsCounterPos", &setting().cpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().cpsPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Total", &setting().cpsTotal)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Jumps", &setting().onJumpsLabel)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##jmpSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##jumpsCounterPos", &setting().jumpsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().jumpsPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Clock", &setting().onClockLabel)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##clkSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##clkPos", &setting().clockPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Session Time", &setting().onSessionTime)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##stimePos", &setting().sessionTimePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Noclip Accuracy", &setting().onNoclipAccuracy)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##naccSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##naccPos", &setting().nocAccPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().nocAccPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Noclip Deaths", &setting().onNoclipDeaths)) {
+				static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+			}
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##ndthsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(163.f);
+				if (ImGui::Combo("##ndthsPos", &setting().nocDeathsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Prefix", &setting().nocDeathsPrefix)) {
+					static_cast<PolzPlayLayer*>(playLayer)->updateStatusLabels();
+				}
+
+				ImGui::TreePop();
+			}
+
+			ImGui::BeginDisabled();
+			ImGui::CheckboxF("Meta", &setting().onMetaLabel);
+			ImGui::SameLine(170.f);
+			if (ImGui::TreeNodeEx("##metaSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+
+
+
+				ImGui::TreePop();
+			}
+			ImGui::EndDisabled();
+		}
+
+		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		if (ImGui::Begin("Icons", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			//if (ImGui::Checkbox("Icon Effects", &setting().onIconEffects)) {
+			//	if (playLayer) {
+			//		PlayLayer::updatePlayerColors();
+			//	}
+			//}
+			//ImGui::SameLine(170.f);
+			//if (ImGui::TreeNodeEx("##iconEffectsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			//	if (ImGui::Checkbox("Color 1", &setting().onIconColor1)) {
+			//		if (playLayer) {
+			//			PlayLayer::updatePlayerColors();
+			//		}
+			//	}
+
+			//	ImGui::TreePop();
+			//}
+
+			if (ImGui::CheckboxF("Same Dual Color", &setting().onSameDualColor)) {
+				if (playLayer) {
+					static_cast<PolzPlayLayer*>(playLayer)->updatePlayerColors();
+				}
+			}
+
+			// ImGui::CheckboxF("Icon Randomizer", &setting().onIconRandomizer);
+			// ImGui::SameLine(170.f);
+			// if (ImGui::TreeNodeEx("##iconRandomizerSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			// 	ImGui::CheckboxF("Cube", &setting().onRandomizeCube);
+			// 	ImGui::CheckboxF("Ship", &setting().onRandomizeShip);
+			// 	ImGui::CheckboxF("Ball", &setting().onRandomizeBall);
+			// 	ImGui::CheckboxF("UFO", &setting().onRandomizeUFO);
+			// 	ImGui::CheckboxF("Dart", &setting().onRandomizeDart);
+			// 	ImGui::CheckboxF("Color 1", &setting().onRandomizeColor1);
+			// 	ImGui::CheckboxF("Color 2", &setting().onRandomizeColor2);
+			// 	//ImGui::CheckboxF("Trail", &setting().onRandomizeTrail);
+
+			// 	ImGui::TreePop();
+			// }
+		}
     }
+
+	updateSpeedhack();
+
+	if (setting().onSpeedhack) {
+		updateSpeedhack();
+	}
 }
 
 void imgui_init() {
@@ -1230,6 +3022,25 @@ void imgui_init() {
 }
 
 void setupImGuiMenu() {
+	zeroDelayHook = Mod::get()->hook(reinterpret_cast<void*>(geode::base::getCocos() + 0xfc240), &CCDisplayLinkDirector_mainLoop, "cocos2d::CCDisplayLinkDirector::mainLoop", tulip::hook::TulipConvention::Thiscall).unwrapOrDefault();
+
+	if (!std::filesystem::is_directory("PolzHax") || !std::filesystem::exists("PolzHax"))
+	{
+		std::filesystem::create_directory("PolzHax");
+	}
+	if (!std::filesystem::is_directory("PolzHax/extensions") || !std::filesystem::exists("PolzHax/extensions"))
+	{
+		std::filesystem::create_directory("PolzHax/extensions");
+	}
+	if (!std::filesystem::is_directory("PolzHax/replays") || !std::filesystem::exists("PolzHax/replays"))
+	{
+		std::filesystem::create_directory("PolzHax/replays");
+	}
+	if (!std::filesystem::is_directory("PolzHax/screenshots") || !std::filesystem::exists("PolzHax/screenshots"))
+	{
+		std::filesystem::create_directory("PolzHax/screenshots");
+	}
+
 	ImGuiHook::setToggleCallback([]() { setting().show = !setting().show; });
 	ImGuiHook::setRenderFunction(imgui_render);
 	ImGuiHook::setInitFunction(imgui_init);

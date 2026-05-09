@@ -7,12 +7,18 @@
 	"name": "PolzHax",
 	"version": "v1.3.0",
 	"developer": "Pololak",
+	"links": {
+		"source": "https://github.com/Pololak/PolzHax",
+		"community": "https://discord.gg/tUuAM9ecSf"
+	},
 	"resources": {
 		"sprites": [
 			"resources/*.png"
 		],
 		"files": [
-			"resources/Muli-SemiBold.ttf"
+			"resources/*.ttf",
+			"resources/*.mp3",
+			"resources/*.fnt"
 		]
 	},
 	"description": ""

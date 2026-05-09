@@ -8,9 +8,7 @@
 #include "imgui-hook.hpp"
 #include "Menu.hpp"
 #include "Setting.hpp"
-// #include "../../Menu.hpp"
-// #include "../../Setting.hpp"
-// #include "../../PauseLayer.hpp"
+#include "PauseLayer.hpp"
 
 using namespace geode::prelude;
 
@@ -40,7 +38,7 @@ HWND windowToHWND(GLFWwindow* window) {
 // why is this an extern
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-class $modify(CCEGLView) {
+class $modify(ImGuiCCEGLView, CCEGLView) {
     void swapBuffers() {
         auto window = this->getWindow();
 
@@ -129,11 +127,10 @@ class $modify(CCEGLView) {
                 }
             }
             else if (msg.message == WM_KEYDOWN && (msg.wParam == VK_F1 || msg.wParam == VK_OEM_3 || msg.wParam == VK_TAB || msg.wParam == setting().m_openMenuKey)) {
-                // std::cout << "key is " << std::hex << static_cast<unsigned>(msg.wParam) << std::endl;
                 g_toggleCallback();
-                // if (!gd::GameManager::sharedState()->getGameVariable("0024") && gd::GameManager::sharedState()->getPlayLayer() && (PauseLayer::get() == nullptr)) {
-                //     CCEGLView::sharedOpenGLView()->showCursor(setting().show);
-                // }
+                if (!GameManager::sharedState()->getGameVariable("0024") && GameManager::sharedState()->m_playLayer && (PolzPauseLayer::get() == nullptr)) {
+                    CCEGLView::sharedOpenGLView()->showCursor(setting().show);
+                }
             }
 
             if (!blockInput)
@@ -166,5 +163,5 @@ class $modify(AppDelegate) {
 };
 
 void ImGuiHook::poll(CCEGLView* self) {
-    self->pollEvents();
+    static_cast<ImGuiCCEGLView*>(self)->pollEvents();
 }

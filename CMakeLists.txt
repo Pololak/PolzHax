@@ -11,7 +11,7 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 project(PolzHax VERSION 1.0.0)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} "src/DebugModule.cpp")
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
@@ -25,7 +25,11 @@ setup_geode_mod(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     libs/imgui
+    libs/detours
 )
+
+add_subdirectory(libs/detours)
+target_link_libraries(${PROJECT_NAME} detours)
 
 add_subdirectory(libs/imgui)
 target_link_libraries(${PROJECT_NAME} imgui opengl32)
