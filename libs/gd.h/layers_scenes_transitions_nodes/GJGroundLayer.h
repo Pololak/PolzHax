@@ -33,8 +33,8 @@ namespace gd {
 		}
 
 		void hideShadows() {
-			if (auto leftShadow = this->getChildByTag(0)) leftShadow->setVisible(false);
-			if (auto rightShadow = this->getChildByTag(1)) rightShadow->setVisible(false);
+			this->getChildByType<cocos2d::CCSprite*>(2)->setVisible(false);
+			this->getChildByType<cocos2d::CCSprite*>(3)->setVisible(false);
 		}
 
 		static GJGroundLayer* create(int groundID) {

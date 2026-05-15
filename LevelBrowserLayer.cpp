@@ -165,6 +165,16 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		menu->addChild(onGoToPage, 0, 13);
 
 		updatePageButton(self);
+
+		auto deleteMenu = CCMenu::create();
+		self->addChild(deleteMenu, 2, 570);
+
+		auto deleteSprite = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
+		auto onDeleteSelectedSpr = gd::ButtonSprite::create(deleteSprite, 0x22, false, 1.f, 0, "GJ_button_04.png", true, 36.f);
+		onDeleteSelectedSpr->setScale(.4f);
+		auto onDeleteSelected = gd::CCMenuItemSpriteExtra::create(onDeleteSelectedSpr, self, menu_selector(LevelBrowserLayer::Callback::onDeleteSelected));
+		onDeleteSelected->setPosition(-145.f, -122.f);
+		deleteMenu->addChild(onDeleteSelected);
 	}
 
 	if (searchObject->m_searchType == gd::SearchType::MyLevels) {
@@ -179,16 +189,6 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		auto onExportLevel = gd::CCMenuItemSpriteExtra::create(onExportLevelSpr, self, menu_selector(LevelBrowserLayer::Callback::onImportLevel));
 		onExportLevel->setPosition(-30.f, 90.f);
 		shareMenu->addChild(onExportLevel);
-
-		auto deleteMenu = CCMenu::create();
-		self->addChild(deleteMenu, 2, 570);
-
-		auto deleteSprite = CCSprite::createWithSpriteFrameName("edit_delBtn_001.png");
-		auto onDeleteSelectedSpr = gd::ButtonSprite::create(deleteSprite, 0x22, false, 1.f, 0, "GJ_button_04.png", true, 36.f);
-		onDeleteSelectedSpr->setScale(.4f);
-		auto onDeleteSelected = gd::CCMenuItemSpriteExtra::create(onDeleteSelectedSpr, self, menu_selector(LevelBrowserLayer::Callback::onDeleteSelected));
-		onDeleteSelected->setPosition(-145.f, -122.f);
-		deleteMenu->addChild(onDeleteSelected);
 
 		//auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
 		//toggleOff->setScale(.5f);
@@ -306,9 +306,15 @@ void __fastcall LevelBrowserLayer::FLAlert_ClickedH(gd::LevelBrowserLayer* _self
 		auto selectedLevels = LevelCell::getSelectedLevels();
 		for (auto level : selectedLevels) {
 			if (level) {
-				auto localLevelManager = gd::LocalLevelManager::sharedState();
-				localLevelManager->m_localLevels->removeObject(level, true);
-				localLevelManager->updateLevelOrder();
+				if (level->m_levelType == gd::GJLevelType::Editor) {
+					auto localLevelManager = gd::LocalLevelManager::sharedState();
+					localLevelManager->m_localLevels->removeObject(level, true);
+					localLevelManager->updateLevelOrder();
+				}
+				if (level->m_levelType == gd::GJLevelType::Saved) {
+					auto savedLevels = gd::GameLevelManager::sharedState()->m_savedLevelsDict;
+					savedLevels->removeObjectForKey(std::to_string(level->m_levelID));
+				}
 				selectedLevels.clear();
 				self->loadPage(self->m_searchObject);
 			}

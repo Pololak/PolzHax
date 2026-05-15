@@ -31,6 +31,7 @@ void EditLevelLayer::Callback::onLevelOrderUp(CCObject* sender) {
 		orderDownBtn->setOpacity(255);
 		orderDownBtn->setColor(ccWHITE);
 	}
+
 	updateLevelOrderLabel(this);
 }
 
@@ -125,12 +126,12 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 	shareMenu->addChild(onExportLevel);
 
 	auto orderMenu = CCMenu::create();
-	orderMenu->setPosition(director->getScreenRight() - 70.f, director->getScreenTop() - 210.f);
+	orderMenu->setPosition(winSize.width / 2.f - 160.f, winSize.height / 2.f - 25.f);
 	self->addChild(orderMenu, 1, 11);
 
 	auto orderLabel = CCLabelBMFont::create("", "bigFont.fnt");
 	orderLabel->setScale(.75f);
-	orderLabel->setPosition(director->getScreenRight() - 70.f, director->getScreenTop() - 210.f);
+	orderLabel->setPosition(winSize.width / 2.f - 160.f, winSize.height / 2.f - 25.f);
 	self->addChild(orderLabel, 0, 12);
 	updateLevelOrderLabel(self);
 
@@ -149,7 +150,7 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 	auto onLevelOrderDown = gd::CCMenuItemSpriteExtra::create(onLevelOrderDownSpr, self, menu_selector(EditLevelLayer::Callback::onLevelOrderDown));
 	onLevelOrderDown->setPositionY(-22.5f);
 	onLevelOrderDown->setSizeMult(1.5f);
-	if (localLevels->indexOfObject(level) == (gd::LocalLevelManager::sharedState()->m_localLevels->count() - 1)) {
+	if (localLevels->indexOfObject(level) == (localLevels->count() - 1)) {
 		onLevelOrderDown->setEnabled(false);
 		onLevelOrderDown->setOpacity(175);
 		onLevelOrderDown->setColor(ccGRAY);

@@ -154,15 +154,6 @@ void updateSpeedhack() {
 	}
 }
 
-void cheatAdd() {
-	setting().cheatsCount++;
-	setting().beforeRestartCheatsCount++;
-}
-
-void cheatDec() {
-	setting().cheatsCount--;
-}
-
 void colorSet() {
 	auto* colors = ImGui::GetStyle().Colors;
 
@@ -328,8 +319,9 @@ void sortTabs() {
 
 void updateUISize() {
 	ImGuiIO& io = ImGui::GetIO();
+	io.FontGlobalScale = 1.f * setting().UISize;
 	//io.FontGlobalScale = 1.f * setting().UISize;
-	ImGui::GetStyle().ScaleAllSizes(setting().UISize);
+	//ImGui::GetStyle().ScaleAllSizes(1.f * setting().UISize);
 }
 
 void imgui_render() {
@@ -342,9 +334,6 @@ void imgui_render() {
 	if (oneX) {
 		setting().load();
 
-		setting().cheatsCount = 0;
-		setting().beforeRestartCheatsCount = 0;
-
 		sortTabs();
 
 		colorSet();
@@ -356,6 +345,13 @@ void imgui_render() {
 		PolzHax::updateFPSBypass();
 
 		// Bypass
+
+		if (setting().onCharacterFilter) {
+			sequence_patch(gd::base + 0x14764, { 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0x14764, { 0x75, 0x07 });
+		}
 
 		if (setting().onIcons) {
 			sequence_patch(gd::base + 0x66e26, { 0x90, 0x90 });
@@ -384,6 +380,13 @@ void imgui_render() {
 		else {
 			sequence_patch(gd::base + 0x1cf27, { 0x76, 0x07 });
 			sequence_patch(gd::base + 0x1cf3b, { 0x76, 0x07 });
+		}
+
+		if (setting().onTextLength) {
+			sequence_patch(gd::base + 0x147de, { 0xeb, 0x04 });
+		}
+		else {
+			sequence_patch(gd::base + 0x147de, { 0x7c, 0x04 });
 		}
 
 		// Cosmetic
@@ -433,7 +436,6 @@ void imgui_render() {
 
 		if (setting().onInstantMirror) {
 			sequence_patch(gd::base + 0xf0d36, { 0x00, 0x00, 0x00, 0x00 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xf0d36, { 0x00, 0x00, 0x00, 0x3f });
@@ -512,7 +514,6 @@ void imgui_render() {
 
 		if (setting().onNoMirror) {
 			sequence_patch(gd::base + 0xf0bf2, { 0xe9, 0x9b, 0x01, 0x00, 0x00, 0x90 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xf0bf2, { 0x0f, 0x84, 0x9a, 0x01, 0x00, 0x00 });
@@ -534,7 +535,6 @@ void imgui_render() {
 
 		if (setting().onNoShadeEffect) {
 			sequence_patch(gd::base + 0xebfe3, { 0xeb });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xebfe3, { 0x77 });
@@ -803,10 +803,6 @@ void imgui_render() {
 
 		// Level
 
-		if (setting().onAutoPickupCoins) {
-			cheatAdd();
-		}
-
 		if (setting().onConfirmExit) {
 			sequence_patch(gd::base + 0xd7f80, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 			sequence_patch(gd::base + 0xd7f8d, { 0x90, 0x90 });
@@ -829,7 +825,6 @@ void imgui_render() {
 
 		if (setting().onEverythingHurts) {
 			sequence_patch(gd::base + 0xeaa42, { 0x90, 0x90 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
@@ -856,13 +851,8 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xdc13b, { 0x0f, 0x82, 0xd6, 0x00, 0x00, 0x00 });
 		}
 
-		if (setting().onHitboxes) {
-			cheatAdd();
-		}
-
 		if (setting().onInstantComplete) {
 			sequence_patch(gd::base + 0xe16f6, { 0xc7, 0x87, 0x74, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x90, 0x90 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xe16f6, { 0xf3, 0x0f, 0x11, 0x8f, 0x74, 0x04, 0x00, 0x00, 0x9f, 0xf6, 0xc4, 0x44 });
@@ -871,7 +861,6 @@ void imgui_render() {
 		if (setting().onJumpHack) {
 			sequence_patch(gd::base + 0xda510, { 0x01 });
 			sequence_patch(gd::base + 0xda295, { 0x01 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xda510, { 0x00 });
@@ -880,7 +869,6 @@ void imgui_render() {
 
 		if (setting().onNoclip) {
 			sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
@@ -924,7 +912,6 @@ void imgui_render() {
 		if (setting().onWaveSlide) {
 			sequence_patch(gd::base + 0xdba98, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 			sequence_patch(gd::base + 0xdc75a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
-			cheatAdd();
 		}
 		else {
 			sequence_patch(gd::base + 0xdba98, { 0x0f, 0x85, 0xe0, 0x02, 0x00, 0x00 });
@@ -1073,12 +1060,6 @@ void imgui_render() {
 			MH_DisableHook(reinterpret_cast<LPVOID*>(reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll")) + 0xfc240));
 		}
 
-		// Speedhack
-
-		if (setting().onSpeedhack) {
-			cheatAdd();
-		}
-
 		oneX = false;
 	}
 
@@ -1182,8 +1163,8 @@ void imgui_render() {
 
 			//ImGui::SetNextItemWidth(135.f);
 			//if (ImGui::DragFloat("UI Size", &setting().UISize, .1f, .5f, 3.f, "%.1f")) {
-			//	//updateUISize();
-			//	//sortTabs();
+			//	updateUISize();
+			//	sortTabs();
 			//}
 
 			if (ImGui::Button("Sort Tabs", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
@@ -1232,7 +1213,14 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Bypass", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::CheckboxF("Character Filter", &setting().onCharacterFilter);
+			if (ImGui::CheckboxF("Character Filter", &setting().onCharacterFilter)) {
+				if (setting().onCharacterFilter) {
+					sequence_patch(gd::base + 0x14764, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0x14764, { 0x75, 0x07 });
+				}
+			}
 			ImGui::Tooltip("Lets you input any character in text fields.");
 
 			if (ImGui::CheckboxF("Icons", &setting().onIcons)) {
@@ -1273,7 +1261,14 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Lets sliders be dragged beyond the visible limit.");
 
-			ImGui::CheckboxF("Text Length", &setting().onTextLength);
+			if (ImGui::CheckboxF("Text Length", &setting().onTextLength)) {
+				if (setting().onTextLength) {
+					sequence_patch(gd::base + 0x147de, { 0xeb, 0x04 });
+				}
+				else {
+					sequence_patch(gd::base + 0x147de, { 0x7c, 0x04 });
+				}
+			}
 			ImGui::Tooltip("Allows for unlimited text length in text inputs.");
 		}
 
@@ -1596,11 +1591,9 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Instant Mirror", &setting().onInstantMirror)) {
 				if (setting().onInstantMirror) {
 					sequence_patch(gd::base + 0xf0d36, { 0x00, 0x00, 0x00, 0x00 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xf0d36, { 0x00, 0x00, 0x00, 0x3f });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Disables the mirror portal animation.");
@@ -1752,11 +1745,9 @@ void imgui_render() {
 			if (ImGui::CheckboxF("No Mirror", &setting().onNoMirror)) {
 				if (setting().onNoMirror) {
 					sequence_patch(gd::base + 0xf0bf2, { 0xe9, 0x9b, 0x01, 0x00, 0x00, 0x90 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xf0bf2, { 0x0f, 0x84, 0x9a, 0x01, 0x00, 0x00 });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Disables mirror portals.");
@@ -1799,11 +1790,9 @@ void imgui_render() {
 			if (ImGui::CheckboxF("No Shade Effect", &setting().onNoShadeEffect)) {
 				if (setting().onNoShadeEffect) {
 					sequence_patch(gd::base + 0xebfe3, { 0xeb });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xebfe3, { 0x77 });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Disables the disappearing effect on invisible blocks and etc.");
@@ -2322,14 +2311,7 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
-			if (ImGui::CheckboxF("Auto Pickup Coins", &setting().onAutoPickupCoins)) {
-				if (setting().onAutoPickupCoins) {
-					cheatAdd();
-				}
-				else {
-					cheatDec();
-				}
-			}
+			ImGui::CheckboxF("Auto Pickup Coins", &setting().onAutoPickupCoins);
 			ImGui::Tooltip("Automatically collects gold coins.");
 
 			ImGui::CheckboxF("Auto Practice Mode", &setting().onAutoPracticeMode);
@@ -2373,11 +2355,9 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Everything Hurts", &setting().onEverythingHurts)) {
 				if (setting().onEverythingHurts) {
 					sequence_patch(gd::base + 0xeaa42, { 0x90, 0x90 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Owie.");
@@ -2414,13 +2394,11 @@ void imgui_render() {
 
 			if (ImGui::CheckboxF("Hitboxes", &setting().onHitboxes)) {
 				if (setting().onHitboxes) {
-					cheatAdd();
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
 					}
 				}
 				else {
-					cheatDec();
 					if (playLayer) {
 						if (!playLayer->m_isDead && !setting().onHitboxesOnDeath) {
 							PlayLayer::clearHitboxes();
@@ -2499,11 +2477,9 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Instant Complete", &setting().onInstantComplete)) {
 				if (setting().onInstantComplete) {
 					sequence_patch(gd::base + 0xe16f6, { 0xc7, 0x87, 0x74, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x70, 0x90, 0x90 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xe16f6, { 0xf3, 0x0f, 0x11, 0x8f, 0x74, 0x04, 0x00, 0x00, 0x9f, 0xf6, 0xc4, 0x44 });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Teleports the player to the end of a level.");
@@ -2515,12 +2491,10 @@ void imgui_render() {
 				if (setting().onJumpHack) {
 					sequence_patch(gd::base + 0xda510, { 0x01 });
 					sequence_patch(gd::base + 0xda295, { 0x01 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xda510, { 0x00 });
 					sequence_patch(gd::base + 0xda295, { 0x00 });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Allows you to jump in mid-air.");
@@ -2528,11 +2502,9 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Noclip", &setting().onNoclip)) {
 				if (setting().onNoclip) {
 					sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
-					cheatDec();
 				}
 
 				PlayLayer::updateStatusLabels();
@@ -2630,14 +2602,7 @@ void imgui_render() {
 			ImGui::CheckboxF("Shipcopter", &setting().onShipcopter);
 			ImGui::Tooltip("Changes Ship physics to be more like Swingcopter (inaccurate).");
 
-			if (ImGui::CheckboxF("Show Layout", &setting().onShowLayout)) {
-				if (setting().onShowLayout) {
-					cheatAdd();
-				}
-				else {
-					cheatDec();
-				}
-			}
+			ImGui::CheckboxF("Show Layout", &setting().onShowLayout);
 			ImGui::Tooltip("Removes all decoration and color from levels.");
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##layoutSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
@@ -2685,12 +2650,10 @@ void imgui_render() {
 				if (setting().onWaveSlide) {
 					sequence_patch(gd::base + 0xdba98, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
 					sequence_patch(gd::base + 0xdc75a, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
-					cheatAdd();
 				}
 				else {
 					sequence_patch(gd::base + 0xdba98, { 0x0f, 0x85, 0xe0, 0x02, 0x00, 0x00 });
 					sequence_patch(gd::base + 0xdc75a, { 0x0f, 0x85, 0x91, 0x03, 0x00, 0x00 });
-					cheatDec();
 				}
 			}
 			ImGui::Tooltip("Lets wave slide on blocks and slopes (like D blocks in 2.1).");
@@ -2947,12 +2910,6 @@ void imgui_render() {
 			ImGui::SameLine();
 			if (ImGui::CheckboxF("Enabled", &setting().onSpeedhack)) {
 				updateSpeedhack();
-				if (setting().onSpeedhack) {
-					cheatAdd();
-				}
-				else {
-					cheatDec();
-				}
 			}
 
 			if (ImGui::CheckboxF("Speedhack Music", &setting().onSpeedhackAudio)) {
@@ -2972,9 +2929,6 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Currenty in works...");
-
 			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
 			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
 				if (setting().labelsScale > 3.f) {
@@ -3202,21 +3156,72 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("Icons", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			//if (ImGui::Checkbox("Icon Effects", &setting().onIconEffects)) {
-			//	if (playLayer) {
-			//		PlayLayer::updatePlayerColors();
-			//	}
-			//}
-			//ImGui::SameLine(170.f);
-			//if (ImGui::TreeNodeEx("##iconEffectsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-			//	if (ImGui::Checkbox("Color 1", &setting().onIconColor1)) {
-			//		if (playLayer) {
-			//			PlayLayer::updatePlayerColors();
-			//		}
-			//	}
+			static bool player1Selected = true;
+			static bool player2Selected = false;
 
-			//	ImGui::TreePop();
-			//}
+			if (ImGui::CheckboxF("Icon Effects", &setting().onIconEffects)) {
+				if (playLayer) {
+					PlayLayer::updatePlayerColors();
+				}
+			}
+
+			if (ImGui::CheckboxF("Player 1", &player1Selected)) {
+				player1Selected = true;
+				player2Selected = false;
+			}
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			if (ImGui::CheckboxF("Player 2", &player2Selected)) {
+				player2Selected = true;
+				player1Selected = false;
+			}
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Color 1");
+
+			static float playerPrimaryColor[3] = {
+				setting().playerPrimaryColorR / 255.f,
+				setting().playerPrimaryColorG / 255.f,
+				setting().playerPrimaryColorB / 255.f
+			};
+
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			if (ImGui::ColorEdit3("##playerPrimaryColor", playerPrimaryColor, ImGuiColorEditFlags_NoInputs)) {
+				setting().playerPrimaryColorR = playerPrimaryColor[0] * 255;
+				setting().playerPrimaryColorG = playerPrimaryColor[1] * 255;
+				setting().playerPrimaryColorB = playerPrimaryColor[2] * 255;
+			}
+
+			/*ImGui::AlignTextToFramePadding();
+			ImGui::Text("Color 2");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			ImGui::ColorEdit3("##playerSecondaryColor", NULL, ImGuiColorEditFlags_NoInputs);
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Glow");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			ImGui::ColorEdit3("##playerGlowColor", NULL, ImGuiColorEditFlags_NoInputs);
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Trail");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			ImGui::ColorEdit3("##playerTrailColor", NULL, ImGuiColorEditFlags_NoInputs);
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Particles");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			ImGui::ColorEdit3("##playerParticlesColor", NULL, ImGuiColorEditFlags_NoInputs);
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Wave Trail");
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			ImGui::ColorEdit3("##playerWaveTrailColor", NULL, ImGuiColorEditFlags_NoInputs);*/
 
 			if (ImGui::CheckboxF("Same Dual Color", &setting().onSameDualColor)) {
 				if (playLayer) {
@@ -3224,20 +3229,20 @@ void imgui_render() {
 				}
 			}
 
-			ImGui::CheckboxF("Icon Randomizer", &setting().onIconRandomizer);
-			ImGui::SameLine(170.f);
-			if (ImGui::TreeNodeEx("##iconRandomizerSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::CheckboxF("Cube", &setting().onRandomizeCube);
-				ImGui::CheckboxF("Ship", &setting().onRandomizeShip);
-				ImGui::CheckboxF("Ball", &setting().onRandomizeBall);
-				ImGui::CheckboxF("UFO", &setting().onRandomizeUFO);
-				ImGui::CheckboxF("Dart", &setting().onRandomizeDart);
-				ImGui::CheckboxF("Color 1", &setting().onRandomizeColor1);
-				ImGui::CheckboxF("Color 2", &setting().onRandomizeColor2);
-				//ImGui::CheckboxF("Trail", &setting().onRandomizeTrail);
+			//ImGui::CheckboxF("Icon Randomizer", &setting().onIconRandomizer);
+			//ImGui::SameLine(170.f);
+			//if (ImGui::TreeNodeEx("##iconRandomizerSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+			//	ImGui::CheckboxF("Cube", &setting().onRandomizeCube);
+			//	ImGui::CheckboxF("Ship", &setting().onRandomizeShip);
+			//	ImGui::CheckboxF("Ball", &setting().onRandomizeBall);
+			//	ImGui::CheckboxF("UFO", &setting().onRandomizeUFO);
+			//	ImGui::CheckboxF("Dart", &setting().onRandomizeDart);
+			//	ImGui::CheckboxF("Color 1", &setting().onRandomizeColor1);
+			//	ImGui::CheckboxF("Color 2", &setting().onRandomizeColor2);
+			//	//ImGui::CheckboxF("Trail", &setting().onRandomizeTrail);
 
-				ImGui::TreePop();
-			}
+			//	ImGui::TreePop();
+			//}
 		}
 	}
 

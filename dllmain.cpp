@@ -56,23 +56,6 @@ void __fastcall hkMainLoop(cocos2d::CCDirector* self) {
 	fpMainLoop(self);
 }
 
-inline void(__thiscall* CCTextInputNode_updateLabel)(gd::CCTextInputNode*, std::string);
-void __fastcall CCTextInputNode_updateLabelH(gd::CCTextInputNode* self, void*, std::string string) {
-	if (setting().onTextLength)
-		self->m_maxLabelLength = 99999;
-
-	CCTextInputNode_updateLabel(self, string);
-
-	if (setting().onCharacterFilter) {
-		self->m_allowedChars = "abcdefghijklmnopqrstuvwxyz"
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-			"0123456789!@#$%^&*()-=_+"
-			"`~[]{}/?.>,<\\|;:'\""
-			" ";
-		CCTextInputNode_updateLabel(self, std::move(string));
-	}
-}
-
 inline void(__thiscall* CCCircleWave_draw)(gd::CCCircleWave*);
 void __fastcall CCCircleWave_drawH(gd::CCCircleWave* self) {
 	if (!setting().onNoEffectCircle) CCCircleWave_draw(self);
@@ -310,7 +293,6 @@ DWORD WINAPI my_thread(void* hModule) {
 	auto cocos = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
 	auto cocos_ext = reinterpret_cast<uintptr_t>(GetModuleHandleA("libExtensions.dll"));
 
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x13e90), CCTextInputNode_updateLabelH, reinterpret_cast<void**>(&CCTextInputNode_updateLabel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xb4b0), CCCircleWave_drawH, reinterpret_cast<void**>(&CCCircleWave_draw));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0xb7b60), CCParticleSystemQuad_initWithTotalParticlesH, reinterpret_cast<void**>(&CCParticleSystemQuad_initWithTotalParticles));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29ac0), AudioEffectsLayer_updateTweenActionH, reinterpret_cast<void**>(&AudioEffectsLayer_updateTweenAction));

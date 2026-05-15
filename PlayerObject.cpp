@@ -64,9 +64,9 @@ bool __fastcall PlayerObject::initH(gd::PlayerObject* self, void*, int frameID, 
 
 	auto gm = gd::GameManager::sharedState();
 
-	//if (setting().onNoMiniIcon || setting().onMiniCubeIcon) {
-	//	self->updatePlayerFrame(frameID);
-	//}
+	if (setting().onNoMiniIcon || setting().onMiniCubeIcon) {
+		self->updatePlayerFrame(frameID);
+	}
 
 	CCSprite* playerExtraSprite = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("player_%02d_glow_001.png", frameID)->getCString());
 	playerExtraSprite->setTag(69);
@@ -94,11 +94,13 @@ void __fastcall PlayerObject::updatePlayerFrameH(gd::PlayerObject* self, void*, 
 
 	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_%02d_extra_001.png", frameID)->getCString());
 
-	if (setting().onIconRandomizer && setting().onRandomizeCube) return PlayerObject::updatePlayerFrame(self, frameID);
+	//if (setting().onIconRandomizer && setting().onRandomizeCube) return PlayerObject::updatePlayerFrame(self, frameID);
 
-	if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerFrame(self, 0);
+	if (gm->getPlayLayer() || LevelEditorLayer::get()) {
+		if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerFrame(self, 0);
 
-	if (setting().onNoMiniIcon) return PlayerObject::updatePlayerFrame(self, gm->m_playerFrame);
+		if (setting().onNoMiniIcon) return PlayerObject::updatePlayerFrame(self, gm->m_playerFrame);
+	}
 
 	PlayerObject::updatePlayerFrame(self, frameID);
 }
@@ -116,9 +118,11 @@ void __fastcall PlayerObject::updatePlayerRollFrameH(gd::PlayerObject* self, voi
 
 	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_ball_%02d_extra_001.png", frameID)->getCString());
 
-	if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerRollFrame(self, 0);
+	if (gm->getPlayLayer() || LevelEditorLayer::get()) {
+		if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerRollFrame(self, 0);
 
-	if (setting().onNoMiniIcon) return PlayerObject::updatePlayerRollFrame(self, gm->m_playerBall);
+		if (setting().onNoMiniIcon) return PlayerObject::updatePlayerRollFrame(self, gm->m_playerBall);
+	}
 
 	PlayerObject::updatePlayerRollFrame(self, frameID);
 }
@@ -139,47 +143,47 @@ void __fastcall PlayerObject::updatePlayerDartFrameH(gd::PlayerObject* self, voi
 	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("dart_%02d_extra_001.png", setting().selectedDartIdx)->getCString());
 }
 
-void __fastcall PlayerObject::updateGlowColorH(gd::PlayerObject* self) {
-	PlayerObject::updateGlowColor(self);
-
-	
-}
-
-void __fastcall PlayerObject::updatePlayerGlowH(gd::PlayerObject* self) {
-	PlayerObject::updatePlayerGlow(self);
-
-	
-}
-
-void __fastcall PlayerObject::toggleFlyModeH(gd::PlayerObject* self, void*, bool p0) {
-	PlayerObject::toggleFlyMode(self, p0);
-
-	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-
-	if (setting().onIconRandomizer && setting().onRandomizeShip && p0) {
-		self->updatePlayerShipFrame(shipIcon);
-	}
-}
-
-void __fastcall PlayerObject::toggleRollModeH(gd::PlayerObject* self, void*, bool p0) {
-	PlayerObject::toggleRollMode(self, p0);
-
-	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-
-	if (setting().onIconRandomizer && setting().onRandomizeBall && p0) {
-		self->updatePlayerRollFrame(rollIcon);
-	}
-}
-
-void __fastcall PlayerObject::toggleBirdModeH(gd::PlayerObject* self, void*, bool p0) {
-	PlayerObject::toggleBirdMode(self, p0);
-
-	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-
-	if (setting().onIconRandomizer && setting().onRandomizeUFO && p0) {
-		self->updatePlayerBirdFrame(birdIcon);
-	}
-}
+//void __fastcall PlayerObject::updateGlowColorH(gd::PlayerObject* self) {
+//	PlayerObject::updateGlowColor(self);
+//
+//	
+//}
+//
+//void __fastcall PlayerObject::updatePlayerGlowH(gd::PlayerObject* self) {
+//	PlayerObject::updatePlayerGlow(self);
+//
+//	
+//}
+//
+//void __fastcall PlayerObject::toggleFlyModeH(gd::PlayerObject* self, void*, bool p0) {
+//	PlayerObject::toggleFlyMode(self, p0);
+//
+//	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
+//
+//	if (setting().onIconRandomizer && setting().onRandomizeShip && p0) {
+//		self->updatePlayerShipFrame(shipIcon);
+//	}
+//}
+//
+//void __fastcall PlayerObject::toggleRollModeH(gd::PlayerObject* self, void*, bool p0) {
+//	PlayerObject::toggleRollMode(self, p0);
+//
+//	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
+//
+//	if (setting().onIconRandomizer && setting().onRandomizeBall && p0) {
+//		self->updatePlayerRollFrame(rollIcon);
+//	}
+//}
+//
+//void __fastcall PlayerObject::toggleBirdModeH(gd::PlayerObject* self, void*, bool p0) {
+//	PlayerObject::toggleBirdMode(self, p0);
+//
+//	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
+//
+//	if (setting().onIconRandomizer && setting().onRandomizeUFO && p0) {
+//		self->updatePlayerBirdFrame(birdIcon);
+//	}
+//}
 
 void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::toggleDartMode(self, p0);
@@ -188,52 +192,52 @@ void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, boo
 		self->m_playerStreak->stopStroke();
 	}
 
-	if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
+	//if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
 
-	if (setting().onIconRandomizer) {
-		if (setting().onRandomizeDart && p0) {
-			self->updatePlayerDartFrame(dartIcon);
-		}
-		else if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-			self->updatePlayerFrame(cubeIcon);
-		}
-	}
-	else {
-		if (!p0 && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-			self->updatePlayerFrame(setting().onNoMiniIcon ? gd::GameManager::sharedState()->m_playerFrame : cubeFrameID);
-		}
-	}
+	//if (setting().onIconRandomizer) {
+	//	if (setting().onRandomizeDart && p0) {
+	//		self->updatePlayerDartFrame(dartIcon);
+	//	}
+	//	else if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
+	//		self->updatePlayerFrame(cubeIcon);
+	//	}
+	//}
+	//else {
+	//	if (!p0 && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
+	//		self->updatePlayerFrame(setting().onNoMiniIcon ? gd::GameManager::sharedState()->m_playerFrame : cubeFrameID);
+	//	}
+	//}
 }
 
 void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::togglePlayerScale(self, p0);
 
-	if (setting().onNoMiniIcon && p0) {
-		if (self->m_rollMode) {
-			self->updatePlayerRollFrame(gd::GameManager::sharedState()->m_playerBall);
-		}
-		if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-			self->updatePlayerFrame(gd::GameManager::sharedState()->m_playerFrame);
-		}
-	}
+	//if (setting().onNoMiniIcon && p0) {
+	//	if (self->m_rollMode) {
+	//		self->updatePlayerRollFrame(gd::GameManager::sharedState()->m_playerBall);
+	//	}
+	//	if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
+	//		self->updatePlayerFrame(gd::GameManager::sharedState()->m_playerFrame);
+	//	}
+	//}
 
 	if (setting().onWaveTrailBugFix) {
 		self->placeStreakPoint();
 	}
 
-	if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
+	//if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
 
-	if (setting().onIconRandomizer && setting().onRandomizeCube && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-		if (!p0) {
-			self->updatePlayerFrame(cubeIcon);
-		}
-		else if (p0 && setting().onNoMiniIcon) {
-			self->updatePlayerFrame(cubeIcon);
-		}
-		else if (p0 && !setting().onNoMiniIcon) {
-			self->updatePlayerFrame(0);
-		}
-	}
+	//if (setting().onIconRandomizer && setting().onRandomizeCube && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
+	//	if (!p0) {
+	//		self->updatePlayerFrame(cubeIcon);
+	//	}
+	//	else if (p0 && setting().onNoMiniIcon) {
+	//		self->updatePlayerFrame(cubeIcon);
+	//	}
+	//	else if (p0 && !setting().onNoMiniIcon) {
+	//		self->updatePlayerFrame(0);
+	//	}
+	//}
 }
 
 void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
@@ -243,12 +247,12 @@ void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
 	PlayerObject::runBallRotation2(self);
 }
 
-void __fastcall PlayerObject::collidedWithObjectH(gd::PlayerObject* self, void*, gd::GameObject* object, CCRect rect) {
-	PlayerObject::collidedWithObject(self, object, rect);
-
-	std::cout << "collidedWithObject: " << object << std::endl;
-	PlayLayer::setDeathObject(object);
-}
+//void __fastcall PlayerObject::collidedWithObjectH(gd::PlayerObject* self, void*, gd::GameObject* object, CCRect rect) {
+//	PlayerObject::collidedWithObject(self, object, rect);
+//
+//	std::cout << "collidedWithObject: " << object << std::endl;
+//	PlayLayer::setDeathObject(object);
+//}
 
 void __fastcall PlayerObject::loadFromCheckpointH(gd::PlayerObject* self, void*, gd::PlayerCheckpoint* playerCheckpoint) {
 	PlayerObject::loadFromCheckpoint(self, playerCheckpoint);
@@ -297,12 +301,12 @@ void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0430), PlayerObject::updatePlayerRollFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerRollFrame));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0290), PlayerObject::updatePlayerBirdFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerBirdFrame));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0580), PlayerObject::updatePlayerDartFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerDartFrame));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfc80), PlayerObject::updateGlowColorH, reinterpret_cast<void**>(&PlayerObject::updateGlowColor));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0f40), PlayerObject::updatePlayerGlowH, reinterpret_cast<void**>(&PlayerObject::updatePlayerGlow));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfc80), PlayerObject::updateGlowColorH, reinterpret_cast<void**>(&PlayerObject::updateGlowColor));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0f40), PlayerObject::updatePlayerGlowH, reinterpret_cast<void**>(&PlayerObject::updatePlayerGlow));
 
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdea20), PlayerObject::toggleFlyModeH, reinterpret_cast<void**>(&PlayerObject::toggleFlyMode));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdf490), PlayerObject::toggleRollModeH, reinterpret_cast<void**>(&PlayerObject::toggleRollMode));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4dec0), PlayerObject::toggleBirdModeH, reinterpret_cast<void**>(&PlayerObject::toggleBirdMode));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdea20), PlayerObject::toggleFlyModeH, reinterpret_cast<void**>(&PlayerObject::toggleFlyMode));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdf490), PlayerObject::toggleRollModeH, reinterpret_cast<void**>(&PlayerObject::toggleRollMode));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4dec0), PlayerObject::toggleBirdModeH, reinterpret_cast<void**>(&PlayerObject::toggleBirdMode));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdee80), PlayerObject::toggleDartModeH, reinterpret_cast<void**>(&PlayerObject::toggleDartMode));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe12e0), PlayerObject::togglePlayerScaleH, reinterpret_cast<void**>(&PlayerObject::togglePlayerScale));
 

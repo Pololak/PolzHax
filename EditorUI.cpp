@@ -20,6 +20,10 @@ gd::EditorUI* EditorUI::get() {
 
 CCLabelBMFont* m_gridSizeLabel = nullptr;
 
+std::unordered_set<int> m_gameObjects = {
+	1, 83, 2, 3, 4, 5, 502, 6, 7, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 80, 81, 82, 90, 91, 92, 93, 94, 95, 96, 116, 117, 118, 119, 120, 121, 122, 160, 161, 162, 163, 164, 165, 166, 167, 737, 168, 169, 193, 207, 208, 209, 210, 211, 212, 213, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 476, 477, 478, 479, 480, 481, 482, 485, 486, 487, 488, 489, 490, 491, 641, 642, 643, 644, 645, 646, 647, 648, 739, 649, 650, 658, 722, 659, 734, 40, 369, 370, 195, 196, 215, 220, 219, 146, 147, 206, 204, 673, 674, 62, 66, 65, 68, 63, 64, 170, 171, 172, 192, 173, 194, 174, 175, 176, 197, 143, 653, 724, 654, 736, 657, 656, 723, 655, 735, 467, 468, 469, 470, 471, 472, 473, 474, 475, 661, 662, 663, 664, 665, 666, 289, 291, 299, 301, 305, 307, 309, 311, 315, 317, 321, 323, 324, 325, 358, 294, 295, 296, 297, 326, 327, 328, 329, 331, 333, 337, 339, 343, 345, 349, 351, 353, 355, 483, 484, 492, 493, 651, 652, 709, 710, 726, 727, 711, 712, 728, 729, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 698, 699, 700, 701, 702, 703, 704, 705, 706, 707, 708, 713, 714, 730, 731, 715, 716, 732, 733, 371, 372, 373, 374, 8, 39, 103, 392, 216, 217, 218, 458, 144, 205, 145, 459, 177, 178, 179, 191, 198, 199, 393, 9, 61, 243, 244, 135, 363, 364, 365, 366, 367, 368, 446, 447, 667, 720, 421, 422, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640, 35, 140, 67, 36, 141, 84, 10, 11, 12, 13, 47, 111, 660, 45, 46, 99, 101, 286, 287, 200, 201, 202, 203, 142, 18, 19, 20, 21, 48, 49, 113, 114, 115, 157, 158, 159, 227, 228, 242, 448, 449, 450, 451, 452, 503, 504, 505, 419, 420, 41, 110, 106, 107, 498, 499, 129, 130, 131, 128, 123, 124, 125, 126, 127, 134, 190, 151, 152, 153, 225, 226, 500, 501, 229, 230, 237, 238, 239, 240, 241, 231, 232, 283, 284, 285, 279, 280, 233, 281, 282, 234, 235, 277, 278, 245, 246, 409, 410, 411, 412, 413, 453, 454, 455, 456, 457, 668, 669, 670, 671, 672, 738, 719, 721, 466, 461, 462, 463, 464, 465, 406, 407, 408, 725, 15, 16, 17, 50, 51, 52, 53, 54, 60, 148, 149, 405, 132, 460, 494, 133, 136, 150, 236, 497, 495, 496, 88, 89, 98, 397, 398, 399, 675, 676, 677, 186, 187, 188, 740, 741, 742, 678, 679, 680, 183, 184, 185, 85, 86, 87, 97, 137, 138, 139, 154, 155, 156, 180, 181, 182, 222, 223, 224, 375, 376, 377, 378, 394, 395, 396, 29, 30, 104, 105, 744, 221, 717, 718, 743, 31, 33, 32, 22, 24, 23, 25, 26, 27, 28, 56, 57, 58, 59, 55
+};
+
 std::string EditorUI::colorToShortString(int id) {
 	switch (id) {
 	case 0: return "D"; break;
@@ -386,6 +390,8 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 		selectedObjectInToolboxIdLabel->setPosition(director->getScreenLeft() + 90.f, director->getScreenBottom() + 80.f);
 		self->addChild(selectedObjectInToolboxIdLabel, 10, 756);
 	}
+
+	//std::cout << "objs: " << m_gameObjects.size() << std::endl;
 
 	return true;
 }
@@ -880,6 +886,41 @@ void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* sende
 	EditorUI::editObject(self, sender);
 }
 
+//void __fastcall EditorUI::setupCreateMenuH(gd::EditorUI* self) {
+//	EditorUI::setupCreateMenu(self);
+//
+//	auto director = CCDirector::sharedDirector();
+//	auto winSize = director->getWinSize();
+//
+//	auto objects = CCArray::create();
+//	objects->addObject(self->getCreateBtn(1, 4));
+//	objects->addObject(self->getCreateBtn(29, 4));
+//	objects->addObject(self->getCreateBtn(34, 4));
+//	objects->addObject(self->getCreateBtn(33, 4));
+//
+//	auto testObjects = gd::EditButtonBar::create(objects, ccp(winSize.width / 2.f - 5.f, director->getScreenBottom() + 86.f), 12, true);
+//	self->addChild(testObjects, 10);
+//	self->m_createButtonBars->addObject(testObjects);
+//
+//	auto tabOff = CCSprite::createWithSpriteFrameName("GJ_tabOff_001.png");
+//	tabOff->setScale(1.1f);
+//	tabOff->setOpacity(150);
+//	auto tabOn = CCSprite::createWithSpriteFrameName("GJ_tabOn_001.png");
+//	tabOn->setScale(1.1f);
+//	tabOn->setOpacity(150);
+//
+//	auto testObjectsTab = gd::CCMenuItemToggler::create(tabOff, tabOn, self, menu_selector(gd::EditorUI::onSelectBuildTab));
+//	testObjectsTab->setSizeMult(1.2f);
+//
+//	self->m_tabsMenu->addChild(testObjectsTab, 0, 12);
+//	//self->m_tabsMenu->alignItemsHorizontallyWithPadding(0.f);
+//	self->m_tabsArray->addObject(testObjectsTab);
+//
+//	self->selectBuildTab(self->m_editorLayer->m_level->m_lastBuildTab);
+//	//self->m_selectedBuildTab->goToPage(self->m_editorLayer->m_level->m_lastBuildPage);
+//	self->updateCreateMenu(false);
+//}
+
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
@@ -917,6 +958,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41ae0), EditorUI::updateGridNodeSizeH, reinterpret_cast<void**>(&EditorUI::updateGridNodeSize));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49680), EditorUI::editButtonUsableH, reinterpret_cast<void**>(&EditorUI::editButtonUsable));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x43590), EditorUI::setupCreateMenuH, reinterpret_cast<void**>(&EditorUI::setupCreateMenu));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));

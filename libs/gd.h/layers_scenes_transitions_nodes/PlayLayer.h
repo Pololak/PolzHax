@@ -113,7 +113,7 @@ namespace gd {
 		int m_attempts; // 0x2e8
 		int m_jumps; // 0x2ec
 		bool m_didJump; // 0x2f0
-		float m_clkTime; // 0x2f4
+		float m_clkTimer; // 0x2f4
 		bool m_showingEndLayer; // 0x2f8
 		bool m_endTriggered; // 0x2f9
 		bool m_resetQueued; // 0x2fa

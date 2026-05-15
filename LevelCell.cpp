@@ -47,6 +47,25 @@ void __fastcall LevelCell::loadLocalLevelCellH(gd::LevelCell* self) {
 	menu->addChild(onSelectLevel, 0, 1);
 }
 
+void __fastcall LevelCell::loadCustomLevelCellH(gd::LevelCell* self) {
+	m_selectedLevels.clear();
+	LevelCell::loadCustomLevelCell(self);
+
+	if (self->m_level->m_levelType == gd::GJLevelType::Saved) {
+		auto toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+		toggleOff->setScale(.6f);
+		auto toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+		toggleOn->setScale(.6f);
+
+		auto menu = CCMenu::create();
+		menu->setPosition(270.f, 45.f);
+		self->m_mainLayer->addChild(menu, 0, 120);
+		auto onSelectLevel = gd::CCMenuItemToggler::create(toggleOff, toggleOn, self, menu_selector(LevelCell::Callback::onSelectLevel));
+		menu->addChild(onSelectLevel, 0, 1);
+	}
+}
+
 void LevelCell::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x313b0), LevelCell::loadLocalLevelCellH, reinterpret_cast<void**>(&LevelCell::loadLocalLevelCell));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x30360), LevelCell::loadCustomLevelCellH, reinterpret_cast<void**>(&LevelCell::loadCustomLevelCell));
 }

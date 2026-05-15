@@ -48,10 +48,22 @@ namespace gd {
 		}
 	};
 
-	class EditButtonBar : cocos2d::CCNode {
+	class EditButtonBar : public cocos2d::CCNode {
 	public:
 		BoomScrollLayer* m_scrollLayer;
 		cocos2d::CCArray* m_pagesArray;
+
+		static EditButtonBar* create(cocos2d::CCArray* objects, cocos2d::CCPoint position, int page, bool isObjects) {
+			auto ret = reinterpret_cast<EditButtonBar * (__fastcall*)(cocos2d::CCArray*, int, bool, cocos2d::CCPoint)>(base + 0x3aa80)(objects, page, isObjects, position);
+
+			__asm add esp, 0xc
+
+			return ret;
+		}
+
+		void goToPage(int page) {
+			
+		}
 	};
 
 	class EditorUI : public cocos2d::CCLayer, FLAlertLayerProtocol, ColorSelectDelegate, GJRotationControlDelegate, MusicDownloadDelegate {
@@ -239,6 +251,18 @@ namespace gd {
 
 		bool editButtonUsable() {
 			return reinterpret_cast<bool(__fastcall*)(EditorUI*)>(base + 0x49680)(this);
+		}
+
+		void onSelectBuildTab(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x494c0)(this, sender);
+		}
+
+		void updateCreateMenu(bool p0) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, bool)>(base + 0x47440)(this, p0);
+		}
+
+		void selectBuildTab(int p0) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, int)>(base + 0x494e0)(this, p0);
 		}
 	};
 }

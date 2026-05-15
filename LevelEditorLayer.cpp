@@ -432,6 +432,11 @@ void LevelEditorLayer::updatePreviewMode() {
 
 		m_editorLayer->m_backgroundSprite->setColor(bgColor);
 
+		if (m_groundLayer) {
+			m_groundLayer->m_groundSprite->setColor(gColor);
+			m_groundLayer->m_line->setColor(lColor);
+		}
+
 		m_color01 = color1;
 		m_color02 = color2;
 		m_color03 = color3;
@@ -489,6 +494,11 @@ void LevelEditorLayer::updatePreviewMode() {
 void LevelEditorLayer::resetColors() {
 	if (m_editorLayer) {
 		m_editorLayer->m_backgroundSprite->setColor(ccGRAY);
+
+		if (m_groundLayer) {
+			m_groundLayer->m_groundSprite->setColor(ccGRAY);
+			m_groundLayer->m_line->setColor(ccWHITE);
+		}
 
 		for (auto section : CCArrayExt<CCArray*>(m_editorLayer->m_levelSections)) {
 			if (section) {
@@ -559,12 +569,42 @@ void LevelEditorLayer::updateOrientedHitboxes(gd::LevelEditorLayer* self) {
 	}
 }
 
-void LevelEditorLayer::LevelEditorLayerExt::updateGroundWidth(float) {
-	if (m_groundLayer) {
-		m_groundLayer->setPositionX(this->m_gameLayer->convertToNodeSpace({ CCDirector::sharedDirector()->getScreenLeft(), 0.f }).x);
-		m_groundLayer->m_line->setPositionX(m_groundLayer->convertToNodeSpace({ CCDirector::sharedDirector()->getWinSize().width / 2.f, 0.f }).x);
-		m_groundLayer->m_isActive = true;
-		m_groundLayer->m_groundWidth = 256.f;
+void LevelEditorLayer::updateGroundWidth() {
+	if (m_editorLayer) {
+		if (m_groundLayer) {
+			auto director = CCDirector::sharedDirector();
+			auto winSize = director->getWinSize();
+
+			m_groundLayer->setPositionX(m_editorLayer->m_gameLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
+			m_groundLayer->m_line->setPositionX(m_groundLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
+
+			float groundWidth = (128.f / m_editorLayer->m_gameLayer->getScale()) * (winSize.width / 128.f);
+			float groundOffset = -(m_editorLayer->m_gameLayer->getPositionX()) / m_editorLayer->m_gameLayer->getScale() + winSize.width / 2.f;
+			m_groundLayer->m_groundSprite->setTextureRect({ groundOffset, 0.f, groundWidth, 128.f });
+		}
+	}
+}
+
+void LevelEditorLayer::removeGroundLayer() {
+	if (m_editorLayer) {
+		if (m_groundLayer != nullptr) {
+			m_groundLayer->removeFromParentAndCleanup(true);
+			m_groundLayer = nullptr;
+		}
+	}
+}
+
+void LevelEditorLayer::createGroundLayer() {
+	if (m_editorLayer) {
+		if (m_groundLayer != nullptr) {
+			removeGroundLayer();
+		}
+		m_groundLayer = gd::GJGroundLayer::create(m_editorLayer->m_levelSettings->m_groundIndex);
+		m_groundLayer->hideShadows();
+		m_groundLayer->m_groundSprite->setAnchorPoint({ .5f, 1.f });
+		m_editorLayer->m_gameLayer->addChild(m_groundLayer, 10);
+
+		updateGroundWidth();
 	}
 }
 
@@ -603,13 +643,9 @@ bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::G
 	auto clicksDrawNode = CCDrawNode::create();
 	self->m_gameLayer->addChild(clicksDrawNode, 1000, 126);
 
-	//m_groundLayer = gd::GJGroundLayer::create(self->m_levelSettings->m_groundIndex);
-	//m_groundLayer->getChildByType<CCSprite*>(2)->setVisible(false);
-	//m_groundLayer->getChildByType<CCSprite*>(3)->setVisible(false);
-	//self->m_gameLayer->addChild(m_groundLayer, 10);
-	////self->schedule(schedule_selector(LevelEditorLayer::LevelEditorLayerExt::updateGroundWidth));
-
-	//m_groundLayer->fadeInGround(5.f);
+	if (setting().onShowGround) {
+		createGroundLayer();
+	}
 
 	return true;
 }
@@ -658,8 +694,12 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 
 	LevelEditorLayer::updateShowHitboxes();
 
-	if (!isEditorPaused && setting().onPreviewMode) {
+	if (setting().onPreviewMode) {
 		LevelEditorLayer::updatePreviewMode();
+	}
+
+	if (setting().onShowGround) {
+		LevelEditorLayer::updateGroundWidth();
 	}
 }
 
@@ -667,6 +707,10 @@ void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, flo
 	LevelEditorLayer::update(self, dt);
 
 	LevelEditorLayer::updateShowHitboxes();
+
+	if (setting().onShowGround) {
+		LevelEditorLayer::updateGroundWidth();
+	}
 }
 
 gd::GameObject* __fastcall LevelEditorLayer::addObjectFromStringH(gd::LevelEditorLayer* self, void*, std::string object) {

@@ -85,6 +85,9 @@ namespace EditorUI {
 	inline void(__thiscall* editObject)(gd::EditorUI*, CCObject*);
 	void __fastcall editObjectH(gd::EditorUI*, void*, CCObject*);
 
+	inline void(__thiscall* setupCreateMenu)(gd::EditorUI*);
+	void __fastcall setupCreateMenuH(gd::EditorUI*);
+
 	std::string colorToShortString(int);
 
 	gd::EditorUI* get();

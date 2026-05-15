@@ -21,7 +21,7 @@ namespace gd {
 	class LeaderboardsLayer : public cocos2d::CCLayer, LeaderboardManagerDelegate {
 	public:
 		GJListLayer* m_list; // 0x11c
-		PAD(0x4)
+		cocos2d::CCArray* m_userScores; // 0x120
 		LeaderboardState m_leaderboardState; // 0x124
 		CCMenuItemToggler* m_top100Tab; // 0x128
 		CCMenuItemToggler* m_globalTab; // 0x12c

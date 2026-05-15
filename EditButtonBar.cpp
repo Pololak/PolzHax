@@ -1,6 +1,7 @@
 #include "EditButtonBar.hpp"
 #include "EditorUI.hpp"
 #include "Setting.hpp"
+#include "utils.hpp"
 
 bool __fastcall EditButtonBar::initH(gd::EditButtonBar* self, void*, CCArray* objs, int page, bool isObjects, CCPoint pos) {
 	auto editorUI = EditorUI::get();
@@ -210,6 +211,23 @@ bool __fastcall EditButtonBar::initH(gd::EditButtonBar* self, void*, CCArray* ob
 	}
 
 	if (!EditButtonBar::init(self, objs, page, isObjects, pos)) return false;
+
+	//if (isObjects) {
+	//	if (page == 11) {
+	//		for (auto btn : CCArrayExt<gd::CreateMenuItem*>(objs)) {
+	//			if (btn) {
+	//				auto buttonSprite = static_cast<gd::ButtonSprite*>(btn->getChildren()->objectAtIndex(0));
+	//				if (buttonSprite) {
+	//					auto object = reinterpret_cast<gd::GameObject*>(buttonSprite->getChildren()->objectAtIndex(0));
+	//					if (object) {
+	//						std::cout << object->m_objectID << ", ";
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
 	return true;
 }
 

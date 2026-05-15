@@ -238,6 +238,16 @@ void EditorPauseLayer::Callback::onPreviewMode(CCObject*) {
 	}
 }
 
+void EditorPauseLayer::Callback::onShowGround(CCObject*) {
+	setting().onShowGround = !setting().onShowGround;
+	if (setting().onShowGround) {
+		LevelEditorLayer::createGroundLayer();
+	}
+	else {
+		LevelEditorLayer::removeGroundLayer();
+	}
+}
+
 void EditorPauseLayer::Callback::onSmallEditorStep(CCObject*) {
 	gd::GameManager::sharedState()->toggleGameVariable("0035");
 }
@@ -347,6 +357,19 @@ void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 	);
 
 	gd::GameToolbox::createToggleButton(
+		menu_selector(EditorPauseLayer::Callback::onShowGround),
+		setting().onShowGround,
+		bottom_menu,
+		self, self,
+		.7f, .4f, 80.f,
+		"bigFont.fnt",
+		false,
+		"Show Ground",
+		ccp(30.f, director->getScreenBottom() + 210.f),
+		ccp(8.f, 0.f)
+	);
+
+	gd::GameToolbox::createToggleButton(
 		menu_selector(EditorPauseLayer::Callback::onPreviewMode),
 		setting().onPreviewMode,
 		bottom_menu,
@@ -355,7 +378,7 @@ void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 		"bigFont.fnt",
 		false,
 		"Preview Mode",
-		ccp(30.f, director->getScreenBottom() + 210.f),
+		ccp(30.f, director->getScreenBottom() + 240.f),
 		ccp(8.f, 0.f)
 	);
 

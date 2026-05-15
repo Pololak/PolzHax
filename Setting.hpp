@@ -174,21 +174,24 @@ struct SettingStruct {
 	float labelsOpacity = 1.f;
 	float labelsScale = 1.f;
 	bool onHideLabels;
-	bool onCheatIndicator; int cheatIndicatorPos = 0;
-	bool onMessageLabel; std::string message; int messagePos = 0;
-	bool onFPSCounter, fpsPrefix = true, useImGuiFps = false; int fpsCounterPos = 0;
-	bool onCPSCounter, cpsPrefix = true, cpsMax = true, cpsTotal; int cpsCounterPos = 0;
-	bool onNoclipAccuracy, nocAccPrefix = true; int nocAccPos = 0;
-	bool onNoclipDeaths, nocDeathsPrefix = true; int nocDeathsPos = 0;
-	bool onClockLabel; int clockPos = 0;
-	bool onSessionTime; int sessionTimePos = 0;
-	bool onBestRunLabel, bestRunPrefix = true; int bestRunPos = 0;
-	bool onAttemptsLabel, attemptsPrefix = true; int attemptsPos = 0;
-	bool onJumpsLabel, jumpsPrefix = true; int jumpsPos = 0;
+	bool onCheatIndicator; int cheatIndicatorPos = 0, cheatIndicatorOrder = 0;
+	bool onMessageLabel; std::string message; int messagePos = 0, messageOrder = 1;
+	bool onFPSCounter, fpsPrefix = true, useImGuiFps = false; int fpsCounterPos = 0, fpsCounterOrder = 4;
+	bool onCPSCounter, cpsPrefix = true, cpsMax = true, cpsTotal; int cpsCounterPos = 0, cpsCounterOrder = 5;
+	bool onNoclipAccuracy, nocAccPrefix = true; int nocAccPos = 0, nocAccOrder = 9;
+	bool onNoclipDeaths, nocDeathsPrefix = true; int nocDeathsPos = 0, nocDeathsOrder = 10;
+	bool onClockLabel; int clockPos = 0, clockOrder = 7;
+	bool onSessionTime; int sessionTimePos = 0, sessionTimeOrder = 8;
+	bool onBestRunLabel, bestRunPrefix = true; int bestRunPos = 0, bestRunOrder = 2;
+	bool onAttemptsLabel, attemptsPrefix = true; int attemptsPos = 0, attemptsOrder = 3;
+	bool onJumpsLabel, jumpsPrefix = true; int jumpsPos = 0, jumpsOrder = 6;
 	bool onMetaLabel; int metaPos = 0;
 
 	// Icons
 	bool onIconEffects; bool onIconColor1 = true, onIconColor2 = true;
+	float playerPrimaryColorR = 1.f, playerPrimaryColorG = 1.f, playerPrimaryColorB = 1.f;
+	float player2PrimaryColorR = 1.f, player2PrimaryColorG = 1.f, player2PrimaryColorB = 1.f;
+
 	bool onSameDualColor;
 	bool onIconRandomizer; bool onRandomizeCube = true, onRandomizeShip = true, onRandomizeBall = true, onRandomizeUFO = true, onRandomizeDart = true, onRandomizeColor1 = true, onRandomizeColor2 = true, onRandomizeTrail = true;
 
@@ -196,6 +199,7 @@ struct SettingStruct {
 	bool onSelectFilter;
 	bool onShowObjectInfo;
 	bool onPreviewMode;
+	bool onShowGround;
 
 	// Editor options
 	bool onCopyString;
@@ -392,17 +396,17 @@ DEF_SCHEMA(
 	labelsOpacity,
 	labelsScale,
 	onHideLabels,
-	onCheatIndicator, cheatIndicatorPos,
-	onMessageLabel, message, messagePos,
-	onFPSCounter, fpsPrefix, useImGuiFps, fpsCounterPos,
-	onCPSCounter, cpsPrefix, cpsMax, cpsTotal, cpsCounterPos,
-	onNoclipAccuracy, nocAccPrefix, nocAccPos,
-	onNoclipDeaths, nocDeathsPrefix, nocDeathsPos,
-	onClockLabel, clockPos,
-	onSessionTime, sessionTimePos,
-	onBestRunLabel, bestRunPrefix, bestRunPos,
-	onAttemptsLabel, attemptsPrefix, attemptsPos,
-	onJumpsLabel, jumpsPrefix, jumpsPos,
+	onCheatIndicator, cheatIndicatorPos, cheatIndicatorOrder,
+	onMessageLabel, message, messagePos, messageOrder,
+	onFPSCounter, fpsPrefix, useImGuiFps, fpsCounterPos, fpsCounterOrder,
+	onCPSCounter, cpsPrefix, cpsMax, cpsTotal, cpsCounterPos, cpsCounterOrder,
+	onNoclipAccuracy, nocAccPrefix, nocAccPos, nocAccOrder,
+	onNoclipDeaths, nocDeathsPrefix, nocDeathsPos, nocDeathsOrder,
+	onClockLabel, clockPos, clockOrder,
+	onSessionTime, sessionTimePos, sessionTimeOrder,
+	onBestRunLabel, bestRunPrefix, bestRunPos, bestRunOrder,
+	onAttemptsLabel, attemptsPrefix, attemptsPos, attemptsOrder,
+	onJumpsLabel, jumpsPrefix, jumpsPos, jumpsOrder,
 	onMetaLabel, metaPos,
 
 	// Icons
@@ -413,6 +417,7 @@ DEF_SCHEMA(
 	onSelectFilter,
 	onShowObjectInfo,
 	onPreviewMode,
+	onShowGround,
 
 	// Editor options
 	onCopyString,

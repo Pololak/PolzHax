@@ -22,6 +22,8 @@
 //
 //DiscordManager ds;
 
+#define SETTING_NAME(var) (#var + 10)
+
 bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	if (!MenuLayer::init(self)) return false;
 
@@ -35,6 +37,8 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	Icons::patchBall(Icons::getCount("player_ball", "001"));
 	Icons::patchBird(Icons::getCount("bird", "001"));
 	Icons::patchDart(Icons::getCount("dart", "001"), setting().selectedDartIdx);
+
+	std::cout << SETTING_NAME(setting().show) << std::endl;
 
 	setting().save();
 	//auto checkpoint = CCSprite::createWithSpriteFrameName("checkpoint_01_001.png");

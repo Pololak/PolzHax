@@ -111,7 +111,7 @@ public:
 
     HJ_ADD( auto getSelector() const { return m_pfnSelector; } )
 
-protected:
+public:
     CCObject*       m_pListener;
     SEL_MenuHandler    m_pfnSelector;
     int             m_nScriptTapHandler;

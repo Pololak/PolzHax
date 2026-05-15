@@ -35,6 +35,7 @@ namespace EditorPauseLayer {
 		void onSelectFilter(CCObject*);
 		void onShowObjectInfo(CCObject*);
 		void onPreviewMode(CCObject*);
+		void onShowGround(CCObject*);
 
 		void onEditorOptions(CCObject*);
 

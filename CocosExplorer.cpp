@@ -296,17 +296,23 @@ void render_node_properties(CCNode* node) {
 		}
 	}
 
-	if (auto item = dynamic_cast<CCMenuItemSprite*>(node)) {
+	if (auto item = dynamic_cast<CCMenuItem*>(node)) {
 		ImGui::NewLine();
 		ImGui::Separator();
 		ImGui::NewLine();
 
-		auto thing = format_addr(union_cast<void*>(item->getSelector())).c_str();
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("CCMenuItem selector: %s", thing);
-		ImGui::SameLine();
-		if (ImGui::Button("Copy##ccMenuItem")) {
-			clipboard::write(CCString::createWithFormat("%s", thing)->getCString());
+		const auto selector = item->m_pfnSelector;
+		if (!selector) {
+			std::string addr = "N/A";
+			ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+		}
+		else {
+			const auto addr = format_addr(union_cast<uintptr_t*>(selector));
+			ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+			ImGui::SameLine();
+			if (ImGui::Button("Copy##ccMenuItem")) {
+				clipboard::write(addr);
+			}
 		}
 
 		if (ImGui::Button("Activate")) {
@@ -393,6 +399,20 @@ void render_node_properties(CCNode* node) {
 				}
 				break;
 			}
+		}
+		float textureRect[4] = {
+					sprite_node->getTextureRect().getMinX(),
+					sprite_node->getTextureRect().getMinY(),
+					sprite_node->getTextureRect().size.width,
+					sprite_node->getTextureRect().size.height,
+		};
+		if (ImGui::DragFloat4("Rect", textureRect), 0.03f) {
+			sprite_node->setTextureRect({ textureRect[0], textureRect[1], textureRect[2], textureRect[3] }, sprite_node->isTextureRectRotated(), sprite_node->getContentSize());
+		}
+
+		bool isRectRotated = sprite_node->isTextureRectRotated();;
+		if (ImGui::Checkbox("Rotate Rect", &isRectRotated)) {
+			sprite_node->setTextureRect(sprite_node->getTextureRect(), isRectRotated, sprite_node->getContentSize());
 		}
 	}
 }

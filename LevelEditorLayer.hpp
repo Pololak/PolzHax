@@ -77,6 +77,9 @@ namespace LevelEditorLayer {
 	void removeTrigger(gd::GameObject*);
 	void insertTrigger(gd::GameObject*);
 	void updateOrientedHitboxes(gd::LevelEditorLayer*);
+	void createGroundLayer();
+	void removeGroundLayer();
+	void updateGroundWidth();
 
 	void updateShowHitboxes();
 

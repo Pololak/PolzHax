@@ -1,5 +1,6 @@
 #include "LevelSettingsLayer.hpp"
 #include "LevelEditorLayer.hpp"
+#include "Setting.hpp"
 
 gd::LevelSettingsLayer* m_levelSettingsLayer;
 
@@ -134,6 +135,14 @@ void __fastcall LevelSettingsLayer::colorSelectClosedH(gd::LevelSettingsLayer* _
 	}
 }
 
+void __fastcall LevelSettingsLayer::selectArtClosedH(gd::LevelSettingsLayer* _self, void*, gd::SelectArtLayer* selectArtLayer) {
+	LevelSettingsLayer::selectArtClosed(_self, selectArtLayer);
+
+	if (setting().onShowGround) {
+		LevelEditorLayer::createGroundLayer();
+	}
+}
+
 void __fastcall LevelSettingsLayer::destructorH(gd::LevelSettingsLayer* self) {
 	LevelSettingsLayer::destructor(self);
 	m_levelSettingsLayer = nullptr;
@@ -142,5 +151,6 @@ void __fastcall LevelSettingsLayer::destructorH(gd::LevelSettingsLayer* self) {
 void LevelSettingsLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x97050), LevelSettingsLayer::initH, reinterpret_cast<void**>(&LevelSettingsLayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9a0c0), LevelSettingsLayer::colorSelectClosedH, reinterpret_cast<void**>(&LevelSettingsLayer::colorSelectClosed));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9a890), LevelSettingsLayer::selectArtClosedH, reinterpret_cast<void**>(&LevelSettingsLayer::selectArtClosed));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x96e90), LevelSettingsLayer::destructorH, reinterpret_cast<void**>(&LevelSettingsLayer::destructor));
 }
