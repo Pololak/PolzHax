@@ -129,7 +129,7 @@ struct SettingStruct {
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
-	bool onNoclip; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
+	bool onNoclip; bool onNoclipAccuracyLimit; bool onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
 	bool onPauseDuringCompletion;
 	bool onPracticeFix;
 	bool onPracticeMusic;
@@ -351,7 +351,7 @@ DEF_SCHEMA(
 	onInstantComplete,
 	onInvisibleDualFix,
 	onJumpHack,
-	onNoclip, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck,
+	onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit, noclipAccuracyLimit, noclipDeathsLimit, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck,
 	onPauseDuringCompletion,
 	onPracticeFix,
 	onPracticeMusic,

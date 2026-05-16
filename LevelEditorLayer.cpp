@@ -604,6 +604,7 @@ void LevelEditorLayer::createGroundLayer() {
 		m_groundLayer->m_groundSprite->setAnchorPoint({ .5f, 1.f });
 		m_editorLayer->m_gameLayer->addChild(m_groundLayer, 10);
 
+		updatePreviewMode();
 		updateGroundWidth();
 	}
 }
@@ -694,7 +695,7 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 
 	LevelEditorLayer::updateShowHitboxes();
 
-	if (setting().onPreviewMode) {
+	if (!isEditorPaused && setting().onPreviewMode) {
 		LevelEditorLayer::updatePreviewMode();
 	}
 

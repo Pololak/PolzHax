@@ -2512,6 +2512,19 @@ void imgui_render() {
 			ImGui::Tooltip("Makes the player invincible.");
 			ImGui::SameLine(170.f);
 			if (ImGui::TreeNodeEx("##noclipSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				//ImGui::CheckboxF("Death Limit", &setting().onNoclipDeathsLimit);
+				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+				//if (ImGui::DragInt("Limit##deathLimit", &setting().noclipDeathsLimit)) {
+				//	if (setting().noclipDeathsLimit < 0) setting().noclipDeathsLimit = 0;
+				//}
+				//
+				//ImGui::CheckboxF("Accuracy Limit", &setting().onNoclipAccuracyLimit);
+				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+				//if (ImGui::DragFloat("Limit##accuracyLimit", &setting().noclipAccuracyLimit, 1.f, 0.f, 100.f, "%.0f")) {
+				//	if (setting().noclipAccuracyLimit < 0.f) setting().noclipAccuracyLimit = 0.f;
+				//	if (setting().noclipAccuracyLimit > 100.f) setting().noclipAccuracyLimit = 100.f;
+				//}
+
 				ImGui::CheckboxF("Noclip Tint", &setting().onNoclipTint);
 
 				static float noclipTintColor[3] = {
@@ -3058,7 +3071,11 @@ void imgui_render() {
 					PlayLayer::updateStatusLabels();
 				}
 
-				if (ImGui::CheckboxF("Show Total", &setting().cpsTotal)) {
+				if (ImGui::CheckboxF("Show Max CPS", &setting().cpsMax)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				if (ImGui::CheckboxF("Show Total Clicks", &setting().cpsTotal)) {
 					PlayLayer::updateStatusLabels();
 				}
 

@@ -154,6 +154,10 @@ namespace gd {
 			return reinterpret_cast<void(__thiscall*)(GameObject*, float)>(base + 0x72840)(this, scale);
 		}
 
+		virtual cocos2d::CCRect const& getObjectRect() {
+			return reinterpret_cast<cocos2d::CCRect const&(__thiscall*)(GameObject*)>(base + 0x722a0)(this);
+		}
+
 		GJCustomColorMode getColorMode() {
 			GJCustomColorMode customColor = this->m_customColorMode;
 			if ((this->m_defaultColorMode == customColor) || this->m_canChangeCustomColor || (customColor == GJCustomColorMode::Default)) {
@@ -186,9 +190,9 @@ namespace gd {
 			reinterpret_cast<void(__fastcall*)(GameObject*)>(base + 0x75a20)(this);
 		}
 
-		cocos2d::CCRect const& getObjectRect() {
-			return *reinterpret_cast<cocos2d::CCRect * (__thiscall*)(GameObject*)>(base + 0x722a0)(this);
-		}
+		//cocos2d::CCRect const& getObjectRect() {
+		//	return *reinterpret_cast<cocos2d::CCRect * (__thiscall*)(GameObject*)>(base + 0x722a0)(this);
+		//}
 
 		void updateOrientedBox() {
 			reinterpret_cast<void(__thiscall*)(GameObject*)>(base + 0x75a50)(this);

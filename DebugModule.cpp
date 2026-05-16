@@ -76,6 +76,8 @@ void renderDebugModule() {
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
+			ImGui::Text("PlayLayer 0x174: %i", from<CCArray*>(pl, 0x174)->count());
+
 			static int colorID = 0;
 			ImGui::InputInt("ColorID", &colorID);
 			if (ImGui::Button("Update Color")) {

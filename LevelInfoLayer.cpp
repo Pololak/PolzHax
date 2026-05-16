@@ -41,7 +41,7 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 	if (m_songWidget) {
 		std::cout << m_songWidget << std::endl;
 		
-		if (setting().onAutoSongDownload) {
+		if (setting().onAutoSongDownload && !m_songWidget->m_isRobtopSong) {
 			m_songWidget->onDownload(nullptr);
 		}
 	}

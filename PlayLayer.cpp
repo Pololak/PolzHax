@@ -48,6 +48,7 @@ bool m_hasClicked;
 bool m_isHolding;
 std::vector<time_t> m_clickFrames;
 int m_totalClicks;
+int m_maxClicks;
 CCLabelBMFont* m_jumpsLabel = nullptr;
 CCLabelBMFont* m_sessionTimeLabel = nullptr;
 CCLabelBMFont* m_bestRunLabel = nullptr;
@@ -338,9 +339,6 @@ void updateAttemptsLabel() {
 		if (setting().attemptsPrefix) {
 			prefix = "Attempt ";
 		}
-		else {
-			prefix.clear();
-		}
 
 		int attempts;
 
@@ -366,9 +364,6 @@ void updateFPSLabel() {
 		if (setting().fpsPrefix) {
 			prefix = setting().onTPSBypass ? " TPS" : " FPS";
 		}
-		else {
-			prefix.clear();
-		}
 
 		if (setting().useImGuiFps) {
 			m_fpsCounterLabel->setString((std::to_string(static_cast<int>(roundf(ImGui::GetIO().Framerate))) + prefix).c_str());
@@ -386,18 +381,16 @@ void updateCPSLabel() {
 		if (setting().cpsPrefix) {
 			prefix = " CPS";
 		}
-		else {
-			prefix.clear();
+
+		std::string maxClicks;
+
+		if (m_clickFrames.size() > m_maxClicks) {
+			m_maxClicks = m_clickFrames.size();
 		}
 
-		//std::string cpsMax;
-
-		//if (setting().cpsMax) {
-		//	cpsMax = "/" + std::to_string(m_totalClicks);
-		//}
-		//else {
-		//	cpsMax.clear();
-		//}
+		if (setting().cpsMax) {
+			maxClicks = "/" + std::to_string(m_maxClicks);
+		}
 
 		std::string cpsTotal;
 
@@ -412,7 +405,7 @@ void updateCPSLabel() {
 			m_cpsCounterLabel->setColor(ccc3(255, 255, 255));
 		}
 
-		m_cpsCounterLabel->setString((std::to_string(m_clickFrames.size()) + cpsTotal + prefix).c_str());
+		m_cpsCounterLabel->setString((std::to_string(m_clickFrames.size()) + maxClicks + cpsTotal + prefix).c_str());
 	}
 }
 
@@ -424,9 +417,6 @@ void updateJumpsLabel() {
 
 		if (setting().jumpsPrefix) {
 			prefix = " Jumps";
-		}
-		else {
-			prefix.clear();
 		}
 
 		m_jumpsLabel->setString((std::to_string(playLayer->m_jumps) + prefix).c_str());
@@ -447,9 +437,6 @@ void updateBestRunLabel() {
 
 		if (setting().bestRunPrefix) {
 			prefix = "Best Run: ";
-		}
-		else {
-			prefix.clear();
 		}
 
 		float newBest = roundf(m_lastRun);
@@ -500,9 +487,6 @@ void updateNoclipAccuracyLabel(bool tintRed = false) {
 		if (setting().nocAccPrefix) {
 			prefix = "Accuracy: ";
 		}
-		else {
-			prefix.clear();
-		}
 
 		if (tintRed) {
 			m_noclipAccuracyLabel->stopAllActions();
@@ -527,9 +511,6 @@ void updateNoclipDeathsLabel(bool tintRed = false) {
 
 		if (setting().nocDeathsPrefix) {
 			prefix = " Deaths";
-		}
-		else {
-			prefix.clear();
 		}
 
 		if (tintRed) {
@@ -769,6 +750,7 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_clickFrames.clear();
 	m_totalClicks = 0;
 	m_isHolding = false;
+	m_maxClicks = 0;
 
 	m_lastRun = 0.f;
 	m_bestRunPercentage = 0.f;
@@ -1048,6 +1030,7 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 
 	m_clickFrames.clear();
 	m_totalClicks = 0;
+	m_maxClicks = 0;
 
 	if (self->m_endTriggered) {
 		self->m_endTriggered = false;
