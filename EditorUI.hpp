@@ -104,7 +104,7 @@ namespace EditorUI {
 		void onColorFilter(CCObject*);
 		void onGoToGroup(CCObject*);
 		void onGridSize(CCObject*);
-
+		void onCircleTool(CCObject*);
 		void onStartPos(CCObject*);
 	};
 

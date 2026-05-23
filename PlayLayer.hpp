@@ -77,6 +77,7 @@ namespace PlayLayer {
 	void updateShowLayout();
 	void nextStartPos();
 	void prevStartPos();
+	void resetPlayerColors();
 	void updatePlayerColors();
 	void updateStatusLabels();
 	void updateStartPosSwitcherLabel();

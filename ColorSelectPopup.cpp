@@ -7,6 +7,7 @@
 #include "RemapTriggerWidget.hpp"
 #include "hsv.hpp"
 #include "NewCustomizeObjectLayer.hpp"
+#include "utils.hpp"
 
 class FadeTimeInput : public cocos2d::CCLayer, gd::TextInputDelegate {
 protected:
@@ -103,29 +104,19 @@ void ColorSelectPopup::Callback::onLiveEdit(CCObject*) {
 	}
 }
 
-ccColor3B getLightBGColor(ccColor3B bgColor) {
-	std::cout << "allo" << std::endl;
-	auto hsv = extension::CCControlUtils::HSVfromRGB(extension::RGBA((int)bgColor.r, (int)bgColor.g, (int)bgColor.b, 255));
-	std::cout << hsv.h << std::endl;
-	std::cout << hsv.s << std::endl;
-	std::cout << hsv.v << std::endl;
-	hsv.s -= 20;
+void ColorSelectPopup::updateLBGValueLabel(gd::ColorSelectPopup* self) {
+	if (self == nullptr) return;
 
-	auto gm = gd::GameManager::sharedState();
+	auto lbgValueLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(302));
+	auto lbgValueSpr = static_cast<CCSprite*>(self->m_mainLayer->getChildByTag(212));
 
-	auto rgb = extension::CCControlUtils::RGBfromHSV(hsv);
+	if (lbgValueLabel && lbgValueSpr) {
+		auto gm = gd::GameManager::sharedState();
+		auto lbg = getLightBGColor(self->m_colorPicker->getColorValue(), gm->colorForIdx(gd::GameManager::sharedState()->m_playerColor));
 
-	return ccc3(rgb.r, rgb.g, rgb.b);
-}
-
-void ColorSelectPopup::Callback::onLBGInfo(CCObject*) {
-	auto gm = gd::GameManager::sharedState();
-	//auto lbgColor = getLightBGColor(this->m_colorPicker->getColorValue());
-
-	//std::stringstream info;
-
-	//info << "Color value: " << lbgColor.r << " " << lbgColor.g << " " << lbgColor.b;
-	//gd::FLAlertLayer::create("Light BG", info.str().c_str(), "OK")->show();
+		lbgValueLabel->setString(CCString::createWithFormat("LBG: %i %i %i", static_cast<int>(lbg.r), static_cast<int>(lbg.g), static_cast<int>(lbg.b))->getCString());
+		lbgValueSpr->setColor(lbg);
+	}
 }
 
 bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::GameObject* object, int colorID, int playerColor, int blending) {
@@ -186,13 +177,20 @@ bool __fastcall ColorSelectPopup::initH(gd::ColorSelectPopup* self, void*, gd::G
 		}
 	}
 
-	//if ((object && object->m_objectID == 29) || ((colorID == 0) && !self->m_durationSlider)) {
-	//	auto onLBGInfoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-	//	onLBGInfoSpr->setScale(.75f);
-	//	auto onLBGInfo = gd::CCMenuItemSpriteExtra::create(onLBGInfoSpr, self, menu_selector(ColorSelectPopup::Callback::onLBGInfo));
-	//	onLBGInfo->setPosition(135.f, 265.f);
-	//	self->m_buttonMenu->addChild(onLBGInfo);
-	//}
+	if ((object && object->m_objectID == 29) || ((colorID == 0) && !self->m_durationSlider)) {
+		auto lbgValueLabel = CCLabelBMFont::create("", "chatFont.fnt");
+		lbgValueLabel->setScale(.8f);
+		lbgValueLabel->setAnchorPoint({ 0.f, .5f });
+		lbgValueLabel->setPosition(director->getScreenLeft() + 30.5f, winSize.height / 2.f - 40.f);
+		self->addChild(lbgValueLabel, 0, 302);
+
+		auto lbgValueSpr = CCSprite::createWithSpriteFrameName("lightsquare_01_01_color_001.png");
+		lbgValueSpr->setScale(.5f);
+		lbgValueSpr->setPosition({ director->getScreenLeft() + 20.5f, winSize.height / 2.f - 40.f });
+		self->m_mainLayer->addChild(lbgValueSpr, 0, 212);
+
+		ColorSelectPopup::updateLBGValueLabel(self);
+	}
 
 	return true;
 }
@@ -203,6 +201,10 @@ void __fastcall ColorSelectPopup::sliderChangedH(gd::ColorSelectPopup* self, voi
 	auto fadeTimeInput = static_cast<FadeTimeInput*>(self->getChildByTag(301));
 	if (fadeTimeInput) {
 		fadeTimeInput->updateInput();
+	}
+
+	if (self->m_targetObject) {
+		self->m_targetObject->m_triggerDuration = self->m_duration;
 	}
 }
 
@@ -215,7 +217,11 @@ void __fastcall ColorSelectPopup::colorValueChangedH(gd::ColorSelectPopup* _self
 		colorInputWidget->update_labels(true, true);
 	}
 
-	//std::cout << (int)getLightBGColor(color).r << std::endl;
+	if (self->m_targetObject) {
+		self->m_targetObject->m_triggerColor = color;
+	}
+
+	ColorSelectPopup::updateLBGValueLabel(self);
 }
 
 void ColorSelectPopup::mem_init() {

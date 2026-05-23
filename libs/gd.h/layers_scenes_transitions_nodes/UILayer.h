@@ -18,6 +18,10 @@ namespace gd {
 		int m_p1TouchId;
 		int m_p2TouchId;
 		float m_clkTimer;
+
+		void toggleCheckpointsMenu(bool p0) {
+			this->m_checkpointMenu->setVisible(p0);
+		}
 	};
 }
 

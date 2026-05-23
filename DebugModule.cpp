@@ -76,6 +76,12 @@ void renderDebugModule() {
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
+			if (pl->m_player) {
+				ImGui::Text("yVel: %f", pl->m_player->m_yVelocity);
+				ImGui::Text("Speed: %f", pl->m_player->m_speed);
+				ImGui::Text("Gravity: %f", pl->m_player->m_gravity);
+			}
+
 			ImGui::Text("PlayLayer 0x174: %i", from<CCArray*>(pl, 0x174)->count());
 
 			static int colorID = 0;

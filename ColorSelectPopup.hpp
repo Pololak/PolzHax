@@ -11,6 +11,8 @@ namespace ColorSelectPopup {
 	inline void(__thiscall* colorValueChanged)(gd::ColorSelectPopup*, ccColor3B);
 	void __fastcall colorValueChangedH(gd::ColorSelectPopup*, void*, ccColor3B);
 
+	void updateLBGValueLabel(gd::ColorSelectPopup*);
+
 	class Callback : public gd::ColorSelectPopup {
 	public:
 		void onDefault(CCObject*);

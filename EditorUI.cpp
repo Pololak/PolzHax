@@ -11,6 +11,7 @@
 #include <numbers>
 #include "RotateSaws.hpp"
 #include "NewCustomizeObjectLayer.hpp"
+#include "CircleToolPopup.hpp"
 
 gd::EditorUI* m_editorUI;
 
@@ -920,6 +921,15 @@ void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* sende
 //	//self->m_selectedBuildTab->goToPage(self->m_editorLayer->m_level->m_lastBuildPage);
 //	self->updateCreateMenu(false);
 //}
+
+void EditorUI::Callback::onCircleTool(CCObject*) {
+	if (this->getSelectedObjects()->count()) {
+		CircleToolPopup::create()->show();
+	}
+	else {
+		gd::FLAlertLayer::create("Circle Tool", "You must first select the objects.", "OK")->show();
+	}
+}
 
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);

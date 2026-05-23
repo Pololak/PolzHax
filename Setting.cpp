@@ -75,4 +75,6 @@ void SettingStruct::save() {
 	});
 
 	ImGui::SaveIniSettingsToDisk(ImGui::GetIO().IniFilename);
+
+	std::cout << "Saved state..." << std::endl;
 }

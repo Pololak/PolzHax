@@ -129,7 +129,7 @@ struct SettingStruct {
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
-	bool onNoclip; bool onNoclipAccuracyLimit; bool onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
+	bool onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
 	bool onPauseDuringCompletion;
 	bool onPracticeFix;
 	bool onPracticeMusic;
@@ -188,9 +188,13 @@ struct SettingStruct {
 	bool onMetaLabel; int metaPos = 0;
 
 	// Icons
-	bool onIconEffects; bool onIconColor1 = true, onIconColor2 = true;
-	float playerPrimaryColorR = 1.f, playerPrimaryColorG = 1.f, playerPrimaryColorB = 1.f;
-	float player2PrimaryColorR = 1.f, player2PrimaryColorG = 1.f, player2PrimaryColorB = 1.f;
+	bool onIconEffects;
+	bool onP1Color, onP1Color2;
+	bool onP2Color, onP2Color2;
+	int playerPrimaryColorR = 255, playerPrimaryColorG = 255, playerPrimaryColorB = 255;
+	int player2PrimaryColorR = 255, player2PrimaryColorG = 255, player2PrimaryColorB = 255;
+	int playerSecondaryColorR = 255, playerSecondaryColorG = 255, playerSecondaryColorB = 255;
+	int player2SecondaryColorR = 255, player2SecondaryColorG = 255, player2SecondaryColorB = 255;
 
 	bool onSameDualColor;
 	bool onIconRandomizer; bool onRandomizeCube = true, onRandomizeShip = true, onRandomizeBall = true, onRandomizeUFO = true, onRandomizeDart = true, onRandomizeColor1 = true, onRandomizeColor2 = true, onRandomizeTrail = true;

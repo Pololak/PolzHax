@@ -308,6 +308,14 @@ void __fastcall PlayerObject::activateStreakH(gd::PlayerObject* self) {
 	}
 }
 
+//void __fastcall PlayerObject::ringJumpH(gd::PlayerObject* self) {
+//	PlayerObject::ringJump(self);
+//
+//	if (self->m_flyMode || self->m_birdMode) {
+//		self->runRotateAction(false);
+//	}
+//}
+
 void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd8ca0), PlayerObject::initH, reinterpret_cast<void**>(&PlayerObject::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdfff0), PlayerObject::updatePlayerFrameH, reinterpret_cast<void**>(&PlayerObject::updatePlayerFrame));
@@ -328,5 +336,6 @@ void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe19c0), PlayerObject::loadFromCheckpointH, reinterpret_cast<void**>(&PlayerObject::loadFromCheckpoint));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xda1a0), PlayerObject::updateJumpH, reinterpret_cast<void**>(&PlayerObject::updateJump));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0d10), PlayerObject::activateStreakH, reinterpret_cast<void**>(&PlayerObject::activateStreak));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xde1c0), PlayerObject::ringJumpH, reinterpret_cast<void**>(&PlayerObject::ringJump));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayerObject::collidedWithObjectH, reinterpret_cast<void**>(&PlayerObject::collidedWithObject));
 }

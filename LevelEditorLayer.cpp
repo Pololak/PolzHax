@@ -578,7 +578,7 @@ void LevelEditorLayer::updateGroundWidth() {
 			m_groundLayer->setPositionX(m_editorLayer->m_gameLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
 			m_groundLayer->m_line->setPositionX(m_groundLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
 
-			float groundWidth = (128.f / m_editorLayer->m_gameLayer->getScale()) * (winSize.width / 128.f);
+			float groundWidth = (128.f / m_editorLayer->m_gameLayer->getScale()) * (winSize.width / 128.f) * 1.5f;
 			float groundOffset = -(m_editorLayer->m_gameLayer->getPositionX()) / m_editorLayer->m_gameLayer->getScale() + winSize.width / 2.f;
 			m_groundLayer->m_groundSprite->setTextureRect({ groundOffset, 0.f, groundWidth, 128.f });
 		}
@@ -604,7 +604,12 @@ void LevelEditorLayer::createGroundLayer() {
 		m_groundLayer->m_groundSprite->setAnchorPoint({ .5f, 1.f });
 		m_editorLayer->m_gameLayer->addChild(m_groundLayer, 10);
 
-		updatePreviewMode();
+		if (setting().onPreviewMode) {
+			updatePreviewMode();
+		}
+		else {
+			resetColors();
+		}
 		updateGroundWidth();
 	}
 }
@@ -658,16 +663,18 @@ void __fastcall LevelEditorLayer::addSpecialH(gd::LevelEditorLayer* self, void*,
 }
 
 void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, void*, gd::GameObject* object) {
+	if (m_playtestStartPos == object) {
+		m_playtestStartPos = nullptr;
+	}
+
 	LevelEditorLayer::removeSpecial(self, object);
+
 	if (isColorTrigger(object)) removeTrigger(object);
 }
 
 void __fastcall LevelEditorLayer::removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* object, bool p0) {
 	LevelEditorLayer::removeObject(self, object, p0);
 	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
-	if (m_playtestStartPos == object) {
-		m_playtestStartPos = nullptr;
-	}
 }
 
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
@@ -695,7 +702,7 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 
 	LevelEditorLayer::updateShowHitboxes();
 
-	if (!isEditorPaused && setting().onPreviewMode) {
+	if (!isEditorPaused && setting().onPreviewMode && (self->m_playerState != 1)) {
 		LevelEditorLayer::updatePreviewMode();
 	}
 
@@ -708,6 +715,10 @@ void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, flo
 	LevelEditorLayer::update(self, dt);
 
 	LevelEditorLayer::updateShowHitboxes();
+
+	if (!isEditorPaused && setting().onPreviewMode && (self->m_playerState == 1)) {
+		LevelEditorLayer::updatePreviewMode();
+	}
 
 	if (setting().onShowGround) {
 		LevelEditorLayer::updateGroundWidth();

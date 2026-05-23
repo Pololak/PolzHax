@@ -1,5 +1,6 @@
 #include "EditButtonBar.hpp"
 #include "EditorUI.hpp"
+#include "CircleToolPopup.hpp"
 #include "Setting.hpp"
 #include "utils.hpp"
 
@@ -207,6 +208,15 @@ bool __fastcall EditButtonBar::initH(gd::EditButtonBar* self, void*, CCArray* ob
 			static_cast<gd::ButtonSprite*>(rotate26CCW->getChildren()->objectAtIndex(0))->addChild(rotate26Label, 5);
 			rotate26CCW->setTag(124);
 			objs->addObject(rotate26CCW);
+
+			// Circle Tool
+
+			auto circleToolLabel = CCLabelBMFont::create("Circle\nTool", "bigFont.fnt", 0.f, CCTextAlignment::kCCTextAlignmentCenter);
+			circleToolLabel->setScale(.35f);
+			circleToolLabel->setPosition({ 20.f, 22.f });
+			auto circleTool = editorUI->getSpriteButton("edit_ccwBtn_001.png", menu_selector(EditorUI::Callback::onCircleTool), nullptr, .9f);
+			static_cast<gd::ButtonSprite*>(circleTool->getChildren()->objectAtIndex(0))->addChild(circleToolLabel, 5);
+			objs->addObject(circleTool);
 		}
 	}
 

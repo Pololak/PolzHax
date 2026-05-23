@@ -419,12 +419,18 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xebe06, { 0xeb, 0x11 });
 			sequence_patch(gd::base + 0xebe20, { 0x90, 0x90 });
 			sequence_patch(gd::base + 0xebdf6, { 0x90, 0x90 });
+
+			sequence_patch(gd::base + 0xebf53, { 0xeb, 0x05 });
+			sequence_patch(gd::base + 0xebf5d, { 0x90, 0x90 });
 		}
 		else {
 			sequence_patch(gd::base + 0xebddb, { 0x74, 0x5d });
 			sequence_patch(gd::base + 0xebe06, { 0x74, 0x11 });
 			sequence_patch(gd::base + 0xebe20, { 0x75, 0x18 });
 			sequence_patch(gd::base + 0xebdf6, { 0x75, 0x42 });
+
+			sequence_patch(gd::base + 0xebf53, { 0x76, 0x05 });
+			sequence_patch(gd::base + 0xebf5d, { 0x76, 0x03 });
 		}
 
 		if (setting().onForceObjectsInvisible) {
@@ -1078,7 +1084,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (300426)");
+			ImGui::Text("1.920 - v1.3.0 (230526)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1412,6 +1418,8 @@ void imgui_render() {
 					}
 				}
 
+				auto glView = CCDirector::sharedDirector()->getOpenGLView();
+
 				auto winSize = CCDirector::sharedDirector()->getWinSize();
 				CCRenderTexture* tex = CCRenderTexture::create(winSize.width, winSize.height, kTexture2DPixelFormat_RGBA8888);
 				tex->beginWithClear(0.f, 0.f, 0.f, 0.f);
@@ -1530,12 +1538,18 @@ void imgui_render() {
 					sequence_patch(gd::base + 0xebe06, { 0xeb, 0x11 });
 					sequence_patch(gd::base + 0xebe20, { 0x90, 0x90 });
 					sequence_patch(gd::base + 0xebdf6, { 0x90, 0x90 });
+					// for 'invisible' objects
+					sequence_patch(gd::base + 0xebf53, { 0xeb, 0x05 });
+					sequence_patch(gd::base + 0xebf5d, { 0x90, 0x90 });
 				}
 				else {
 					sequence_patch(gd::base + 0xebddb, { 0x74, 0x5d });
 					sequence_patch(gd::base + 0xebe06, { 0x74, 0x11 });
 					sequence_patch(gd::base + 0xebe20, { 0x75, 0x18 });
 					sequence_patch(gd::base + 0xebdf6, { 0x75, 0x42 });
+
+					sequence_patch(gd::base + 0xebf53, { 0x76, 0x05 });
+					sequence_patch(gd::base + 0xebf5d, { 0x76, 0x03 });
 				}
 			}
 			ImGui::Tooltip("Disables fading when objects leave the viewable play area.");
@@ -2400,7 +2414,7 @@ void imgui_render() {
 				}
 				else {
 					if (playLayer) {
-						if (!playLayer->m_isDead && !setting().onHitboxesOnDeath) {
+						if (!playLayer->m_isDead && setting().onHitboxesOnDeath) {
 							PlayLayer::clearHitboxes();
 						}
 					}
@@ -2411,7 +2425,14 @@ void imgui_render() {
 			if (ImGui::TreeNodeEx("##hitboxesSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				// Solids
 
-				ImGui::CheckboxF("Solids", &setting().onSolidHitboxes);
+				if (ImGui::CheckboxF("Solids", &setting().onSolidHitboxes)) {
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
 
 				static float solidsColor[3] = {
 					setting().solidR / 255.f,
@@ -2425,11 +2446,25 @@ void imgui_render() {
 					setting().solidR = solidsColor[0] * 255;
 					setting().solidG = solidsColor[1] * 255;
 					setting().solidB = solidsColor[2] * 255;
+
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
 				}
 
 				// Hazards
 
-				ImGui::CheckboxF("Hazards", &setting().onHazardHitboxes);
+				if (ImGui::CheckboxF("Hazards", &setting().onHazardHitboxes)) {
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
 
 				static float hazardsColor[3] = {
 					setting().hazardR / 255.f,
@@ -2443,11 +2478,25 @@ void imgui_render() {
 					setting().hazardR = hazardsColor[0] * 255;
 					setting().hazardG = hazardsColor[1] * 255;
 					setting().hazardB = hazardsColor[2] * 255;
+
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
 				}
 
 				// Specials
 
-				ImGui::CheckboxF("Specials", &setting().onSpecialHitboxes);
+				if (ImGui::CheckboxF("Specials", &setting().onSpecialHitboxes)) {
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
 
 				static float specialsColor[3] = {
 					setting().specialR / 255.f,
@@ -2461,12 +2510,33 @@ void imgui_render() {
 					setting().specialR = specialsColor[0] * 255;
 					setting().specialG = specialsColor[1] * 255;
 					setting().specialB = specialsColor[2] * 255;
+
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
 				}
 
-				ImGui::CheckboxF("Player", &setting().onPlayerHitboxes);
+				if (ImGui::CheckboxF("Player", &setting().onPlayerHitboxes)) {
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
 
 				ImGui::SetNextItemWidth(80.f);
-				ImGui::DragInt("Opacity", &setting().hitboxesOpacity, 1.f, 0, 255);
+				if (ImGui::DragInt("Opacity", &setting().hitboxesOpacity, 1.f, 0, 255)) {
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
 
 				ImGui::TreePop();
 			}
@@ -3176,39 +3246,82 @@ void imgui_render() {
 			static bool player1Selected = true;
 			static bool player2Selected = false;
 
-			if (ImGui::CheckboxF("Icon Effects", &setting().onIconEffects)) {
-				if (playLayer) {
-					PlayLayer::updatePlayerColors();
-				}
-			}
+			//if (ImGui::CheckboxF("Icon Effects", &setting().onIconEffects)) {
+			//	if (playLayer) {
+			//		PlayLayer::updatePlayerColors();
+			//	}
+			//}
 
-			if (ImGui::CheckboxF("Player 1", &player1Selected)) {
-				player1Selected = true;
-				player2Selected = false;
-			}
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			if (ImGui::CheckboxF("Player 2", &player2Selected)) {
-				player2Selected = true;
-				player1Selected = false;
-			}
+			//if (ImGui::CheckboxF("Player 1", &player1Selected)) {
+			//	player1Selected = true;
+			//	player2Selected = false;
+			//}
+			//ImGui::SameLine();
+			//ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			//if (ImGui::CheckboxF("Player 2", &player2Selected)) {
+			//	player2Selected = true;
+			//	player1Selected = false;
+			//}
 
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Color 1");
+			//if (ImGui::CheckboxF("Color 1", &(player1Selected ? setting().onP1Color : setting().onP2Color))) {
+			//	if (playLayer) {
+			//		PlayLayer::updatePlayerColors();
+			//	}
+			//}
 
-			static float playerPrimaryColor[3] = {
-				setting().playerPrimaryColorR / 255.f,
-				setting().playerPrimaryColorG / 255.f,
-				setting().playerPrimaryColorB / 255.f
-			};
+			//static float playerPrimaryColor[3] = {
+			//	setting().playerPrimaryColorR / 255.f,
+			//	setting().playerPrimaryColorG / 255.f,
+			//	setting().playerPrimaryColorB / 255.f
+			//};
 
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			if (ImGui::ColorEdit3("##playerPrimaryColor", playerPrimaryColor, ImGuiColorEditFlags_NoInputs)) {
-				setting().playerPrimaryColorR = playerPrimaryColor[0] * 255;
-				setting().playerPrimaryColorG = playerPrimaryColor[1] * 255;
-				setting().playerPrimaryColorB = playerPrimaryColor[2] * 255;
-			}
+			//static float player2PrimaryColor[3] = {
+			//	setting().player2PrimaryColorR / 255.f,
+			//	setting().player2PrimaryColorG / 255.f,
+			//	setting().player2PrimaryColorB / 255.f
+			//};
+
+			//ImGui::SameLine();
+			//ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			//if (ImGui::ColorEdit3("##playerPrimaryColor", player1Selected ? playerPrimaryColor : player2PrimaryColor, ImGuiColorEditFlags_NoInputs)) {
+			//	(player1Selected ? setting().playerPrimaryColorR : setting().player2PrimaryColorR) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[0] * 255;
+			//	(player1Selected ? setting().playerPrimaryColorG : setting().player2PrimaryColorG) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[1] * 255;
+			//	(player1Selected ? setting().playerPrimaryColorB : setting().player2PrimaryColorB) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[2] * 255;
+
+			//	if (playLayer) {
+			//		PlayLayer::updatePlayerColors();
+			//	}
+			//}
+
+			//if (ImGui::CheckboxF("Color 2", &(player1Selected ? setting().onP1Color2 : setting().onP2Color2))) {
+			//	if (playLayer) {
+			//		PlayLayer::updatePlayerColors();
+			//	}
+			//}
+
+			//static float playerSecondaryColor[3] = {
+			//	setting().playerSecondaryColorR / 255.f,
+			//	setting().playerSecondaryColorG / 255.f,
+			//	setting().playerSecondaryColorB / 255.f
+			//};
+
+			//static float player2SecondaryColor[3] = {
+			//	setting().player2SecondaryColorR / 255.f,
+			//	setting().player2SecondaryColorG / 255.f,
+			//	setting().player2SecondaryColorB / 255.f
+			//};
+
+			//ImGui::SameLine();
+			//ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+			//if (ImGui::ColorEdit3("##playerSecondaryColor", player1Selected ? playerSecondaryColor : player2SecondaryColor, ImGuiColorEditFlags_NoInputs)) {
+			//	(player1Selected ? setting().playerSecondaryColorR : setting().player2SecondaryColorR) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[0] * 255;
+			//	(player1Selected ? setting().playerSecondaryColorG : setting().player2SecondaryColorG) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[1] * 255;
+			//	(player1Selected ? setting().playerSecondaryColorB : setting().player2SecondaryColorB) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[2] * 255;
+
+			//	if (playLayer) {
+			//		PlayLayer::updatePlayerColors();
+			//	}
+			//}
 
 			/*ImGui::AlignTextToFramePadding();
 			ImGui::Text("Color 2");

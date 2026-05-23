@@ -249,13 +249,20 @@ std::string* __fastcall GameLevelManager_getLengthStrH(gd::GameLevelManager* sel
 	return str;
 }
 
-inline void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate*);
-void __fastcall AppDelegate_trySaveGameH(gd::AppDelegate* self) {
-	AppDelegate_trySaveGame(self);
+inline void(__thiscall* AppDelegate_applicationDidEnterBackground)(gd::AppDelegate*);
+void __fastcall AppDelegate_applicationDidEnterBackgroundH(gd::AppDelegate* self) {
+	AppDelegate_applicationDidEnterBackground(self);
 	if (setting().onAutoSave) {
 		setting().save();
 	}
-	std::cout << "Saved state..." << std::endl;
+}
+
+inline void(__thiscall* AppDelegate_applicationWillEnterForeground)(gd::AppDelegate*);
+void __fastcall AppDelegate_applicationWillEnterForegroundH(gd::AppDelegate* self) {
+	AppDelegate_applicationWillEnterForeground(self);
+	if (setting().onAutoSave) {
+		setting().save();
+	}
 }
 
 bool debugCheck() {
@@ -293,6 +300,9 @@ DWORD WINAPI my_thread(void* hModule) {
 	auto cocos = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
 	auto cocos_ext = reinterpret_cast<uintptr_t>(GetModuleHandleA("libExtensions.dll"));
 
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x28d10), AppDelegate_applicationDidEnterBackgroundH, reinterpret_cast<void**>(&AppDelegate_applicationDidEnterBackground));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x28f00), AppDelegate_applicationWillEnterForegroundH, reinterpret_cast<void**>(&AppDelegate_applicationWillEnterForeground));
+
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xb4b0), CCCircleWave_drawH, reinterpret_cast<void**>(&CCCircleWave_draw));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0xb7b60), CCParticleSystemQuad_initWithTotalParticlesH, reinterpret_cast<void**>(&CCParticleSystemQuad_initWithTotalParticles));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x29ac0), AudioEffectsLayer_updateTweenActionH, reinterpret_cast<void**>(&AudioEffectsLayer_updateTweenAction));
@@ -301,7 +311,6 @@ DWORD WINAPI my_thread(void* hModule) {
 	MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0xcee0), CCControlUtils_RGBfromHSVH, reinterpret_cast<void**>(&CCControlUtils_RGBfromHSV));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0xa4990), CCTransitionScene_initWithDurationH, reinterpret_cast<void**>(&CCTransitionScene_initWithDuration));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x293f0), AppDelegate_trySaveGameH, reinterpret_cast<void**>(&AppDelegate_trySaveGame));
 	MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0x16ad0), CCHttpClient_sendH, reinterpret_cast<void**>(&CCHttpClient_send));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x599b0), GameLevelManager_getLengthStrH, reinterpret_cast<void**>(&GameLevelManager_getLengthStr));
 

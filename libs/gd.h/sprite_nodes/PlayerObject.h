@@ -187,6 +187,10 @@ namespace gd {
 		void toggleDartMode(bool p0) {
 			reinterpret_cast<void(__thiscall*)(PlayerObject*, bool)>(base + 0xdee80)(this, p0);
 		}
+
+		void runRotateAction(bool ground) {
+			reinterpret_cast<void(__fastcall*)(PlayerObject*, bool)>(base + 0xdab30)(this, ground);
+		}
 	};
 }
 

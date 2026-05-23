@@ -382,18 +382,14 @@ void NewCustomizeObjectLayer::updateColorSprites() {
 		if (colorSprite) {
 			if (editorLayer) {
 				if (setting().m_liveColorEnabled && setting().onPreviewMode) {
-					for (auto colorSprite : CCArrayExt<ColorChannelSprite*>(m_colorSprites)) {
-						if (colorSprite) {
-							switch (colorSprite->getTag()) {
-							case 3: colorSprite->updateValues(LevelEditorLayer::getColor01(), LevelEditorLayer::getColor01().blending); break;
-							case 4: colorSprite->updateValues(LevelEditorLayer::getColor02(), LevelEditorLayer::getColor02().blending); break;
-							case 5: colorSprite->updateValues(getLightBGColor(editorLayer->m_backgroundSprite->getColor(), gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor)), true); break;
-							case 6: colorSprite->updateValues(LevelEditorLayer::getColor03(), LevelEditorLayer::getColor03().blending); break;
-							case 7: colorSprite->updateValues(LevelEditorLayer::getColor04(), LevelEditorLayer::getColor04().blending); break;
-							case 8: colorSprite->updateValues(LevelEditorLayer::getColor3DL(), LevelEditorLayer::getColor3DL().blending); break;
-							default: break;
-							}
-						}
+					switch (colorSprite->getTag()) {
+					case 3: colorSprite->updateValues(LevelEditorLayer::getColor01(), LevelEditorLayer::getColor01().blending); break;
+					case 4: colorSprite->updateValues(LevelEditorLayer::getColor02(), LevelEditorLayer::getColor02().blending); break;
+					case 5: colorSprite->updateValues(getLightBGColor(editorLayer->m_backgroundSprite->getColor(), gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor)), true); break;
+					case 6: colorSprite->updateValues(LevelEditorLayer::getColor03(), LevelEditorLayer::getColor03().blending); break;
+					case 7: colorSprite->updateValues(LevelEditorLayer::getColor04(), LevelEditorLayer::getColor04().blending); break;
+					case 8: colorSprite->updateValues(LevelEditorLayer::getColor3DL(), LevelEditorLayer::getColor3DL().blending); break;
+					default: break;
 					}
 				}
 				else {
@@ -498,18 +494,18 @@ void NewCustomizeObjectLayer::updateColorsLive(float) {
 		if (colorSprite) {
 			if (editorLayer) {
 				if (setting().m_liveColorEnabled && setting().onPreviewMode) {
-					for (auto colorSprite : CCArrayExt<ColorChannelSprite*>(m_colorSprites)) {
-						if (colorSprite) {
-							switch (colorSprite->getTag()) {
-							case 3: colorSprite->updateValues(LevelEditorLayer::getColor01(), LevelEditorLayer::getColor01().blending); break;
-							case 4: colorSprite->updateValues(LevelEditorLayer::getColor02(), LevelEditorLayer::getColor02().blending); break;
-							case 5: colorSprite->updateValues(getLightBGColor(editorLayer->m_backgroundSprite->getColor(), gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor)), true); break;
-							case 6: colorSprite->updateValues(LevelEditorLayer::getColor03(), LevelEditorLayer::getColor03().blending); break;
-							case 7: colorSprite->updateValues(LevelEditorLayer::getColor04(), LevelEditorLayer::getColor04().blending); break;
-							case 8: colorSprite->updateValues(LevelEditorLayer::getColor3DL(), LevelEditorLayer::getColor3DL().blending); break;
-							default: break;
-							}
-						}
+					switch (colorSprite->getTag()) {
+					case 3: colorSprite->updateValues(LevelEditorLayer::getColor01(), LevelEditorLayer::getColor01().blending); break;
+					case 4: colorSprite->updateValues(LevelEditorLayer::getColor02(), LevelEditorLayer::getColor02().blending); break;
+					case 5: colorSprite->updateValues(getLightBGColor(editorLayer->m_backgroundSprite->getColor(), gd::GameManager::sharedState()->colorForIdx(gd::GameManager::sharedState()->m_playerColor)), true); break;
+					case 6: colorSprite->updateValues(LevelEditorLayer::getColor03(), LevelEditorLayer::getColor03().blending); break;
+					case 7: colorSprite->updateValues(LevelEditorLayer::getColor04(), LevelEditorLayer::getColor04().blending); break;
+					case 8: colorSprite->updateValues(LevelEditorLayer::getColor3DL(), LevelEditorLayer::getColor3DL().blending); break;
+					default: break;
+					}
+
+					if (colorSprite->getTag() == m_selectedColorIdx) {
+						m_selectedColorSprite->updateValues(colorSprite->getColor(), colorSprite->m_blendingDot->isVisible());
 					}
 				}
 			}

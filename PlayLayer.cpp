@@ -289,7 +289,7 @@ void PlayLayer::clearHitboxes() {
 	objectDrawNode->clear();
 }
 
-void PlayLayer::updatePlayerColors() {
+void PlayLayer::resetPlayerColors() {
 	auto self = gd::GameManager::sharedState()->getPlayLayer();
 
 	if (self == nullptr) return;
@@ -298,9 +298,39 @@ void PlayLayer::updatePlayerColors() {
 
 	auto gm = gd::GameManager::sharedState();
 
-	self->m_player2->setColor(setting().onSameDualColor ? gm->colorForIdx(gm->m_playerColor) : gm->colorForIdx(gm->m_playerColor2));
-	self->m_player2->setSecondColor(setting().onSameDualColor ? gm->colorForIdx(gm->m_playerColor2) : gm->colorForIdx(gm->m_playerColor));
+	self->m_player->setColor(gm->colorForIdx(gm->m_playerColor));
+	self->m_player->setSecondColor(gm->colorForIdx(gm->m_playerColor2));
 
+	self->m_player2->setColor(gm->colorForIdx(gm->m_playerColor2));
+	self->m_player2->setSecondColor(gm->colorForIdx(gm->m_playerColor));
+
+	self->m_player->updateGlowColor();
+	self->m_player2->updateGlowColor();
+}
+
+void PlayLayer::updatePlayerColors() {
+	auto self = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (self == nullptr) return;
+
+	if (self->m_player2 == nullptr) return;
+
+	PlayLayer::resetPlayerColors();
+
+	auto gm = gd::GameManager::sharedState();
+
+	self->m_player->setColor(setting().onIconEffects && setting().onP1Color ? ccc3(setting().playerPrimaryColorR, setting().playerPrimaryColorG, setting().playerPrimaryColorB) : gm->colorForIdx(gm->m_playerColor));
+	self->m_player->setSecondColor(setting().onIconEffects && setting().onP1Color2 ? ccc3(setting().playerSecondaryColorR, setting().playerSecondaryColorG, setting().playerSecondaryColorB) : gm->colorForIdx(gm->m_playerColor2));
+
+	self->m_player2->setColor(setting().onIconEffects && setting().onP2Color ? ccc3(setting().player2PrimaryColorR, setting().player2PrimaryColorG, setting().player2PrimaryColorB) : gm->colorForIdx(gm->m_playerColor2));
+	self->m_player2->setSecondColor(setting().onIconEffects && setting().onP2Color2 ? ccc3(setting().player2SecondaryColorR, setting().player2SecondaryColorG, setting().player2SecondaryColorB) : gm->colorForIdx(gm->m_playerColor));
+
+	if (!setting().onIconEffects) {
+		self->m_player2->setColor(setting().onSameDualColor ? gm->colorForIdx(gm->m_playerColor) : gm->colorForIdx(gm->m_playerColor2));
+		self->m_player2->setSecondColor(setting().onSameDualColor ? gm->colorForIdx(gm->m_playerColor2) : gm->colorForIdx(gm->m_playerColor));
+	}
+
+	self->m_player->updateGlowColor();
 	self->m_player2->updateGlowColor();
 }
 
@@ -361,16 +391,13 @@ void updateFPSLabel() {
 	if (m_fpsCounterLabel && m_fpsCounterLabel->isVisible()) {
 		std::string prefix;
 
+		auto fpsValue = setting().useImGuiFps ? static_cast<int>(roundf(ImGui::GetIO().Framerate)) : static_cast<int>(roundf(fps));
+
 		if (setting().fpsPrefix) {
-			prefix = setting().onTPSBypass ? " TPS" : " FPS";
+			prefix = (setting().onTPSBypass && !setting().useImGuiFps) ? " TPS" : " FPS";
 		}
 
-		if (setting().useImGuiFps) {
-			m_fpsCounterLabel->setString((std::to_string(static_cast<int>(roundf(ImGui::GetIO().Framerate))) + prefix).c_str());
-		}
-		else {
-			m_fpsCounterLabel->setString((std::to_string(static_cast<int>(roundf(fps))) + prefix).c_str());
-		}
+		m_fpsCounterLabel->setString((std::to_string(fpsValue) + prefix).c_str());
 	}
 }
 
@@ -1173,16 +1200,14 @@ void __fastcall PlayLayer::createObjectsFromSetupH(gd::PlayLayer* self, void*, g
 void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void*, bool practice) {
 	m_checkpoints.clear();
 
-	//if (setting().onPracticeMusic && practice && !self->m_practiceMode) {
-	//	self->m_practiceMode = practice;
-
-	//	self->m_uiLayer->toggleCheckpointsMenu(practice);
-
-	//	self->stopActionByTag(18);
-	//	return;
-	//}
-
-	PlayLayer::togglePracticeMode(self, practice);
+	if (setting().onPracticeMusic && practice && !self->m_practiceMode) {
+		self->m_practiceMode = practice;
+		self->m_uiLayer->toggleCheckpointsMenu(practice);
+		self->stopActionByTag(18); // this one stops Everyplay record on mobile, but for some reason Rob stops it in PC version too
+	}
+	else {
+		PlayLayer::togglePracticeMode(self, practice);
+	}
 
 	if (setting().onHidePracticeButtons) {
 		self->m_uiLayer->m_checkpointMenu->setVisible(!setting().onHidePracticeButtons);

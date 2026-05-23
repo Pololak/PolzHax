@@ -53,6 +53,9 @@ namespace PlayerObject {
 	inline void(__thiscall* activateStreak)(gd::PlayerObject*);
 	void __fastcall activateStreakH(gd::PlayerObject*);
 
+	inline void(__thiscall* ringJump)(gd::PlayerObject*);
+	void __fastcall ringJumpH(gd::PlayerObject*);
+
 	inline void(__thiscall* updateJump)(gd::PlayerObject*, float);
 	void __fastcall updateJumpH(gd::PlayerObject*, void*);
 
