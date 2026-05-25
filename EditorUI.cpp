@@ -276,21 +276,6 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	onTrash->setEnabled(false);
 	leftMenu->addChild(onTrash, 0, 201);
 
-	////
-	//auto freeRotateBtn = static_cast<gd::CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("21"));
-	//auto snapRotateBtn = static_cast<gd::CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("22"));
-
-	//if (freeRotateBtn && snapRotateBtn) {
-	//	freeRotateBtn->setVisible(true);
-	//	static_cast<gd::ButtonSprite*>(freeRotateBtn->getChildren()->objectAtIndex(0))->setColor(ccGRAY);
-	//	freeRotateBtn->setEnabled(false);
-
-	//	snapRotateBtn->setVisible(true);
-	//	static_cast<gd::ButtonSprite*>(snapRotateBtn->getChildren()->objectAtIndex(0))->setColor(ccGRAY);
-	//	snapRotateBtn->setEnabled(false);
-	//}
-	////
-
 	self->m_groupPrevBtn->setPositionX(self->m_groupPrevBtn->getPositionX() - 10.f);
 	self->m_groupNextBtn->setPositionX(self->m_groupNextBtn->getPositionX() - 10.f);
 	self->m_currentGroupLabel->setPositionX(self->m_currentGroupLabel->getPositionX() - 10.f);
@@ -391,8 +376,6 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 		selectedObjectInToolboxIdLabel->setPosition(director->getScreenLeft() + 90.f, director->getScreenBottom() + 80.f);
 		self->addChild(selectedObjectInToolboxIdLabel, 10, 756);
 	}
-
-	//std::cout << "objs: " << m_gameObjects.size() << std::endl;
 
 	return true;
 }
@@ -575,7 +558,6 @@ CCPoint* __fastcall EditorUI::moveForCommandH(gd::EditorUI* self, void*, CCPoint
 }
 
 void __fastcall EditorUI::transformObjectH(gd::EditorUI* self, void*, gd::GameObject* obj, gd::EditCommand command, bool p0) {
-	//std::cout << obj->getTexture()->getName() << std::endl;
 	CCArray* selectedObjects = self->getSelectedObjects();
 	int selectedObjectsCount = selectedObjects->count();
 
@@ -639,16 +621,6 @@ void __fastcall EditorUI::onGroupUpH(gd::EditorUI* self, void*, CCObject* sender
 	if (editorLayerInput) {
 		editorLayerInput->updateInputNode();
 	}
-
-	//if (auto obj = self->m_selectedObject) {
-	//	obj->m_objectID = self->m_selectedCreateObjectID;
-	//	auto newTextureName = gd::ObjectToolbox::sharedState()->intKeyToFrame(obj->m_objectID);
-	//	auto newSpr = CCSprite::createWithSpriteFrameName(newTextureName);
-	//	obj->m_textureName.clear();
-	//	obj->m_textureName = newTextureName;
-	//	obj->setTexture(newSpr->getTexture());
-	//	obj->setTextureRect(newSpr->getTextureRect());
-	//}
 }
 
 bool touchIntersectsInput(gd::CCTextInputNode* input, CCTouch* touch) {

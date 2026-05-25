@@ -83,6 +83,26 @@ static int selectedCategory = 0;
 static int selectedPlayerVariable = -1;
 static int selectedCreatorVariable = -1;
 
+float SHORT_ITEM_WIDTH() {
+	return ImGui::GetWindowWidth() / 2.f - ImGui::GetStyle().WindowPadding.x * 1.25f;
+}
+
+float LONG_ITEM_WIDTH() {
+	return ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x * 2.f;
+}
+
+float SHORT_INPUT_WIDTH() {
+	return 80.f * setting().UISize;
+}
+
+float LONG_CENTER_X() {
+	return ImGui::GetWindowWidth() / 2.f - LONG_ITEM_WIDTH() / 2.f;
+}
+
+float IN_TREENODE_OFFSET_X() {
+	return ImGui::GetWindowWidth() - 160.f * setting().UISize - ImGui::GetStyle().WindowPadding.x;
+}
+
 float getVariableValue() {
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	auto editorLayer = LevelEditorLayer::get();
@@ -218,100 +238,100 @@ void colorSet() {
 }
 
 void sortTabs() {
-	float polzhax_xPos = 5.f;
+	float polzhax_xPos = 5.f * setting().UISize;
 	float addingInterfaceY = -1.f;
 	float addingReplayY = -1.f;
 	float bypass_xPos = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("PolzHax", nullptr);
-		ImGui::SetWindowPos(ImVec2(5.f, 5.f));
-		bypass_xPos = polzhax_xPos + ImGui::GetWindowWidth() + 5.f;
-		addingInterfaceY = ImGui::GetWindowHeight() + 10.f;
+		ImGui::SetWindowPos(ImVec2(5.f * setting().UISize, 5.f * setting().UISize));
+		bypass_xPos = polzhax_xPos + ImGui::GetWindowWidth() + 5.f * setting().UISize;
+		addingInterfaceY = ImGui::GetWindowHeight() + 10.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Interface", nullptr);
-		ImGui::SetWindowPos(ImVec2(5.f, addingInterfaceY));
-		addingReplayY = addingInterfaceY + ImGui::GetWindowHeight() + 5.f;
+		ImGui::SetWindowPos(ImVec2(5.f * setting().UISize, addingInterfaceY));
+		addingReplayY = addingInterfaceY + ImGui::GetWindowHeight() + 5.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Replay", nullptr);
-		ImGui::SetWindowPos(ImVec2(5.f, addingReplayY));
+		ImGui::SetWindowPos(ImVec2(5.f * setting().UISize, addingReplayY));
 	}
 	float addingUtilityY = -1.f;
 	float addingScreenshotY = -1.f;
 	float cosmetic_xPos = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Bypass", nullptr);
-		ImGui::SetWindowPos(ImVec2(bypass_xPos, 5.f));
-		cosmetic_xPos = bypass_xPos + ImGui::GetWindowWidth() + 5.f;
-		addingUtilityY = ImGui::GetWindowHeight() + 10.f;
+		ImGui::SetWindowPos(ImVec2(bypass_xPos, 5.f * setting().UISize));
+		cosmetic_xPos = bypass_xPos + ImGui::GetWindowWidth() + 5.f * setting().UISize;
+		addingUtilityY = ImGui::GetWindowHeight() + 10.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Utility", nullptr);
 		ImGui::SetWindowPos(ImVec2(bypass_xPos, addingUtilityY));
-		addingScreenshotY = addingUtilityY + ImGui::GetWindowHeight() + 5.f;
+		addingScreenshotY = addingUtilityY + ImGui::GetWindowHeight() + 5.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Screenshot", nullptr);
 		ImGui::SetWindowPos(ImVec2(bypass_xPos, addingScreenshotY));
 	}
 	float creator_xPos = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Cosmetic", nullptr);
-		ImGui::SetWindowPos(ImVec2(cosmetic_xPos, 5.f));
-		creator_xPos = cosmetic_xPos + ImGui::GetWindowWidth() + 5.f;
+		ImGui::SetWindowPos(ImVec2(cosmetic_xPos, 5.f * setting().UISize));
+		creator_xPos = cosmetic_xPos + ImGui::GetWindowWidth() + 5.f * setting().UISize;
 	}
 	float addingVariablesY = -1.f;
 	float level_xPos = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Creator", nullptr);
-		ImGui::SetWindowPos(ImVec2(creator_xPos, 5.f));
-		level_xPos = creator_xPos + ImGui::GetWindowWidth() + 5.f;
-		addingVariablesY = ImGui::GetWindowHeight() + 10.f;
+		ImGui::SetWindowPos(ImVec2(creator_xPos, 5.f * setting().UISize));
+		level_xPos = creator_xPos + ImGui::GetWindowWidth() + 5.f * setting().UISize;
+		addingVariablesY = ImGui::GetWindowHeight() + 10.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Variables", nullptr);
 		ImGui::SetWindowPos(ImVec2(creator_xPos, addingVariablesY));
 	}
 	float universal_xPos = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Level", nullptr);
-		ImGui::SetWindowPos(ImVec2(level_xPos, 5.f));
-		universal_xPos = level_xPos + ImGui::GetWindowWidth() + 5.f;
+		ImGui::SetWindowPos(ImVec2(level_xPos, 5.f * setting().UISize));
+		universal_xPos = level_xPos + ImGui::GetWindowWidth() + 5.f * setting().UISize;
 	}
 	float addingSpeedhackY = -1.f;
 	float status_xPos = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Universal", nullptr);
-		ImGui::SetWindowPos(ImVec2(universal_xPos, 5.f));
-		status_xPos = universal_xPos + ImGui::GetWindowWidth() + 5.f;
-		addingSpeedhackY = ImGui::GetWindowHeight() + 10.f;
+		ImGui::SetWindowPos(ImVec2(universal_xPos, 5.f * setting().UISize));
+		status_xPos = universal_xPos + ImGui::GetWindowWidth() + 5.f * setting().UISize;
+		addingSpeedhackY = ImGui::GetWindowHeight() + 10.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Speedhack", nullptr);
 		ImGui::SetWindowPos(ImVec2(universal_xPos, addingSpeedhackY));
 	}
 	float addingIconsY = -1.f;
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Status", nullptr);
-		ImGui::SetWindowPos(ImVec2(status_xPos, 5.f));
-		addingIconsY = ImGui::GetWindowHeight() + 10.f;
+		ImGui::SetWindowPos(ImVec2(status_xPos, 5.f * setting().UISize));
+		addingIconsY = ImGui::GetWindowHeight() + 10.f * setting().UISize;
 	}
 	{
-		ImGui::SetWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Icons", nullptr);
 		ImGui::SetWindowPos(ImVec2(status_xPos, addingIconsY));
 	}
@@ -319,21 +339,28 @@ void sortTabs() {
 
 void updateUISize() {
 	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+
 	io.FontGlobalScale = 1.f * setting().UISize;
-	//io.FontGlobalScale = 1.f * setting().UISize;
-	//ImGui::GetStyle().ScaleAllSizes(1.f * setting().UISize);
+
+	style.WindowPadding.x = 8.f * setting().UISize;
+	style.WindowPadding.y = 8.f * setting().UISize;
+
+	style.FramePadding.x = 4.f * setting().UISize;
+	style.FramePadding.y = 3.f * setting().UISize;
+
+	style.ItemSpacing.x = 8.f * setting().UISize;
+	style.ItemSpacing.y = 4.f * setting().UISize;
 }
 
 void imgui_render() {
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	auto editorLayer = LevelEditorLayer::get();
 
-	const float SHORT_ITEM_WIDTH = (ImGui::GetWindowWidth() / 2.f - ImGui::GetStyle().WindowPadding.x * 1.25f) * setting().UISize;
-	const float LONG_ITEM_WIDTH = (ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x * 2.f) * setting().UISize;
-
 	if (oneX) {
 		setting().load();
 
+		updateUISize();
 		sortTabs();
 
 		colorSet();
@@ -1082,19 +1109,19 @@ void imgui_render() {
 			renderDebugModule();
 		}
 		
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (230526)");
+			ImGui::Text("1.920 - v1.3.0 (250526)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+			if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 				setting().save();
 				gd::FLAlertLayer::create("Saved", "Hack state is saved.", "OK")->show();
 			}
 
-			ImGui::HotKey("Alt Hotkey", setting().m_openMenuKey, 0.f, ImVec2(SHORT_ITEM_WIDTH, 0));
+			ImGui::HotKey("Alt Hotkey", setting().m_openMenuKey, 0.f, ImVec2(SHORT_ITEM_WIDTH(), 0));
 
 			if (ImGui::CheckboxF("Thread Priority", &setting().onThreadPriority)) {
 				if (setting().onThreadPriority) {
@@ -1104,9 +1131,10 @@ void imgui_render() {
 					SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
 				}
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##threadPrioritySettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##priorities", &setting().priority, priorities, IM_ARRAYSIZE(priorities))) {
 					if (setting().onThreadPriority) {
 						updatePriority();
@@ -1116,14 +1144,16 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
-			filter.Draw("Search", 135.f);
+			filter.Draw("Search", 135.f * setting().UISize);
 
 			if (setting().onDeveloperMode) {
-				if (ImGui::Button("Cocos Explorer", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+				ImGui::SetCursorPosX(LONG_CENTER_X());
+				if (ImGui::Button("Cocos Explorer", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 					setting().onCocosExplorer = !setting().onCocosExplorer;
 				}
 
-				if (ImGui::Button("GDPS Switcher", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+				ImGui::SetCursorPosX(LONG_CENTER_X());
+				if (ImGui::Button("GDPS Switcher", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 					setting().onGDPSSwitcher = !setting().onGDPSSwitcher;
 				}
 			}
@@ -1133,7 +1163,7 @@ void imgui_render() {
 			}
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Interface", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			static float bgColor[4] = {
 				setting().bgColor01,
@@ -1167,21 +1197,21 @@ void imgui_render() {
 				colorSet();
 			}
 
-			//ImGui::SetNextItemWidth(135.f);
-			//if (ImGui::DragFloat("UI Size", &setting().UISize, .1f, .5f, 3.f, "%.1f")) {
-			//	updateUISize();
-			//	sortTabs();
-			//}
+			ImGui::SetNextItemWidth(135.f * setting().UISize);
+			if (ImGui::DragFloat("UI Size", &setting().UISize, .1f, .5f, 3.f, "%.2fx")) {
+				updateUISize();
+			}
 
-			if (ImGui::Button("Sort Tabs", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Sort Tabs", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 				sortTabs();
 			}
 		}
 
 		if (setting().onDeveloperMode) {
-			ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+			ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 			if (ImGui::Begin("Replay", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-				ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+				ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
 				if (ImGui::Combo("##selectedMacro", &selectedReplay, replayNames, replayNames.size())) {
 					if (replayNames.size()) {
 						std::cout << "Selected Macro: " << replayNames[selectedReplay].c_str() << std::endl;
@@ -1202,22 +1232,22 @@ void imgui_render() {
 				ImGui::CheckboxF("Auto Save", &setting().onAutoSaveReplay);
 				ImGui::SameLine(0.f, 0.f);
 				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 
 				}
 
-				if (ImGui::Button("Clear & New", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+				if (ImGui::Button("Clear & New", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 
 				}
 				ImGui::SameLine(0.f, 0.f);
 				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-				if (ImGui::Button("Delete", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+				if (ImGui::Button("Delete", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 
 				}
 			}
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Bypass", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			if (ImGui::CheckboxF("Character Filter", &setting().onCharacterFilter)) {
 				if (setting().onCharacterFilter) {
@@ -1278,14 +1308,15 @@ void imgui_render() {
 			ImGui::Tooltip("Allows for unlimited text length in text inputs.");
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Utility", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::HotKey("", setting().m_p1click, 0.f, ImVec2(SHORT_ITEM_WIDTH, 0.f), "P1 Click");
+			ImGui::HotKey("", setting().m_p1click, 0.f, ImVec2(SHORT_ITEM_WIDTH(), 0.f), "P1 Click");
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			ImGui::HotKey("", setting().m_p2click, 0.f, ImVec2(SHORT_ITEM_WIDTH, 0.f), "P2 Click");
+			ImGui::HotKey("", setting().m_p2click, 0.f, ImVec2(SHORT_ITEM_WIDTH(), 0.f), "P2 Click");
 
-			if (ImGui::Button("Uncomplete Level", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Uncomplete Level", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 				if (playLayer) {
 					auto gsm = gd::GameStatsManager::sharedState();
 					auto glm = gd::GameLevelManager::sharedState();
@@ -1317,15 +1348,18 @@ void imgui_render() {
 				}
 			}
 
-			if (ImGui::Button("Restart Level", ImVec2(LONG_ITEM_WIDTH, 0))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Restart Level", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				if (playLayer) playLayer->resetLevel();
 			}
 
-			if (ImGui::Button("Practice Mode", ImVec2(LONG_ITEM_WIDTH, 0))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Practice Mode", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				if (playLayer) playLayer->togglePracticeMode(!playLayer->m_practiceMode);
 			}
 
-			if (ImGui::Button("Settings", ImVec2(LONG_ITEM_WIDTH, 0))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Settings", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				//CCARRAY_FOREACH_B_TYPE(CCDirector::sharedDirector()->getRunningScene()->getChildren(), optionsLayer, gd::OptionsLayer) {
 				//	if (optionsLayer->getTag() == 0x725) {
 				//		
@@ -1341,7 +1375,8 @@ void imgui_render() {
 			static bool showFirstBtn = true;
 			static bool showSecondBtn = false;
 			if (showFirstBtn) {
-				if (ImGui::Button("Refresh Textures", ImVec2(LONG_ITEM_WIDTH, 0))) {
+				ImGui::SetCursorPosX(LONG_CENTER_X());
+				if (ImGui::Button("Refresh Textures", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 					showFirstBtn = false;
 					showSecondBtn = true;
 				}
@@ -1360,7 +1395,8 @@ void imgui_render() {
 				}
 			}
 
-			if (ImGui::Button("Inject DLL", ImVec2(LONG_ITEM_WIDTH, 0))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Inject DLL", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				auto selection = pfd::open_file("Select a file", CCFileUtils::sharedFileUtils()->getWritablePath2(), { "DLL File", "*.dll" }, pfd::opt::multiselect).result();
 				for (auto const& filename : selection) {
 					LoadLibrary(filename.c_str());
@@ -1369,20 +1405,20 @@ void imgui_render() {
 				}
 			}
 
-			if (ImGui::Button("Resources", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+			if (ImGui::Button("Resources", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/Resources").c_str(), NULL, NULL, SW_SHOW);
 			}
-			//ImGui::SameLine(0.f, 4.f);
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			if (ImGui::Button("AppData", ImVec2(SHORT_ITEM_WIDTH, 0))) {
+			if (ImGui::Button("AppData", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 				ShellExecute(0, NULL, CCFileUtils::sharedFileUtils()->getWritablePath().c_str(), NULL, NULL, SW_SHOW);
 			}
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Screenshot", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			if (ImGui::Button("Screenshot", ImVec2(LONG_ITEM_WIDTH, 0))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Screenshot", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				bool pauseMenuVisibility = false;
 				bool labelsVisibility = false;
 				bool backgroundVisibility = false;
@@ -1474,15 +1510,16 @@ void imgui_render() {
 			ImGui::CheckboxF("Hide Player", &setting().onHidePlayerOnShot);
 			ImGui::CheckboxF("Copy To Clipboard", &setting().onCopyShotToClipboard);
 
-			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH, 0))) {
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/screenshots").c_str(), NULL, NULL, SW_SHOW);
 			}
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Cosmetic", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::CheckboxF("Accurate Percentage", &setting().onAccuratePercentage);
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##accuratePercentageSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				int index = 0;
 				for (int i = 0; i < IM_ARRAYSIZE(decimalValues); i++) {
@@ -1491,7 +1528,8 @@ void imgui_render() {
 						break;
 					}
 				}
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##decimalPlaces", &index, decimalPlaces, IM_ARRAYSIZE(decimalPlaces))) {
 					setting().decimalPlaces = decimalValues[index];
 				}
@@ -1933,10 +1971,11 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Wave Pulse Size", &setting().onWavePulseSize);
 			ImGui::Tooltip("Changes the wave pulse size multiplier.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##wavePulseSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 
-				ImGui::SetNextItemWidth(80.f);
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::DragFloat("Size", &setting().wavePulseSize, .1f, .1f, 2.3f, "%.1fx");
 
 				ImGui::TreePop();
@@ -1956,7 +1995,7 @@ void imgui_render() {
 			ImGui::Tooltip("Keeps wave trail visible on death.");
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Creator", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			if (ImGui::CheckboxF("Absolute Position", &setting().onAbsolutePosition)) {
 				if (setting().onAbsolutePosition) {
@@ -2233,17 +2272,17 @@ void imgui_render() {
 		}
 
 		if (setting().onDeveloperMode) {
-			ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+			ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 			if (ImGui::Begin("Variables", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-				ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+				ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
 				ImGui::Combo("##variablesCategory", &selectedCategory, variablesCategory, IM_ARRAYSIZE(variablesCategory));
 
 				if (selectedCategory == 0) {
-					ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+					ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
 					ImGui::Combo("##playerVariables", &selectedPlayerVariable, playerVariables, IM_ARRAYSIZE(playerVariables));
 				}
 				else {
-					ImGui::SetNextItemWidth(LONG_ITEM_WIDTH);
+					ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
 					ImGui::Combo("##creatorVariables", &selectedCreatorVariable, creatorVariables, IM_ARRAYSIZE(creatorVariables));
 				}
 
@@ -2262,64 +2301,73 @@ void imgui_render() {
 				if ((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1)) {
 					ImGui::BeginDisabled();
 				}
-				ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+				ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 				ImGui::InputFloat("##variableValue", &variableValue);
 				ImGui::SameLine(0.f, 0.f);
 				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-				if (ImGui::Button("Set", ImVec2(SHORT_ITEM_WIDTH, 0.f))) {
+				if (ImGui::Button("Set", ImVec2(SHORT_ITEM_WIDTH(), 0.f))) {
 
 				}
 
-				if (ImGui::Button("Reset", ImVec2(SHORT_ITEM_WIDTH, 0.f))) {
+				if (ImGui::Button("Reset", ImVec2(SHORT_ITEM_WIDTH(), 0.f))) {
 
 				}
 				ImGui::SameLine(0.f, 0.f);
 				ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH, 0.f))) {
+				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH(), 0.f))) {
 
 				}
 				if ((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1)) {
 					ImGui::EndDisabled();
 				}
 
-				if (ImGui::Button("Reset All", ImVec2(LONG_ITEM_WIDTH, 0.f))) {
+				ImGui::SetCursorPosX(LONG_CENTER_X());
+				if (ImGui::Button("Reset All", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 
 				}
 			}
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			//ImGui::CheckboxF("0% Practice Complete", &setting().onZeroPracticeComplete);
 			//ImGui::Tooltip("Completes a level if you beat it in 1 practice attempt.");
 
 			ImGui::CheckboxF("Auto Deafen", &setting().onAutoDeafen);
-			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-				ImGui::SetTooltip("Deafens user in Discord after a certain %%.");
-			ImGui::SameLine(170.f);
+			ImGui::Tooltip("Deafens user in Discord after a certain %%.");
+
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##autodeafenSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::CheckboxF("Undeafen On Pause", &setting().onPauseUndeafen);
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::CheckboxF("Deafen in Practice", &setting().onPracticeDeafen);
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::CheckboxF("Deafen with StartPos", &setting().onTestmodeDeafen);
 
-				ImGui::SetNextItemWidth(80.f);
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::DragFloat("Deafen at", &setting().deafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
-				ImGui::SetNextItemWidth(80.f);
+
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::DragFloat("Undeafen at", &setting().undeafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
 
-				ImGui::HotKey("Shortcut", setting().m_autoDeafenKey, 0.f, ImVec2(80.f, 0.f));
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::HotKey("Shortcut", setting().m_autoDeafenKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
 
 				ImGui::TreePop();
 			}
 
 			ImGui::CheckboxF("Auto Kill", &setting().onAutoKill);
-			if (ImGui::IsItemHovered() && GImGui->HoveredIdTimer > 0.5f)
-				ImGui::SetTooltip("Kills a player at a certain percentage.");
-			ImGui::SameLine(170.f);
+			ImGui::Tooltip("Kills a player at a certain percentage.");
+
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##autoKillSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(80.f);
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::DragFloat("Kill at", &setting().killPercentage, 1.f, 0.f, 100.f, "%.0f%%");
 
 				ImGui::TreePop();
@@ -2421,10 +2469,11 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Visualizes level hitboxes.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##hitboxesSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				// Solids
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Solids", &setting().onSolidHitboxes)) {
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
@@ -2441,7 +2490,7 @@ void imgui_render() {
 				};
 
 				ImGui::SameLine();
-				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (30.f * setting().UISize));
 				if (ImGui::ColorEdit3("##solidsColor", solidsColor, ImGuiColorEditFlags_NoInputs)) {
 					setting().solidR = solidsColor[0] * 255;
 					setting().solidG = solidsColor[1] * 255;
@@ -2457,6 +2506,7 @@ void imgui_render() {
 
 				// Hazards
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Hazards", &setting().onHazardHitboxes)) {
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
@@ -2473,7 +2523,7 @@ void imgui_render() {
 				};
 
 				ImGui::SameLine();
-				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (30.f * setting().UISize));
 				if (ImGui::ColorEdit3("##hazardsColor", hazardsColor, ImGuiColorEditFlags_NoInputs)) {
 					setting().hazardR = hazardsColor[0] * 255;
 					setting().hazardG = hazardsColor[1] * 255;
@@ -2489,6 +2539,7 @@ void imgui_render() {
 
 				// Specials
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Specials", &setting().onSpecialHitboxes)) {
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
@@ -2505,7 +2556,7 @@ void imgui_render() {
 				};
 
 				ImGui::SameLine();
-				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (30.f * setting().UISize));
 				if (ImGui::ColorEdit3("##specialsColor", specialsColor, ImGuiColorEditFlags_NoInputs)) {
 					setting().specialR = specialsColor[0] * 255;
 					setting().specialG = specialsColor[1] * 255;
@@ -2519,6 +2570,7 @@ void imgui_render() {
 					}
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Player", &setting().onPlayerHitboxes)) {
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
@@ -2528,7 +2580,8 @@ void imgui_render() {
 					}
 				}
 
-				ImGui::SetNextItemWidth(80.f);
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::DragInt("Opacity", &setting().hitboxesOpacity, 1.f, 0, 255)) {
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
@@ -2580,21 +2633,22 @@ void imgui_render() {
 				PlayLayer::updateStatusLabels();
 			}
 			ImGui::Tooltip("Makes the player invincible.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##noclipSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				//ImGui::CheckboxF("Death Limit", &setting().onNoclipDeathsLimit);
-				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 				//if (ImGui::DragInt("Limit##deathLimit", &setting().noclipDeathsLimit)) {
 				//	if (setting().noclipDeathsLimit < 0) setting().noclipDeathsLimit = 0;
 				//}
 				//
 				//ImGui::CheckboxF("Accuracy Limit", &setting().onNoclipAccuracyLimit);
-				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 				//if (ImGui::DragFloat("Limit##accuracyLimit", &setting().noclipAccuracyLimit, 1.f, 0.f, 100.f, "%.0f")) {
 				//	if (setting().noclipAccuracyLimit < 0.f) setting().noclipAccuracyLimit = 0.f;
 				//	if (setting().noclipAccuracyLimit > 100.f) setting().noclipAccuracyLimit = 100.f;
 				//}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::CheckboxF("Noclip Tint", &setting().onNoclipTint);
 
 				static float noclipTintColor[3] = {
@@ -2604,7 +2658,7 @@ void imgui_render() {
 				};
 
 				ImGui::SameLine();
-				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
+				ImGui::SetCursorPosX(ImGui::GetWindowWidth() - (30.f * setting().UISize));
 				if (ImGui::ColorEdit3("##noclipTintColor", noclipTintColor, ImGuiColorEditFlags_NoInputs)) {
 					setting().noclipTintR = noclipTintColor[0] * 255;
 					setting().noclipTintG = noclipTintColor[1] * 255;
@@ -2618,6 +2672,7 @@ void imgui_render() {
 					}
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Experimental (buggy)", &setting().onNoclipUnstuck)) {
 					if (setting().onNoclipUnstuck) {
 						sequence_patch(gd::base + 0xdae16, { 0xe9, 0x00, 0x02, 0x00, 0x00, 0x90 });
@@ -2673,10 +2728,11 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Respawn Time", &setting().onRespawnTime);
 			ImGui::Tooltip("Changes player respawn time.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##respawnTimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 
-				ImGui::SetNextItemWidth(80.f);
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::DragFloat("Time", &setting().respawnValue, 100.f, 0.f, 10000.f, "%.0fms");
 
 				ImGui::TreePop();
@@ -2687,7 +2743,7 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Show Layout", &setting().onShowLayout);
 			ImGui::Tooltip("Removes all decoration and color from levels.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##layoutSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				static float layoutBg[3] = {
 					setting().layoutBGR / 255.f,
@@ -2695,6 +2751,7 @@ void imgui_render() {
 					setting().layoutBGB / 255.f
 				};
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::ColorEdit3("Background Color##layout", layoutBg, ImGuiColorEditFlags_NoInputs)) {
 					setting().layoutBGR = layoutBg[0] * 255;
 					setting().layoutBGG = layoutBg[1] * 255;
@@ -2707,6 +2764,7 @@ void imgui_render() {
 					setting().layoutGB / 255.f
 				};
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::ColorEdit3("Ground Color##layout", layoutG, ImGuiColorEditFlags_NoInputs)) {
 					setting().layoutGR = layoutG[0] * 255;
 					setting().layoutGG = layoutG[1] * 255;
@@ -2721,10 +2779,13 @@ void imgui_render() {
 
 			ImGui::CheckboxF("StartPos Switcher", &setting().onStartPosSwitcher);
 			ImGui::Tooltip("Lets you switch between multiple start positions in-level.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##startPosSwitcherSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::HotKey("Previous", setting().m_previousStartPosKey, 0.f, ImVec2(80.f, 0.f));
-				ImGui::HotKey("Next", setting().m_nextStartPosKey, 0.f, ImVec2(80.f, 0.f));
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::HotKey("Previous", setting().m_previousStartPosKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::HotKey("Next", setting().m_nextStartPosKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
 
 				ImGui::TreePop();
 			}
@@ -2742,9 +2803,9 @@ void imgui_render() {
 			ImGui::Tooltip("Lets wave slide on blocks and slopes (like D blocks in 2.1).");
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::SetNextItemWidth(80.f);
+			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
 				PolzHax::updateFPSBypass();
 			}
@@ -2753,7 +2814,7 @@ void imgui_render() {
 				PolzHax::updateFPSBypass();
 			}
 
-			ImGui::SetNextItemWidth(80.f);
+			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			ImGui::DragFloat("##tpsBypass", &setting().tpsValue, 1.f, 1.f, 480.f, "%.0f TPS");
 			ImGui::SameLine();
 			ImGui::CheckboxF("Unlock TPS", &setting().onTPSBypass);
@@ -2856,7 +2917,7 @@ void imgui_render() {
 			//}
 			//ImGui::SameLine(170.f);
 			//if (ImGui::TreeNodeEx("##pitchShifterSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-			//	ImGui::SetNextItemWidth(80.f);
+			//	ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			//	if (ImGui::DragFloat("Pitch", &setting().pitchValue, .1f, .1f, 2.f, "%.1f")) {
 			//		PitchShifter::setPitch(setting().onPitchShifter ? setting().pitchValue : 1.f);
 			//	}
@@ -2876,9 +2937,10 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Retry Keybind", &setting().onRetryKeybind);
 			ImGui::Tooltip("Lets you restart level by pressing R.");
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##retryKeySettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::HotKey("Keybind", setting().m_retryKeybind, 0.f, ImVec2(80.f, 0.f));
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::HotKey("Keybind", setting().m_retryKeybind, 0.f, ImVec2(80.f * setting().UISize, 0.f));
 
 				ImGui::TreePop();
 			}
@@ -2983,9 +3045,9 @@ void imgui_render() {
 			ImGui::Tooltip("Reduces input delay.");
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Speedhack", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::SetNextItemWidth(90.f);
+			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			if (ImGui::DragFloat("##speedhack", &setting().speedhackValue, .05f, 0.f, 10.f)) {
 				if (setting().speedhackValue < 0.f) setting().speedhackValue = 0.f;
 				updateSpeedhack();
@@ -3010,9 +3072,9 @@ void imgui_render() {
 				ImGui::EndDisabled();
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
 				if (setting().labelsScale > 3.f) {
 					setting().labelsScale = 3.f;
@@ -3025,7 +3087,7 @@ void imgui_render() {
 			}
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH);
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 			if (ImGui::DragFloat("##labelsOpacity", &setting().labelsOpacity, .1f, .1f, 1.f, "Opacity: %.1fx")) {
 				if (setting().labelsOpacity > 1.f) {
 					setting().labelsOpacity = 1.f;
@@ -3044,9 +3106,10 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Cheat Indicator", &setting().onCheatIndicator)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##ciSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##ciPos", &setting().cheatIndicatorPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3057,14 +3120,16 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Message", &setting().onMessageLabel)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##msgSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##msgCounterPos", &setting().messagePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::InputText("##message", &setting().message)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3075,13 +3140,15 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Best Run", &setting().onBestRunLabel)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##brunPos", &setting().bestRunPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().bestRunPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3092,13 +3159,15 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Attempt", &setting().onAttemptsLabel)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##attsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##attsCounterPos", &setting().attemptsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().attemptsPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3109,17 +3178,20 @@ void imgui_render() {
 			if (ImGui::CheckboxF("FPS Counter", &setting().onFPSCounter)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##fpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##fpsCounterPos", &setting().fpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().fpsPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show ImGui FPS", &setting().useImGuiFps)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3130,21 +3202,25 @@ void imgui_render() {
 			if (ImGui::CheckboxF("CPS Counter", &setting().onCPSCounter)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##cpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##cpsCounterPos", &setting().cpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().cpsPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Max CPS", &setting().cpsMax)) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Total Clicks", &setting().cpsTotal)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3155,13 +3231,15 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Jumps", &setting().onJumpsLabel)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##jmpSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##jumpsCounterPos", &setting().jumpsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().jumpsPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3172,9 +3250,10 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Clock", &setting().onClockLabel)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##clkSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##clkPos", &setting().clockPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3185,9 +3264,10 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Session Time", &setting().onSessionTime)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##stimePos", &setting().sessionTimePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3198,13 +3278,15 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Noclip Accuracy", &setting().onNoclipAccuracy)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##naccSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##naccPos", &setting().nocAccPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().nocAccPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3215,13 +3297,15 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Noclip Deaths", &setting().onNoclipDeaths)) {
 				PlayLayer::updateStatusLabels();
 			}
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##ndthsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(163.f);
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##ndthsPos", &setting().nocDeathsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
 					PlayLayer::updateStatusLabels();
 				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().nocDeathsPrefix)) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -3231,7 +3315,7 @@ void imgui_render() {
 
 			ImGui::BeginDisabled();
 			ImGui::CheckboxF("Meta", &setting().onMetaLabel);
-			ImGui::SameLine(170.f);
+			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##metaSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 
 
@@ -3241,7 +3325,7 @@ void imgui_render() {
 			ImGui::EndDisabled();
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(200.f, 0.f));
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Icons", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			static bool player1Selected = true;
 			static bool player2Selected = false;

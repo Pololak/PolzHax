@@ -9,12 +9,22 @@
 #include "utils.hpp"
 
 void renderDebugModule() {
-	ImGui::SetNextWindowSize(ImVec2(300, 300));
+	ImGui::SetNextWindowSize(ImVec2(300.f * setting().UISize, 300.f * setting().UISize));
 	if (ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 		auto director = CCDirector::sharedDirector();
 		auto winSize = director->getWinSize();
 
 		ImGui::Text("Window Resolution: %.0fx%.0f", director->getOpenGLView()->getFrameSize().width, director->getOpenGLView()->getFrameSize().height);
+		ImGui::Text("WindowPadding: %f/%f", ImGui::GetStyle().WindowPadding.x, ImGui::GetStyle().WindowPadding.y);
+		ImGui::Text("FramePadding: %f/%f", ImGui::GetStyle().FramePadding.x, ImGui::GetStyle().FramePadding.y);
+		ImGui::Text("ItemSpacing: %f/%f", ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().ItemSpacing.y);
+		ImGui::Text("CellPadding: %f/%f", ImGui::GetStyle().CellPadding.x, ImGui::GetStyle().CellPadding.y);
+
+		float SHORT_ITEM_WIDTH = (200.f * setting().UISize) / 2.f - ImGui::GetStyle().WindowPadding.x * 1.25f;
+		float LONG_ITEM_WIDTH = (200.f * setting().UISize) - ImGui::GetStyle().WindowPadding.x * 2.f;
+
+		ImGui::Text("SHORT_ITEM_WIDTH: %f", SHORT_ITEM_WIDTH);
+		ImGui::Text("LONG_ITEM_WIDTH: %f", LONG_ITEM_WIDTH);
 
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("GameManager: 0x%p", gd::GameManager::sharedState());
@@ -118,6 +128,12 @@ void renderDebugModule() {
 			if (ImGui::Button("Open ColorSelectPopup")) {
 				gd::ColorSelectPopup::create(editorLayer->m_uiLayer->m_selectedObject)->show();
 			}
+
+			ImGui::Text("Section: %i", editorLayer->sectionForPos(-(editorLayer->m_gameLayer->getPositionX()) / editorLayer->m_gameLayer->getScale() + CCDirector::sharedDirector()->getWinSize().width / 2.f));
+
+			float screenBorderLeft = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenLeft(), 0.f }).x;
+			float screenBorderRight = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenRight(), 0.f }).x;
+			ImGui::Text("Screen Borders: %f/%f", screenBorderLeft, screenBorderRight);
 		}
 	}
 	ImGui::End();

@@ -14,45 +14,32 @@
 //        return false;
 
 void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
-	//if (setting().onDurationLines) {
-	//	if (self->m_effectObjects->count() != 0) {
-	//		for (int i = 0; i < self->m_effectObjects->count(); i++) {
-	//			auto effectObject = reinterpret_cast<gd::GameObject*>(self->m_effectObjects->objectAtIndex(i));
-	//			if (effectObject) {
-	//				auto triggerDuration = self->xPosForTime(self->timeForXPos(effectObject->getPositionX()) + effectObject->m_triggerDuration);
-
-	//				glLineWidth(2);
-	//				ccDrawColor4B(100, 100, 100, 75);
-	//				switch (effectObject->m_objectID) {
-	//					case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743: {
-	//						if (effectObject->m_triggerDuration > 0) {
-	//							ccDrawLine(effectObject->getPosition(), { triggerDuration, effectObject->getPositionY() });
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
 	DrawGridLayer::draw(self);
+
+	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
+	auto editorLayer = self->m_levelEditorLayer;
+
+	float screenBorderLeft = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenLeft(), 0.f }).x;
+	float screenBorderRight = editorLayer->m_gameLayer->convertToNodeSpace({director->getScreenRight(), 0.f}).x;
 
 	if (setting().onDurationLines) {
 		if (self->m_effectObjects->count() != 0) {
 			for (int i = 0; i < self->m_effectObjects->count(); i++) {
 				auto effectObject = reinterpret_cast<gd::GameObject*>(self->m_effectObjects->objectAtIndex(i));
 				if (effectObject) {
-					auto triggerDuration = self->xPosForTime(self->timeForXPos(effectObject->getPositionX()) + effectObject->m_triggerDuration);
-
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 					glLineWidth(2);
 					ccDrawColor4B(100, 100, 100, 75);
 					switch (effectObject->m_objectID) {
-					case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743: {
-						if (effectObject->m_triggerDuration > 0) {
-							ccDrawLine(effectObject->getPosition(), { triggerDuration, effectObject->getPositionY() });
+						case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743: {
+							if (effectObject->m_triggerDuration > 0.f) {
+								float triggerDurationEndPoint = self->xPosForTime(self->timeForXPos(effectObject->getPositionX()) + effectObject->m_triggerDuration);
+								if ((effectObject->getPositionX() < screenBorderRight) && (triggerDurationEndPoint > screenBorderLeft)) {
+									ccDrawLine(effectObject->getPosition(), { triggerDurationEndPoint, effectObject->getPositionY() });
+								}
+							}
 						}
-					}
 					}
 				}
 			}

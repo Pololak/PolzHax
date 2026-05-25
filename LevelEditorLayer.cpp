@@ -287,7 +287,7 @@ float getPreviewPos() {
 			return m_editorLayer->m_gridLayer->m_lastMusicXPosition;
 		}
 		else {
-			return -(m_editorLayer->m_gameLayer->getPositionX()) / m_editorLayer->m_gameLayer->getScale() + CCDirector::sharedDirector()->getWinSize().width / 2.f;
+			return m_editorLayer->m_gameLayer->convertToNodeSpace(CCDirector::sharedDirector()->getWinSize() / 2.f).x;
 		}
 	}
 	else return 0.f;
@@ -579,7 +579,7 @@ void LevelEditorLayer::updateGroundWidth() {
 			m_groundLayer->m_line->setPositionX(m_groundLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
 
 			float groundWidth = (128.f / m_editorLayer->m_gameLayer->getScale()) * (winSize.width / 128.f) * 1.5f;
-			float groundOffset = -(m_editorLayer->m_gameLayer->getPositionX()) / m_editorLayer->m_gameLayer->getScale() + winSize.width / 2.f;
+			float groundOffset = m_editorLayer->m_gameLayer->convertToNodeSpace(winSize / 2.f).x;
 			m_groundLayer->m_groundSprite->setTextureRect({ groundOffset, 0.f, groundWidth, 128.f });
 		}
 	}
@@ -680,29 +680,9 @@ void __fastcall LevelEditorLayer::removeObjectH(gd::LevelEditorLayer* self, void
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
 	LevelEditorLayer::updateVisibility(self, dt);
 
-	//for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
-	//	if (section) {
-	//		for (auto object : CCArrayExt<gd::GameObject*>(section)) {
-	//			if (!object) continue;
-
-	//			auto fme = gd::FMODAudioEngine::sharedEngine();
-	//			float pulse = fme->m_pulse1;
-
-	//			if (object && object->m_useAudioScale) {
-	//				if ((self->m_playerState == 1) || self->m_uiLayer->m_playtestMusic) {
-	//					object->setScale(pulse);
-	//				}
-	//				else {
-	//					object->setScale(1.f);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
 	LevelEditorLayer::updateShowHitboxes();
 
-	if (!isEditorPaused && setting().onPreviewMode && (self->m_playerState != 1)) {
+	if (!isEditorPaused && setting().onPreviewMode/* && (self->m_playerState != 1)*/) {
 		LevelEditorLayer::updatePreviewMode();
 	}
 
@@ -716,9 +696,10 @@ void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, flo
 
 	LevelEditorLayer::updateShowHitboxes();
 
-	if (!isEditorPaused && setting().onPreviewMode && (self->m_playerState == 1)) {
-		LevelEditorLayer::updatePreviewMode();
-	}
+	// breaks preview rotations
+	//if (!isEditorPaused && setting().onPreviewMode && (self->m_playerState == 1)) {
+	//	LevelEditorLayer::updatePreviewMode();
+	//}
 
 	if (setting().onShowGround) {
 		LevelEditorLayer::updateGroundWidth();
@@ -767,8 +748,6 @@ void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* _self, void
 
 	otherPlayer->flipGravity(!isFlipped, showEffect);
 }
-
-//CCArray* m_hideableUIElements = nullptr;
 
 void runCustomPlaytest(gd::LevelEditorLayer* self, gd::StartPosObject* startPos) {
 	self->setStartPosObject(startPos);
@@ -847,16 +826,6 @@ void __fastcall LevelEditorLayer::onStopPlaytestH(gd::LevelEditorLayer* self) {
 		RotateSaws::pauseRotations(self);
 		RotateSaws::resumeRotations(self);
 	}
-
-	//if (m_hideableUIElements) {
-	//	for (auto node : CCArrayExt<CCNode*>(m_hideableUIElements)) {
-	//		if (node) {
-	//			node->setVisible(true);
-	//		}
-	//	}
-
-	//	m_hideableUIElements = nullptr;
-	//}
 }
 
 void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*, int p0, bool p1) {

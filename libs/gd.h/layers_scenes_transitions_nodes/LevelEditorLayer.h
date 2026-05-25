@@ -107,6 +107,12 @@ namespace gd {
 		void updateDualGround(PlayerObject* player, int mode, bool instant) {
 			reinterpret_cast<void(__thiscall*)(LevelEditorLayer*, PlayerObject*, int, bool)>(base + 0x923a0)(this, player, mode, instant);
 		}
+
+		int sectionForPos(float x) {
+			int section = x / 100;
+			if (section < 0) section = 0;
+			return section;
+		}
 	};
 }
 

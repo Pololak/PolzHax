@@ -177,7 +177,7 @@ struct SettingStruct {
 	bool onCheatIndicator; int cheatIndicatorPos = 0, cheatIndicatorOrder = 0;
 	bool onMessageLabel; std::string message; int messagePos = 0, messageOrder = 1;
 	bool onFPSCounter, fpsPrefix = true, useImGuiFps = false; int fpsCounterPos = 0, fpsCounterOrder = 4;
-	bool onCPSCounter, cpsPrefix = true, cpsMax = true, cpsTotal; int cpsCounterPos = 0, cpsCounterOrder = 5;
+	bool onCPSCounter, cpsPrefix = true, cpsMax = true, cpsTotal = true; int cpsCounterPos = 0, cpsCounterOrder = 5;
 	bool onNoclipAccuracy, nocAccPrefix = true; int nocAccPos = 0, nocAccOrder = 9;
 	bool onNoclipDeaths, nocDeathsPrefix = true; int nocDeathsPos = 0, nocDeathsOrder = 10;
 	bool onClockLabel; int clockPos = 0, clockOrder = 7;
