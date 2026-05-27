@@ -8,11 +8,11 @@ void EndLevelLayer::Callback::onShowEndLayer(CCObject* sender) {
 	auto director = CCDirector::sharedDirector();
 	const CCPoint pos = this->m_endPosition;
 	this->stopAllActions();
-	this->runAction(CCFadeTo::create(.5f, 125));
-	this->m_mainLayer->runAction(CCEaseInOut::create(CCMoveTo::create(.5, pos), 2.f));
+	this->runAction(CCFadeTo::create(setting().onFastMenu ? 0.f : .5f, 125));
+	this->m_mainLayer->runAction(CCEaseInOut::create(CCMoveTo::create(setting().onFastMenu ? 0.f : .5f, pos), 2.f));
 	auto btn = static_cast<gd::CCMenuItemSpriteExtra*>(sender);
 	btn->setEnabled(false);
-	btn->runAction(CCSequence::create(CCEaseInOut::create(CCMoveTo::create(.5f, ccp(0.f, btn->getPositionY() + 35.f)), 2.f), CCFadeTo::create(.5f, 255), nullptr));
+	btn->runAction(CCSequence::create(CCEaseInOut::create(CCMoveTo::create(setting().onFastMenu ? 0.f : .5f, ccp(0.f, btn->getPositionY() + 35.f)), 2.f), CCFadeTo::create(setting().onFastMenu ? 0.f : .5f, 255), nullptr));
 	auto onHideEndLayer = static_cast<gd::CCMenuItemSpriteExtra*>(this->m_actionsMenu->getChildByTag(54));
 	if (onHideEndLayer) {
 		onHideEndLayer->setEnabled(true);
@@ -22,15 +22,15 @@ void EndLevelLayer::Callback::onShowEndLayer(CCObject* sender) {
 void EndLevelLayer::Callback::onHideEndLayer(CCObject* sender) {
 	const CCPoint pos = this->m_startPosition;
 	this->stopAllActions();
-	this->runAction(CCFadeTo::create(.5f, 0));
-	this->m_mainLayer->runAction(CCEaseInOut::create(CCMoveTo::create(.5, pos), 2.f));
+	this->runAction(CCFadeTo::create(setting().onFastMenu ? 0.f : .5f, 0));
+	this->m_mainLayer->runAction(CCEaseInOut::create(CCMoveTo::create(setting().onFastMenu ? 0.f : .5f, pos), 2.f));
 	static_cast<gd::CCMenuItemSpriteExtra*>(sender)->setEnabled(false);
 	auto showEndLayerMenu = static_cast<CCMenu*>(this->getChildByTag(55));
 	if (showEndLayerMenu) {
 		auto onShowEndLayer = static_cast<gd::CCMenuItemSpriteExtra*>(showEndLayerMenu->getChildByTag(56));
 		if (onShowEndLayer) {
 			onShowEndLayer->setEnabled(true);
-			onShowEndLayer->runAction(CCSequence::create(CCEaseInOut::create(CCMoveTo::create(.5f, ccp(0.f, onShowEndLayer->getPositionY() - 35.f)), 2.f), CCFadeTo::create(.5f, 125), nullptr));
+			onShowEndLayer->runAction(CCSequence::create(CCEaseInOut::create(CCMoveTo::create(setting().onFastMenu ? 0.f : .5f, ccp(0.f, onShowEndLayer->getPositionY() - 35.f)), 2.f), CCFadeTo::create(setting().onFastMenu ? 0.f : .5f, 125), nullptr));
 		}
 	}
 }

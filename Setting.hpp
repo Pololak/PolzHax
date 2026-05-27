@@ -36,6 +36,7 @@ struct SettingStruct {
 
 	// Cosmetic
 	bool onAccuratePercentage; int decimalPlaces = 1;
+	bool onAlwaysNewBest;
 	bool onCoinsShowUncollected;
 	bool onCoinsInPractice;
 	bool onForceDontEnter;
@@ -129,6 +130,7 @@ struct SettingStruct {
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
+	bool onKrazyManMode;
 	bool onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
 	bool onPauseDuringCompletion;
 	bool onPracticeFix;
@@ -154,7 +156,7 @@ struct SettingStruct {
 	bool onIncreaseMaxLevels;
 	bool onLockCursor;
 	bool onNoRotation;
-	bool onNoTransition;
+	bool onNoTransition, onFastMenu;
 	bool onPitchShifter; float pitchValue = 1.f;
 	bool onQuickCheckpointMode;
 	bool onRetryKeybind; int m_retryKeybind = 0x52;
@@ -185,7 +187,7 @@ struct SettingStruct {
 	bool onBestRunLabel, bestRunPrefix = true; int bestRunPos = 0, bestRunOrder = 2;
 	bool onAttemptsLabel, attemptsPrefix = true; int attemptsPos = 0, attemptsOrder = 3;
 	bool onJumpsLabel, jumpsPrefix = true; int jumpsPos = 0, jumpsOrder = 6;
-	bool onMetaLabel; int metaPos = 0;
+	bool onMetaLabel, playerXPos = true, playerYPos = true, playerYVel, playerRot, playerGrav, playerSpd; int metaPos = 0;
 
 	// Icons
 	bool onIconEffects;
@@ -262,6 +264,7 @@ DEF_SCHEMA(
 
 	// Cosmetic
 	onAccuratePercentage, decimalPlaces,
+	onAlwaysNewBest,
 	onCoinsShowUncollected,
 	onCoinsInPractice,
 	onForceDontEnter,
@@ -380,7 +383,7 @@ DEF_SCHEMA(
 	onIncreaseMaxLevels,
 	onLockCursor,
 	onNoRotation,
-	onNoTransition,
+	onNoTransition, onFastMenu,
 	onPitchShifter, pitchValue,
 	onQuickCheckpointMode,
 	onRetryKeybind, m_retryKeybind,
@@ -411,7 +414,7 @@ DEF_SCHEMA(
 	onBestRunLabel, bestRunPrefix, bestRunPos, bestRunOrder,
 	onAttemptsLabel, attemptsPrefix, attemptsPos, attemptsOrder,
 	onJumpsLabel, jumpsPrefix, jumpsPos, jumpsOrder,
-	onMetaLabel, metaPos,
+	onMetaLabel, playerXPos, playerYPos, playerYVel, playerRot, playerGrav, playerSpd, metaPos,
 
 	// Icons
 	onSameDualColor,

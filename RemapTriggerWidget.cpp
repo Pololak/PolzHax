@@ -12,6 +12,7 @@ std::string RemapTriggerWidget::intToColorString(int id) {
 	case 718: return "Col3"; break;
 	case 743: return "Col4"; break;
 	case 744: return "3DL"; break;
+	default: return ""; break;
 	}
 }
 

@@ -60,7 +60,7 @@ const char* priorities[] = {
 };
 
 const char* statusLabelsPosition[] = {
-	"Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left"
+	"Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right"
 };
 
 const char* cocosTransitions[] = {
@@ -417,6 +417,13 @@ void imgui_render() {
 		}
 
 		// Cosmetic
+
+		if (setting().onAlwaysNewBest) {
+			sequence_patch(gd::base + 0xf077e, { 0x90, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xf077e, { 0x74, 0x14 });
+		}
 
 		if (setting().onCoinsShowUncollected) {
 			sequence_patch(gd::base + 0x43368, { 0x8b, 0xc2, 0x90 });
@@ -900,6 +907,13 @@ void imgui_render() {
 			sequence_patch(gd::base + 0xda295, { 0x00 });
 		}
 
+		if (setting().onKrazyManMode) {
+			sequence_patch(gd::base + 0x72a8e, { 0x8b, 0xd8, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0x72a8e, { 0x0f, 0x45, 0xd8 });
+		}
+
 		if (setting().onNoclip) {
 			sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
 		}
@@ -1013,6 +1027,40 @@ void imgui_render() {
 			sequence_patch(libcocosbase + 0x60578, { 0xf3, 0x0f, 0x11, 0x41, 0x1c, 0xf3, 0x0f, 0x11, 0x41, 0x18 });
 		}
 
+		if (setting().onFastMenu) {
+			// FLAlertLayer::show()
+			sequence_patch(gd::base + 0x160c3, { 0x00, 0x00, 0x80, 0x3f });
+			sequence_patch(gd::base + 0x160fe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0x1618b, { 0x00, 0x00, 0x00, 0x00 });
+			// GJDropDownLayer::hideLayer()
+			sequence_patch(gd::base + 0x7c058, { 0x00, 0x00, 0x00, 0x00 });
+			sequence_patch(gd::base + 0x7c0a3, { 0x00, 0x00, 0x00, 0x00 });
+			// GJDropDownLayer::showLayer()
+			sequence_patch(gd::base + 0x7bfd6, { 0x00, 0x00, 0x00, 0x00 });
+			sequence_patch(gd::base + 0x7bf7a, { 0x00, 0x00, 0x00, 0x00 });
+			// EndLevelLayer::showLayer()
+			sequence_patch(gd::base + 0x515e3, { 0x00, 0x00, 0x00, 0x00 });
+			sequence_patch(gd::base + 0x51638, { 0x00, 0x00, 0x00, 0x00 });
+			// InfoLayer/CustomSongLayer::show()
+			sequence_patch(gd::base + 0x378c3, { 0x00, 0x00, 0x80, 0x3f });
+			sequence_patch(gd::base + 0x378fe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0x37962, { 0x00, 0x00, 0x00, 0x00 });
+		}
+		else {
+			sequence_patch(gd::base + 0x160c3, { 0xcd, 0xcc, 0xcc, 0x3d });
+			sequence_patch(gd::base + 0x160fe, { 0x50, 0xff, 0x15, 0x70, 0xf2, 0x50, 0x00 });
+			sequence_patch(gd::base + 0x1618b, { 0x29, 0x5c, 0x0f, 0x3e });
+			sequence_patch(gd::base + 0x7c058, { 0x00, 0x00, 0x00, 0x3f });
+			sequence_patch(gd::base + 0x7c0a3, { 0x00, 0x00, 0x00, 0x3f });
+			sequence_patch(gd::base + 0x7bfd6, { 0x00, 0x00, 0x00, 0x3f });
+			sequence_patch(gd::base + 0x7bf7a, { 0x00, 0x00, 0x00, 0x3f });
+			sequence_patch(gd::base + 0x515e3, { 0x00, 0x00, 0x80, 0x3f });
+			sequence_patch(gd::base + 0x51638, { 0x00, 0x00, 0x80, 0x3f });
+			sequence_patch(gd::base + 0x378c3, { 0xcd, 0xcc, 0xcc, 0x3d });
+			sequence_patch(gd::base + 0x378fe, { 0x50, 0xff, 0x15, 0x70, 0xf2, 0x50, 0x00 });
+			sequence_patch(gd::base + 0x37962, { 0x29, 0x5c, 0x0f, 0x3e });
+		}
+
 		if (setting().onQuickCheckpointMode) {
 			sequence_patch(gd::base + 0x14a6f4, { 0x00, 0x00, 0x70, 0x42 });
 		}
@@ -1111,7 +1159,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (250526)");
+			ImGui::Text("1.920 - v1.3.0 (Vanilla)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1199,6 +1247,9 @@ void imgui_render() {
 
 			ImGui::SetNextItemWidth(135.f * setting().UISize);
 			if (ImGui::DragFloat("UI Size", &setting().UISize, .1f, .5f, 3.f, "%.2fx")) {
+				if (setting().UISize < .5f) setting().UISize = .5f;
+				if (setting().UISize > 3.f) setting().UISize = 3.f;
+
 				updateUISize();
 			}
 
@@ -1537,6 +1588,15 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
+			if (ImGui::CheckboxF("Always New Best", &setting().onAlwaysNewBest)) {
+				if (setting().onAlwaysNewBest) {
+					sequence_patch(gd::base + 0xf077e, { 0x90, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xf077e, { 0x74, 0x14 });
+				}
+			}
+			ImGui::Tooltip("Always shows new best on death.");
 
 			if (ImGui::CheckboxF("Coins Show Uncollected", &setting().onCoinsShowUncollected)) {
 				if (setting().onCoinsShowUncollected) {
@@ -1976,7 +2036,10 @@ void imgui_render() {
 
 				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				ImGui::DragFloat("Size", &setting().wavePulseSize, .1f, .1f, 2.3f, "%.1fx");
+				if (ImGui::DragFloat("Size", &setting().wavePulseSize, .1f, .1f, 2.3f, "%.1fx")) {
+					if (setting().wavePulseSize < .1f) setting().wavePulseSize = .1f;
+					if (setting().wavePulseSize > 2.3f) setting().wavePulseSize = 2.3f;
+				}
 
 				ImGui::TreePop();
 			}
@@ -2349,11 +2412,17 @@ void imgui_render() {
 
 				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				ImGui::DragFloat("Deafen at", &setting().deafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
+				if (ImGui::DragFloat("Deafen at", &setting().deafenPercent, 1.f, 0.f, 100.f, "%.0f%%")) {
+					if (setting().deafenPercent < 0.f) setting().deafenPercent = 0.f;
+					if (setting().deafenPercent > 100.f) setting().deafenPercent = 100.f;
+				}
 
 				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				ImGui::DragFloat("Undeafen at", &setting().undeafenPercent, 1.f, 0.f, 100.f, "%.0f%%");
+				if (ImGui::DragFloat("Undeafen at", &setting().undeafenPercent, 1.f, 0.f, 100.f, "%.0f%%")) {
+					if (setting().undeafenPercent < 0.f) setting().undeafenPercent = 0.f;
+					if (setting().undeafenPercent > 100.f) setting().undeafenPercent = 100.f;
+				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::HotKey("Shortcut", setting().m_autoDeafenKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
@@ -2368,7 +2437,10 @@ void imgui_render() {
 			if (ImGui::TreeNodeEx("##autoKillSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				ImGui::DragFloat("Kill at", &setting().killPercentage, 1.f, 0.f, 100.f, "%.0f%%");
+				if (ImGui::DragFloat("Kill at", &setting().killPercentage, 1.f, 0.f, 100.f, "%.0f%%")) {
+					if (setting().killPercentage < 0.f) setting().killPercentage = 0.f;
+					if (setting().killPercentage > 100.f) setting().killPercentage = 100.f;
+				}
 
 				ImGui::TreePop();
 			}
@@ -2583,6 +2655,9 @@ void imgui_render() {
 				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::DragInt("Opacity", &setting().hitboxesOpacity, 1.f, 0, 255)) {
+					if (setting().hitboxesOpacity < 0) setting().hitboxesOpacity = 0;
+					if (setting().hitboxesOpacity > 255) setting().hitboxesOpacity = 255;
+
 					if (playLayer) {
 						PlayLayer::updateShowHitboxes();
 					}
@@ -2621,6 +2696,16 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Allows you to jump in mid-air.");
+
+			if (ImGui::CheckboxF("KrmaL Mode", &setting().onKrazyManMode)) {
+				if (setting().onKrazyManMode) {
+					sequence_patch(gd::base + 0x72a8e, { 0x8b, 0xd8, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0x72a8e, { 0x0f, 0x45, 0xd8 });
+				}
+			}
+			ImGui::Tooltip("Well... It makes level invisible.");
 
 			if (ImGui::CheckboxF("Noclip", &setting().onNoclip)) {
 				if (setting().onNoclip) {
@@ -2733,7 +2818,9 @@ void imgui_render() {
 
 				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				ImGui::DragFloat("Time", &setting().respawnValue, 100.f, 0.f, 10000.f, "%.0fms");
+				if (ImGui::DragFloat("Time", &setting().respawnValue, 100.f, 0.f, 10000.f, "%.0fms")) {
+					if (setting().onRespawnTime < 0.f) setting().onRespawnTime = 0.f;
+				}
 
 				ImGui::TreePop();
 			}
@@ -2807,6 +2894,8 @@ void imgui_render() {
 		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
+				if (setting().fpsValue < 1.f) setting().fpsValue = 1.f;
+
 				PolzHax::updateFPSBypass();
 			}
 			ImGui::SameLine();
@@ -2815,7 +2904,9 @@ void imgui_render() {
 			}
 
 			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
-			ImGui::DragFloat("##tpsBypass", &setting().tpsValue, 1.f, 1.f, 480.f, "%.0f TPS");
+			if (ImGui::DragFloat("##tpsBypass", &setting().tpsValue, 1.f, 1.f, 480.f, "%.0f TPS")) {
+				if (setting().tpsValue < 1.f) setting().tpsValue = 1.f;
+			}
 			ImGui::SameLine();
 			ImGui::CheckboxF("Unlock TPS", &setting().onTPSBypass);
 
@@ -2911,6 +3002,48 @@ void imgui_render() {
 
 			ImGui::CheckboxF("No Transition", &setting().onNoTransition);
 			ImGui::Tooltip("Shorterns scene transition time to 0s.");
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##noTransitionSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("Fast Menu", &setting().onFastMenu)) {
+					if (setting().onFastMenu) {
+						// FLAlertLayer::show()
+						sequence_patch(gd::base + 0x160c3, { 0x00, 0x00, 0x80, 0x3f });
+						sequence_patch(gd::base + 0x160fe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+						sequence_patch(gd::base + 0x1618b, { 0x00, 0x00, 0x00, 0x00 });
+						// GJDropDownLayer::hideLayer()
+						sequence_patch(gd::base + 0x7c058, { 0x00, 0x00, 0x00, 0x00 });
+						sequence_patch(gd::base + 0x7c0a3, { 0x00, 0x00, 0x00, 0x00 });
+						// GJDropDownLayer::showLayer()
+						sequence_patch(gd::base + 0x7bfd6, { 0x00, 0x00, 0x00, 0x00 });
+						sequence_patch(gd::base + 0x7bf7a, { 0x00, 0x00, 0x00, 0x00 });
+						// EndLevelLayer::showLayer()
+						sequence_patch(gd::base + 0x515e3, { 0x00, 0x00, 0x00, 0x00 });
+						sequence_patch(gd::base + 0x51638, { 0x00, 0x00, 0x00, 0x00 });
+						// InfoLayer/CustomSongLayer::show()
+						sequence_patch(gd::base + 0x378c3, { 0x00, 0x00, 0x80, 0x3f });
+						sequence_patch(gd::base + 0x378fe, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+						sequence_patch(gd::base + 0x37962, { 0x00, 0x00, 0x00, 0x00 });
+					}
+					else {
+						sequence_patch(gd::base + 0x160c3, { 0xcd, 0xcc, 0xcc, 0x3d });
+						sequence_patch(gd::base + 0x160fe, { 0x50, 0xff, 0x15, 0x70, 0xf2, 0x50, 0x00 });
+						sequence_patch(gd::base + 0x1618b, { 0x29, 0x5c, 0x0f, 0x3e });
+						sequence_patch(gd::base + 0x7c058, { 0x00, 0x00, 0x00, 0x3f });
+						sequence_patch(gd::base + 0x7c0a3, { 0x00, 0x00, 0x00, 0x3f });
+						sequence_patch(gd::base + 0x7bfd6, { 0x00, 0x00, 0x00, 0x3f });
+						sequence_patch(gd::base + 0x7bf7a, { 0x00, 0x00, 0x00, 0x3f });
+						sequence_patch(gd::base + 0x515e3, { 0x00, 0x00, 0x80, 0x3f });
+						sequence_patch(gd::base + 0x51638, { 0x00, 0x00, 0x80, 0x3f });
+						sequence_patch(gd::base + 0x378c3, { 0xcd, 0xcc, 0xcc, 0x3d });
+						sequence_patch(gd::base + 0x378fe, { 0x50, 0xff, 0x15, 0x70, 0xf2, 0x50, 0x00 });
+						sequence_patch(gd::base + 0x37962, { 0x29, 0x5c, 0x0f, 0x3e });
+					}
+				}
+				ImGui::Tooltip("Same as in 2.2, affects popups and dropdowns.");
+
+				ImGui::TreePop();
+			}
 
 			//if (ImGui::CheckboxF("Pitch Shifter", &setting().onPitchShifter)) {
 			//	PitchShifter::setPitch(setting().onPitchShifter ? setting().pitchValue : 1.f);
@@ -3076,12 +3209,8 @@ void imgui_render() {
 		if (ImGui::Begin("Status", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 			if (ImGui::DragFloat("##labelsScale", &setting().labelsScale, .1f, .1f, 3.f, "Scale: %.1fx")) {
-				if (setting().labelsScale > 3.f) {
-					setting().labelsScale = 3.f;
-				}
-				if (setting().labelsScale < .1f) {
-					setting().labelsScale = .1f;
-				}
+				if (setting().labelsScale < .1f) setting().labelsScale = .1f;
+				if (setting().labelsScale > 3.f) setting().labelsScale = 3.f;
 
 				PlayLayer::updateStatusLabels();
 			}
@@ -3089,12 +3218,8 @@ void imgui_render() {
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 			if (ImGui::DragFloat("##labelsOpacity", &setting().labelsOpacity, .1f, .1f, 1.f, "Opacity: %.1fx")) {
-				if (setting().labelsOpacity > 1.f) {
-					setting().labelsOpacity = 1.f;
-				}
-				if (setting().labelsOpacity < .1f) {
-					setting().labelsOpacity = .1f;
-				}
+				if (setting().labelsOpacity < .1f) setting().labelsOpacity = .1f;
+				if (setting().labelsOpacity > 1.f) setting().labelsOpacity = 1.f;
 
 				PlayLayer::updateStatusLabels();
 			}
@@ -3313,16 +3438,49 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
-			ImGui::BeginDisabled();
-			ImGui::CheckboxF("Meta", &setting().onMetaLabel);
+			if (ImGui::CheckboxF("Meta", &setting().onMetaLabel)) {
+				PlayLayer::updateStatusLabels();
+			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##metaSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(160.f * setting().UISize);
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::Combo("##metaPos", &setting().metaPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
+					PlayLayer::updateStatusLabels();
+				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("X Pos", &setting().playerXPos)) {
+					PlayLayer::updateStatusLabels();
+				}
 
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("Y Pos", &setting().playerYPos)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("Y Velocity", &setting().playerYVel)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("Rotation", &setting().playerRot)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("Gravity", &setting().playerGrav)) {
+					PlayLayer::updateStatusLabels();
+				}
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::CheckboxF("Speed", &setting().playerSpd)) {
+					PlayLayer::updateStatusLabels();
+				}
 
 				ImGui::TreePop();
 			}
-			ImGui::EndDisabled();
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
@@ -3469,14 +3627,18 @@ void imgui_render() {
 
 void imgui_init() {
 	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+
 	io.Fonts->Clear();
 	auto font = io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
 	io.Fonts->Build();
 	ImGui_ImplOpenGL3_CreateFontsTexture();
 	io.FontDefault = font;
 
-	ImGui::GetStyle().WindowTitleAlign = ImVec2(.5f, .5f);
-	ImGui::GetStyle().WindowBorderSize = 0;
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+	style.WindowTitleAlign = ImVec2(.5f, .5f);
+	style.WindowBorderSize = 0;
 
 	colorSet();
 }

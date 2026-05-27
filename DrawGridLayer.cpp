@@ -1,5 +1,7 @@
 #include "DrawGridLayer.hpp"
 #include "Setting.hpp"
+#include "utils.hpp"
+#include <unordered_map>
 
 //#define MAKE_MIDHOOK(addr, func)        \
 //    if (MH_CreateHook(                  \
@@ -13,6 +15,36 @@
 //    ) != MH_OK)                         \
 //        return false;
 
+struct EffectObjectCache {
+	float m_objectXPos;
+	float m_duration;
+	float m_durationEndXPos;
+};
+
+static std::unordered_map<gd::GameObject*, EffectObjectCache> triggerDurationCache;
+
+float xPosForTriggerDuration(gd::DrawGridLayer* gridLayer, gd::GameObject* object) {
+	auto objectXPos = object->getPositionX();
+	auto triggerDuration = object->m_triggerDuration;
+
+	auto it = triggerDurationCache.find(object);
+	if (it != triggerDurationCache.end()) {
+		auto& triggerCache = it->second;
+		if ((triggerCache.m_objectXPos == objectXPos) && (triggerCache.m_duration == triggerDuration)) {
+			return triggerCache.m_durationEndXPos;
+		}
+	}
+
+	auto res = gridLayer->xPosForTime(gridLayer->timeForXPos(objectXPos) + triggerDuration);
+	triggerDurationCache[object] = {
+		objectXPos,
+		triggerDuration,
+		res
+	};
+
+	return res;
+}
+
 void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	DrawGridLayer::draw(self);
 
@@ -20,22 +52,24 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 	auto winSize = director->getWinSize();
 	auto editorLayer = self->m_levelEditorLayer;
 
+	float screenBorderTop = editorLayer->m_gameLayer->convertToNodeSpace({ 0.f, director->getScreenTop()}).y;
+	float screenBorderBottom = editorLayer->m_gameLayer->convertToNodeSpace({ 0.f, director->getScreenBottom()}).y;
 	float screenBorderLeft = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenLeft(), 0.f }).x;
 	float screenBorderRight = editorLayer->m_gameLayer->convertToNodeSpace({director->getScreenRight(), 0.f}).x;
 
 	if (setting().onDurationLines) {
-		if (self->m_effectObjects->count() != 0) {
-			for (int i = 0; i < self->m_effectObjects->count(); i++) {
-				auto effectObject = reinterpret_cast<gd::GameObject*>(self->m_effectObjects->objectAtIndex(i));
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glLineWidth(2);
+		ccDrawColor4B(100, 100, 100, 75);
+
+		if (self->m_effectObjects->count()) {
+			for (auto effectObject : CCArrayExt<gd::GameObject*>(self->m_effectObjects)) {
 				if (effectObject) {
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-					glLineWidth(2);
-					ccDrawColor4B(100, 100, 100, 75);
 					switch (effectObject->m_objectID) {
 						case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743: {
 							if (effectObject->m_triggerDuration > 0.f) {
-								float triggerDurationEndPoint = self->xPosForTime(self->timeForXPos(effectObject->getPositionX()) + effectObject->m_triggerDuration);
-								if ((effectObject->getPositionX() < screenBorderRight) && (triggerDurationEndPoint > screenBorderLeft)) {
+								float triggerDurationEndPoint = xPosForTriggerDuration(self, effectObject);
+								if ((effectObject->getPositionX() < screenBorderRight) && (triggerDurationEndPoint > screenBorderLeft) && (screenBorderBottom < effectObject->getPositionY() < screenBorderTop)) {
 									ccDrawLine(effectObject->getPosition(), { triggerDurationEndPoint, effectObject->getPositionY() });
 								}
 							}
@@ -50,9 +84,7 @@ void __fastcall DrawGridLayer::drawH(gd::DrawGridLayer* self) {
 void __fastcall DrawGridLayer::loadTimeMarkersH(gd::DrawGridLayer* self, void*, gd::string markers) { // taken from Zmx https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/src/modules/editor.cpp#L23
 	DrawGridLayer::loadTimeMarkers(self, markers);
 
-	auto startSpeed = self->m_levelEditorLayer->m_levelSettings->m_startSpeed;
-
-	switch (startSpeed) {
+	switch (self->m_levelEditorLayer->m_levelSettings->m_startSpeed) {
 	case 0:
 	default:
 		self->m_guidelineSpacing = self->m_normalGuidelineSpacing;
@@ -103,8 +135,15 @@ void __fastcall DrawGridLayer::loadTimeMarkersH(gd::DrawGridLayer* self, void*, 
 //    return true;
 //}
 
+void __fastcall DrawGridLayer::destructorH(gd::DrawGridLayer* self) {
+	DrawGridLayer::destructor(self);
+	triggerDurationCache.clear();
+}
+
 void DrawGridLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93710), DrawGridLayer::drawH, reinterpret_cast<void**>(&DrawGridLayer::draw));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x93030), DrawGridLayer::loadTimeMarkersH, reinterpret_cast<void**>(&DrawGridLayer::loadTimeMarkers));
+
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x92ca0), DrawGridLayer::destructorH, reinterpret_cast<void**>(&DrawGridLayer::destructor));
     //loadDrawGridLayerMidHook();
 }

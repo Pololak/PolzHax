@@ -25,6 +25,7 @@ bool __fastcall CustomSongWidget::initH(gd::CustomSongWidget* self, void*, gd::S
 void __fastcall CustomSongWidget::updateSongInfoH(gd::CustomSongWidget* self) {
 	if (m_copySongIDBtn) {
 		m_copySongIDBtn->setPosition(self->m_moreBtn->getPositionX() + 50.f, self->m_moreBtn->getPositionY());
+		m_copySongIDBtn->setVisible(self->m_moreBtn->isVisible());
 	}
 
 	CustomSongWidget::updateSongInfo(self);

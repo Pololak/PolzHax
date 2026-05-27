@@ -172,8 +172,9 @@ std::string keyToURL(int key) {
 	case 2:
 		return "https://nebulaps.ps.fhgdps.com/";
 	case 3:
-		return "https://www.boomlings.com/database/";
+		return "http://platinumtwo.ps.fhgdps.com/";
 	case 4:
+		return "https://www.boomlings.com/database/";
 	default:
 		return setting().m_customServerURL;
 	}
@@ -197,7 +198,7 @@ void __fastcall CCHttpClient_sendH(extension::CCHttpClient* self, void*, extensi
 		keyToURL(setting().m_serverIndex)
 	);
 
-	if (setting().m_serverIndex == 3) { // if main gd
+	if (setting().m_serverIndex == 4) { // if main gd
 		new_request_url = str_replace(
 			new_request_url, "getGJLevels19",
 			"getGJLevels21"

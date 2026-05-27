@@ -21,8 +21,8 @@ bool __fastcall EditorPauseLayer::initH(gd::EditorPauseLayer* self, void*, gd::L
 
 	// Time logic
 	float time = floorf(editorLayer->m_gridLayer->timeForXPos(editorLayer->getLastObjectX()));
-	int hours = time / 3600.f; // why not
-	int minutes = (time - (hours * 3600)) / 60.f;
+	int hours = time / 3600;
+	int minutes = (time - (hours * 3600)) / 60;
 	int seconds = (time - (minutes * 60)) - (hours * 3600);
 
 	if (time > 3599) {
@@ -35,14 +35,6 @@ bool __fastcall EditorPauseLayer::initH(gd::EditorPauseLayer* self, void*, gd::L
 		levelTimeLabel->setString(CCString::createWithFormat("%is", seconds)->getCString());
 	}
 	//
-
-	//auto levelLengthLabel = CCLabelBMFont::create("", "goldFont.fnt");
-	//levelLengthLabel->setScale(.5f);
-	//levelLengthLabel->setPosition(director->getScreenLeft() + 10.f, director->getScreenTop() - 45.f);
-	//levelLengthLabel->setAnchorPoint({ 0.f, 1.f });
-	//self->addChild(levelLengthLabel);
-
-	//levelLengthLabel->setString(lengthToString(editorLayer->m_gridLayer->timeForXPos(editorLayer->getLastObjectX())).c_str());
 
 	return true;
 }

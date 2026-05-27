@@ -66,6 +66,7 @@ int m_deaths;
 int m_deathsFull;
 float m_totalDelta;
 float m_prevX;
+CCLabelBMFont* m_metaLabel = nullptr;
 
 bool m_cheatingBeforeRestart;
 
@@ -92,7 +93,8 @@ bool PlayLayer::isCheating() {
 		setting().onRecordMacro ||
 		setting().onShipcopter ||
 		(setting().onSpeedhack && setting().speedhackValue != 1.f) ||
-		setting().onHidePauseMenu;
+		setting().onHidePauseMenu ||
+		setting().onKrazyManMode;
 }
 
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
@@ -454,7 +456,20 @@ void updateSessionTimeLabel() {
 	if (m_sessionTimeLabel && m_sessionTimeLabel->isVisible()) {
 		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 
-		m_sessionTimeLabel->setString(CCString::createWithFormat("%.01fs", playLayer->m_clkTimer)->getCString());
+		auto sessionTime = floorf(playLayer->m_clkTimer);
+		int hours = sessionTime / 3600.f;
+		int minutes = (sessionTime - (hours * 3600)) / 60.f;
+		int seconds = (sessionTime - (minutes * 60)) - (hours * 3600);
+
+		if (sessionTime > 3599) {
+			m_sessionTimeLabel->setString(std::string(((hours < 10) ? "0" + std::to_string(hours) : std::to_string(hours)) + ":" + ((minutes < 10) ? "0" + std::to_string(minutes) : std::to_string(minutes)) + ":" + ((seconds < 10) ? "0" + std::to_string(seconds) : std::to_string(seconds))).c_str());
+		}
+		else if (sessionTime > 59) {
+			m_sessionTimeLabel->setString(std::string(((minutes < 10) ? "0" + std::to_string(minutes) : std::to_string(minutes)) + ":" + ((seconds < 10) ? "0" + std::to_string(seconds) : std::to_string(seconds))).c_str());
+		}
+		else {
+			m_sessionTimeLabel->setString(CCString::createWithFormat("%.02fs", playLayer->m_clkTimer)->getCString());
+		}
 	}
 }
 
@@ -550,6 +565,23 @@ void updateNoclipDeathsLabel(bool tintRed = false) {
 	}
 }
 
+void updateMetaLabel() {
+	if (m_metaLabel && m_metaLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+		std::stringstream ss;
+
+		if (setting().playerXPos) ss << "X: " << playLayer->m_player->getPositionX() << "\n";
+		if (setting().playerYPos) ss << "Y: " << playLayer->m_player->getPositionY() << "\n";
+		if (setting().playerYVel) ss << "yVel: " << playLayer->m_player->m_yVelocity << "\n";
+		if (setting().playerRot) ss << "Rot: " << playLayer->m_player->getRotation() << "\n";
+		if (setting().playerGrav) ss << "Gravity: " << playLayer->m_player->m_gravity << "\n";
+		if (setting().playerSpd) ss << "Speed: " << playLayer->m_player->m_timeMod << "\n";
+
+		m_metaLabel->setString(ss.str().c_str());
+	}
+}
+
 void PlayLayer::updateStatusLabels() {
 	auto self = gd::GameManager::sharedState()->getPlayLayer();
 
@@ -606,6 +638,9 @@ void PlayLayer::updateStatusLabels() {
 	m_noclipDeathsLabel->setTag(setting().nocDeathsPos);
 	//m_noclipDeathsLabel->setZOrder(setting().nocDeathsOrder);
 
+	m_metaLabel->setVisible(setting().onMetaLabel);
+	m_metaLabel->setTag(setting().metaPos);
+
 	int topLeftLabelsCount = 0;
 	int topRightLabelsCount = 0;
 	int bottomRightLabelsCount = 0;
@@ -637,22 +672,22 @@ void PlayLayer::updateStatusLabels() {
 				topRightLabelsCount++;
 			}
 
-			if (label->getTag() == 2) { // Bottom-Right
-				label->setAnchorPoint(ccp(1.f, 0.f));
-				if (label != m_cheatIndicatorLabel) {
-					label->m_pAlignment = kCCTextAlignmentRight;
-				}
-				label->setPosition(rightStatusXPos, (director->getScreenBottom() + 2.f) + (bottomRightLabelsCount * setting().labelsScale * 13.f));
-				bottomRightLabelsCount++;
-			}
-
-			if (label->getTag() == 3) { // Bottom-Left
+			if (label->getTag() == 2) { // Bottom-Left
 				label->setAnchorPoint(ccp(0.f, 0.f));
 				if (label != m_cheatIndicatorLabel) {
 					label->m_pAlignment = kCCTextAlignmentLeft;
 				}
 				label->setPosition(leftStatusXPos, (director->getScreenBottom() + 2.f) + (bottomLeftLabelsCount * setting().labelsScale * 13.f));
 				bottomLeftLabelsCount++;
+			}
+
+			if (label->getTag() == 3) { // Bottom-Right
+				label->setAnchorPoint(ccp(1.f, 0.f));
+				if (label != m_cheatIndicatorLabel) {
+					label->m_pAlignment = kCCTextAlignmentRight;
+				}
+				label->setPosition(rightStatusXPos, (director->getScreenBottom() + 2.f) + (bottomRightLabelsCount * setting().labelsScale * 13.f));
+				bottomRightLabelsCount++;
 			}
 		}
 	}
@@ -668,6 +703,7 @@ void PlayLayer::updateStatusLabels() {
 	updateClockLabel();
 	updateNoclipAccuracyLabel();
 	updateNoclipDeathsLabel();
+	updateMetaLabel();
 }
 
 void PlayLayer::updateStartPosSwitcherLabel() {
@@ -790,8 +826,6 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_totalDelta = 0;
 	m_prevX = 0;
 
-	setting().beforeRestartCheatsCount = setting().cheatsCount;
-
 	if (!PlayLayer::init(self, level)) return false;
 
 	//
@@ -904,6 +938,9 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	m_noclipDeathsLabel = CCLabelBMFont::create("", "bigFont.fnt");
 	m_labelsNode->addChild(m_noclipDeathsLabel);
+
+	m_metaLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	m_labelsNode->addChild(m_metaLabel);
 
 	PlayLayer::updateStatusLabels();
 
@@ -1038,6 +1075,7 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	updateClockLabel();
 	updateNoclipAccuracyLabel();
 	updateNoclipDeathsLabel();
+	updateMetaLabel();
 }
 
 void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
@@ -1340,7 +1378,7 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
 		}
 	}
 
-	if (!self->m_practiceMode && !self->m_testMode) {
+	if (!self->m_practiceMode && !self->m_testMode && !m_cheatingBeforeRestart) {
 		m_lastRun = 100.f;
 	}
 
@@ -1467,6 +1505,7 @@ void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	m_clockLabel = nullptr;
 	m_noclipAccuracyLabel = nullptr;
 	m_noclipDeathsLabel = nullptr;
+	m_metaLabel = nullptr;
 }
 
 void PlayLayer::mem_init() {

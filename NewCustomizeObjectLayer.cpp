@@ -22,7 +22,7 @@ const char* NewCustomizeObjectLayer::colorToString(int colorID) {
 	case 7: return "Col4"; break;
 	case 8: return "3DL"; break;
 	case 9: return "White"; break;
-	default: break;
+	default: return ""; break;
 	}
 }
 
@@ -243,7 +243,7 @@ bool NewCustomizeObjectLayer::init(gd::GameObject* object, CCArray* objects) {
 	this->updateSelectedColorLabel();
 	this->updateSelectPosition();
 
-	if (setting().m_liveColorEnabled && setting().onDeveloperMode) {
+	if (setting().m_liveColorEnabled) {
 		this->schedule(schedule_selector(NewCustomizeObjectLayer::updateColorsLive));
 	}
 
@@ -476,7 +476,7 @@ void NewCustomizeObjectLayer::toggleLiveColor(CCObject* sender) {
 
 	setting().m_liveColorEnabled = !setting().m_liveColorEnabled;
 
-	if (setting().m_liveColorEnabled && setting().onDeveloperMode) {
+	if (setting().m_liveColorEnabled) {
 		this->schedule(schedule_selector(NewCustomizeObjectLayer::updateColorsLive));
 	}
 	else {
