@@ -23,12 +23,12 @@ bool m_deafenPressed = false;
 
 int m_smoothFrames = 0; // https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/include/hooks/PlayLayer.hpp#L16
 
-std::vector<Checkpoint> m_checkpoints;
-
 int m_currentStartPos = 0;
 std::vector<gd::StartPosObject*> m_startPositions;
 std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges, m_mirrorPortals;
 std::unordered_map<gd::StartPosObject*, std::pair<float, float>> m_startPositionsBestRun; // first = best run, second = compare best run
+
+std::unordered_map<gd::CheckpointObject*, CheckpointStorage> m_checkpointStorage;
 
 gd::GameObject* m_portalRef;
 gd::GameObject* m_dualPortalRef;
@@ -97,6 +97,24 @@ bool PlayLayer::isCheating() {
 		setting().onKrazyManMode;
 }
 
+static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
+	gd::GameObject* closest = nullptr;
+
+	std::ranges::sort(vec, [](gd::GameObject* a, gd::GameObject* b) {
+		return a->getPositionX() < b->getPositionX();
+		});
+
+	for (auto obj : vec) {
+		if (obj->getPositionX() - 10 > startPos->getPositionX())
+			break;
+		if (obj->getPositionX() - 10 < startPos->getPositionX())
+			closest = obj;
+	}
+
+	return closest;
+}
+
+
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 	if (playLayer->m_practiceMode) return;
 
@@ -138,23 +156,6 @@ void PlayLayer::prevStartPos() {
 }
 
 std::vector<gd::GameObject*> m_colorTriggers;
-
-static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
-	gd::GameObject* closest = nullptr;
-
-	std::ranges::sort(vec, [](gd::GameObject* a, gd::GameObject* b) {
-		return a->getPositionX() < b->getPositionX();
-		});
-
-	for (auto obj : vec) {
-		if (obj->getPositionX() - 10 > startPos->getPositionX())
-			break;
-		if (obj->getPositionX() - 10 < startPos->getPositionX())
-			closest = obj;
-	}
-
-	return closest;
-}
 
 void setupStartPos(gd::StartPosObject* startPos) { // Eclipse menu https://github.com/EclipseMenu/EclipseMenu/blob/main/src/hacks/Level/SmartStartPos.cpp
 	gd::LevelSettingsObject* startPosSettings = startPos->m_settings;
@@ -783,7 +784,7 @@ void fixInitColorTriggers() {
 
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
-	m_checkpoints.clear();
+	m_checkpointStorage.clear();
 
 	m_dualPortals.clear();
 	m_gamemodePortals.clear();
@@ -1108,11 +1109,24 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
 
-	//PlayLayer::clearHitboxes();
-
 	if (setting().onPracticeFix) {
-		if (self->m_practiceMode && m_checkpoints.size() > 0) {
-			m_checkpoints.back().restore(self);
+		if (self->m_practiceMode && m_checkpointStorage.size()) {
+			auto it = m_checkpointStorage.find(static_cast<gd::CheckpointObject*>(self->m_checkpoints->lastObject()));
+			if (it != m_checkpointStorage.end()) {
+				auto& currentCheckpointStorage = it->second;
+
+				self->m_cameraPortal = currentCheckpointStorage.m_cameraPortal;
+				self->m_dualModeCamera = currentCheckpointStorage.m_dualPortal;
+
+				from<float>(self->m_player, 0x18) = currentCheckpointStorage.m_rotationX;
+				from<float>(self->m_player2, 0x18) = currentCheckpointStorage.m_rotationXP2;
+				from<float>(self->m_player, 0x1c) = currentCheckpointStorage.m_rotationY;
+				from<float>(self->m_player2, 0x1c) = currentCheckpointStorage.m_rotationYP2;
+				self->m_player->m_slopeYVel = currentCheckpointStorage.m_slopeYVelocity;
+				self->m_player2->m_slopeYVel = currentCheckpointStorage.m_slopeYVelocityP2;
+				self->m_player->m_yVelocity = currentCheckpointStorage.m_yVelocity;
+				self->m_player2->m_yVelocity = currentCheckpointStorage.m_yVelocityP2;
+			}
 		}
 	}
 
@@ -1236,7 +1250,7 @@ void __fastcall PlayLayer::createObjectsFromSetupH(gd::PlayLayer* self, void*, g
 }
 
 void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void*, bool practice) {
-	m_checkpoints.clear();
+	m_checkpointStorage.clear();
 
 	if (setting().onPracticeMusic && practice && !self->m_practiceMode) {
 		self->m_practiceMode = practice;
@@ -1302,8 +1316,6 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 		}
 	}
 
-	//PlayLayer::updateShowHitboxes();
-
 	if (m_deafenPressed) {
 		m_deafenPressed = false;
 		keybd_event(VK_MENU, 0x38, 0, 0);
@@ -1311,18 +1323,6 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
-
-	std::cout << "Death hazard: " << m_deathObject << std::endl;
-	//if (m_deathObject) {
-	//	auto objectDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(125));
-
-	//	if (setting().onSolidHitboxes)
-	//		Hitboxes::drawSolidsObjectHitbox(reinterpret_cast<gd::GameObject*>(m_deathObject), objectDrawNode);
-	//	if (setting().onHazardHitboxes)
-	//		Hitboxes::drawHazardsObjectHitbox(reinterpret_cast<gd::GameObject*>(m_deathObject), objectDrawNode);
-	//	if (setting().onSpecialHitboxes)
-	//		Hitboxes::drawSpecialsObjectHitbox(reinterpret_cast<gd::GameObject*>(m_deathObject), objectDrawNode);
-	//}
 
 	if (setting().onRespawnTime) {
 		float respawnTime = setting().respawnValue / 1000.f;
@@ -1363,10 +1363,6 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
-	//if (self->m_practiceMode && setting().onZeroPracticeComplete && self->m_lastRunPercent == 0) {
-	//	self->m_practiceMode = false;
-	//}
-
 	PlayLayer::levelComplete(self);
 
 	if (!self->m_practiceMode && self->m_testMode) {
@@ -1417,32 +1413,33 @@ void __fastcall PlayLayer::loadLastCheckpointH(gd::PlayLayer* self) {
 	}
 
 	PlayLayer::loadLastCheckpoint(self);
-
-	if (setting().onPracticeFix) {
-		if (self->m_checkpoints->count() > 0) {
-			self->m_cameraPortal = m_portalRef;
-			self->m_dualModeCamera = m_dualPortalRef;
-		}
-	}
 }
 
 gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
-	if (self->m_player != nullptr) {
-		m_checkpoints.push_back({ Checkpoint::from(self) });
-	}
+	auto ret = PlayLayer::createCheckpoint(self);
 
-	m_portalRef = self->m_cameraPortal;
-	m_dualPortalRef = self->m_dualModeCamera;
+	m_checkpointStorage[ret] = {
+		self->m_cameraPortal,
+		self->m_dualModeCamera,
+		from<float>(self->m_player, 0x18),
+		from<float>(self->m_player2, 0x18),
+		from<float>(self->m_player, 0x1c),
+		from<float>(self->m_player2, 0x1c),
+		self->m_player->m_slopeYVel,
+		self->m_player2->m_slopeYVel,
+		self->m_player->m_yVelocity,
+		self->m_player2->m_yVelocity
+	};
 
-	return PlayLayer::createCheckpoint(self);
+	return ret;
 }
 
 void __fastcall PlayLayer::removeLastCheckpointH(gd::PlayLayer* self) {
-	PlayLayer::removeLastCheckpoint(self);
-
-	if (m_checkpoints.size() > 0) {
-		m_checkpoints.pop_back();
+	if (m_checkpointStorage.size()) {
+		m_checkpointStorage.erase(static_cast<gd::CheckpointObject*>(self->m_checkpoints->lastObject()));
 	}
+
+	PlayLayer::removeLastCheckpoint(self);
 }
 
 void __fastcall PlayLayer::spawnPlayer2H(gd::PlayLayer* self) {
