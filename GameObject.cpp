@@ -63,8 +63,6 @@ void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
 //	std::cout << std::boolalpha << self->m_hasBeenActivatedP1 << std::endl;
 //	std::cout << p0 << std::endl;
 //	std::cout << std::boolalpha << p0->m_hasBeenActivatedP1 << std::endl;
-//
-//	//m_activatedObjects[self] = { self->m_hasBeenActivatedP1, self->m_hasBeenActivatedP2 };
 //}
 
 void GameObject::mem_init() {

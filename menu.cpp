@@ -2785,6 +2785,13 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Practice Bug Fix", &setting().onPracticeFix);
 			ImGui::Tooltip("Saves & restores player velocity and object blending in practice mode.");
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##practiceFixSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::CheckboxF("Activated Objects", &setting().onStoreObjects);
+
+				ImGui::TreePop();
+			}
 
 			if (ImGui::CheckboxF("Practice Music", &setting().onPracticeMusic)) {
 				if (setting().onPracticeMusic) {

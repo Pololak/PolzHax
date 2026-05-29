@@ -1094,6 +1094,41 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 				self->m_player2->m_slopeYVel = currentCheckpointStorage.m_slopeYVelocityP2;
 				self->m_player->m_yVelocity = currentCheckpointStorage.m_yVelocity;
 				self->m_player2->m_yVelocity = currentCheckpointStorage.m_yVelocityP2;
+
+				if (setting().onStoreObjects) {
+					for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
+						if (section) {
+							for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+								if (object) {
+									switch (object->m_objectType) {
+									case gd::GameObjectType::InverseGravityPortal:
+									case gd::GameObjectType::NormalGravityPortal:
+									case gd::GameObjectType::ShipPortal:
+									case gd::GameObjectType::CubePortal:
+									case gd::GameObjectType::YellowJumpPad:
+									case gd::GameObjectType::PinkJumpPad:
+									case gd::GameObjectType::GravityPad:
+									case gd::GameObjectType::YellowJumpRing:
+									case gd::GameObjectType::PinkJumpRing:
+									case gd::GameObjectType::GravityRing:
+									case gd::GameObjectType::BallPortal:
+									case gd::GameObjectType::RegularSizePortal:
+									case gd::GameObjectType::MiniSizePortal:
+									case gd::GameObjectType::UfoPortal:
+									case gd::GameObjectType::WavePortal:
+										auto ao = currentCheckpointStorage.m_activatedObjects.find(object);
+										if (ao != currentCheckpointStorage.m_activatedObjects.end()) {
+											auto& values = ao->second;
+
+											object->m_hasBeenActivatedP1 = values.first;
+											object->m_hasBeenActivatedP2 = values.second;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1113,6 +1148,15 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 			coin->destroyObject();
 			self->pickupItem(coin);
 		}
+	}
+
+	if (!self->m_practiceMode) {
+		m_prevX = self->m_player->getPositionX();
+		m_noclipFrames = 0;
+		m_totalDelta = 0;
+		m_deaths = 0;
+		m_deathsFull = 0;
+		m_wouldDie = false;
 	}
 
 	//if (setting().onIconRandomizer) {
@@ -1149,15 +1193,6 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	//	self->m_player->updatePlayerFrame(cubeIcon);
 	//	self->m_player2->updatePlayerFrame(cubeIcon);
 	//}
-
-	if (!self->m_practiceMode) {
-		m_prevX = self->m_player->getPositionX();
-		m_noclipFrames = 0;
-		m_totalDelta = 0;
-		m_deaths = 0;
-		m_deathsFull = 0;
-		m_wouldDie = false;
-	}
 }
 
 void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObject* object) {
@@ -1398,6 +1433,35 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 		self->m_player->m_yVelocity,
 		self->m_player2->m_yVelocity
 	};
+
+	for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
+		if (section) {
+			for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+				if (object) {
+					switch (object->m_objectType) {
+					case gd::GameObjectType::InverseGravityPortal:
+					case gd::GameObjectType::NormalGravityPortal:
+					case gd::GameObjectType::ShipPortal:
+					case gd::GameObjectType::CubePortal:
+					case gd::GameObjectType::YellowJumpPad:
+					case gd::GameObjectType::PinkJumpPad:
+					case gd::GameObjectType::GravityPad:
+					case gd::GameObjectType::YellowJumpRing:
+					case gd::GameObjectType::PinkJumpRing:
+					case gd::GameObjectType::GravityRing:
+					case gd::GameObjectType::BallPortal:
+					case gd::GameObjectType::RegularSizePortal:
+					case gd::GameObjectType::MiniSizePortal:
+					case gd::GameObjectType::UfoPortal:
+					case gd::GameObjectType::WavePortal:
+						if (object->m_hasBeenActivatedP1 || object->m_hasBeenActivatedP2) {
+							m_checkpointStorage[ret].m_activatedObjects[object] = { object->m_hasBeenActivatedP1, object->m_hasBeenActivatedP2 };
+						}
+					}
+				}
+			}
+		}
+	}
 
 	return ret;
 }

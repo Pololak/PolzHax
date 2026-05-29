@@ -16,4 +16,6 @@ struct CheckpointStorage {
     float m_slopeYVelocityP2;
     double m_yVelocity;
     double m_yVelocityP2;
+
+    std::unordered_map<gd::GameObject*, std::pair<bool, bool>> m_activatedObjects;
 };

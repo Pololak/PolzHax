@@ -133,7 +133,7 @@ struct SettingStruct {
 	bool onKrazyManMode;
 	bool onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
 	bool onPauseDuringCompletion;
-	bool onPracticeFix;
+	bool onPracticeFix, onStoreAccuracy, onStoreObjects;
 	bool onPracticeMusic;
 	bool onReplayLastCheckpoint;
 	bool onRespawnTime; float respawnValue = 1000.f;
@@ -360,7 +360,7 @@ DEF_SCHEMA(
 	onJumpHack,
 	onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit, noclipAccuracyLimit, noclipDeathsLimit, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck,
 	onPauseDuringCompletion,
-	onPracticeFix,
+	onPracticeFix, onStoreAccuracy, onStoreObjects,
 	onPracticeMusic,
 	onReplayLastCheckpoint,
 	onRespawnTime, respawnValue,
