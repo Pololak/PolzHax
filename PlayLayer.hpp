@@ -71,6 +71,8 @@ namespace PlayLayer {
 	void setDeathObject(CCObject*);
 	bool isCheating();
 	bool getCheatingBeforeRestart();
+	int getCurrentStartPos();
+	std::vector<gd::StartPosObject*> getStartPositions();
 
 	void updateShowHitboxes();
 	void clearHitboxes();

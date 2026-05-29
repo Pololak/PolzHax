@@ -1,5 +1,8 @@
 #pragma once
 #include "pch.h"
+#include <unordered_map>
+
+//inline std::unordered_map<gd::GameObject*, std::pair<bool, bool>> m_activatedObjects;
 
 struct CheckpointStorage {
     gd::GameObject* m_cameraPortal;

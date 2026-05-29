@@ -14,6 +14,9 @@ namespace GameObject {
 	inline void(__thiscall* triggerObject)(gd::GameObject*);
 	void __fastcall triggerObjectH(gd::GameObject*);
 
+	inline void(__thiscall* activatedByPlayer)(gd::GameObject*, gd::GameObject*);
+	void __fastcall activatedByPlayerH(gd::GameObject*, void*, gd::GameObject*);
+
 	void mem_init();
 }
 

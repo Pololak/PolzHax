@@ -128,7 +128,20 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	updateCheatIndicator2(self);
 
 	if (playLayer->m_testMode && !playLayer->m_practiceMode) {
-		
+		auto attemptsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(0);
+		auto jumpsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(1);
+		auto timeLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(2);
+
+		attemptsLabel->setPositionY(attemptsLabel->getPositionY() + 10.f);
+		jumpsLabel->setPositionY(jumpsLabel->getPositionY() + 10.f);
+		timeLabel->setPositionY(timeLabel->getPositionY() + 10.f);
+
+		auto startPosLabel = CCLabelBMFont::create("", "goldFont.fnt");
+		startPosLabel->setScale(.8f);
+		startPosLabel->setPosition(winSize.width / 2.f, winSize.height / 2.f - 29.f);
+		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
+		startPosLabel->setString(CCString::createWithFormat("StartPos: %i%%", startPosLevelPos)->getCString());
+		self->m_mainLayer->addChild(startPosLabel, 3);
 	}
 }
 

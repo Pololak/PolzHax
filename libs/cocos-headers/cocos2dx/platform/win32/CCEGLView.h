@@ -49,104 +49,205 @@ public:
     virtual void end();
     virtual void swapBuffers();
     virtual void setFrameSize(float width, float height);
-	RT_REMOVE(  virtual void setEditorFrameSize(float width, float height,HWND hWnd);   )
+    // Robtop Removal
+    // virtual void setEditorFrameSize(float width, float height,HWND hWnd);
     virtual void setIMEKeyboardState(bool bOpen);
+    void updateWindow(int width, int height);
+    void pollEvents(void);
 
     void setMenuResource(LPCWSTR menu);
     void setWndProc(CUSTOM_WND_PROC proc);
 
 protected:
-    RT_REMOVE(  virtual bool Create();  )
+    // Robtop Removal
+    // virtual bool Create();
+    void setupWindow(cocos2d::CCRect rect);
+    // @note RobTop Addition
+    bool initGlew();
+
 public:
-    bool initGL();
-    void destroyGL();
+    // Robtop Removal
+    // bool initGL();
+    // Robtop Removal
+    // void destroyGL();
 
-    RT_REMOVE(  virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam); )
+    // Robtop Removal
+    // virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
-	void setHWnd(HWND hWnd);
+    void setHWnd(HWND hWnd);
     // win32 platform function
-    RT_REMOVE( HWND getHWnd(); )
-    RT_REMOVE(  virtual void resize(int width, int height); )
-    RT_ADD(     void resizeWindow(int width, int height);   )
-	
-    /* 
+    // Robtop Removal
+    // HWND getHWnd();
+    // Robtop Removal
+    // virtual void resize(int width, int height);
+    // @note RobTop Addition
+    void resizeWindow(int width, int height);
+
+    /*
      * Set zoom factor for frame. This method is for debugging big resolution (e.g.new ipad) app on desktop.
      */
     void setFrameZoomFactor(float fZoomFactor);
-	float getFrameZoomFactor();
-    RT_REMOVE(  virtual void centerWindow();    )
-    RT_ADD(     void centerWindow();            )
+    float getFrameZoomFactor();
+    // @note RobTop Addition: made non virtual
+    void centerWindow();
+    // @note RobTop Addition
+    bool windowShouldClose();
+    // @note RobTop Addition
+    void showCursor(bool state);
 
-    RT_ADD(     void showCursor(bool state);    )
-	    
-    typedef void (*LPFN_ACCELEROMETER_KEYHOOK)( UINT message,WPARAM wParam, LPARAM lParam );
-    void setAccelerometerKeyHook( LPFN_ACCELEROMETER_KEYHOOK lpfnAccelerometerKeyHook );
+    typedef void (*LPFN_ACCELEROMETER_KEYHOOK)(UINT message, WPARAM wParam, LPARAM lParam);
+    void setAccelerometerKeyHook(LPFN_ACCELEROMETER_KEYHOOK lpfnAccelerometerKeyHook);
 
-    virtual void setViewPortInPoints(float x , float y , float w , float h);
-    virtual void setScissorInPoints(float x , float y , float w , float h);
-    
+    virtual void setViewPortInPoints(float x, float y, float w, float h);
+    virtual void setScissorInPoints(float x, float y, float w, float h);
+
     // static function
     /**
-    @brief    get the shared main open gl window
+    @brief      get the shared main open gl window
     */
     static CCEGLView* sharedOpenGLView();
-    RT_ADD( static CCEGLView* create(const std::string&);   )
 
-    RT_ADD(
-        //actually this is my function but i dont wanna make a new macro for it
-        inline CCPoint getMousePosition() { return { m_fMouseX, m_fMouseY }; }
+    /**
+    * @note RobTop addition
+    */
+    static CCEGLView* create(const std::string&);
 
-        void toggleFullScreen(bool fullscreen);
+    static cocos2d::CCEGLView* createWithFullScreen(std::string const&, bool);
+    static cocos2d::CCEGLView* createWithFullScreen(std::string const&, bool, GLFWvidmode const&, GLFWmonitor*);
+    static cocos2d::CCEGLView* createWithRect(std::string const&, cocos2d::CCRect, float);
 
-        GLFWwindow* getWindow(void) const;
-    )
+    /**
+     * @note Geode addition
+     */
+    inline CCPoint getMousePosition() { return { m_fMouseX, m_fMouseY }; }
+
+    void toggleFullScreen(bool fullscreen);
+
+    /**
+     * @note RobTop addition
+     */
+    GLFWwindow* getWindow(void) const;
+
+    /**
+     * @note RobTop addition
+     */
+    CCSize getDisplaySize();
+
+    void capture();
+    void checkErrorGL(char const*);
+
+    void enableRetina(bool);
+
+    bool getCursorLocked() const;
+    bool getGameplayActive() const;
+    bool getIsBorderless() const;
+    bool getIsFullscreen() const;
+    int getRetinaFactor() const;
+    bool getShouldHideCursor() const;
+    void iconify();
+
+    bool initWithFullScreen(std::string const&, bool);
+    bool initWithFullscreen(std::string const&, bool, GLFWvidmode const&, GLFWmonitor*);
+    bool initWithRect(std::string const&, cocos2d::CCRect, float);
+
+    bool isRetinaEnabled() const;
+
+    void onGLFWWindowCloseFunCallback(GLFWwindow*);
+    void releaseCapture();
+    void showMessage(std::string);
+
+    void toggleGameplayActive(bool);
+    void toggleLockCursor(bool);
+    void updateDesignSize(int, int);
+    void updateFrameSize();
+
+public:
+    static CCEGLView* s_pEglView;
+    /*
+        // @note unknown members here
+        uint8_t m_unkPad[8];
+    */
+    bool m_bCaptured;
+    // Robtop Removal
+    // HWND m_hWnd;
+    // Robtop Removal
+    // HDC  m_hDC;
+    // Robtop Removal
+    // HGLRC m_hRC;
+    // Robtop Removal
+    // LPFN_ACCELEROMETER_KEYHOOK m_lpfnAccelerometerKeyHook;
+    bool m_bSupportTouch;
+    // @note RobTop Addition
+    bool m_bInRetinaMonitor;
+    // @note RobTop Addition
+    bool m_bRetinaEnabled;
+    // @note RobTop Addition
+    int m_nRetinaFactor;
+    // @note RobTop Addition
+    bool m_bCursorHidden;
+    // @note may be before m_bCursorHidden
+/*
+    int m_unkSize4;
+*/
+// Robtop Removal
+// LPCWSTR m_menu;
+// Robtop Removal
+// CUSTOM_WND_PROC m_wndproc;
+    float m_fFrameZoomFactor;
+    // @note RobTop Addition
+    GLFWwindow* m_pMainWindow;
+    // @note RobTop Addition
+    GLFWmonitor* m_pPrimaryMonitor;
+public:
+    // @note RobTop Addition
+    CC_SYNTHESIZE(CCSize, m_obWindowedSize, WindowedSize);
+
+    // @note RobTop Addition
+    float m_fMouseX;
+    // @note RobTop Addition
+    float m_fMouseY;
+    // @note RobTop Addition
+    bool m_bIsFullscreen;
+    /*
+        // @note RobTop Addition
+        bool m_bIsBorderless;
+        // @note RobTop Addition
+        bool m_bIsFix;
+    */
+    // @note RobTop Addition
+    bool m_bShouldHideCursor;
+    /*
+        // @note RobTop Addition
+        bool m_bCursorLocked;
+    */
+    // @note RobTop Addition
+    bool m_bShouldCallGLFinish;
 
 protected:
-	static CCEGLView* s_pEglView;
-    bool m_bCaptured;
-    RT_REMOVE(
-    HWND m_hWnd;
-    HDC  m_hDC;
-    HGLRC m_hRC;
-    LPFN_ACCELEROMETER_KEYHOOK m_lpfnAccelerometerKeyHook;
-    )
-    bool m_bSupportTouch;
-    RT_ADD(
-        bool m_bInRetinaMonitor;
-        bool m_bRetinaEnabled;
-        int m_nRetinaFactor;
-        bool m_bCursorHidden;
-    )
-    RT_REMOVE(
-    LPCWSTR m_menu;
-    CUSTOM_WND_PROC m_wndproc;
-    )
-    float m_fFrameZoomFactor;
-    RT_ADD(
-        GLFWwindow* m_pMainWindow;
-        GLFWmonitor* m_pPrimaryMonitor;
-        CCSize m_obWindowedSize;
-        float m_fMouseX;
-        float m_fMouseY;
-        bool m_bIsFullscreen;
-        bool m_bShouldHideCursor;
-        bool m_bShouldCallGLFinish;
-    )
-
-    RT_ADD(
-        void onGLFWCharCallback(GLFWwindow* window, unsigned int entered);
-        void onGLFWCursorEnterFunCallback(GLFWwindow* window, int entered);
-        void onGLFWDeviceChangeFunCallback(GLFWwindow* window);
-        void onGLFWError(int code, const char* description);
-        void onGLFWframebuffersize(GLFWwindow* window, int width, int height);
-        void onGLFWMouseMoveCallBack(GLFWwindow* window, double x, double y);
-        void onGLFWMouseCallBack(GLFWwindow* window, int button, int action, int mods);
-        void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        void onGLFWMouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-        void onGLFWWindowIconifyFunCallback(GLFWwindow* window, int iconified);
-        void onGLFWWindowPosCallback(GLFWwindow* window, int x, int y);
-        void onGLFWWindowSizeFunCallback(GLFWwindow* window, int width, int height);
-    )
+    // @note RobTop Addition
+    void onGLFWCharCallback(GLFWwindow* window, unsigned int entered);
+    // @note RobTop Addition
+    void onGLFWCursorEnterFunCallback(GLFWwindow* window, int entered);
+    // @note RobTop Addition
+    void onGLFWDeviceChangeFunCallback(GLFWwindow* window);
+    // @note RobTop Addition
+    void onGLFWError(int code, const char* description);
+    // @note RobTop Addition
+    void onGLFWframebuffersize(GLFWwindow* window, int width, int height);
+    // @note RobTop Addition
+    void onGLFWMouseMoveCallBack(GLFWwindow* window, double x, double y);
+    // @note RobTop Addition
+    void onGLFWMouseCallBack(GLFWwindow* window, int button, int action, int mods);
+    // @note RobTop Addition
+    void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    // @note RobTop Addition
+    void onGLFWMouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+    // @note RobTop Addition
+    void onGLFWWindowIconifyFunCallback(GLFWwindow* window, int iconified);
+    // @note RobTop Addition
+    void onGLFWWindowPosCallback(GLFWwindow* window, int x, int y);
+    // @note RobTop Addition
+    void onGLFWWindowSizeFunCallback(GLFWwindow* window, int width, int height);
 };
 
 NS_CC_END

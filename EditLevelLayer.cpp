@@ -6,6 +6,11 @@
 
 bool m_noRotationPass;
 CCMenu* m_levelActionsMenu;
+CCLabelBMFont* m_idLabel;
+
+void EditLevelLayer::Callback::onLevelID(CCObject*) {
+	CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(gd::SearchType::Search, CCString::createWithFormat("%i", this->m_level->m_levelID)->getCString()))));
+}
 
 void EditLevelLayer::Callback::onLevelOrderUp(CCObject* sender) {
 	auto btn = static_cast<gd::CCMenuItemSpriteExtra*>(sender);
@@ -93,6 +98,7 @@ void EditLevelLayer::Callback::onMoveToTop(CCObject*) {
 
 bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGameLevel* level) {
 	m_levelActionsMenu = nullptr;
+	m_idLabel = nullptr;
 	if (!EditLevelLayer::init(self, level)) return false;
 
 	auto director = CCDirector::sharedDirector();
@@ -157,6 +163,27 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 	}
 	orderMenu->addChild(onLevelOrderDown, 0, 2);
 
+	if (m_idLabel) {
+		m_idLabel->setVisible(false);
+
+		auto menu = CCMenu::create();
+		self->addChild(menu);
+
+		const char* labelString = "ID: na";
+		if (level->m_levelID != 0) {
+			labelString = CCString::createWithFormat("ID: %i", level->m_levelID)->getCString();
+		}
+		if (level->m_originalLevel != 0) {
+			labelString = CCString::createWithFormat("%s (%i)", labelString, level->m_originalLevel)->getCString();
+		}
+		auto levelIDLabel = CCLabelBMFont::create(labelString, "goldFont.fnt");
+		levelIDLabel->setScale(.6f);
+		auto onLevelID = gd::CCMenuItemSpriteExtra::create(levelIDLabel, self, menu_selector(EditLevelLayer::Callback::onLevelID));
+		onLevelID->setEnabled(level->m_levelID != 0);
+		onLevelID->setPosition(menu->convertToNodeSpace(m_idLabel->getPosition()));
+		menu->addChild(onLevelID);
+	}
+
 	return true;
 }
 
@@ -200,9 +227,17 @@ void __fastcall EditLevelLayer::levelActionsMenuH() {
 	EditLevelLayer::levelActionsMenu();
 }
 
+void __fastcall EditLevelLayer::levelIDLabelH() {
+	__asm {
+		mov m_idLabel, eax
+	}
+	EditLevelLayer::levelIDLabel();
+}
+
 void __fastcall EditLevelLayer::destructorH(gd::EditLevelLayer* self) {
 	EditLevelLayer::destructor(self);
 	m_levelActionsMenu = nullptr;
+	m_idLabel = nullptr;
 }
 
 void EditLevelLayer::mem_init() {
@@ -212,4 +247,5 @@ void EditLevelLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3da30), EditLevelLayer::onCloneH, reinterpret_cast<void**>(&EditLevelLayer::onClone));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3b3d0), EditLevelLayer::destructorH, reinterpret_cast<void**>(&EditLevelLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3c065), EditLevelLayer::levelActionsMenuH, reinterpret_cast<void**>(&EditLevelLayer::levelActionsMenu));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x3ca99), EditLevelLayer::levelIDLabelH, reinterpret_cast<void**>(&EditLevelLayer::levelIDLabel));
 }

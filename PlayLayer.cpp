@@ -24,7 +24,15 @@ bool m_deafenPressed = false;
 int m_smoothFrames = 0; // https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/include/hooks/PlayLayer.hpp#L16
 
 int m_currentStartPos = 0;
+int PlayLayer::getCurrentStartPos() {
+	return m_currentStartPos;
+}
+
 std::vector<gd::StartPosObject*> m_startPositions;
+std::vector<gd::StartPosObject*> PlayLayer::getStartPositions() {
+	return m_startPositions;
+}
+
 std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges, m_mirrorPortals;
 std::unordered_map<gd::StartPosObject*, std::pair<float, float>> m_startPositionsBestRun; // first = best run, second = compare best run
 
@@ -741,50 +749,10 @@ void PlayLayer::updateStartPosSwitcherLabel() {
 	onNextStartPos->runAction(CCSequence::create(CCDelayTime::create(1.f), CCFadeOut::create(.5f), CCHide::create(), nullptr));
 }
 
-void fixInitColorTriggers() {
-	auto self = gd::GameManager::sharedState()->getPlayLayer();
-	if (!self) return;
-	
-	std::vector<gd::GameObject*> m_bgColorTriggers, m_gColorTriggers, m_lineColorTriggers, m_objColorTriggers, m_col1ColorTriggers, m_col2ColorTriggers, m_col3ColorTriggers, m_col4ColorTriggers, m_dlColorTriggers;
-
-	for (auto obj : m_colorTriggers) {
-		if (obj) {
-			switch (obj->m_objectID) {
-			case 29: m_bgColorTriggers.push_back(obj); break;
-			case 30: m_gColorTriggers.push_back(obj); break;
-			case 104: m_lineColorTriggers.push_back(obj); break;
-			case 105: m_objColorTriggers.push_back(obj); break;
-			case 221: m_col1ColorTriggers.push_back(obj); break;
-			case 717: m_col2ColorTriggers.push_back(obj); break;
-			case 718: m_col3ColorTriggers.push_back(obj); break;
-			case 743: m_col4ColorTriggers.push_back(obj); break;
-			case 744: m_dlColorTriggers.push_back(obj); break;
-			default: break;
-			}
-		}
-	}
-
-	std::sort(m_bgColorTriggers.begin(), m_bgColorTriggers.end(), [](gd::GameObject* a, gd::GameObject* b) {
-		return a->getPositionX() < b->getPositionX();
-		});
-
-	gd::GameObject* closestBGTrigger = nullptr;
-
-	for (auto obj : m_bgColorTriggers) {
-		if (obj->getPositionX() < self->m_player->getPositionX()) {
-			closestBGTrigger = obj;
-		}
-	}
-
-	if (closestBGTrigger) {
-		self->m_activeBGColorAction->m_toColor = closestBGTrigger->m_triggerColor;
-		self->m_activeBGColorAction->m_duration = 0.f;
-	}
-}
-
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpointStorage.clear();
+	//m_activatedObjects.clear();
 
 	m_dualPortals.clear();
 	m_gamemodePortals.clear();
@@ -1337,11 +1305,11 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 		}
 	}
 
-	if (!self->m_practiceMode && !self->m_testMode && !setting().onNoclip) {
+	if (!self->m_practiceMode && !self->m_testMode && !m_cheatingBeforeRestart) {
 		m_lastRun = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 	}
 
-	if (!self->m_practiceMode && self->m_testMode && !setting().onNoclip) {
+	if (!self->m_practiceMode && self->m_testMode && !m_cheatingBeforeRestart) {
 		if (m_startPositions.size() && m_currentStartPos > -1) {
 			gd::StartPosObject* currentStartPosObject = m_startPositions[m_currentStartPos];
 			if (currentStartPosObject) {

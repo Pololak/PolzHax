@@ -17,6 +17,9 @@ namespace EditLevelLayer {
 	inline void(__thiscall* levelActionsMenu)();
 	void __fastcall levelActionsMenuH();
 
+	inline void(__thiscall* levelIDLabel)();
+	void __fastcall levelIDLabelH();
+
 	inline void(__thiscall* destructor)(gd::EditLevelLayer*);
 	void __fastcall destructorH(gd::EditLevelLayer*);
 
@@ -28,6 +31,7 @@ namespace EditLevelLayer {
 		void onExportLevel(CCObject*);
 		void onLevelOrderUp(CCObject*);
 		void onLevelOrderDown(CCObject*);
+		void onLevelID(CCObject*);
 	};
 
 	void mem_init();
