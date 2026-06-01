@@ -121,11 +121,18 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	showEndLayerMenu->addChild(onShowEndLayer, 0, 56);
 
 	auto cheatIndicator = CCLabelBMFont::create(".", "bigFont.fnt");
-	cheatIndicator->setAnchorPoint({ 0.f, 1.f });
-	cheatIndicator->setPosition(winSize.width / 2.f - 172.f, winSize.height / 2.f + 127.5f);
+	cheatIndicator->setPosition(winSize.width / 2.f - 168.f, winSize.height / 2.f + 110.f);
 	self->m_mainLayer->addChild(cheatIndicator, 15, 507);
 
 	updateCheatIndicator2(self);
+
+	auto versionLabel = CCLabelBMFont::create("v1.3.0 (V)", "chatFont.fnt");
+	versionLabel->setScale(.6f);
+	versionLabel->setAnchorPoint({ 0.f, 1.f });
+	versionLabel->setColor(ccc3(100, 100, 100));
+	versionLabel->setOpacity(100);
+	versionLabel->setPosition(winSize.width / 2.f - 162.f, winSize.height / 2.f + 105.25f);
+	self->m_mainLayer->addChild(versionLabel, 15);
 
 	if (playLayer->m_testMode && !playLayer->m_practiceMode) {
 		auto attemptsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(0);

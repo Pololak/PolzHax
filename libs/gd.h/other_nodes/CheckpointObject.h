@@ -6,7 +6,6 @@
 namespace gd {
 	class GameObject;
 	class ColorAction;
-	enum class EnterEffect {};
 
 	class PlayerCheckpoint : public cocos2d::CCNode {
 	public:

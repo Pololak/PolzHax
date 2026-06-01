@@ -15,6 +15,10 @@ void GJGarageLayer::Callback::onIconPreview(CCObject*) {
 	IconPreviewPopup::create()->show();
 }
 
+void GJGarageLayer::Callback::onGarageRopeBack(CCObject*) {
+	return;
+}
+
 bool __fastcall GJGarageLayer::initH(gd::GJGarageLayer* self) {
 	m_iconTypeMenu = nullptr;
 	if (!GJGarageLayer::init(self)) return false;

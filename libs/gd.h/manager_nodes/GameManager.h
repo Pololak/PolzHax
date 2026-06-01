@@ -4,25 +4,8 @@
 #include <gd.h>
 
 namespace gd {
-	enum IconType {
-		Cube = 0,
-		Ship = 1,
-		Ball = 2,
-		UFO = 3,
-		Wave = 4,
-		Special = 99
-	};
-
 	class PlayLayer;
 	class LevelSelectLayer {};
-	enum class LastGameScene {
-		MenuLayer = 0,
-		CreatorLayer = 1,
-		MyLevelsLayer = 2,
-		LevelInfoLayerOrEditLevelLayer = 3,
-		AnotherMenuLayer = 7,
-		LevelSelectLayer = 9
-	};
 	class PremiumPopup : public cocos2d::CCNode {};
 	class GameRateDelegate;
 

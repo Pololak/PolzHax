@@ -6,15 +6,6 @@
 namespace gd {
 	class GameObject;
 
-	enum class UndoCommand {
-		Delete = 1,
-		New = 2,
-		Paste = 3,
-		DeleteMulti = 4,
-		Transform = 5,
-		Select = 6,
-	};
-
 	class GameObjectCopy : public cocos2d::CCObject {
 	public:
 		GameObject* m_object; // 0x18

@@ -166,6 +166,18 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 
 		updatePageButton(self);
 
+		//auto onSearchSpr = CCSprite::create("gj_findBtn_001.png");
+		//auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
+		//onSearch->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 55.f, director->getScreenTop() - 70.f }));
+		//onSearch->setVisible(m_customSearchQuery.empty());
+		//menu->addChild(onSearch, 0, 14);
+
+		//auto onCancelSearchSpr = CCSprite::create("gj_findBtnOff_001.png");
+		//auto onCancelSearch = gd::CCMenuItemSpriteExtra::create(onCancelSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onCancelSearch));
+		//onCancelSearch->setPosition(onSearch->getPosition());
+		//onCancelSearch->setVisible(!m_customSearchQuery.empty());
+		//menu->addChild(onCancelSearch, 0, 15);
+
 		auto deleteMenu = CCMenu::create();
 		self->addChild(deleteMenu, 2, 570);
 
@@ -198,21 +210,6 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		//auto onSelectAll = gd::CCMenuItemToggler::create(toggleOff, toggleOn, self, menu_selector(LevelBrowserLayer::Callback::onSelectAll));
 		//onSelectAll->setPosition(-125.f, -122.f);
 		//deleteMenu->addChild(onSelectAll, 0, 1);
-
-		//auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
-		//if (menu) {
-		//	auto onSearchSpr = CCSprite::create("gj_findBtn_001.png");
-		//	auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
-		//	onSearch->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 55.f, director->getScreenTop() - 70.f }));
-		//	onSearch->setVisible(m_customSearchQuery.empty());
-		//	menu->addChild(onSearch, 0, 14);
-
-		//	auto onCancelSearchSpr = CCSprite::create("gj_findBtnOff_001.png");
-		//	auto onCancelSearch = gd::CCMenuItemSpriteExtra::create(onCancelSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onCancelSearch));
-		//	onCancelSearch->setPosition(onSearch->getPosition());
-		//	onCancelSearch->setVisible(!m_customSearchQuery.empty());
-		//	menu->addChild(onCancelSearch, 0, 15);
-		//}
 	}
 
 	return true;
@@ -221,54 +218,46 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* searchObject) {
 	LevelBrowserLayer::loadPage(self, searchObject);
 
-	//std::cout << "1\n";
+	//if (searchObject->m_searchQuery.size()) {
+	//	if (searchObject->m_searchType == gd::SearchType::MyLevels) {
+	//		auto localLevels = gd::LocalLevelManager::sharedState()->m_localLevels;
 
-	//if (!m_customSearchQuery.empty() && (searchObject->m_searchType == gd::SearchType::MyLevels)) {
-	//	std::cout << "2\n";
-	//	std::cout << "SearchType: " << (int)searchObject->m_searchType << std::endl;
-	//	std::cout << "SearchQuery: " << m_customSearchQuery << std::endl;
-	//	std::cout << "3\n";
-
-	//	CCArray* levels = gd::LocalLevelManager::sharedState()->m_localLevels;
-
-	//	std::cout << "4\n";
-	//	auto filteredLevels = CCArray::create();
-	//	for (auto level : CCArrayExt<gd::GJGameLevel*>(levels)) {
-	//		if (level && ci_contains(level->m_levelName, m_customSearchQuery)) {
-	//			filteredLevels->addObject(level);
+	//		auto filteredLevels = CCArray::create();
+	//		for (auto level : CCArrayExt<gd::GJGameLevel*>(localLevels)) {
+	//			if (level) {
+	//				if (ci_contains(level->m_levelName.c_str(), searchObject->m_searchQuery.c_str())) {
+	//					filteredLevels->addObject(level);
+	//				}
+	//			}
 	//		}
-	//	}
-	//	std::cout << "5\n";
 
-	//	int page = searchObject->m_page;
-	//	int uVar12 = page * 10; // I don't really know how to name it
+	//		int page = searchObject->m_page;
+	//		int uVar12 = page * 10; // idk how to name it
 
-	//	std::cout << "6\n";
-	//	auto filteredLevelsPerPage = CCArray::create();
-	//	if (filteredLevels->count()) {
-	//		self->m_itemCount = filteredLevels->count();
+	//		auto filteredLevelsPerPage = CCArray::create();
+	//		if (filteredLevels->count()) {
+	//			self->m_itemCount = filteredLevels->count();
 
-	//		for (int i = uVar12; i != uVar12 + 10 && i <= filteredLevels->count() - 1; ++i) {
-	//			auto level = static_cast<gd::GJGameLevel*>(filteredLevels->objectAtIndex(i));
-	//			filteredLevelsPerPage->addObject(level);
+	//			for (int i = uVar12; i != uVar12 + 10 && i <= filteredLevels->count() - 1; ++i) {
+	//				auto level = static_cast<gd::GJGameLevel*>(filteredLevels->objectAtIndex(i));
+	//				filteredLevelsPerPage->addObject(level);
+	//			}
 	//		}
-	//	}
-	//	std::cout << "7\n";
 
-	//	if (filteredLevelsPerPage->count()) {
-	//		std::cout << "8\n";
-	//		self->m_array = filteredLevelsPerPage;
-	//		self->setupLevelBrowser(filteredLevelsPerPage);
-	//		self->updateLevelsLabel();
-	//	}
-	//	
-	//	std::cout << "9\n";
-	//	int totalItems = self->m_itemCount;
-	//	if (self->m_searchObject->m_page == ((totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10)) {
-	//		self->m_rightArrow->setVisible(false);
-	//	}
-	//	if (self->m_searchObject->m_page == 0) {
-	//		self->m_leftArrow->setVisible(false);
+	//		if (filteredLevelsPerPage->count()) {
+	//			self->m_array->release();
+	//			self->m_array = filteredLevelsPerPage;
+	//			self->setupLevelBrowser(filteredLevelsPerPage);
+	//			self->updateLevelsLabel();
+	//		}
+
+	//		int totalItems = self->m_itemCount;
+	//		if (self->m_searchObject->m_page == ((totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10)) {
+	//			self->m_rightArrow->setVisible(false);
+	//		}
+	//		if (self->m_searchObject->m_page == 0) {
+	//			self->m_leftArrow->setVisible(false);
+	//		}
 	//	}
 	//}
 
@@ -288,14 +277,6 @@ void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*,
 		//	onCancelSearch->setVisible(!m_customSearchQuery.empty());
 		//}
 	}
-
-	//auto deleteMenu = static_cast<CCMenu*>(self->getChildByTag(570));
-	//if (deleteMenu) {
-	//	auto onSelectAll = static_cast<gd::CCMenuItemToggler*>(deleteMenu->getChildByTag(1));
-	//	if (onSelectAll) {
-	//		onSelectAll->toggle(false);
-	//	}
-	//}
 
 	updatePageButton(self);
 }

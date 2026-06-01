@@ -17,13 +17,6 @@ namespace gd {
 	class TableView;
 	class TableViewCell;
 
-	enum class UpdateResponse {
-		Unknown,
-		UpToDate,
-		GameVerOutOfDate,
-		UpdateSuccess,
-	};
-
 	class AppDelegate : public cocos2d::CCApplication {
 	public:
 		static AppDelegate* get() {

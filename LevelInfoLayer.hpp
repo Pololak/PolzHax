@@ -14,6 +14,9 @@ namespace LevelInfoLayer {
 	inline void(__thiscall* onLevelInfo)(gd::LevelInfoLayer*, CCObject*);
 	void __fastcall onLevelInfoH(gd::LevelInfoLayer*, void*, CCObject*);
 
+	inline void(__thiscall* levelUpdateFinished)(gd::LevelInfoLayer*, gd::GJGameLevel*, gd::UpdateResponse);
+	void __fastcall levelUpdateFinishedH(gd::LevelInfoLayer*, void*, gd::GJGameLevel*, gd::UpdateResponse);
+
 	inline void(__thiscall* destructor)(gd::LevelInfoLayer*);
 	void __fastcall destructorH(gd::LevelInfoLayer*);
 

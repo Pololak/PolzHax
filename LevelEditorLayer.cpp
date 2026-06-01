@@ -869,6 +869,12 @@ void __fastcall LevelEditorLayer::drawH(gd::LevelEditorLayer* self) {
 	//}
 }
 
+void __fastcall LevelEditorLayer::playMusicH(gd::LevelEditorLayer* self) {
+	LevelEditorLayer::playMusic(self);
+
+	std::cout << "playMusic()" << std::endl;
+}
+
 void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	LevelEditorLayer::destructor(self);
 	m_colorTriggers.clear();
@@ -900,6 +906,8 @@ void LevelEditorLayer::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90800), LevelEditorLayer::pushButtonH, reinterpret_cast<void**>(&LevelEditorLayer::pushButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x908f0), LevelEditorLayer::releaseButtonH, reinterpret_cast<void**>(&LevelEditorLayer::releaseButton));
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90d70), LevelEditorLayer::playMusicH, reinterpret_cast<void**>(&LevelEditorLayer::playMusic));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x926b0), LevelEditorLayer::drawH, reinterpret_cast<void**>(&LevelEditorLayer::draw));
 

@@ -8,6 +8,10 @@ void LeaderboardsLayer::Callback::onRefresh(CCObject*) {
 	glm->resetTimerForKey("leaderboard_week");
 	glm->resetTimerForKey("leaderboard_global");
 	glm->resetTimerForKey("leaderboard_creator");
+
+	gd::LeaderboardState originalState = this->m_leaderboardState;
+	this->m_leaderboardState = static_cast<gd::LeaderboardState>(5);
+	this->selectLeaderboard(originalState);
 }
 
 bool __fastcall LeaderboardsLayer::initH(gd::LeaderboardsLayer* self, void*, gd::LeaderboardState state) {

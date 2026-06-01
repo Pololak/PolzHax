@@ -3,10 +3,12 @@
 #include "LevelShare.hpp"
 #include "nfd.h"
 #include <fstream>
+#include "shellapi.h"
 
 bool m_noRotationPass;
 CCMenu* m_levelActionsMenu;
 CCLabelBMFont* m_idLabel;
+std::string m_exportedLevelPath;
 
 void EditLevelLayer::Callback::onLevelID(CCObject*) {
 	CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(gd::SearchType::Search, CCString::createWithFormat("%i", this->m_level->m_levelID)->getCString()))));
@@ -86,7 +88,7 @@ void EditLevelLayer::Callback::onExportLevel(CCObject*) {
 		std::ofstream file(path);
 		dumpLevel(this->m_level, file);
 		free(path);
-		gd::FLAlertLayer::create("Success", "The level has been saved.", "OK")->show();
+		gd::FLAlertLayer::create("Success", "The level has been exported.", "OK")->show();
 	}
 }
 
@@ -200,6 +202,9 @@ void __fastcall EditLevelLayer::FLAlert_ClickedH(gd::EditLevelLayer* _self, void
 		gd::LocalLevelManager::sharedState()->updateLevelOrder();
 		updateLevelOrderLabel(self);
 	}
+	//if ((layer->getTag() == 0x1c) && btn2) {
+	//	ShellExecute(0, NULL, m_exportedLevelPath.c_str(), NULL, NULL, SW_SHOW);
+	//}
 	EditLevelLayer::FLAlert_Clicked(_self, layer, btn2);
 }
 
@@ -238,6 +243,7 @@ void __fastcall EditLevelLayer::destructorH(gd::EditLevelLayer* self) {
 	EditLevelLayer::destructor(self);
 	m_levelActionsMenu = nullptr;
 	m_idLabel = nullptr;
+	m_exportedLevelPath.clear();
 }
 
 void EditLevelLayer::mem_init() {

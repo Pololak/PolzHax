@@ -3,6 +3,7 @@
 #include "nfd.h"
 #include <fstream>
 #include "Setting.hpp"
+#include "utils.hpp"
 
 gd::CustomSongWidget* m_songWidget;
 
@@ -17,15 +18,8 @@ void LevelInfoLayer::Callback::onExportLevel(CCObject*) {
 		std::ofstream file(path);
 		dumpLevel(this->m_level, file);
 		free(path);
-		gd::FLAlertLayer::create("Success", "The level has been saved.", "OK")->show();
+		gd::FLAlertLayer::create("Success", "The level has been exported.", "OK")->show();
 	}
-}
-
-void LevelInfoLayer::Callback::onGarage(CCObject*) {
-	auto scene = gd::GJGarageLayer::scene();
-	scene->setUserData(this->m_level);
-	CCDirector::sharedDirector()->pushScene(CCTransitionMoveInT::create(.5f, scene));
-	gd::GameManager::sharedState()->m_lastScene = static_cast<gd::LastGameScene>(3);
 }
 
 void LevelInfoLayer::Callback::onMoveToTop(CCObject*) {
@@ -69,6 +63,20 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 	onMoveToTop->setPosition(actionsMenu->convertToNodeSpace(ccp(director->getScreenRight() - 80.f, director->getScreenBottom() + 70.f)));
 	actionsMenu->addChild(onMoveToTop);
 
+	if (setting().onDeveloperMode) {
+		auto developerLabel = CCLabelBMFont::create("", "chatFont.fnt");
+		developerLabel->setScale(.6f);
+		developerLabel->setPosition(director->getScreenLeft() + 60.f, director->getScreenTop() - 60.f);
+		developerLabel->setAnchorPoint({ 0.f, 1.f });
+		self->addChild(developerLabel, 15);
+
+		std::stringstream ss;
+
+		ss << "m_featured: " << level->m_featured << std::endl;
+
+		developerLabel->setString(ss.str().c_str());
+	}
+
 	return true;
 }
 
@@ -107,6 +115,13 @@ void __fastcall LevelInfoLayer::onLevelInfoH(gd::LevelInfoLayer* self, void*, CC
 	gd::FLAlertLayer::create("Level Info", info, "OK")->show();
 }
 
+void __fastcall LevelInfoLayer::levelUpdateFinishedH(gd::LevelInfoLayer* _self, void*, gd::GJGameLevel* level, gd::UpdateResponse response) {
+	LevelInfoLayer::levelUpdateFinished(_self, level, response);
+	auto self = reinterpret_cast<gd::LevelInfoLayer*>(reinterpret_cast<uintptr_t>(_self) - 0x11c);
+
+	self->updateLabelValues();
+}
+
 void __fastcall LevelInfoLayer::songWidgetH() {
 	__asm {
 		mov m_songWidget, eax
@@ -124,6 +139,7 @@ void LevelInfoLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9e2c0), LevelInfoLayer::onCloneH, reinterpret_cast<void**>(&LevelInfoLayer::onClone));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9f2d0), LevelInfoLayer::FLAlert_ClickedH, reinterpret_cast<void**>(&LevelInfoLayer::FLAlert_Clicked));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9ed10), LevelInfoLayer::onLevelInfoH, reinterpret_cast<void**>(&LevelInfoLayer::onLevelInfo));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9da70), LevelInfoLayer::levelUpdateFinishedH, reinterpret_cast<void**>(&LevelInfoLayer::levelUpdateFinished));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9b940), LevelInfoLayer::destructorH, reinterpret_cast<void**>(&LevelInfoLayer::destructor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x9cb06), LevelInfoLayer::songWidgetH, reinterpret_cast<void**>(&LevelInfoLayer::songWidget));
 }

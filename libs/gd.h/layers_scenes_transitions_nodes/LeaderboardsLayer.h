@@ -9,14 +9,7 @@ namespace gd {
 	class CCMenuItemSpriteExtra;
 	class LoadingCircle;
 	class TextArea;
-
-	enum class LeaderboardState {
-		Default = 0,
-		Top100 = 1,
-		Global = 2,
-		Creators = 3,
-		TopWeek = 4
-	};
+	enum class LeaderboardState;
 
 	class LeaderboardsLayer : public cocos2d::CCLayer, LeaderboardManagerDelegate {
 	public:
@@ -30,6 +23,10 @@ namespace gd {
 		CCMenuItemSpriteExtra* m_infoButton; // 0x138
 		LoadingCircle* m_loadingCircle; // 0x13c
 		TextArea* m_noInternet; // 0x140
+
+		void selectLeaderboard(LeaderboardState state) {
+			reinterpret_cast<void(__thiscall*)(LeaderboardsLayer*, LeaderboardState)>(base + 0x88b70)(this, state);
+		}
 	};
 }
 

@@ -92,6 +92,14 @@ void renderDebugModule() {
 				ImGui::Text("Gravity: %f", pl->m_player->m_gravity);
 			}
 
+			static float customYVel = 0.f;
+			ImGui::SetNextItemWidth(80.f);
+			ImGui::DragFloat("yVel", &customYVel);
+			ImGui::SameLine();
+			if (ImGui::Button("Apply")) {
+				pl->m_player->m_yVelocity = customYVel;
+			}
+
 			ImGui::Text("PlayLayer 0x174: %i", from<CCArray*>(pl, 0x174)->count());
 
 			static int colorID = 0;

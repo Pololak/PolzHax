@@ -32,6 +32,10 @@ namespace gd {
 						);
 		}
 
+		void playBackgroundMusic(std::string path, bool p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(GameSoundManager*, std::string, bool, bool)>(base + 0x17850)(this, path, p0, p1);
+		}
+
 		void stopBackgroundMusic() {
 			reinterpret_cast<void(__fastcall*)(GameSoundManager*)>(base + 0x17940)(this);
 		}

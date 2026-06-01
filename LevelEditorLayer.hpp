@@ -61,6 +61,9 @@ namespace LevelEditorLayer {
 	inline void(__thiscall* releaseButton)(gd::LevelEditorLayer*, int, bool);
 	void __fastcall releaseButtonH(gd::LevelEditorLayer*, void*, int, bool);
 
+	inline void(__thiscall* playMusic)(gd::LevelEditorLayer*);
+	void __fastcall playMusicH(gd::LevelEditorLayer*);
+
 	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
 	void __fastcall drawH(gd::LevelEditorLayer*);
 

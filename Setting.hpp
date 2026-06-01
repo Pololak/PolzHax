@@ -197,6 +197,8 @@ struct SettingStruct {
 	int player2PrimaryColorR = 255, player2PrimaryColorG = 255, player2PrimaryColorB = 255;
 	int playerSecondaryColorR = 255, playerSecondaryColorG = 255, playerSecondaryColorB = 255;
 	int player2SecondaryColorR = 255, player2SecondaryColorG = 255, player2SecondaryColorB = 255;
+	bool onWaveTrailColor;
+	int playerWaveTrailColorR = 255, playerWaveTrailColorG = 255, playerWaveTrailColorB = 255;
 
 	bool onSameDualColor;
 	bool onIconRandomizer; bool onRandomizeCube = true, onRandomizeShip = true, onRandomizeBall = true, onRandomizeUFO = true, onRandomizeDart = true, onRandomizeColor1 = true, onRandomizeColor2 = true, onRandomizeTrail = true;
@@ -417,6 +419,16 @@ DEF_SCHEMA(
 	onMetaLabel, playerXPos, playerYPos, playerYVel, playerRot, playerGrav, playerSpd, metaPos,
 
 	// Icons
+	onIconEffects,
+	onP1Color, onP1Color2,
+	onP2Color, onP2Color2,
+	playerPrimaryColorR, playerPrimaryColorG, playerPrimaryColorB,
+	player2PrimaryColorR, player2PrimaryColorG, player2PrimaryColorB,
+	playerSecondaryColorR, playerSecondaryColorG, playerSecondaryColorB,
+	player2SecondaryColorR, player2SecondaryColorG, player2SecondaryColorB,
+	onWaveTrailColor,
+	playerWaveTrailColorR, playerWaveTrailColorG, playerWaveTrailColorB,
+
 	onSameDualColor,
 	onIconRandomizer, onRandomizeCube, onRandomizeShip, onRandomizeBall, onRandomizeUFO, onRandomizeDart, onRandomizeColor1, onRandomizeColor2, onRandomizeTrail,
 

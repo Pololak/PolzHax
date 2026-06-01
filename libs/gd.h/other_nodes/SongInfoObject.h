@@ -4,12 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-    enum class GJSongError {
-        FailedToFetch = 1,
-        NotAllowed = 2,
-        DownloadCancelled = 3
-    };
-
     class SongInfoObject : public cocos2d::CCNode {
     public:
     };

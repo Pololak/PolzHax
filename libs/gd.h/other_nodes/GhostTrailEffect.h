@@ -4,11 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-	enum class GhostType {
-		Disabled = 0,
-		Enabled = 1,
-	};
-
 	class GhostTrailEffect {
 	public:
 	};

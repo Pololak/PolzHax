@@ -43,14 +43,6 @@ namespace gd {
 		static GJGarageLayer* node() {
 			return reinterpret_cast<GJGarageLayer * (__fastcall*)()>(base + 0x7c240)();
 		}
-
-		static cocos2d::CCScene* scene() {
-			auto scene = cocos2d::CCScene::create();
-
-			scene->addChild(node());
-
-			return scene;
-		}
 	};
 }
 

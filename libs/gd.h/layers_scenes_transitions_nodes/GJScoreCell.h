@@ -4,11 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-	enum class GJScoreType {
-		Unknown = 0,
-		Creator = 1
-	};
-
 	class GJUserScore : public cocos2d::CCNode {
 	public:
 		std::string m_userName; // 0xe8

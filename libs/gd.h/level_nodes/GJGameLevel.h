@@ -4,12 +4,6 @@
 #include <gd.h>
 
 namespace gd {
-    enum class GJLevelType {
-        Local = 1,
-        Editor = 2,
-        Saved = 3
-    };
-
 	class GJGameLevel : public cocos2d::CCNode {
 	public:
         cocos2d::CCDictionary* m_lastBuildSave; // 0xe8

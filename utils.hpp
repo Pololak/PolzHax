@@ -12,6 +12,8 @@
 
 #define CCARRAY_FOREACH_B_TYPE(__array__, __obj__, __type__) CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__*, ix)
 
+#define VARIABLE_NAME(var) (#var + 10)
+
 inline auto getExePath() {
 	char buffer[MAX_PATH];
 	GetModuleFileNameA(GetModuleHandleA(NULL), buffer, MAX_PATH);

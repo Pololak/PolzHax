@@ -10,10 +10,6 @@ namespace gd {
 	class TableViewDelegate;
 	class TableViewDataSource;
 
-	enum class TableViewCellEditingStyle {
-
-	};
-
 	class TableViewCell : public cocos2d::CCLayer {
 	public:
 		cocos2d::CCMenu* m_buttonMenu; // 0x118

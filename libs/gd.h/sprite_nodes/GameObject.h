@@ -7,49 +7,6 @@ namespace gd {
 	class CCSpritePlus;
 	class OBB2D;
 
-	enum class GameObjectType {
-		Solid = 0,
-		Basic = 1,
-		Hazard = 2,
-		InverseGravityPortal = 3,
-		NormalGravityPortal = 4,
-		ShipPortal = 5,
-		CubePortal = 6,
-		Decoration = 7,
-		PulsingDecoration = 8,
-		YellowJumpPad = 9,
-		PinkJumpPad = 10,
-		GravityPad = 11,
-		YellowJumpRing = 12,
-		PinkJumpRing = 13,
-		GravityRing = 14,
-		NormalMirrorPortal = 15,
-		InverseMirrorPortal = 16,
-		BallPortal = 17,
-		RegularSizePortal = 18,
-		MiniSizePortal = 19,
-		UfoPortal = 20,
-		Modifier = 21,
-		Breakable = 22,
-		SecretCoin = 23,
-		DualPortal = 24,
-		SoloPortal = 25,
-		Slope = 26,
-		WavePortal = 27
-	};
-
-	enum class GJCustomColorMode {
-		Default = 0,
-		PCol1 = 1,
-		PCol2 = 2,
-		Col1 = 3,
-		Col2 = 4,
-		LightBG = 5,
-		Col3 = 6,
-		Col4 = 7,
-		Col3DL = 8
-	};
-
 	class GameObject : public CCSpritePlus {
 	public:
 		bool m_isFlippedX; // 0x1c4

@@ -34,6 +34,10 @@ namespace gd {
 		bool shouldDownloadLevel() {
 			return reinterpret_cast<bool(__thiscall*)(LevelInfoLayer*)>(base + 0x9cc40)(this);
 		}
+
+		void updateLabelValues() {
+			reinterpret_cast<void(__fastcall*)(LevelInfoLayer*)>(base + 0x9eeb0)(this);
+		}
 	};
 }
 

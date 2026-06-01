@@ -64,6 +64,7 @@ namespace gd {
 }
 
 #include "GDProtocols.h"
+#include "enums.h"
 #include "delegates/delegates.h"
 
 #include "actions/CCCircleWave.h"

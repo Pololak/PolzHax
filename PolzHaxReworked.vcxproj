@@ -602,6 +602,7 @@
     <ClInclude Include="libs\gd.h\actions\CCCircleWave.h" />
     <ClInclude Include="libs\gd.h\audio_nodes\FMODAudioEngine.h" />
     <ClInclude Include="libs\gd.h\delegates\delegates.h" />
+    <ClInclude Include="libs\gd.h\include\enums.h" />
     <ClInclude Include="libs\gd.h\include\GameToolbox.h" />
     <ClInclude Include="libs\gd.h\include\gd.h" />
     <ClInclude Include="libs\gd.h\include\gdMacros.h" />

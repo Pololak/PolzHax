@@ -66,7 +66,7 @@ bool FindLevelPopup::init(gd::LevelBrowserLayer* parent) {
 
 void FindLevelPopup::onSearch(CCObject*) {
 	if (m_parent && !this->m_input->getString().empty()) {
-		LevelBrowserLayer::setCustomSearchQuery(this->m_input->getString());
+		m_parent->m_searchObject->m_searchQuery = this->m_input->getString();
 		m_parent->m_searchObject->m_page = 0;
 		m_parent->loadPage(m_parent->m_searchObject);
 	}

@@ -3495,112 +3495,82 @@ void imgui_render() {
 			static bool player1Selected = true;
 			static bool player2Selected = false;
 
-			//if (ImGui::CheckboxF("Icon Effects", &setting().onIconEffects)) {
-			//	if (playLayer) {
-			//		PlayLayer::updatePlayerColors();
-			//	}
-			//}
+			if (ImGui::CheckboxF("Icon Effects", &setting().onIconEffects)) {
+				if (playLayer) {
+					PlayLayer::updatePlayerColors();
+				}
+			}
 
-			//if (ImGui::CheckboxF("Player 1", &player1Selected)) {
-			//	player1Selected = true;
-			//	player2Selected = false;
-			//}
-			//ImGui::SameLine();
-			//ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			//if (ImGui::CheckboxF("Player 2", &player2Selected)) {
-			//	player2Selected = true;
-			//	player1Selected = false;
-			//}
+			if (ImGui::CheckboxF("Player 1", &player1Selected)) {
+				player1Selected = true;
+				player2Selected = false;
+			}
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			if (ImGui::CheckboxF("Player 2", &player2Selected)) {
+				player2Selected = true;
+				player1Selected = false;
+			}
 
-			//if (ImGui::CheckboxF("Color 1", &(player1Selected ? setting().onP1Color : setting().onP2Color))) {
-			//	if (playLayer) {
-			//		PlayLayer::updatePlayerColors();
-			//	}
-			//}
+			if (ImGui::CheckboxF("Color 1", &(player1Selected ? setting().onP1Color : setting().onP2Color))) {
+				if (playLayer) {
+					PlayLayer::updatePlayerColors();
+				}
+			}
 
-			//static float playerPrimaryColor[3] = {
-			//	setting().playerPrimaryColorR / 255.f,
-			//	setting().playerPrimaryColorG / 255.f,
-			//	setting().playerPrimaryColorB / 255.f
-			//};
+			static float playerPrimaryColor[3] = {
+				setting().playerPrimaryColorR / 255.f,
+				setting().playerPrimaryColorG / 255.f,
+				setting().playerPrimaryColorB / 255.f
+			};
 
-			//static float player2PrimaryColor[3] = {
-			//	setting().player2PrimaryColorR / 255.f,
-			//	setting().player2PrimaryColorG / 255.f,
-			//	setting().player2PrimaryColorB / 255.f
-			//};
+			static float player2PrimaryColor[3] = {
+				setting().player2PrimaryColorR / 255.f,
+				setting().player2PrimaryColorG / 255.f,
+				setting().player2PrimaryColorB / 255.f
+			};
 
-			//ImGui::SameLine();
-			//ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			//if (ImGui::ColorEdit3("##playerPrimaryColor", player1Selected ? playerPrimaryColor : player2PrimaryColor, ImGuiColorEditFlags_NoInputs)) {
-			//	(player1Selected ? setting().playerPrimaryColorR : setting().player2PrimaryColorR) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[0] * 255;
-			//	(player1Selected ? setting().playerPrimaryColorG : setting().player2PrimaryColorG) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[1] * 255;
-			//	(player1Selected ? setting().playerPrimaryColorB : setting().player2PrimaryColorB) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[2] * 255;
-
-			//	if (playLayer) {
-			//		PlayLayer::updatePlayerColors();
-			//	}
-			//}
-
-			//if (ImGui::CheckboxF("Color 2", &(player1Selected ? setting().onP1Color2 : setting().onP2Color2))) {
-			//	if (playLayer) {
-			//		PlayLayer::updatePlayerColors();
-			//	}
-			//}
-
-			//static float playerSecondaryColor[3] = {
-			//	setting().playerSecondaryColorR / 255.f,
-			//	setting().playerSecondaryColorG / 255.f,
-			//	setting().playerSecondaryColorB / 255.f
-			//};
-
-			//static float player2SecondaryColor[3] = {
-			//	setting().player2SecondaryColorR / 255.f,
-			//	setting().player2SecondaryColorG / 255.f,
-			//	setting().player2SecondaryColorB / 255.f
-			//};
-
-			//ImGui::SameLine();
-			//ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			//if (ImGui::ColorEdit3("##playerSecondaryColor", player1Selected ? playerSecondaryColor : player2SecondaryColor, ImGuiColorEditFlags_NoInputs)) {
-			//	(player1Selected ? setting().playerSecondaryColorR : setting().player2SecondaryColorR) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[0] * 255;
-			//	(player1Selected ? setting().playerSecondaryColorG : setting().player2SecondaryColorG) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[1] * 255;
-			//	(player1Selected ? setting().playerSecondaryColorB : setting().player2SecondaryColorB) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[2] * 255;
-
-			//	if (playLayer) {
-			//		PlayLayer::updatePlayerColors();
-			//	}
-			//}
-
-			/*ImGui::AlignTextToFramePadding();
-			ImGui::Text("Color 2");
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			ImGui::ColorEdit3("##playerSecondaryColor", NULL, ImGuiColorEditFlags_NoInputs);
+			if (ImGui::ColorEdit3("##playerPrimaryColor", player1Selected ? playerPrimaryColor : player2PrimaryColor, ImGuiColorEditFlags_NoInputs)) {
+				(player1Selected ? setting().playerPrimaryColorR : setting().player2PrimaryColorR) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[0] * 255;
+				(player1Selected ? setting().playerPrimaryColorG : setting().player2PrimaryColorG) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[1] * 255;
+				(player1Selected ? setting().playerPrimaryColorB : setting().player2PrimaryColorB) = (player1Selected ? playerPrimaryColor : player2PrimaryColor)[2] * 255;
 
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Glow");
+				if (playLayer) {
+					PlayLayer::updatePlayerColors();
+				}
+			}
+
+			if (ImGui::CheckboxF("Color 2", &(player1Selected ? setting().onP1Color2 : setting().onP2Color2))) {
+				if (playLayer) {
+					PlayLayer::updatePlayerColors();
+				}
+			}
+
+			static float playerSecondaryColor[3] = {
+				setting().playerSecondaryColorR / 255.f,
+				setting().playerSecondaryColorG / 255.f,
+				setting().playerSecondaryColorB / 255.f
+			};
+
+			static float player2SecondaryColor[3] = {
+				setting().player2SecondaryColorR / 255.f,
+				setting().player2SecondaryColorG / 255.f,
+				setting().player2SecondaryColorB / 255.f
+			};
+
 			ImGui::SameLine();
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			ImGui::ColorEdit3("##playerGlowColor", NULL, ImGuiColorEditFlags_NoInputs);
+			if (ImGui::ColorEdit3("##playerSecondaryColor", player1Selected ? playerSecondaryColor : player2SecondaryColor, ImGuiColorEditFlags_NoInputs)) {
+				(player1Selected ? setting().playerSecondaryColorR : setting().player2SecondaryColorR) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[0] * 255;
+				(player1Selected ? setting().playerSecondaryColorG : setting().player2SecondaryColorG) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[1] * 255;
+				(player1Selected ? setting().playerSecondaryColorB : setting().player2SecondaryColorB) = (player1Selected ? playerSecondaryColor : player2SecondaryColor)[2] * 255;
 
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Trail");
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			ImGui::ColorEdit3("##playerTrailColor", NULL, ImGuiColorEditFlags_NoInputs);
-
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Particles");
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			ImGui::ColorEdit3("##playerParticlesColor", NULL, ImGuiColorEditFlags_NoInputs);
-
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Wave Trail");
-			ImGui::SameLine();
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 30.f);
-			ImGui::ColorEdit3("##playerWaveTrailColor", NULL, ImGuiColorEditFlags_NoInputs);*/
+				if (playLayer) {
+					PlayLayer::updatePlayerColors();
+				}
+			}
 
 			if (ImGui::CheckboxF("Same Dual Color", &setting().onSameDualColor)) {
 				if (playLayer) {

@@ -13,26 +13,6 @@ namespace gd {
 	class CCMenuItemToggler;
 	class CreateMenuItem;
 
-	enum class EditCommand {
-		SmallLeft = 1,
-		SmallRight = 2,
-		SmallUp = 3,
-		SmallDown = 4,
-
-		Left = 5,
-		Right = 6,
-		Up = 7,
-		Down = 8,
-
-		BigLeft = 9,
-		BigRight = 10,
-		BigUp = 11,
-		BigDown = 12,
-
-		FlipX = 21,
-		FlipY = 22
-	};
-
 	class GJRotationControl : public cocos2d::CCLayer {
 	public:
 		cocos2d::CCPoint m_cursorDifference; // 0x118

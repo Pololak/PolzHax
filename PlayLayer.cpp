@@ -166,8 +166,9 @@ void PlayLayer::prevStartPos() {
 std::vector<gd::GameObject*> m_colorTriggers;
 
 void setupStartPos(gd::StartPosObject* startPos) { // Eclipse menu https://github.com/EclipseMenu/EclipseMenu/blob/main/src/hacks/Level/SmartStartPos.cpp
+	gd::PlayLayer* playLayer = gd::GameManager::sharedState()->m_playLayer;
 	gd::LevelSettingsObject* startPosSettings = startPos->m_settings;
-	gd::LevelSettingsObject* levelSettings = gd::GameManager::sharedState()->getPlayLayer()->m_levelSettings;
+	gd::LevelSettingsObject* levelSettings = playLayer->m_levelSettings;
 
 	startPosSettings->m_startDual = levelSettings->m_startDual;
 	startPosSettings->m_startMode = levelSettings->m_startMode;
@@ -175,8 +176,9 @@ void setupStartPos(gd::StartPosObject* startPos) { // Eclipse menu https://githu
 	startPosSettings->m_startSpeed = levelSettings->m_startSpeed;
 
 	gd::GameObject* obj = getClosestObject(m_dualPortals, startPos);
-	if (obj)
+	if (obj) {
 		startPosSettings->m_startDual = obj->m_objectID == 286;
+	}
 
 	obj = getClosestObject(m_gamemodePortals, startPos);
 
@@ -1293,6 +1295,10 @@ void __fastcall PlayLayer::updateVisibilityH(gd::PlayLayer* self) {
 		self->m_player2->m_audioScale = 1.f;
 	}
 	//
+
+	if (!gd::GameManager::sharedState()->getGameVariable("0024") && !self->m_showingEndLayer) {
+		CCEGLView::sharedOpenGLView()->showCursor(setting().show);
+	}
 }
 
 void __fastcall PlayLayer::updateAttemptsH(gd::PlayLayer* self) {
@@ -1521,6 +1527,12 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 	PlayLayer::releaseButton(self, p0, p1);
 }
 
+void __fastcall PlayLayer::drawH(gd::PlayLayer* self) {
+	PlayLayer::draw(self);
+
+	
+}
+
 void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	PlayLayer::destructor(self);
 	m_labelsNode = nullptr;
@@ -1558,6 +1570,7 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0a00), PlayLayer::pushButtonH, reinterpret_cast<void**>(&PlayLayer::pushButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0af0), PlayLayer::releaseButtonH, reinterpret_cast<void**>(&PlayLayer::releaseButton));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee5e0), PlayLayer::drawH, reinterpret_cast<void**>(&PlayLayer::draw));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayLayer::collidedWithObjectH, reinterpret_cast<void**>(&PlayLayer::collidedWithObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeb28f), hazardDeathObjectH, reinterpret_cast<void**>(&hazardObject));
