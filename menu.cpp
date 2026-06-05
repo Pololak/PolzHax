@@ -167,9 +167,9 @@ void updateSpeedhack() {
 	SpeedHack::SetSpeed(setting().onClassicMode ? value : 1.f);
 
 	if (auto fme = gd::FMODAudioEngine::sharedEngine()) {
-		if (auto sound = fme->m_globalChannel) {
-			if (setting().onSpeedhackAudio) sound->setPitch(value);
-			else sound->setPitch(1.f);
+		auto musicChannel = fme->m_globalChannel;
+		if (musicChannel) {
+			musicChannel->setPitch(setting().onSpeedhackAudio ? value : 1.f);
 		}
 	}
 }

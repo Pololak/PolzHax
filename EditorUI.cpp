@@ -733,7 +733,6 @@ void __fastcall EditorUI::setupDeleteMenuH(gd::EditorUI* self) {
 void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key) {
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf4);
 	auto kb = CCDirector::sharedDirector()->getKeyboardDispatcher();
-	bool ctrlPressed = kb->getControlKeyPressed();
 	bool ctrlAltPressed = kb->getControlKeyPressed() && kb->getAltKeyPressed();
 	bool shiftPressed = kb->getShiftKeyPressed();
 
@@ -764,10 +763,6 @@ void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key)
 	}
 	else if (key == KEY_E && shiftPressed) {
 		self->transformObjectCall(static_cast<gd::EditCommand>(121));
-	}
-	else if (key == KEY_X && ctrlPressed) {
-		self->onCopy(nullptr);
-		self->onDeleteSelected(nullptr);
 	}
 	else if (key == KEY_F3) {
 		setting().onPreviewMode = !setting().onPreviewMode;
