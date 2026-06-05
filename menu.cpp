@@ -633,10 +633,14 @@ void imgui_render() {
 		// Creator
 
 		if (setting().onAbsolutePosition) {
-			sequence_patch(gd::base + 0x4b49d, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 });
+			sequence_patch(gd::base + 0x4b49d, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 }); // EditorUI::moveObject()
+			sequence_patch(gd::base + 0x4be15, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 }); // EditorUI::flipObjectsX()
+			sequence_patch(gd::base + 0x4c205, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 }); // EditorUI::flipObjectsY()
 		}
 		else {
 			sequence_patch(gd::base + 0x4b49d, { 0x51, 0x8b, 0xcf, 0xff, 0x50, 0x5c });
+			sequence_patch(gd::base + 0x4be15, { 0x51, 0x8b, 0xcf, 0xff, 0x56, 0x5c });
+			sequence_patch(gd::base + 0x4c205, { 0x51, 0x8b, 0xcf, 0xff, 0x56, 0x5c });
 		}
 
 		if (setting().onCopyHack) {
@@ -2062,13 +2066,17 @@ void imgui_render() {
 		if (ImGui::Begin("Creator", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			if (ImGui::CheckboxF("Absolute Position", &setting().onAbsolutePosition)) {
 				if (setting().onAbsolutePosition) {
-					sequence_patch(gd::base + 0x4b49d, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 });
+					sequence_patch(gd::base + 0x4b49d, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 }); // EditorUI::moveObject()
+					sequence_patch(gd::base + 0x4be15, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 }); // EditorUI::flipObjectsX()
+					sequence_patch(gd::base + 0x4c205, { 0x90, 0x8b, 0xcf, 0x90, 0x90, 0x90 }); // EditorUI::flipObjectsY()
 				}
 				else {
 					sequence_patch(gd::base + 0x4b49d, { 0x51, 0x8b, 0xcf, 0xff, 0x50, 0x5c });
+					sequence_patch(gd::base + 0x4be15, { 0x51, 0x8b, 0xcf, 0xff, 0x56, 0x5c });
+					sequence_patch(gd::base + 0x4c205, { 0x51, 0x8b, 0xcf, 0xff, 0x56, 0x5c });
 				}
 			}
-			ImGui::Tooltip("Locks object position for rotation.");
+			ImGui::Tooltip("Locks objects position for rotation/flipping.");
 
 			if (ImGui::CheckboxF("Copy Hack", &setting().onCopyHack)) {
 				if (setting().onCopyHack) {
@@ -2715,7 +2723,9 @@ void imgui_render() {
 					sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
 				}
 
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::Tooltip("Makes the player invincible.");
 			ImGui::SameLine(170.f * setting().UISize);
@@ -3219,7 +3229,9 @@ void imgui_render() {
 				if (setting().labelsScale < .1f) setting().labelsScale = .1f;
 				if (setting().labelsScale > 3.f) setting().labelsScale = 3.f;
 
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
@@ -3228,262 +3240,348 @@ void imgui_render() {
 				if (setting().labelsOpacity < .1f) setting().labelsOpacity = .1f;
 				if (setting().labelsOpacity > 1.f) setting().labelsOpacity = 1.f;
 
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 
 			if (ImGui::CheckboxF("Hide All", &setting().onHideLabels)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 
 			if (ImGui::CheckboxF("Cheat Indicator", &setting().onCheatIndicator)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##ciSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##ciPos", &setting().cheatIndicatorPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Message", &setting().onMessageLabel)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##msgSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##msgCounterPos", &setting().messagePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::InputText("##message", &setting().message)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Best Run", &setting().onBestRunLabel)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##brunSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##brunPos", &setting().bestRunPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().bestRunPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Attempt", &setting().onAttemptsLabel)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##attsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##attsCounterPos", &setting().attemptsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().attemptsPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("FPS Counter", &setting().onFPSCounter)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##fpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##fpsCounterPos", &setting().fpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().fpsPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show ImGui FPS", &setting().useImGuiFps)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("CPS Counter", &setting().onCPSCounter)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##cpsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##cpsCounterPos", &setting().cpsCounterPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().cpsPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Max CPS", &setting().cpsMax)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Total Clicks", &setting().cpsTotal)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Jumps", &setting().onJumpsLabel)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##jmpSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##jumpsCounterPos", &setting().jumpsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().jumpsPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Clock", &setting().onClockLabel)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##clkSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##clkPos", &setting().clockPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Session Time", &setting().onSessionTime)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##stimeSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##stimePos", &setting().sessionTimePos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Noclip Accuracy", &setting().onNoclipAccuracy)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##naccSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##naccPos", &setting().nocAccPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().nocAccPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Noclip Deaths", &setting().onNoclipDeaths)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##ndthsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##ndthsPos", &setting().nocDeathsPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Show Prefix", &setting().nocDeathsPrefix)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Meta", &setting().onMetaLabel)) {
-				PlayLayer::updateStatusLabels();
+				if (playLayer) {
+					PlayLayer::updateStatusLabels();
+				}
 			}
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##metaSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetNextItemWidth(160.f * setting().UISize);
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::Combo("##metaPos", &setting().metaPos, statusLabelsPosition, IM_ARRAYSIZE(statusLabelsPosition))) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("X Pos", &setting().playerXPos)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Y Pos", &setting().playerYPos)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Y Velocity", &setting().playerYVel)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Rotation", &setting().playerRot)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Gravity", &setting().playerGrav)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Speed", &setting().playerSpd)) {
-					PlayLayer::updateStatusLabels();
+					if (playLayer) {
+						PlayLayer::updateStatusLabels();
+					}
 				}
 
 				ImGui::TreePop();

@@ -22,8 +22,6 @@
 //
 //DiscordManager ds;
 
-#define SETTING_NAME(var) (#var + 10)
-
 bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	if (!MenuLayer::init(self)) return false;
 
@@ -38,7 +36,16 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	Icons::patchBird(Icons::getCount("bird", "001"));
 	Icons::patchDart(Icons::getCount("dart", "001"), setting().selectedDartIdx);
 
-	std::cout << SETTING_NAME(setting().show) << std::endl;
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+
+	switch (tm.tm_mon)
+	{
+	case 11:
+		CCParticleSnow* snow = CCParticleSnow::createWithTotalParticles(700);
+		self->addChild(snow);
+		break;
+	}
 
 	setting().save();
 	//auto checkpoint = CCSprite::createWithSpriteFrameName("checkpoint_01_001.png");

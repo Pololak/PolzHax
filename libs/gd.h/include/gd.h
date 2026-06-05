@@ -134,6 +134,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/InfoLayer.h"
 #include "layers_scenes_transitions_nodes/LeaderboardsLayer.h"
 #include "layers_scenes_transitions_nodes/MoreSearchLayer.h"
+#include "layers_scenes_transitions_nodes/ShareLevelLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
 

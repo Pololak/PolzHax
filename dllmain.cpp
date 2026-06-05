@@ -27,6 +27,7 @@
 #include "LevelInfoLayer.hpp"
 #include "LevelSearchLayer.hpp"
 #include "LevelSettingsLayer.hpp"
+#include "LoadingLayer.hpp"
 #include "MenuGameLayer.hpp"
 #include "MenuLayer.hpp"
 #include "MoreSearchLayer.hpp"
@@ -35,6 +36,7 @@
 #include "PlayerObject.hpp"
 #include "PlayLayer.hpp"
 #include "SetGroupIDLayer.hpp"
+#include "ShareLevelLayer.hpp"
 #include "SimplePlayer.hpp"
 #include "UILayer.hpp"
 
@@ -339,6 +341,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	LevelInfoLayer::mem_init();
 	LevelSearchLayer::mem_init();
 	LevelSettingsLayer::mem_init();
+	LoadingLayer::mem_init();
 	//MenuGameLayer::mem_init();
 	MenuLayer::mem_init();
 	MoreSearchLayer::mem_init();
@@ -348,6 +351,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	PlayLayer::mem_init();
 	RingObject::mem_init();
 	SetGroupIDLayer::mem_init();
+	//ShareLevelLayer::mem_init();
 	SimplePlayer::mem_init();
 	UILayer::mem_init();
 

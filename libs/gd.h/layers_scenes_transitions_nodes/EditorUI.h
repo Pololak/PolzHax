@@ -205,6 +205,10 @@ namespace gd {
 			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x41e60)(this);
 		}
 
+		void onCopy(cocos2d::CCObject* sender) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x490c0)(this, sender);
+		}
+
 		void onDuplicate(cocos2d::CCObject* sender) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, cocos2d::CCObject*)>(base + 0x48e70)(this, sender);
 		}

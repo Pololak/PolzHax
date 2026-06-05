@@ -31,6 +31,10 @@ namespace gd {
 
 			return ret;
 		}
+
+		void setString(char const* str) {
+			reinterpret_cast<void(__thiscall*)(TextArea*, char const*)>(base + 0x20220)(this, str);
+		}
 	};
 	#pragma runtime_checks("s", restore)
 }

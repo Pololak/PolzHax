@@ -4,27 +4,19 @@
 #include <gd.h>
 
 namespace gd {
-	class LoadingLayer : public cocos2d::CCLayer {
-	protected:
-		PAD(4);
-		int m_nLoadIndex;
-		cocos2d::CCLabelBMFont* m_pCaption;
-		PAD(4);
-		//artifacts of rob debugging something
-		cocos2d::CCSprite* m_pSliderBar;
-		float m_fSliderGrooveXPos;
-		PAD(4);
-		bool m_bFromRefresh;
+	class TextArea;
 
+	class LoadingLayer : public cocos2d::CCLayer {
 	public:
-		static LoadingLayer* create(bool fromReload) {
-			return reinterpret_cast<LoadingLayer* (__fastcall*)(bool)>(
-				base + 0x18BFE0
-				)(fromReload);
-		}
-		void setFromRefresh(bool value) {
-			m_bFromRefresh = value;
-		}
+		bool m_unknown; // 0x118
+		bool m_unknown2; // 0x119
+		int m_loadStep; // 0x11c
+		cocos2d::CCLabelBMFont* m_caption; // 0x120
+		TextArea* m_textArea; // 0x124
+		cocos2d::CCSprite* m_sliderBar; // 0x128
+		float m_sliderGrooveXPos; // 0x12c
+		float m_sliderGrooveHeight; // 0x130
+		bool m_fromRefresh; // 0x134
 	};
 }
 

@@ -644,6 +644,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ScrollingLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SelectArtLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SetGroupIDLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ShareLevelLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\UILayer.h" />
     <ClInclude Include="libs\gd.h\level_nodes\EndPortalObject.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h" />
@@ -700,6 +701,7 @@
     <ClInclude Include="libs\nfd\src\include\nfd.h" />
     <ClInclude Include="libs\nfd\src\nfd_common.h" />
     <ClInclude Include="LiveColorEdit.hpp" />
+    <ClInclude Include="LoadingLayer.hpp" />
     <ClInclude Include="matplist.hpp" />
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="MenuGameLayer.hpp" />
@@ -721,6 +723,7 @@
     <ClInclude Include="RotateSaws.hpp" />
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
+    <ClInclude Include="ShareLevelLayer.hpp" />
     <ClInclude Include="SimplePlayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
     <ClInclude Include="SURVEY_PROGRAM.hpp" />
@@ -793,6 +796,7 @@
     <ClCompile Include="libs\nfd\src\nfd_common.c" />
     <ClCompile Include="libs\nfd\src\nfd_win.cpp" />
     <ClCompile Include="LiveColorEdit.cpp" />
+    <ClCompile Include="LoadingLayer.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuGameLayer.cpp" />
     <ClCompile Include="MenuLayer.cpp" />
@@ -816,6 +820,7 @@
     <ClCompile Include="RotateSaws.cpp" />
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
+    <ClCompile Include="ShareLevelLayer.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />
     <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="SURVEY_PROGRAM.cpp" />

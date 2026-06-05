@@ -1800,6 +1800,15 @@
     <ClInclude Include="libs\gd.h\include\enums.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="ShareLevelLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ShareLevelLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadingLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2064,6 +2073,12 @@
       <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
     <ClCompile Include="HardStreak.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="ShareLevelLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadingLayer.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>

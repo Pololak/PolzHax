@@ -21,7 +21,7 @@ namespace gd {
 		ScrollingLayer* m_scrollingLayer; // 0x1b0
 		int m_scrollAction; // 0x1b4
 		bool m_containsBorder; // 0x1b8
-		bool m_noAction; // 0x1bc
+		bool m_noAction; // 0x1b9
 
 		virtual ~FLAlertLayer() {
 			cocos2d::CCDirector::sharedDirector()->getTouchDispatcher()->decrementForcePrio();
