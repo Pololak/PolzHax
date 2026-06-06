@@ -516,7 +516,7 @@ void updateBestRunLabel() {
 			m_bestRunPercentage = newBest;
 		}
 
-		m_bestRunLabel->setString((prefix + std::to_string(static_cast<int>(m_bestRunPercentage)) + "%").c_str());
+		m_bestRunLabel->setString((prefix + std::to_string(static_cast<int>(roundf(m_bestRunPercentage))) + "%").c_str());
 
 		if (m_bestRunPercentage == 0) {
 			m_bestRunLabel->setString((prefix + "None").c_str());

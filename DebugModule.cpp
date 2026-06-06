@@ -143,6 +143,21 @@ void renderDebugModule() {
 			float screenBorderRight = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenRight(), 0.f }).x;
 			ImGui::Text("Screen Borders: %f/%f", screenBorderLeft, screenBorderRight);
 		}
+
+		//auto mdm = gd::MusicDownloadManager::sharedState();
+
+		//static int musicID = 0;
+		//ImGui::SetNextItemWidth(120.f);
+		//ImGui::InputInt("Song ID", &musicID);
+
+		//if (mdm->isSongDownloaded(musicID)) {
+		//	auto songObject = mdm->getSongInfoObject(musicID);
+		//	if (songObject) {
+		//		ImGui::Text("Song Name: %s", songObject->m_songName);
+		//		ImGui::Text("Artist Name: %s", songObject->m_artistName);
+		//		ImGui::Text("File size: %f", songObject->m_fileSize);
+		//	}
+		//}
 	}
 	ImGui::End();
 }

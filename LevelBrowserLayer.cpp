@@ -21,6 +21,7 @@ void LevelBrowserLayer::updatePageButton(gd::LevelBrowserLayer* self) {
 			auto label = static_cast<CCLabelBMFont*>(sprite->getChildren()->objectAtIndex(0));
 			if (label) {
 				label->setString(CCString::createWithFormat("%i", self->m_searchObject->m_page + 1)->getCString());
+				label->setScale(1.f);
 				label->limitLabelWidth(32.f, .8f, 0.f);
 			}
 		}

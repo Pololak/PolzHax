@@ -656,6 +656,7 @@
     <ClInclude Include="libs\gd.h\manager_nodes\GameStatsManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\LocalLevelManager.h" />
+    <ClInclude Include="libs\gd.h\manager_nodes\MusicDownloadManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\ObjectToolbox.h" />
     <ClInclude Include="libs\gd.h\menu_nodes\CCMenuItemSpriteExtra.h" />
     <ClInclude Include="libs\gd.h\menu_nodes\CCMenuItemToggler.h" />

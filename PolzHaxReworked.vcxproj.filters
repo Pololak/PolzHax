@@ -1809,6 +1809,9 @@
     <ClInclude Include="LoadingLayer.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="libs\gd.h\manager_nodes\MusicDownloadManager.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

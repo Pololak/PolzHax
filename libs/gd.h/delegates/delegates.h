@@ -150,6 +150,11 @@ namespace gd {
 		virtual float cellHeightForRowAtIndexPath(CCIndexPath&, TableView*) { return 0; }
 		virtual void didSelectRowAtIndexPath(CCIndexPath&, TableView*) {}
 	};
+
+	class PlatformDownloadDelegate {
+		virtual void downloadFinished(char const*);
+		virtual void downloadFailed(char const*);
+	};
 }
 
 #endif // !__DELEGATES_H__

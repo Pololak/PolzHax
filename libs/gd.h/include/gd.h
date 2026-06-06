@@ -84,6 +84,7 @@ namespace gd {
 #include "manager_nodes/GameStatsManager.h"
 #include "manager_nodes/LocalLevelManager.h"
 #include "manager_nodes/ObjectToolbox.h"
+#include "manager_nodes/MusicDownloadManager.h"
 
 #include "scroll_nodes/CCContentLayer.h"
 #include "scroll_nodes/CCIndexPath.h"
