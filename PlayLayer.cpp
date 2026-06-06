@@ -486,6 +486,8 @@ void updateSessionTimeLabel() {
 
 void updateBestRunLabel() {
 	if (m_bestRunLabel && m_bestRunLabel->isVisible()) {
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
 		std::string prefix;
 
 		if (setting().bestRunPrefix) {
@@ -494,8 +496,8 @@ void updateBestRunLabel() {
 
 		float newBest = roundf(m_lastRun);
 
-		if (m_startPositions.size()) {
-			if (m_currentStartPos > -1) {
+		if (playLayer->m_testMode) {
+			if (m_currentStartPos != -1) {
 				int startPosLevelPos = static_cast<int>(roundf(m_startPositions[m_currentStartPos]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
 				int newStartPosBest = static_cast<int>(roundf(m_startPositionsBestRun[m_startPositions[m_currentStartPos]].first));
 
@@ -505,15 +507,16 @@ void updateBestRunLabel() {
 				else {
 					m_bestRunLabel->setString((prefix + "None").c_str());
 				}
-
-				return;
 			}
+
+			return;
 		} 
 
 		if (newBest >= m_bestRunPercentage) {
 			m_bestRunPercentage = newBest;
-			m_bestRunLabel->setString((prefix + std::to_string(static_cast<int>(newBest)) + "%").c_str());
 		}
+
+		m_bestRunLabel->setString((prefix + std::to_string(static_cast<int>(m_bestRunPercentage)) + "%").c_str());
 
 		if (m_bestRunPercentage == 0) {
 			m_bestRunLabel->setString((prefix + "None").c_str());
