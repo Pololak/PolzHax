@@ -149,6 +149,7 @@ namespace gd {
 #include "sprite_nodes/TextArea.h"
 #include "sprite_nodes/HardStreak.h"
 #include "sprite_nodes/SimplePlayer.h"
+#include "sprite_nodes/SearchButton.h"
 
 #include "text_input_nodes/CCTextInputNode.h"
 

@@ -682,6 +682,7 @@
     <ClInclude Include="libs\gd.h\sprite_nodes\GameObject.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\HardStreak.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\PlayerObject.h" />
+    <ClInclude Include="libs\gd.h\sprite_nodes\SearchButton.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\SimplePlayer.h" />
     <ClInclude Include="libs\gd.h\sprite_nodes\TextArea.h" />
     <ClInclude Include="libs\gd.h\text_input_nodes\CCTextInputNode.h" />

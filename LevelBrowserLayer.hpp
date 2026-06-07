@@ -29,6 +29,9 @@ namespace LevelBrowserLayer {
 
 		void onDeleteSelected(CCObject*);
 		void onSelectAll(CCObject*);
+
+		void onFavorites(CCObject*);
+		void onSaved(CCObject*);
 	};
 
 	void mem_init();

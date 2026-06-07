@@ -5,6 +5,7 @@
 #include <fstream>
 #include "FindLevelPopup.hpp"
 #include "GoToPagePopup.hpp"
+#include "Setting.hpp"
 
 std::string m_customSearchQuery;
 
@@ -122,6 +123,14 @@ void LevelBrowserLayer::Callback::onImportLevel(CCObject*) {
 	}
 }
 
+void LevelBrowserLayer::Callback::onFavorites(CCObject*) {
+	CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(static_cast<gd::SearchType>(100)))));
+}
+
+void LevelBrowserLayer::Callback::onSaved(CCObject*) {
+	CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::LevelBrowserLayer::scene(gd::GJSearchObject::create(gd::SearchType::SavedLevels))));
+}
+
 bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* searchObject) {
 	if (!LevelBrowserLayer::init(self, searchObject)) return false;
 
@@ -213,11 +222,37 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 		//deleteMenu->addChild(onSelectAll, 0, 1);
 	}
 
+	if (setting().onDeveloperMode) {
+		if (searchObject->m_searchType == gd::SearchType::SavedLevels || searchObject->m_searchType == static_cast<gd::SearchType>(100)) {
+			auto menu = CCMenu::create();
+			self->addChild(menu);
+
+			CCSprite* onFavoritesSpr = nullptr;
+			SEL_MenuHandler callback = nullptr;
+			if (searchObject->m_searchType == gd::SearchType::SavedLevels) {
+				onFavoritesSpr = CCSprite::create("GJ_heartOn_001.png");
+				callback = static_cast<SEL_MenuHandler>(&LevelBrowserLayer::Callback::onFavorites);
+			}
+			else {
+				onFavoritesSpr = CCSprite::create("GJ_heartOff_001.png");
+				callback = static_cast<SEL_MenuHandler>(&LevelBrowserLayer::Callback::onSaved);
+			}
+
+			auto onFavorites = gd::CCMenuItemSpriteExtra::create(onFavoritesSpr, self, callback);
+			onFavorites->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 68.f, director->getScreenBottom() + 30.f }));
+			menu->addChild(onFavorites);
+		}
+	}
+
 	return true;
 }
 
 void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* searchObject) {
 	LevelBrowserLayer::loadPage(self, searchObject);
+
+	if (searchObject->m_searchType == static_cast<gd::SearchType>(100)) {
+
+	}
 
 	//if (searchObject->m_searchQuery.size()) {
 	//	if (searchObject->m_searchType == gd::SearchType::MyLevels) {

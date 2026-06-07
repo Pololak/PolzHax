@@ -30,6 +30,10 @@ namespace gd {
             return ret;
         }
 
+        static GJSearchObject* create(SearchType type) {
+            return GJSearchObject::create(type, "");
+        }
+
         const char* getKey() {
             return reinterpret_cast<const char*(__fastcall*)(GJSearchObject*)>(base + 0x65570)(this);
         }

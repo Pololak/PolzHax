@@ -212,6 +212,61 @@ void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, boo
 void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::togglePlayerScale(self, p0);
 
+	if (setting().onModernParticles) {
+		self->m_playerGroundParticles->setScale(1.f);
+		self->m_trailingParticles->setScale(1.f);
+		self->m_shipClickParticles->setScale(1.f);
+		self->m_vehicleGroundParticles->setScale(1.f);
+		self->m_ufoClickParticles->setScale(1.f);
+		self->m_landParticles->setScale(1.f);
+		self->m_landParticles2->setScale(1.f);
+
+		if (p0) {
+			self->m_playerGroundParticles->m_fStartSize = self->m_playerGroundParticles->m_fStartSize * self->m_playerScale;
+			self->m_playerGroundParticles->m_fStartSizeVar = self->m_playerGroundParticles->m_fStartSizeVar * self->m_playerScale;
+
+			self->m_trailingParticles->m_fStartSize = self->m_trailingParticles->m_fStartSize * self->m_playerScale;
+			self->m_trailingParticles->m_fStartSizeVar = self->m_trailingParticles->m_fStartSizeVar * self->m_playerScale;
+
+			self->m_shipClickParticles->m_fStartSize = self->m_shipClickParticles->m_fStartSize * .4f;
+			self->m_shipClickParticles->m_fStartSizeVar = self->m_shipClickParticles->m_fStartSizeVar * .4f;
+
+			self->m_vehicleGroundParticles->m_fStartSize = self->m_vehicleGroundParticles->m_fStartSize * self->m_playerScale;
+			self->m_vehicleGroundParticles->m_fStartSizeVar = self->m_vehicleGroundParticles->m_fStartSizeVar * self->m_playerScale;
+
+			self->m_ufoClickParticles->m_fStartSize = self->m_ufoClickParticles->m_fStartSize * self->m_playerScale;	
+			self->m_ufoClickParticles->m_fStartSizeVar = self->m_ufoClickParticles->m_fStartSizeVar * self->m_playerScale;
+
+			self->m_landParticles->m_fStartSize = self->m_landParticles->m_fStartSize * self->m_playerScale;
+			self->m_landParticles->m_fStartSizeVar = self->m_landParticles->m_fStartSizeVar * self->m_playerScale;
+
+			self->m_landParticles2->m_fStartSize = self->m_landParticles2->m_fStartSize * self->m_playerScale;
+			self->m_landParticles2->m_fStartSizeVar = self->m_landParticles2->m_fStartSizeVar * self->m_playerScale;
+		}
+		else {
+			self->m_playerGroundParticles->m_fStartSize = 4.f;
+			self->m_playerGroundParticles->m_fStartSizeVar = 3.f;
+
+			self->m_trailingParticles->m_fStartSize = 4.f;
+			self->m_trailingParticles->m_fStartSizeVar = 3.f;
+
+			self->m_shipClickParticles->m_fStartSize = 6.f;
+			self->m_shipClickParticles->m_fStartSizeVar = 4.5f;
+
+			self->m_vehicleGroundParticles->m_fStartSize = 3.f;
+			self->m_vehicleGroundParticles->m_fStartSizeVar = 2.f;
+
+			self->m_ufoClickParticles->m_fStartSize = 8.f;
+			self->m_ufoClickParticles->m_fStartSizeVar = 2.f;
+
+			self->m_landParticles->m_fStartSize = 5.f;
+			self->m_landParticles->m_fStartSizeVar = 3.f;
+
+			self->m_landParticles2->m_fStartSize = 5.f;
+			self->m_landParticles2->m_fStartSizeVar = 3.f;
+		}
+	}
+
 	//if (setting().onNoMiniIcon && p0) {
 	//	if (self->m_rollMode) {
 	//		self->updatePlayerRollFrame(gd::GameManager::sharedState()->m_playerBall);

@@ -28,6 +28,10 @@ void LevelInfoLayer::Callback::onMoveToTop(CCObject*) {
 	layer->show();
 }
 
+void LevelInfoLayer::Callback::onFavorite(CCObject*) {
+
+}
+
 bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGameLevel* level) {
 	m_songWidget = nullptr;
 	if (!LevelInfoLayer::init(self, level)) return false;
@@ -75,6 +79,13 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 		ss << "m_featured: " << level->m_featured << std::endl;
 
 		developerLabel->setString(ss.str().c_str());
+
+		auto onFavoriteOff = CCSprite::create("GJ_heartOff_001.png");
+		auto onFavoriteOn = CCSprite::create("GJ_heartOn_001.png");
+
+		auto onFavorite = gd::CCMenuItemToggler::create(onFavoriteOff, onFavoriteOn, self, menu_selector(LevelInfoLayer::Callback::onFavorite));
+		onFavorite->setPosition(actionsMenu->convertToNodeSpace({ director->getScreenLeft() + 68.f, director->getScreenBottom() + 30.f }));
+		actionsMenu->addChild(onFavorite);
 	}
 
 	return true;

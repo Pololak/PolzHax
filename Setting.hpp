@@ -51,6 +51,7 @@ struct SettingStruct {
 	bool onInversedTrail;
 	bool onMaxParticles;
 	bool onMiniCubeIcon;
+	bool onModernParticles;
 	bool onNoAnimations;
 	bool onNoBackgroundFlash;
 	bool onNoCompletionEffect;
@@ -281,6 +282,7 @@ DEF_SCHEMA(
 	onInversedTrail,
 	onMaxParticles,
 	onMiniCubeIcon,
+	onModernParticles,
 	onNoAnimations,
 	onNoBackgroundFlash,
 	onNoCompletionEffect,

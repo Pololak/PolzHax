@@ -61,8 +61,8 @@ namespace gd {
 		cocos2d::CCParticleSystemQuad* m_vehicleGroundParticles; // 0x418
 		cocos2d::CCParticleSystemQuad* m_ufoClickParticles; // 0x41c
 		PAD(4)
-		cocos2d::CCParticleSystemQuad* m_landParticle; // 0x424
-		cocos2d::CCParticleSystemQuad* m_landParticle2; // 0x428
+		cocos2d::CCParticleSystemQuad* m_landParticles; // 0x424
+		cocos2d::CCParticleSystemQuad* m_landParticles2; // 0x428
 		PAD(8)
 		int m_streakType; // 0x434
 		PAD(12)

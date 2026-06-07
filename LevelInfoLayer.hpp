@@ -28,6 +28,7 @@ namespace LevelInfoLayer {
 		void onExportLevel(CCObject*);
 		void onGarage(CCObject*);
 		void onMoveToTop(CCObject*);
+		void onFavorite(CCObject*);
 	};
 
 	void mem_init();
