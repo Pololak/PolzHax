@@ -1182,7 +1182,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.0 (Vanilla)");
+			ImGui::Text("1.920 - v1.3.1 (Vanilla)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1774,6 +1774,13 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Makes game animations instant (e.g. buttons).");
+
+			if (ImGui::CheckboxF("No Background Effect", &setting().onNoBackgroundEffect)) {
+				if (playLayer) {
+					playLayer->m_glitterParticleSystem->setVisible(!setting().onNoBackgroundEffect);
+				}
+			}
+			ImGui::Tooltip("Disables background particles.");
 
 			if (ImGui::CheckboxF("No Background Flash", &setting().onNoBackgroundFlash)) {
 				if (setting().onNoBackgroundFlash) {

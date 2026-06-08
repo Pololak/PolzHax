@@ -53,6 +53,7 @@ struct SettingStruct {
 	bool onMiniCubeIcon;
 	bool onModernParticles;
 	bool onNoAnimations;
+	bool onNoBackgroundEffect;
 	bool onNoBackgroundFlash;
 	bool onNoCompletionEffect;
 	bool onNoCompletionPopup;
@@ -284,6 +285,7 @@ DEF_SCHEMA(
 	onMiniCubeIcon,
 	onModernParticles,
 	onNoAnimations,
+	onNoBackgroundEffect,
 	onNoBackgroundFlash,
 	onNoCompletionEffect,
 	onNoCompletionPopup,

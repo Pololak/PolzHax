@@ -827,6 +827,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	self->m_player2->m_shipClickParticles->setVisible(!setting().onNoVehicleParticles);
 	self->m_player->m_ufoClickParticles->setVisible(!setting().onNoVehicleParticles);
 	self->m_player2->m_ufoClickParticles->setVisible(!setting().onNoVehicleParticles);
+
+	self->m_glitterParticleSystem->setVisible(!setting().onNoBackgroundEffect);
 	//
 
 	auto director = CCDirector::sharedDirector();

@@ -260,6 +260,9 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	CCMenu* leftMenu = static_cast<CCMenu*>(self->m_undoBtn->getParent());
 	CCMenu* rightMenu = static_cast<CCMenu*>(self->m_deselectBtn->getParent());
 
+	self->m_positionSlider->setAnchorPoint({ 0.f, 0.f });
+	self->m_positionSlider->setScale(.8f);
+
 	auto objectInfoLabel = CCLabelBMFont::create("", "chatFont.fnt");
 	objectInfoLabel->setAnchorPoint({ 0.f, 1.f });
 	objectInfoLabel->setScale(.6f);
