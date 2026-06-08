@@ -750,14 +750,33 @@ void __fastcall LevelEditorLayer::flipGravityH(gd::LevelEditorLayer* _self, void
 }
 
 void runCustomPlaytest(gd::LevelEditorLayer* self, gd::StartPosObject* startPos) {
-	self->setStartPosObject(startPos);
+	gd::LevelSettingsObject* settingsObject = nullptr;
+	if (startPos) {
+		settingsObject = startPos->m_settings;
+	}
+	else {
+		settingsObject = self->m_levelSettings;
+	}
 
-	self->m_player->setPosition(startPos->getPosition());
-	self->m_player2->setPosition(startPos->getPosition());
+	if (startPos) {
+		self->setStartPosObject(startPos);
+	}
+	else {
+		self->setStartPosObject(nullptr);
+	}
 
-	self->setupLevelStart(startPos->m_settings);
+	if (startPos) {
+		self->m_player->setPosition(startPos->getPosition());
+		self->m_player2->setPosition(startPos->getPosition());
+	}
+	else {
+		self->m_player->setPosition(ccp(0.f, 0.f));
+		self->m_player2->setPosition(ccp(0.f, 0.f));
+	}
 
-	if (startPos->m_settings->m_startMode == 0) {
+	self->setupLevelStart(settingsObject);
+
+	if (settingsObject->m_startMode == 0) {
 		self->m_player->toggleFlyMode(false);
 		self->m_player2->toggleFlyMode(false);
 		self->m_player->toggleRollMode(false);
@@ -793,6 +812,11 @@ void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
 		if (!fromSelectedStartPos) {
 			runCustomPlaytest(self, m_playtestStartPos);
 		}
+	}
+
+	auto keyboardDispatcher = CCDirector::sharedDirector()->getKeyboardDispatcher();
+	if (keyboardDispatcher->getShiftKeyPressed()) {
+		runCustomPlaytest(self, nullptr);
 	}
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
