@@ -75,8 +75,8 @@ void LevelBrowserLayer::Callback::onDeleteSelected(CCObject*) {
 }
 
 void LevelBrowserLayer::Callback::onCancelSearch(CCObject*) {
-	if (!m_customSearchQuery.empty()) {
-		m_customSearchQuery.clear();
+	if (!this->m_searchObject->m_searchQuery.empty()) {
+		this->m_searchObject->m_searchQuery.clear();
 		this->loadPage(this->m_searchObject);
 	}
 }
@@ -176,17 +176,19 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 
 		updatePageButton(self);
 
-		//auto onSearchSpr = CCSprite::create("gj_findBtn_001.png");
-		//auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
-		//onSearch->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 55.f, director->getScreenTop() - 70.f }));
-		//onSearch->setVisible(m_customSearchQuery.empty());
-		//menu->addChild(onSearch, 0, 14);
+		if (setting().onDeveloperMode) {
+			auto onSearchSpr = CCSprite::create("gj_findBtn_001.png");
+			auto onSearch = gd::CCMenuItemSpriteExtra::create(onSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onSearch));
+			onSearch->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 55.f, director->getScreenTop() - 70.f }));
+			onSearch->setVisible(m_customSearchQuery.empty());
+			menu->addChild(onSearch, 0, 14);
 
-		//auto onCancelSearchSpr = CCSprite::create("gj_findBtnOff_001.png");
-		//auto onCancelSearch = gd::CCMenuItemSpriteExtra::create(onCancelSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onCancelSearch));
-		//onCancelSearch->setPosition(onSearch->getPosition());
-		//onCancelSearch->setVisible(!m_customSearchQuery.empty());
-		//menu->addChild(onCancelSearch, 0, 15);
+			auto onCancelSearchSpr = CCSprite::create("gj_findBtnOff_001.png");
+			auto onCancelSearch = gd::CCMenuItemSpriteExtra::create(onCancelSearchSpr, self, menu_selector(LevelBrowserLayer::Callback::onCancelSearch));
+			onCancelSearch->setPosition(onSearch->getPosition());
+			onCancelSearch->setVisible(!m_customSearchQuery.empty());
+			menu->addChild(onCancelSearch, 0, 15);
+		}
 
 		auto deleteMenu = CCMenu::create();
 		self->addChild(deleteMenu, 2, 570);
@@ -239,7 +241,7 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 			}
 
 			auto onFavorites = gd::CCMenuItemSpriteExtra::create(onFavoritesSpr, self, callback);
-			onFavorites->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 68.f, director->getScreenBottom() + 30.f }));
+			onFavorites->setPosition(menu->convertToNodeSpace({ director->getScreenLeft() + 30.f, director->getScreenBottom() + 70.f }));
 			menu->addChild(onFavorites);
 		}
 	}
@@ -250,52 +252,75 @@ bool __fastcall LevelBrowserLayer::initH(gd::LevelBrowserLayer* self, void*, gd:
 void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*, gd::GJSearchObject* searchObject) {
 	LevelBrowserLayer::loadPage(self, searchObject);
 
-	if (searchObject->m_searchType == static_cast<gd::SearchType>(100)) {
+	if (setting().onDeveloperMode) {
+		if (searchObject->m_searchType == static_cast<gd::SearchType>(100)) {
+			auto glm = gd::GameLevelManager::sharedState();
+			CCArray* favoritedLevels = CCArray::create();
 
+			for (auto key : CCArrayExt<CCString*>(glm->m_savedLevelsDict->allKeys())) {
+				auto level = static_cast<gd::GJGameLevel*>(glm->m_savedLevelsDict->objectForKey(key->getCString()));
+				if (level) {
+					if (!level->m_levelString.size()) continue;
+
+					auto strings = split(setting().m_favoritedLevelsIDs, ',');
+					for (const auto& str : strings) {
+						const int i = std::stoi(str);
+						if (level->m_levelID == i) {
+							favoritedLevels->addObject(level);
+						}
+					}
+				}
+			}
+
+			if (favoritedLevels->count()) {
+				self->m_array = favoritedLevels;
+				self->setupLevelBrowser(favoritedLevels);
+				self->updateLevelsLabel();
+			}
+		}
+
+		if (searchObject->m_searchQuery.size()) {
+			if (searchObject->m_searchType == gd::SearchType::MyLevels) {
+				auto localLevels = gd::LocalLevelManager::sharedState()->m_localLevels;
+
+				auto filteredLevels = CCArray::create();
+				for (auto level : CCArrayExt<gd::GJGameLevel*>(localLevels)) {
+					if (level) {
+						if (ci_contains(level->m_levelName.c_str(), searchObject->m_searchQuery.c_str())) {
+							filteredLevels->addObject(level);
+						}
+					}
+				}
+
+				int page = searchObject->m_page;
+				int uVar12 = page * 10; // idk how to name it
+
+				auto filteredLevelsPerPage = CCArray::create();
+				if (filteredLevels->count()) {
+					self->m_itemCount = filteredLevels->count();
+
+					for (int i = uVar12; i != uVar12 + 10 && i <= filteredLevels->count() - 1; ++i) {
+						auto level = static_cast<gd::GJGameLevel*>(filteredLevels->objectAtIndex(i));
+						filteredLevelsPerPage->addObject(level);
+					}
+				}
+
+				if (filteredLevelsPerPage->count()) {
+					self->m_array = filteredLevelsPerPage;
+					self->setupLevelBrowser(filteredLevelsPerPage);
+					self->updateLevelsLabel();
+				}
+
+				int totalItems = self->m_itemCount;
+				if (self->m_searchObject->m_page == ((totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10)) {
+					self->m_rightArrow->setVisible(false);
+				}
+				if (self->m_searchObject->m_page == 0) {
+					self->m_leftArrow->setVisible(false);
+				}
+			}
+		}
 	}
-
-	//if (searchObject->m_searchQuery.size()) {
-	//	if (searchObject->m_searchType == gd::SearchType::MyLevels) {
-	//		auto localLevels = gd::LocalLevelManager::sharedState()->m_localLevels;
-
-	//		auto filteredLevels = CCArray::create();
-	//		for (auto level : CCArrayExt<gd::GJGameLevel*>(localLevels)) {
-	//			if (level) {
-	//				if (ci_contains(level->m_levelName.c_str(), searchObject->m_searchQuery.c_str())) {
-	//					filteredLevels->addObject(level);
-	//				}
-	//			}
-	//		}
-
-	//		int page = searchObject->m_page;
-	//		int uVar12 = page * 10; // idk how to name it
-
-	//		auto filteredLevelsPerPage = CCArray::create();
-	//		if (filteredLevels->count()) {
-	//			self->m_itemCount = filteredLevels->count();
-
-	//			for (int i = uVar12; i != uVar12 + 10 && i <= filteredLevels->count() - 1; ++i) {
-	//				auto level = static_cast<gd::GJGameLevel*>(filteredLevels->objectAtIndex(i));
-	//				filteredLevelsPerPage->addObject(level);
-	//			}
-	//		}
-
-	//		if (filteredLevelsPerPage->count()) {
-	//			self->m_array->release();
-	//			self->m_array = filteredLevelsPerPage;
-	//			self->setupLevelBrowser(filteredLevelsPerPage);
-	//			self->updateLevelsLabel();
-	//		}
-
-	//		int totalItems = self->m_itemCount;
-	//		if (self->m_searchObject->m_page == ((totalItems % 10 == 0) ? totalItems / 10 - 1 : totalItems / 10)) {
-	//			self->m_rightArrow->setVisible(false);
-	//		}
-	//		if (self->m_searchObject->m_page == 0) {
-	//			self->m_leftArrow->setVisible(false);
-	//		}
-	//	}
-	//}
 
 	auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
 	if (menu) {
@@ -306,12 +331,14 @@ void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*,
 			onLastPage->setVisible(self->m_rightArrow->isVisible());
 		}
 
-		//if (auto onSearchBtn = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(14))) {
-		//	onSearchBtn->setVisible(m_customSearchQuery.empty());
-		//}
-		//if (auto onCancelSearch = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(15))) {
-		//	onCancelSearch->setVisible(!m_customSearchQuery.empty());
-		//}
+		if (setting().onDeveloperMode) {
+			if (auto onSearchBtn = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(14))) {
+				onSearchBtn->setVisible(searchObject->m_searchQuery.empty());
+			}
+			if (auto onCancelSearch = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(15))) {
+				onCancelSearch->setVisible(!searchObject->m_searchQuery.empty());
+			}
+		}
 	}
 
 	updatePageButton(self);

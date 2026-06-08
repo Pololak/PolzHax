@@ -25,6 +25,17 @@ inline std::pair<std::string, std::string> split_once(const std::string& str, ch
 	return { str.substr(0, n), str.substr(n + 1) };
 }
 
+inline std::vector<std::string> split(const std::string& str, char delim) {
+	std::vector<std::string> strings;
+	size_t start;
+	size_t end = 0;
+	while ((start = str.find_first_not_of(delim, end)) != std::string::npos) {
+		end = str.find(delim, start);
+		strings.push_back(str.substr(start, end - start));
+	}
+	return strings;
+}
+
 template <class Stream, class... Args>
 void format_to(Stream& stream, const std::string_view& str, Args&&... args) {
 	if constexpr (sizeof...(Args) == 0) {
@@ -282,6 +293,12 @@ public:
 template <class T>
 concept CocosObject = std::derived_from<T, cocos2d::CCObject>;
 
+template <class T>
+concept CocosObjectPtr = std::is_pointer_v<T> && std::is_convertible_v<T, cocos2d::CCObject const*>;
+
+template <class K>
+concept CocosDictionaryKey = std::same_as<K, int> || std::same_as<K, intptr_t> || std::same_as<K, gd::string> || std::same_as<K, std::string>;
+
 template <class InpT, CocosObject T = std::remove_pointer_t<InpT>>
 class CCArrayExt {
 protected:
@@ -348,6 +365,140 @@ public:
 
 	cocos2d::CCArray* inner() {
 		return m_arr;
+	}
+};
+
+/**
+	 * A templated wrapper over `CCDictElement`, acting as a simple iterator over
+	 * `CCDictionary`.
+	 *
+	 * @tparam Type Pointer to a type that inherits CCObject.
+	 */
+template <class K, class InpT, CocosObject T = std::remove_pointer_t<InpT>>
+struct CCDictIterator {
+public:
+	CCDictIterator(cocos2d::CCDictElement* p) : m_ptr(p) {}
+
+	cocos2d::CCDictElement* m_ptr;
+
+	std::pair<K, T*> operator*() {
+		if constexpr (std::is_same_v<K, std::string> || std::is_same_v<K, gd::string>) {
+			return { m_ptr->getStrKey(), static_cast<T*>(m_ptr->getObject()) };
+		}
+		else {
+			return { m_ptr->getIntKey(), static_cast<T*>(m_ptr->getObject()) };
+		}
+	}
+
+	auto& operator++() {
+		m_ptr = static_cast<decltype(m_ptr)>(m_ptr->hh.next);
+		return *this;
+	}
+
+	friend bool operator==(CCDictIterator<K, InpT> const& a, CCDictIterator<K, InpT> const& b) {
+		return a.m_ptr == b.m_ptr;
+	};
+
+	friend bool operator!=(CCDictIterator<K, InpT> const& a, CCDictIterator<K, InpT> const& b) {
+		return a.m_ptr != b.m_ptr;
+	};
+
+	bool operator!=(int b) {
+		return m_ptr != nullptr;
+	}
+};
+
+/**
+ * A simple struct that as an entry to a `CCDictionary`.
+ *
+ * @tparam Type Pointer to a type that inherits CCObject.
+ */
+template <class K, class InpT, CocosObject T = std::remove_pointer_t<InpT>>
+struct CCDictEntry {
+	K m_key;
+	cocos2d::CCDictionary* m_dict;
+
+	CCDictEntry(K key, cocos2d::CCDictionary* dict) : m_key(key), m_dict(dict) {}
+
+	T* operator->() {
+		return static_cast<T*>(m_dict->objectForKey(m_key));
+	}
+
+	operator T* () {
+		return static_cast<T*>(m_dict->objectForKey(m_key));
+	}
+
+	CCDictEntry& operator=(T* f) {
+		m_dict->setObject(f, m_key);
+		return *this;
+	}
+};
+
+/**
+ * A templated wrapper over CCDictionary, providing easy iteration and indexing.
+ * This will keep ownership of the given CCDictionary*.
+ *
+ * @tparam Key Type of the key. MUST only be int or gd::string or std::string.
+ * @tparam ValuePtr Pointer to a type that inherits CCObject.
+ *
+ * @example
+ * CCDictionaryExt<std::string, GJGameLevel*> levels = getSomeDict();
+ * // Easy indexing, giving you the type you assigned
+ * GJGameLevel* myLvl = levels["Cube Adventures"];
+ *
+ * // Easy iteration using C++ range-based for loops
+ * for (auto [name, level] : levels) {
+ *   log::info("{}: {}", name, level->m_levelID);
+ * }
+ */
+template <CocosDictionaryKey Key, class ValueInpT, CocosObject Value = std::remove_pointer_t<ValueInpT>>
+struct CCDictionaryExt {
+protected:
+	using ValuePtr = Value*;
+
+	Ref<cocos2d::CCDictionary> m_dict;
+
+public:
+	CCDictionaryExt() : m_dict(cocos2d::CCDictionary::create()) {}
+
+	CCDictionaryExt(cocos2d::CCDictionary* dict) : m_dict(dict) {}
+
+	CCDictionaryExt(CCDictionaryExt const& d) : m_dict(d.m_dict) {}
+
+	CCDictionaryExt(CCDictionaryExt&& d) : m_dict(d.m_dict) {
+		d.m_dict = nullptr;
+	}
+
+	auto begin() {
+		return CCDictIterator<Key, ValuePtr>(m_dict->m_pElements);
+	}
+
+	// do not use this
+	auto end() {
+		return nullptr;
+	}
+
+	size_t size() {
+		return m_dict->count();
+	}
+
+	auto operator[](const Key& key) {
+		auto ret = static_cast<ValuePtr>(m_dict->objectForKey(key));
+		if (!ret) m_dict->setObject(cocos2d::CCNode::create(), key);
+
+		return CCDictEntry<Key, ValuePtr>(key, m_dict);
+	}
+
+	bool contains(const Key& key) {
+		return m_dict->objectForKey(key) != nullptr;
+	}
+
+	size_t count(const Key& key) {
+		return this->contains(key) ? 1 : 0;
+	}
+
+	cocos2d::CCDictionary* inner() {
+		return m_dict;
 	}
 };
 

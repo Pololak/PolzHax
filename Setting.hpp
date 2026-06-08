@@ -243,6 +243,8 @@ struct SettingStruct {
 
 	// Screenshot
 	bool onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard;
+
+	std::string m_favoritedLevelsIDs;
 };
 
 SettingStruct& setting();
@@ -465,5 +467,7 @@ DEF_SCHEMA(
 
 	onAutoSaveReplay,
 
-	onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard
+	onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard,
+
+	m_favoritedLevelsIDs
 )

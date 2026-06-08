@@ -29,7 +29,13 @@ void LevelInfoLayer::Callback::onMoveToTop(CCObject*) {
 }
 
 void LevelInfoLayer::Callback::onFavorite(CCObject*) {
-
+	auto strings = split(setting().m_favoritedLevelsIDs, ',');
+	for (const auto& str : strings) {
+		const int i = std::stoi(str);
+		if (this->m_level->m_levelID == i) {
+			
+		}
+	}
 }
 
 bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGameLevel* level) {
@@ -86,6 +92,14 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 		auto onFavorite = gd::CCMenuItemToggler::create(onFavoriteOff, onFavoriteOn, self, menu_selector(LevelInfoLayer::Callback::onFavorite));
 		onFavorite->setPosition(actionsMenu->convertToNodeSpace({ director->getScreenLeft() + 68.f, director->getScreenBottom() + 30.f }));
 		actionsMenu->addChild(onFavorite);
+
+		auto strings = split(setting().m_favoritedLevelsIDs, ',');
+		for (const auto& str : strings) {
+			const int i = std::stoi(str);
+			if (self->m_level->m_levelID == i) {
+				onFavorite->toggle(true);
+			}
+		}
 	}
 
 	return true;

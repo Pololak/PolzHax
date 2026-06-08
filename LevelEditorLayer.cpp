@@ -669,12 +669,8 @@ void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, voi
 
 	LevelEditorLayer::removeSpecial(self, object);
 
-	if (isColorTrigger(object)) removeTrigger(object);
-}
-
-void __fastcall LevelEditorLayer::removeObjectH(gd::LevelEditorLayer* self, void*, gd::GameObject* object, bool p0) {
-	LevelEditorLayer::removeObject(self, object, p0);
 	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
+	if (isColorTrigger(object)) removeTrigger(object);
 }
 
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
@@ -919,7 +915,6 @@ void LevelEditorLayer::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ed10), LevelEditorLayer::addSpecialH, reinterpret_cast<void**>(&LevelEditorLayer::addSpecial));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ee30), LevelEditorLayer::removeSpecialH, reinterpret_cast<void**>(&LevelEditorLayer::removeSpecial));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8e180), LevelEditorLayer::removeObjectH, reinterpret_cast<void**>(&LevelEditorLayer::removeObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8ef20), LevelEditorLayer::updateVisibilityH, reinterpret_cast<void**>(&LevelEditorLayer::updateVisibility));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x91620), LevelEditorLayer::updateH, reinterpret_cast<void**>(&LevelEditorLayer::update));
 

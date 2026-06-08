@@ -405,12 +405,14 @@ void updateFPSLabel() {
 		std::string prefix;
 
 		auto fpsValue = setting().useImGuiFps ? static_cast<int>(roundf(ImGui::GetIO().Framerate)) : static_cast<int>(roundf(fps));
+		auto imguiFPSValue = static_cast<int>(roundf(ImGui::GetIO().Framerate));
+		auto tpsValue = static_cast<int>(roundf(fps)); // yeah it counts as tps
 
 		if (setting().fpsPrefix) {
-			prefix = (setting().onTPSBypass && !setting().useImGuiFps) ? " TPS" : " FPS";
+			prefix = setting().onTPSBypass ? " FPS/TPS" : " FPS";
 		}
 
-		m_fpsCounterLabel->setString((std::to_string(fpsValue) + prefix).c_str());
+		m_fpsCounterLabel->setString((setting().onTPSBypass ? (std::to_string(imguiFPSValue) + "/" + std::to_string(tpsValue) + prefix).c_str() : (std::to_string(fpsValue) + prefix).c_str()));
 	}
 }
 
