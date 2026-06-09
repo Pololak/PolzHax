@@ -102,7 +102,9 @@ bool PlayLayer::isCheating() {
 		setting().onShipcopter ||
 		(setting().onSpeedhack && setting().speedhackValue != 1.f) ||
 		setting().onHidePauseMenu ||
-		setting().onKrazyManMode;
+		setting().onKrazyManMode ||
+		setting().onForceBlockType ||
+		setting().onNoHitbox;
 }
 
 static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
@@ -286,6 +288,21 @@ void PlayLayer::updateShowHitboxes() {
 					Hitboxes::drawHazardsObjectHitbox(obj, objectDrawNode);
 				if (setting().onSpecialHitboxes)
 					Hitboxes::drawSpecialsObjectHitbox(obj, objectDrawNode);
+				if (setting().onTriggerHitboxes) {
+					switch (obj->m_objectID) {
+					case 29:
+					case 30:
+					case 104:
+					case 105:
+					case 221:
+					case 717:
+					case 718:
+					case 743:
+					case 744:
+						Hitboxes::drawRectObj(objectDrawNode, obj, ccc4f(0.f, 1.f, 1.f, 1.f));
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -723,7 +740,7 @@ void PlayLayer::updateStatusLabels() {
 }
 
 void PlayLayer::updateStartPosSwitcherLabel() {
-	if (m_startPositions.empty()) return;
+	if (m_startPositions.empty() || !setting().onStartPosSwitcher) return;
 
 	auto self = gd::GameManager::sharedState()->getPlayLayer();
 	if (!self) return;

@@ -887,10 +887,16 @@ void imgui_render() {
 		}
 
 		if (setting().onEverythingHurts) {
-			sequence_patch(gd::base + 0xeaa42, { 0x90, 0x90 });
+			sequence_patch(gd::base + 0x52a00, { 0xb8, 0x02, 0x00, 0x00, 0x00, 0x90 });
+		}
+		else if (setting().onForceBlockType) {
+			sequence_patch(gd::base + 0x52a00, { 0xb8, 0x00, 0x00, 0x00, 0x00, 0x90 });
+		}
+		else if (setting().onNoHitbox) {
+			sequence_patch(gd::base + 0x52a00, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
 		}
 		else {
-			sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
+			sequence_patch(gd::base + 0x52a00, { 0x8b, 0x81, 0x68, 0x02, 0x00, 0x00 });
 		}
 
 		if (setting().onEverythingPulses) {
@@ -2524,11 +2530,13 @@ void imgui_render() {
 			ImGui::Tooltip("Syncs music to checked speed-portals, instead of only ones the player hit.");
 
 			if (ImGui::CheckboxF("Everything Hurts", &setting().onEverythingHurts)) {
+				setting().onForceBlockType = false;
+				setting().onNoHitbox = false;
 				if (setting().onEverythingHurts) {
-					sequence_patch(gd::base + 0xeaa42, { 0x90, 0x90 });
+					sequence_patch(gd::base + 0x52a00, { 0xb8, 0x02, 0x00, 0x00, 0x00, 0x90 });
 				}
 				else {
-					sequence_patch(gd::base + 0xeaa42, { 0x75, 0x0b });
+					sequence_patch(gd::base + 0x52a00, { 0x8b, 0x81, 0x68, 0x02, 0x00, 0x00 });
 				}
 			}
 			ImGui::Tooltip("Owie.");
@@ -2542,6 +2550,18 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Enables pulsing on all objects.");
+
+			if (ImGui::CheckboxF("Force Block Type", &setting().onForceBlockType)) {
+				setting().onEverythingHurts = false;
+				setting().onNoHitbox = false;
+				if (setting().onForceBlockType) {
+					sequence_patch(gd::base + 0x52a00, { 0xb8, 0x00, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0x52a00, { 0x8b, 0x81, 0x68, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Treats all objects as if they were blocks.");
 
 			if (ImGui::CheckboxF("Freeze Player", &setting().onFreezePlayer)) {
 				if (setting().onFreezePlayer) {
@@ -2679,6 +2699,18 @@ void imgui_render() {
 					}
 				}
 
+				if (setting().onDeveloperMode) {
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					if (ImGui::CheckboxF("Triggers", &setting().onTriggerHitboxes)) {
+						if (playLayer) {
+							PlayLayer::updateShowHitboxes();
+						}
+						if (editorLayer) {
+							LevelEditorLayer::updateShowHitboxes();
+						}
+					}
+				}
+
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Player", &setting().onPlayerHitboxes)) {
 					if (playLayer) {
@@ -2811,6 +2843,18 @@ void imgui_render() {
 
 				ImGui::TreePop();
 			}
+
+			if (ImGui::CheckboxF("No Hitbox", &setting().onNoHitbox)) {
+				setting().onEverythingHurts = false;
+				setting().onForceBlockType = false;
+				if (setting().onNoHitbox) {
+					sequence_patch(gd::base + 0x52a00, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0x52a00, { 0x8b, 0x81, 0x68, 0x02, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Disables all object hitboxes. Special objects are disabled.");
 
 			if (ImGui::CheckboxF("Pause During Completion", &setting().onPauseDuringCompletion)) {
 				if (setting().onPauseDuringCompletion) {

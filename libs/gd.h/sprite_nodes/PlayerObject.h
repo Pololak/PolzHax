@@ -115,6 +115,14 @@ namespace gd {
 		float m_audioScale; // 0x4c8
 		float m_groundHeight; // 0x4cc
 
+		static PlayerObject* create(int player, int ship, cocos2d::CCLayer* layer) {
+			auto ret = reinterpret_cast<PlayerObject * (__fastcall*)(int, int, cocos2d::CCLayer*)>(base + 0xd8bf0)(player, ship, layer);
+
+			__asm add esp, 0x4
+
+			return ret;
+		}
+
 		virtual void setPosition(cocos2d::CCPoint const& position) {
 			return reinterpret_cast<void(__thiscall*)(PlayerObject*, cocos2d::CCPoint const&)>(base + 0xdf8c0)(this, position);
 		}

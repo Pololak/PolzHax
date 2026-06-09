@@ -125,15 +125,17 @@ struct SettingStruct {
 	bool onCorrectiveMusicSync;
 	bool onEverythingHurts;
 	bool onEverythingPulses;
+	bool onForceBlockType;
 	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
-	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0;
+	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0; bool onTriggerHitboxes;
 	bool onHitboxesOnDeath;
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
 	bool onKrazyManMode;
 	bool onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
+	bool onNoHitbox;
 	bool onPauseDuringCompletion;
 	bool onPracticeFix, onStoreAccuracy, onStoreObjects;
 	bool onPracticeMusic;
@@ -359,14 +361,16 @@ DEF_SCHEMA(
 	onCorrectiveMusicSync,
 	onEverythingHurts,
 	onEverythingPulses,
+	onForceBlockType,
 	onFreezePlayer,
 	onHighFPSRotationFix,
-	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB,
+	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB, onTriggerHitboxes,
 	onHitboxesOnDeath,
 	onInstantComplete,
 	onInvisibleDualFix,
 	onJumpHack,
 	onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit, noclipAccuracyLimit, noclipDeathsLimit, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck,
+	onNoHitbox,
 	onPauseDuringCompletion,
 	onPracticeFix, onStoreAccuracy, onStoreObjects,
 	onPracticeMusic,
