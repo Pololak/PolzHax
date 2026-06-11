@@ -155,6 +155,30 @@ namespace gd {
 		virtual void downloadFinished(char const*);
 		virtual void downloadFailed(char const*);
 	};
+
+	class GJAccountBackupDelegate {
+		virtual void backupAccountFinished();
+		virtual void backupAccountFailed(BackupAccountError);
+	};
+
+	class GJAccountDelegate {
+		virtual void accountStatusChanged();
+	};
+
+	class GJAccountLoginDelegate {
+		virtual void loginAccountFinished(int, int) {}
+		virtual void loginAccountFailed(AccountError) {}
+	};
+
+	class GJAccountRegisterDelegate {
+		virtual void registerAccountFinished();
+		virtual void registerAccountFailed(AccountError);
+	};
+
+	class GJAccountSyncDelegate {
+		virtual void syncAccountFinished();
+		virtual void syncAccountFailed(BackupAccountError);
+	};
 }
 
 #endif // !__DELEGATES_H__

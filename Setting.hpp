@@ -129,7 +129,7 @@ struct SettingStruct {
 	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
 	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0; bool onTriggerHitboxes;
-	bool onHitboxesOnDeath;
+	bool onHitboxesOnDeath, onDeathObjectOnly;
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
@@ -365,7 +365,7 @@ DEF_SCHEMA(
 	onFreezePlayer,
 	onHighFPSRotationFix,
 	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB, onTriggerHitboxes,
-	onHitboxesOnDeath,
+	onHitboxesOnDeath, onDeathObjectOnly,
 	onInstantComplete,
 	onInvisibleDualFix,
 	onJumpHack,

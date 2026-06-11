@@ -77,6 +77,25 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", fme)->getCString());
 		}
 
+		auto gjam = gd::GJAccountManager::sharedState();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("GJAccountManager: 0x%p", gjam);
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - 50.f);
+		if (ImGui::Button("Copy##gjAccountManager", ImVec2(50.f, 0.f))) {
+			clipboard::write(CCString::createWithFormat("%p", gjam)->getCString());
+		}
+
+		if (ImGui::CollapsingHeader("Account info (password)")) {
+			ImGui::Text("Username: %s", gjam->m_username.c_str());
+			ImGui::Text("Password: %s", gjam->m_password.c_str());
+			ImGui::Text("AccountID: %i", gjam->m_accountID);
+		}
+
+		if (ImGui::Button("Refresh Login")) {
+			gjam->loginAccount(gjam->m_username, gjam->m_password);
+		}
+
 		ImGui::Text("Pulse 1: %f", fme->m_pulse1);
 		ImGui::Text("Pulse 2: %f", fme->m_pulse2);
 		ImGui::Text("Pulse 3: %f", fme->m_pulse3);
@@ -170,8 +189,6 @@ void renderDebugModule() {
 				
 			}
 		}
-
-		ImGui::Text("USER32.DLL %p", reinterpret_cast<uintptr_t>(GetModuleHandleA("USER32.dll")));
 
 		//auto mdm = gd::MusicDownloadManager::sharedState();
 

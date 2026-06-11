@@ -252,6 +252,16 @@ std::string* __fastcall GameLevelManager_getLengthStrH(gd::GameLevelManager* sel
 	return str;
 }
 
+inline gd::GJGameLevel* (__fastcall* GJGameLevel_create)(CCDictionary*); // https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/src/modules/textures.cpp#L243
+gd::GJGameLevel* __fastcall GJGameLevel_createH(CCDictionary* dict) {
+	auto level = GJGameLevel_create(dict);
+
+	auto objStr = dict->valueForKey("45");
+	level->m_objectCount = objStr->intValue();
+
+	return level;
+}
+
 inline void(__thiscall* AppDelegate_applicationDidEnterBackground)(gd::AppDelegate*);
 void __fastcall AppDelegate_applicationDidEnterBackgroundH(gd::AppDelegate* self) {
 	AppDelegate_applicationDidEnterBackground(self);
@@ -317,6 +327,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0x97d50), CCKeyboardDispatcher_dispatchKeyboardMSGH, reinterpret_cast<void**>(&CCKeyboardDispatcher_dispatchKeyboardMSG));
 	MH_CreateHook(reinterpret_cast<void*>(cocos_ext + 0x16ad0), CCHttpClient_sendH, reinterpret_cast<void**>(&CCHttpClient_send));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x599b0), GameLevelManager_getLengthStrH, reinterpret_cast<void**>(&GameLevelManager_getLengthStr));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x613f0), GJGameLevel_createH, reinterpret_cast<void**>(&GJGameLevel_create));
 
 	CCSchedulerHook::mem_init();
 	ColorSelectPopup::mem_init();

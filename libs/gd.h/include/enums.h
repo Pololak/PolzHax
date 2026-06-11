@@ -154,6 +154,27 @@ namespace gd {
 		GameVerOutOfDate,
 		UpdateSuccess,
 	};
+
+	enum class AccountError {
+		EmailsDoNotMatch = -99,
+		AlreadyLinkedToDifferentSteamAccount = -13,
+		AccountDisabled = -12,
+		AlreadyLinkedToDifferentAccount = -10,
+		TooShortLessThan3 = -9,
+		TooShortLessThan6 = -8,
+		PasswordsDoNotMatch = -7,
+		InvalidEmail = -6,
+		InvalidPassword = -5,
+		InvalidUsername = -4,
+		AlreadyUsedEmail = -3,
+		AlreadyUsedUsername = -2
+	};
+
+	enum class BackupAccountError {
+		BackupOrSyncFailed = -3,
+		LoginFailed = -2,
+		GenericError = -1
+	};
 }
 
 #endif // !__ENUMS_H__

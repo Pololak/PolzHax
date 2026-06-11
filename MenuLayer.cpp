@@ -22,6 +22,34 @@
 //
 //DiscordManager ds;
 
+class PolzSpriteButton : public cocos2d::CCSprite {
+protected:
+	virtual bool init(const char* caption) {
+		auto label = CCLabelBMFont::create(caption, "bigFont.fnt");
+		label->limitLabelWidth(75.f, 1.f, .1f);
+		label->setPosition(45.875f, 15.25f);
+		this->addChild(label);
+
+		return this->initWithSpriteFrameName("GJ_longBtn01_001.png");
+	}
+public:
+	bool m_toggled;
+
+	void toggleBGImage(bool toggle) {
+		this->initWithSpriteFrameName(toggle ? "GJ_longBtn02_001.png" : "GJ_longBtn01_001.png");
+	}
+
+	static PolzSpriteButton* create(const char* caption) {
+		PolzSpriteButton* ret = new PolzSpriteButton();
+		if (ret && ret->init(caption)) {
+			ret->autorelease();
+			return ret;
+		}
+		CC_SAFE_DELETE(ret);
+		return nullptr;
+	}
+};
+
 bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 	if (!MenuLayer::init(self)) return false;
 

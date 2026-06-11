@@ -74,15 +74,56 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 	actionsMenu->addChild(onMoveToTop);
 
 	if (setting().onDeveloperMode) {
+		auto labelBg = extension::CCScale9Sprite::create("square02_small.png");
+		labelBg->setPosition(director->getScreenLeft() + 96.f, winSize.height / 2.f);
+		labelBg->setOpacity(100);
+		labelBg->setContentSize({ 80.f, 240.f });
+		self->addChild(labelBg, -1);
+
 		auto developerLabel = CCLabelBMFont::create("", "chatFont.fnt");
-		developerLabel->setScale(.6f);
-		developerLabel->setPosition(director->getScreenLeft() + 60.f, director->getScreenTop() - 60.f);
-		developerLabel->setAnchorPoint({ 0.f, 1.f });
+		developerLabel->setScale(.4f);
+		developerLabel->setPosition(director->getScreenLeft() + 60.f, winSize.height / 2.f);
+		developerLabel->setAnchorPoint({ 0.f, .5f });
 		self->addChild(developerLabel, 15);
 
 		std::stringstream ss;
 
+		ss << "m_levelID: " << level->m_levelID << std::endl;
+		ss << "m_userName: " << level->m_userName.c_str() << std::endl;
+		ss << "m_uploadDate: " << level->m_uploadDate.c_str() << std::endl;
+		ss << "m_updateDate: " << level->m_updateDate.c_str() << std::endl;
+		ss << "m_userID: " << level->m_userID << std::endl;
+		ss << "m_difficulty: " << level->m_difficulty << std::endl;
+		ss << "m_levelRev: " << level->m_levelRev << std::endl;
+		ss << "m_objectCount: " << level->m_objectCount << std::endl;
+		ss << "m_order: " << level->m_order << std::endl;
+		ss << "m_ratings: " << level->m_ratings << std::endl;
+		ss << "m_ratingsSum: " << level->m_ratingsSum << std::endl;
+		ss << "m_completes: " << level->m_completes << std::endl;
+		ss << "m_hasBeenModified: " << std::boolalpha << level->m_hasBeenModified << std::endl;
+		ss << "m_levelVersion: " << level->m_levelVersion << std::endl;
+		ss << "m_gameVersion: " << level->m_gameVersion << std::endl;
+		ss << "m_likes: " << level->m_likes << std::endl;
+		ss << "m_dislikes: " << level->m_dislikes << std::endl;
 		ss << "m_featured: " << level->m_featured << std::endl;
+		ss << "m_password: " << level->m_password << std::endl;
+		ss << "m_twoPlayerMode: " << std::boolalpha << level->m_twoPlayerMode << std::endl;
+		ss << "m_starRatings: " << level->m_starRatings << std::endl;
+		ss << "m_starRatingsSum: " << level->m_starRatingsSum << std::endl;
+		ss << "m_maxStarRatings: " << level->m_maxStarRatings << std::endl;
+		ss << "m_minStarRatings: " << level->m_minStarRatings << std::endl;
+		ss << "m_demonVotes: " << level->m_demonVotes << std::endl;
+		ss << "m_rateStars: " << level->m_rateStars << std::endl;
+		ss << "m_rateFeature: " << std::boolalpha << level->m_rateFeature << std::endl;
+		ss << "m_rateUser: " << level->m_rateUser.c_str() << std::endl;
+		ss << "m_dontSave: " << std::boolalpha << level->m_dontSave << std::endl;
+		ss << "m_isHidden: " << std::boolalpha << level->m_isHidden << std::endl;
+		ss << "m_ID: " << level->m_ID << std::endl;
+		ss << "m_tempName: " << level->m_tempName.c_str() << std::endl;
+		ss << "m_capacity001: " << level->m_capacity001 << std::endl;
+		ss << "m_capacity002: " << level->m_capacity002 << std::endl;
+		ss << "m_capacity003: " << level->m_capacity003 << std::endl;
+		ss << "m_capacity004: " << level->m_capacity004 << std::endl;
 
 		developerLabel->setString(ss.str().c_str());
 

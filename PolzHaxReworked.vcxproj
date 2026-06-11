@@ -612,6 +612,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ButtonPage.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CCBlockLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ColorSelectPopup.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CreatorLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomizeObjectLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CustomSongWidget.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\DrawGridLayer.h" />
@@ -654,6 +655,7 @@
     <ClInclude Include="libs\gd.h\manager_nodes\GameManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameSoundManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GameStatsManager.h" />
+    <ClInclude Include="libs\gd.h\manager_nodes\GJAccountManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\GManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\LocalLevelManager.h" />
     <ClInclude Include="libs\gd.h\manager_nodes\MusicDownloadManager.h" />

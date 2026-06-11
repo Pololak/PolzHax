@@ -9,7 +9,12 @@ namespace gd {
 		cocos2d::CCLabelBMFont* m_label; // 0x1b8
 		cocos2d::CCSprite* m_sprite; // 0x1bc
 
-		static SearchButton* create(char const* texture, char const* label, char const* icon, float labelScale) {
+		virtual bool init(char const* texture, char const* label, float labelScale, char const* icon) {
+			__asm movss xmm2, labelScale
+			return reinterpret_cast<bool(__thiscall*)(SearchButton*, char const*, char const*, char const*)>(base + 0xa3270)(this, texture, label, icon);
+		}
+
+		static SearchButton* create(char const* texture, char const* label, float labelScale, char const* icon) {
 			__asm movss xmm2, labelScale
 			auto ret = reinterpret_cast<SearchButton * (__fastcall*)(char const*, char const*, char const*)>(base + 0xa3180)(texture, label, icon);
 

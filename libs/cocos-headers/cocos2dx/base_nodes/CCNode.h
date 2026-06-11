@@ -434,10 +434,6 @@ public:
      * @return The untransformed size of the node.
      */
     virtual const CCSize& getContentSize() const;
-
-    //Robtop Modification:
-    //virtual CCSize getScaledContentSize();
-
     /**
      * Sets whether the node is visible
      *
@@ -1431,6 +1427,11 @@ public:
             }
 
             return nullptr;
+        }
+
+        inline CCSize getScaledContentSize() {
+            auto cs = getContentSize();
+            return { cs.width * m_fScaleX, cs.height * m_fScaleY };
         }
     )
 private:

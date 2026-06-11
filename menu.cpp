@@ -1439,6 +1439,12 @@ void imgui_render() {
 			}
 
 			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Reset Volume", ImVec2(LONG_ITEM_WIDTH(), 0))) {
+				gd::FMODAudioEngine::sharedEngine()->m_backgroundMusicVolume = 1.f;
+				gd::FMODAudioEngine::sharedEngine()->m_effectsVolume = 1.f;
+			}
+
+			ImGui::SetCursorPosX(LONG_CENTER_X());
 			if (ImGui::Button("Settings", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 				//CCARRAY_FOREACH_B_TYPE(CCDirector::sharedDirector()->getRunningScene()->getChildren(), optionsLayer, gd::OptionsLayer) {
 				//	if (optionsLayer->getTag() == 0x725) {
@@ -2740,6 +2746,18 @@ void imgui_render() {
 
 			ImGui::CheckboxF("Hitboxes on Death", &setting().onHitboxesOnDeath);
 			ImGui::Tooltip("Visualizes level hitboxes, only on death");
+			if (setting().onDeveloperMode) {
+				ImGui::SameLine(170.f * setting().UISize);
+				if (ImGui::TreeNodeEx("##hitboxesDeathSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					ImGui::TextWrapped("NOTE: Currently it shows ONLY hazard objects (spikes, saws, etc.)");
+
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					ImGui::CheckboxF("Death Object Only", &setting().onDeathObjectOnly);
+
+					ImGui::TreePop();
+				}
+			}
 
 			if (ImGui::CheckboxF("Instant Complete", &setting().onInstantComplete)) {
 				if (setting().onInstantComplete) {

@@ -114,7 +114,7 @@ void render_node_properties(CCNode* node) {
 
 	if (ImGui::BeginPopupModal("Add Child")) {
 		static int item = 0;
-		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0CCScale9Sprite\0ButtonSprite\0");
+		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0CCScale9Sprite\0ButtonSprite\0SearchButton\0");
 
 		static int tag = -1;
 		ImGui::InputInt("Tag", &tag);
@@ -129,6 +129,9 @@ void render_node_properties(CCNode* node) {
 		static bool limitWidth;
 		static char buttonTexture[256];
 		static float buttonHeight;
+
+		// SearchButton stuff
+		static char iconTexture[256];
 
 		if (item == 1) {
 			ImGui::InputText("Text", text, 256);
@@ -156,6 +159,12 @@ void render_node_properties(CCNode* node) {
 			ImGui::InputText("Texture", buttonTexture, 256);
 			ImGui::InputText("Font", labelFont, 256);
 			ImGui::InputFloat("Button Height", &buttonHeight);
+		}
+		if (item == 7) {
+			ImGui::InputText("Button Texture", buttonTexture, 256);
+			ImGui::InputText("Label", text, 256);
+			ImGui::InputText("Icon Texture", iconTexture, 256);
+			ImGui::InputFloat("Text Scale", &textScale);
 		}
 
 		ImGui::Separator();
@@ -203,6 +212,12 @@ void render_node_properties(CCNode* node) {
 			case 6: {
 				gd::ButtonSprite* child;
 				child = gd::ButtonSprite::create(text, buttonWidth, widthLimit, textScale, limitWidth, labelFont, buttonTexture, buttonHeight);
+				_child = child;
+				break;
+			}
+			case 7: {
+				gd::SearchButton* child;
+				child = gd::SearchButton::create(buttonTexture, text, textScale, iconTexture);
 				_child = child;
 				break;
 			}

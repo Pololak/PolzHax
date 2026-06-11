@@ -85,6 +85,7 @@ namespace gd {
 #include "manager_nodes/LocalLevelManager.h"
 #include "manager_nodes/ObjectToolbox.h"
 #include "manager_nodes/MusicDownloadManager.h"
+#include "manager_nodes/GJAccountManager.h"
 
 #include "scroll_nodes/CCContentLayer.h"
 #include "scroll_nodes/CCIndexPath.h"
@@ -136,6 +137,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/LeaderboardsLayer.h"
 #include "layers_scenes_transitions_nodes/MoreSearchLayer.h"
 #include "layers_scenes_transitions_nodes/ShareLevelLayer.h"
+#include "layers_scenes_transitions_nodes/CreatorLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
 
