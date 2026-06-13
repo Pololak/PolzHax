@@ -27,6 +27,27 @@ void PlayerObject::setDartIcon(int val) {
 	dartIcon = val;
 }
 
+void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // https://github.com/adafcaefc/SwingCopter/blob/master/SwingCopter/main.cpp
+	const auto direction = self->m_gravityFlipped ? -1.f : 1.f;
+
+	const auto size = (self->getScale() != 1.f) ? .85f : 1.f;
+
+	const auto gravity = (std::fabs(self->m_yVelocity) > 6.) ? self->m_gravity + 1. : self->m_gravity;
+
+	const auto modifier = -.5 * gravity * delta * direction / size;
+	const auto yAcceleration = self->m_yVelocity + modifier;
+
+	if (std::fabs(self->m_yVelocity) <= 6. || std::fabs(yAcceleration) <= std::fabs(self->m_yVelocity)) {
+		self->m_yVelocity = yAcceleration;
+	}
+
+	if (self->m_upKeyDown && self->m_upKeyPressed) {
+		self->m_upKeyPressed = false;
+		self->m_upKeyDown = false;
+		self->flipGravity(!self->m_gravityFlipped, true);
+	}
+}
+
 void PlayerObject::newPlayerExtraFrame(gd::PlayerObject* playerObject, const char* playerFrame) {
 	CCSprite* playerExtraSpr = static_cast<CCSprite*>(playerObject->m_playerFrame->getChildByTag(69));
 	auto spriteFrameCache = CCSpriteFrameCache::sharedSpriteFrameCache();
@@ -321,30 +342,9 @@ void __fastcall PlayerObject::loadFromCheckpointH(gd::PlayerObject* self, void*,
 	}
 }
 
-void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // https://github.com/adafcaefc/SwingCopter/blob/master/SwingCopter/main.cpp
-	const auto direction = self->m_gravityFlipped ? -1.f : 1.f;
-
-	const auto size = (self->getScale() != 1.f) ? .85f : 1.f;
-
-	const auto gravity = (std::fabs(self->m_yVelocity) > 6.) ? self->m_gravity + 1. : self->m_gravity;
-
-	const auto modifier = -.5 * gravity * delta * direction / size;
-	const auto yAcceleration = self->m_yVelocity + modifier;
-
-	if (std::fabs(self->m_yVelocity) <= 6. || std::fabs(yAcceleration) <= std::fabs(self->m_yVelocity)) {
-		self->m_yVelocity = yAcceleration;
-	}
-
-	if (self->m_upKeyDown && self->m_upKeyPressed) {
-		self->m_upKeyPressed = false;
-		self->m_upKeyDown = false;
-		self->flipGravity(!self->m_gravityFlipped, true);
-	}
-}
-
 void __fastcall PlayerObject::updateJumpH(gd::PlayerObject* self, void*) {
 	float delta = 0.f;
-	__asm movss[delta], xmm1;
+	__asm movss delta, xmm1;
 
 	if (!self->m_flyMode || !setting().onShipcopter) return PlayerObject::updateJump(self, delta);
 
@@ -360,6 +360,22 @@ void __fastcall PlayerObject::activateStreakH(gd::PlayerObject* self) {
 
 	if (setting().onTrailBugFix && (self->m_playerScale == 1.f) && (gd::GameManager::sharedState()->m_playerStreak == 2)) {
 		self->m_playerStreak->m_fMinSeg = 14.f;
+	}
+}
+
+void __fastcall PlayerObject::playerDestroyedH(gd::PlayerObject* self, void*, bool p0) {
+	PlayerObject::playerDestroyed(self, p0);
+
+	CCSprite* playerExtraSpr = static_cast<CCSprite*>(self->m_playerFrame->getChildByTag(69));
+	CCSprite* vehicleExtraSpr = static_cast<CCSprite*>(self->m_vehicleFrame->getChildByTag(69));
+
+	if (!setting().onNoDeathEffect) {
+		if (playerExtraSpr) {
+			playerExtraSpr->runAction(CCFadeTo::create(.05f, 0));
+		}
+		if (vehicleExtraSpr) {
+			vehicleExtraSpr->runAction(CCFadeTo::create(.05f, 0));
+		}
 	}
 }
 
@@ -393,4 +409,5 @@ void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0d10), PlayerObject::activateStreakH, reinterpret_cast<void**>(&PlayerObject::activateStreak));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xde1c0), PlayerObject::ringJumpH, reinterpret_cast<void**>(&PlayerObject::ringJump));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayerObject::collidedWithObjectH, reinterpret_cast<void**>(&PlayerObject::collidedWithObject));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xddda0), PlayerObject::playerDestroyedH, reinterpret_cast<void**>(&PlayerObject::playerDestroyed));
 }

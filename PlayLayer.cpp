@@ -13,11 +13,7 @@
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
-CCObject* m_deathObject;
-
-void PlayLayer::setDeathObject(CCObject* object) {
-	m_deathObject = object;
-}
+gd::GameObject* m_deathObject;
 
 bool m_deafenPressed = false;
 
@@ -773,6 +769,30 @@ void PlayLayer::updateStartPosSwitcherLabel() {
 	onNextStartPos->runAction(CCSequence::create(CCDelayTime::create(1.f), CCFadeOut::create(.5f), CCHide::create(), nullptr));
 }
 
+void PlayLayer::setupReplay(gd::PlayLayer* self, std::string replayString) {
+	if (self->m_playbackMode) {
+		m_cheatingBeforeRestart = true;
+
+		if (self->m_replayActions) {
+			self->m_replayActions->release();
+			self->m_replayActions = nullptr;
+		}
+
+		auto newInputs = CCArray::create();
+		auto parsedReplayData = explode(replayString, ';');
+
+		for (const auto& parsedData : parsedReplayData) {
+			auto stringAction = CCString::create(parsedData);
+			newInputs->addObject(stringAction);
+		}
+
+		self->m_replayActions = newInputs;
+		self->m_replayActions->retain();
+	}
+
+	std::cout << "Replay Actions count: " << self->m_replayActions->count() << std::endl;
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpointStorage.clear();
@@ -1099,6 +1119,10 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 		self->m_player2->stopAllActions();
 	}
 
+	if (self->m_playbackMode) {
+		PlayLayer::setupReplay(self, self->m_level->m_recordString);
+	}
+
 	PlayLayer::resetLevel(self);
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
@@ -1340,6 +1364,36 @@ void __fastcall PlayLayer::processItemsH(gd::PlayLayer* self) {
 void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
 	PlayLayer::destroyPlayer(self, player);
 
+	//if (setting().onDeathObjectOnly) {
+	//	if (self->m_hazardObjects) {
+	//		for (int i = 0; i < self->m_hazardObjects->count(); ++i) {
+	//			auto object = reinterpret_cast<gd::GameObject*>(self->m_hazardObjects->objectAtIndex(i));
+	//			if (object) {
+	//				object->updateOrientedBox();
+
+	//				if (object->m_objectRadius > 0.f) {
+	//					if (self->objectIntersectsCircle(self->m_player, object)) {
+	//						std::cout << "Circle object: " << object << std::endl;
+	//						if (m_deathObject) {
+	//							m_deathObject = nullptr;
+	//						}
+	//						m_deathObject = object;
+	//					}
+	//				}
+	//				else {
+	//					if (self->m_player->m_objectRect2.intersectsRect(object->m_objectRect2)) {
+	//						std::cout << "Hazard object: " << object << std::endl;
+	//						if (m_deathObject) {
+	//							m_deathObject = nullptr;
+	//						}
+	//						m_deathObject = object;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
 	m_wouldDie = true;
 
 	if (setting().onNoclipTint && setting().onNoclip) {
@@ -1396,6 +1450,11 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
+	if (self->m_playbackMode) {
+		self->onQuit();
+		return;
+	}
+
 	PlayLayer::levelComplete(self);
 
 	if (!self->m_practiceMode && self->m_testMode) {
@@ -1551,11 +1610,20 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 	PlayLayer::releaseButton(self, p0, p1);
 }
 
-void __fastcall PlayLayer::drawH(gd::PlayLayer* self) {
-	PlayLayer::draw(self);
-
-	
-}
+//void __fastcall PlayLayer::checkCollisionsH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
+//	float dt = 0.f;
+//	__asm movss dt, xmm2
+//	PlayLayer::checkCollisions(self, player);
+//
+//	std::cout << dt << std::endl;
+//	std::cout << player << std::endl;
+//}
+//
+//void __fastcall PlayLayer::drawH(gd::PlayLayer* self) {
+//	PlayLayer::draw(self);
+//
+//	
+//}
 
 void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	PlayLayer::destructor(self);
@@ -1594,6 +1662,7 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0a00), PlayLayer::pushButtonH, reinterpret_cast<void**>(&PlayLayer::pushButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0af0), PlayLayer::releaseButtonH, reinterpret_cast<void**>(&PlayLayer::releaseButton));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xea180), PlayLayer::checkCollisionsH, reinterpret_cast<void**>(&PlayLayer::checkCollisions));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee5e0), PlayLayer::drawH, reinterpret_cast<void**>(&PlayLayer::draw));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayLayer::collidedWithObjectH, reinterpret_cast<void**>(&PlayLayer::collidedWithObject));

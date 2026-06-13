@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Setting.hpp"
 #include "utils.hpp"
+#include "PlayLayer.hpp"
 
 gd::CustomSongWidget* m_songWidget;
 
@@ -34,6 +35,23 @@ void LevelInfoLayer::Callback::onFavorite(CCObject*) {
 		const int i = std::stoi(str);
 		if (this->m_level->m_levelID == i) {
 			
+		}
+	}
+}
+
+void LevelInfoLayer::Callback::onPlayReplay(CCObject*) {
+	if (!this->shouldDownloadLevel()) {
+		gd::GameSoundManager::sharedState()->stopBackgroundMusic();
+		gd::GameSoundManager::sharedState()->playSound("playSound_01.ogg");
+
+		gd::GameManager::sharedState()->m_lastScene = gd::LastGameScene::LevelInfoLayerOrEditLevelLayer;
+
+		CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::PlayLayer::scene(this->m_level)));
+
+		auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+		if (playLayer) {
+			playLayer->m_playbackMode = true;
+			PlayLayer::setupReplay(playLayer, this->m_level->m_recordString);
 		}
 	}
 }
@@ -90,6 +108,7 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 
 		ss << "m_levelID: " << level->m_levelID << std::endl;
 		ss << "m_userName: " << level->m_userName.c_str() << std::endl;
+		ss << "m_recordString: " << level->m_recordString.c_str() << std::endl;
 		ss << "m_uploadDate: " << level->m_uploadDate.c_str() << std::endl;
 		ss << "m_updateDate: " << level->m_updateDate.c_str() << std::endl;
 		ss << "m_userID: " << level->m_userID << std::endl;
@@ -134,13 +153,12 @@ bool __fastcall LevelInfoLayer::initH(gd::LevelInfoLayer* self, void*, gd::GJGam
 		onFavorite->setPosition(actionsMenu->convertToNodeSpace({ director->getScreenLeft() + 68.f, director->getScreenBottom() + 30.f }));
 		actionsMenu->addChild(onFavorite);
 
-		auto strings = split(setting().m_favoritedLevelsIDs, ',');
-		for (const auto& str : strings) {
-			const int i = std::stoi(str);
-			if (self->m_level->m_levelID == i) {
-				onFavorite->toggle(true);
-			}
-		}
+		auto onPlayReplaySpr = CCSprite::createWithSpriteFrameName("GJ_playBtn2_001.png");
+		onPlayReplaySpr->setScale(.35f);
+		auto onPlayReplay = gd::CCMenuItemSpriteExtra::create(onPlayReplaySpr, self, menu_selector(LevelInfoLayer::Callback::onPlayReplay));
+		onPlayReplay->setOpacity(100);
+		onPlayReplay->setPositionX(60.f);
+		self->m_playBtnMenu->addChild(onPlayReplay, -1);
 	}
 
 	return true;

@@ -65,11 +65,16 @@ namespace PlayLayer {
 	inline void(__thiscall* releaseButton)(gd::PlayLayer*, int, bool);
 	void __fastcall releaseButtonH(gd::PlayLayer*, void*, int, bool);
 
+	inline void(__thiscall* checkCollisions)(gd::PlayLayer*, gd::PlayerObject*);
+	void __fastcall checkCollisionsH(gd::PlayLayer*, void*, gd::PlayerObject*);
+
 	inline void(__thiscall* draw)(gd::PlayLayer*);
 	void __fastcall drawH(gd::PlayLayer*);
 
 	inline void(__thiscall* hazardObject)();
 	void __fastcall hazardObjectH();
+
+	void setupReplay(gd::PlayLayer*, std::string);
 
 	void setDeathObject(CCObject*);
 	bool isCheating();

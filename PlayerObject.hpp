@@ -59,6 +59,9 @@ namespace PlayerObject {
 	inline void(__thiscall* updateJump)(gd::PlayerObject*, float);
 	void __fastcall updateJumpH(gd::PlayerObject*, void*);
 
+	inline void(__thiscall* playerDestroyed)(gd::PlayerObject*, bool);
+	void __fastcall playerDestroyedH(gd::PlayerObject*, void*, bool);
+
 	inline void updateSwing(gd::PlayerObject* self, const float delta);
 
 	void newPlayerExtraFrame(gd::PlayerObject*, const char*);

@@ -25,8 +25,9 @@ THE SOFTWARE.
 #define __SUPPORT_ZIPUTILS_H__
 
 #include <string>
-#include "CCPlatformDefine.h"
+#include <filesystem>
 #include "platform/CCPlatformConfig.h"
+#include "../../include/ccMacros.h"
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 #include "platform/android/CCFileUtilsAndroid.h"
@@ -146,31 +147,19 @@ namespace cocos2d
         */
         static void ccSetPvrEncryptionKey(unsigned int keyPart1, unsigned int keyPart2, unsigned int keyPart3, unsigned int keyPart4);
 
-        RT_ADD(
-            /** Encodes to the XOR + Base64 encoding rob uses
-            * @param string the string to encode
-            * @param key the xor key
-            */
-            static std::string base64EncodeEnc(std::string string, std::string key);
-            /** Decodes the XOR + Base64 encoding rob uses
-            * @param string the string to decode
-            * @param key the xor key
-            */
-            static std::string base64DecodeEnc(std::string string, std::string key);
-            
-
-            static std::string base64URLDecode(std::string string);
-            static std::string base64URLEncode(std::string string);
-
-            static std::string compressString(std::string, bool, int);
-            static std::string decompressString(std::string, bool, int);
-            static void decompressString2(unsigned char*, bool, int, int);
-
-            static void encryptDecrypt(std::string, int);
-            static void encryptDecryptWKey(std::string, std::string);
-
-            static char hexToChar(std::string*);
-        )
+        static std::string base64DecodeEnc(std::string const&, std::string);
+        static std::string base64EncodeEnc(std::string const&, std::string);
+        static std::string base64URLDecode(std::string const&);
+        static std::string base64URLEncode(std::string const&);
+        static int ccDeflateMemory(unsigned char* data, unsigned int size, unsigned char** out);
+        static int ccDeflateMemoryWithHint(unsigned char*, unsigned int, unsigned char**, unsigned int);
+        static std::string compressString(std::string data, bool encrypt);
+        static std::string decompressString(std::string data, bool encrypt);
+        static std::string decompressString2(unsigned char* data, bool encrypt, int size);
+        static std::string encryptDecrypt(std::string const& data, int encryptionKey);
+        static std::string encryptDecryptWKey(std::string const&, std::string);
+        static unsigned char hexToChar(const std::string&);
+        static std::string urlDecode(const std::string&);
 
     private:
         static int ccInflateMemoryWithHint(unsigned char *in, unsigned int inLength, unsigned char **out, unsigned int *outLength, 
@@ -200,7 +189,7 @@ namespace cocos2d
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
         friend class CCFileUtilsAndroid;
 #endif
-        
+
         /**
         * Constructor, open zip file and store file list.
         *
@@ -210,8 +199,21 @@ namespace cocos2d
         *
         * @since v2.0.5
         */
-        ZipFile(const std::string &zipFile, const std::string &filter = std::string());
+        ZipFile(const std::string& zipFile, const std::string& filter = std::string());
         virtual ~ZipFile();
+
+        /**
+         * Custom function added for geode; returns if the
+         * zip file was successfully decoded.
+         *
+         * @return true if the zip was successfully loaded,
+         *         false otherwise.
+         *
+         * @since geode v1.0.0
+         */
+        bool isLoaded() const;
+
+        bool unzipAllTo(std::filesystem::path const& path);
 
         /**
         * Regenerate accessible file list based on a new filter string.
@@ -222,7 +224,7 @@ namespace cocos2d
         *
         * @since v2.0.5
         */
-        bool setFilter(const std::string &filter);
+        bool setFilter(const std::string& filter);
 
         /**
         * Check does a file exists or not in zip file
@@ -232,7 +234,7 @@ namespace cocos2d
         *
         * @since v2.0.5
         */
-        bool fileExists(const std::string &fileName) const;
+        bool fileExists(const std::string& fileName) const;
 
         /**
         * Get resource file data from a zip file.
@@ -243,16 +245,26 @@ namespace cocos2d
         *
         * @since v2.0.5
         */
-        unsigned char *getFileData(const std::string &fileName, unsigned long *pSize);
+        unsigned char* getFileData(const std::string& fileName, unsigned long* pSize);
+
+        /**
+         * Custom function added for geode; returns all of
+         * the files in the zip that match the current filter.
+         *
+         * @return Vector of filenames
+         *
+         * @since geode v1.0.0
+         */
+        std::vector<std::string> getAllFiles() const;
 
     private:
-        bool setFilter(const std::string &filer, ZipFilePrivate *data);
-        unsigned char *getFileData(const std::string &fileName, unsigned long *pSize, ZipFilePrivate *data);
-        
+        bool setFilter(const std::string& filer, ZipFilePrivate* data);
+        unsigned char* getFileData(const std::string& fileName, unsigned long* pSize, ZipFilePrivate* data);
+
         /** Internal data like zip file pointer / file list array and so on */
-        ZipFilePrivate *_data;
+        ZipFilePrivate* _data;
         /** Another data used not in main thread */
-        ZipFilePrivate *_dataThread;
+        ZipFilePrivate* _dataThread;
     };
 } // end of namespace cocos2d
 #endif // __SUPPORT_ZIPUTILS_H__

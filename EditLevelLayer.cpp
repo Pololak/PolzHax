@@ -4,6 +4,7 @@
 #include "nfd.h"
 #include <fstream>
 #include "shellapi.h"
+#include "PlayLayer.hpp"
 
 bool m_noRotationPass;
 CCMenu* m_levelActionsMenu;
@@ -98,6 +99,21 @@ void EditLevelLayer::Callback::onMoveToTop(CCObject*) {
 	flalert->show();
 }
 
+void EditLevelLayer::Callback::onPlayReplay(CCObject*) {
+	gd::GameSoundManager::sharedState()->stopBackgroundMusic();
+	gd::GameSoundManager::sharedState()->playSound("playSound_01.ogg");
+
+	gd::GameManager::sharedState()->m_lastScene = gd::LastGameScene::LevelInfoLayerOrEditLevelLayer;
+
+	CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(.5f, gd::PlayLayer::scene(this->m_level)));
+
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+	if (playLayer) {
+		playLayer->m_playbackMode = true;
+		PlayLayer::setupReplay(playLayer, this->m_level->m_recordString);
+	}
+}
+
 bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGameLevel* level) {
 	m_levelActionsMenu = nullptr;
 	m_idLabel = nullptr;
@@ -184,6 +200,15 @@ bool __fastcall EditLevelLayer::initH(gd::EditLevelLayer* self, void*, gd::GJGam
 		onLevelID->setEnabled(level->m_levelID != 0);
 		onLevelID->setPosition(menu->convertToNodeSpace(m_idLabel->getPosition()));
 		menu->addChild(onLevelID);
+	}
+
+	if (setting().onDeveloperMode) {
+		auto onPlayReplaySpr = CCSprite::createWithSpriteFrameName("GJ_playBtn2_001.png");
+		onPlayReplaySpr->setScale(.5f);
+		auto onPlayReplay = gd::CCMenuItemSpriteExtra::create(onPlayReplaySpr, self, menu_selector(EditLevelLayer::Callback::onPlayReplay));
+		onPlayReplay->setOpacity(100);
+		onPlayReplay->setPositionX(170.f);
+		self->m_buttonMenu->addChild(onPlayReplay, -1);
 	}
 
 	return true;

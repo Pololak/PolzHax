@@ -308,6 +308,8 @@ DWORD WINAPI my_thread(void* hModule) {
 	sequence_patch(gd::base + 0x3a669, { 0x00, 0x00, 0x00, 0x43 }); // CustomSongWidget m_artistLabel->limitLabelWidth(120.f, ...)
 	sequence_patch(gd::base + 0x3e9e1, { 0x00, 0x00, 0x8c, 0x42 }); // EditorPauseLayer keysButton y pos 70
 	sequence_patch(gd::base + 0x486f9, { 0x24, 0xa3, 0x54, 0x00 }); // EditorUI::onPlayback()
+	sequence_patch(gd::base + 0x146aeb, { 0x39 });
+	sequence_patch(gd::base + 0x146af7, { 0x39 });
 
 	SpeedHack::Setup();
 

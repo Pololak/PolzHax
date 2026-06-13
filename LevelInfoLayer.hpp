@@ -29,6 +29,7 @@ namespace LevelInfoLayer {
 		void onGarage(CCObject*);
 		void onMoveToTop(CCObject*);
 		void onFavorite(CCObject*);
+		void onPlayReplay(CCObject*);
 	};
 
 	void mem_init();

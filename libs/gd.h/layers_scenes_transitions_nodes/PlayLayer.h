@@ -21,7 +21,8 @@ namespace gd {
 	public:
 		bool m_drawDebug; // 0x120
 		cocos2d::CCDrawNode* m_drawNode; // 0x124
-		PAD(32)
+		float m_cameraMoveToY; // 0x128
+		PAD(28)
 		StartPosObject* m_startPosObject; // 0x148
 		LevelSettingsObject* m_levelSettings; // 0x14c
 		EndPortalObject* m_endPortalObject; // 0x150
@@ -32,7 +33,7 @@ namespace gd {
 		cocos2d::CCSprite* m_backgroundSprite; // 0x164
 		PAD(0x8)
 		cocos2d::CCArray* m_levelSections; // 0x170
-		PAD(0x4)
+		cocos2d::CCArray* m_hazardObjects; // 0x174
 		cocos2d::CCArray* m_activeObjects; // 0x178
 		PAD(0x4)
 		cocos2d::CCArray* m_spawnObjects; // 0x180
@@ -58,8 +59,10 @@ namespace gd {
 		float m_levelLength; // 0x1d0
 		float m_realLevelLength; // 0x1d4
 		cocos2d::CCLabelBMFont* m_attemptsLabel; // 0x1d8
-		PAD(24)
-		cocos2d::CCDictionary* m_particlesDict; // 0x1f4
+		PAD(16)
+		float m_cameraFlip; // 0x1ec
+		PAD(4)
+		cocos2d::CCDictionary* m_particlesDictionary; // 0x1f4
 		PAD(0x4)
 		cocos2d::CCArray* m_particles; // 0x1fc
 		cocos2d::CCNode* m_backgroundFlash; // 0x200 // bg white flash when entering sizing portals
@@ -73,9 +76,15 @@ namespace gd {
 		cocos2d::CCSprite* m_custom04ColorRef; // 0x220
 		cocos2d::CCSprite* m_sliderGroove; // 0x224
 		cocos2d::CCSprite* m_sliderBar; // 0x228
-		PAD(40)
-		std::string m_replayString; // 0x254
-		cocos2d::CCArray* m_replayActions; // 0x26c
+		PAD(28)
+		bool m_recordActions; // 0x248
+		bool m_player1PushSaved; // 0x249
+		bool m_player1ReleaseSaved; // 0x24a
+		bool m_player2PushSaved; // 0x24b
+		bool m_player2ReleaseSaved; // 0x24c
+		std::string m_replayString; // 0x250
+		cocos2d::CCArray* m_replayActions; // 0x268
+		float m_idk; // 0x26c
 		double m_levelTime; // 0x270
 		bool m_needsReorderColor01; // 0x278
 		bool m_needsReorderColor02; // 0x279
@@ -134,6 +143,18 @@ namespace gd {
 		bool m_customColor03Blend; // 0x32b
 		bool m_customColor04Blend; // 0x32c
 		bool m_customColorDLBlend; // 0x32d
+
+		static PlayLayer* create(GJGameLevel* level) {
+			return reinterpret_cast<PlayLayer * (__fastcall*)(GJGameLevel*)>(base + 0xe3530)(level);
+		}
+
+		static cocos2d::CCScene* scene(GJGameLevel* level) {
+			auto scene = cocos2d::CCScene::create();
+
+			scene->addChild(PlayLayer::create(level));
+
+			return scene;
+		}
 
 		void resetLevel() {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f20)(this);
@@ -254,6 +275,10 @@ namespace gd {
 
 		cocos2d::ccColor3B get3DLineColor() {
 			return this->m_3DLineColorRef->getColor();
+		}
+
+		bool objectIntersectsCircle(GameObject* object, GameObject* circle) {
+			return reinterpret_cast<bool(__thiscall*)(PlayLayer*, GameObject*, GameObject*)>(base + 0x90400)(this, object, circle);
 		}
 	};
 }

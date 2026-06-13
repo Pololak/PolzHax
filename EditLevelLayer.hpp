@@ -32,6 +32,7 @@ namespace EditLevelLayer {
 		void onLevelOrderUp(CCObject*);
 		void onLevelOrderDown(CCObject*);
 		void onLevelID(CCObject*);
+		void onPlayReplay(CCObject*);
 	};
 
 	void mem_init();

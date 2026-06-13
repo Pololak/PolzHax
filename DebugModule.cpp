@@ -6,6 +6,7 @@
 #include <imgui-hook.hpp>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <string>
+#include <support/zip_support/ZipUtils.h>
 
 #include "utils.hpp"
 
@@ -107,6 +108,21 @@ void renderDebugModule() {
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
+			static bool cl = false;
+			if (ImGui::Checkbox("Disable No Collision on Playback", &cl)) {
+				if (cl) {
+					sequence_patch(gd::base + 0xeb33a, { 0xe9, 0x72, 0xf3, 0xff, 0xff, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xeb33a, { 0x0f, 0x84, 0x71, 0xf3, 0xff, 0xff });
+				}
+			}
+
+			ImGui::TextWrapped("m_replayString: %s", pl->m_replayString.c_str());
+			
+			//ImGui::TextWrapped("IDK: %s", cocos2d::ZipUtils::decompressString(pl->m_level->m_levelString.c_str(), false));
+			//ImGui::TextWrapped("IDK: %s", cocos2d::ZipUtils::decompressString(pl->m_level->m_recordString, false));
+
 			if (pl->m_player) {
 				ImGui::Text("yVel: %f", pl->m_player->m_yVelocity);
 				ImGui::Text("Speed: %f", pl->m_player->m_speed);

@@ -601,6 +601,18 @@ inline cocos2d::ccColor3B getLightBGColor(ccColor3B bg, ccColor3B p1) {
 	}
 }
 
+inline std::vector<std::string> explode(std::string& string, char separator) {
+	std::stringstream segmentstream(string);
+	std::string segmented;
+	std::vector<std::string> splitlist;
+
+	while (std::getline(segmentstream, segmented, separator)) {
+		splitlist.push_back(segmented);
+	}
+
+	return splitlist;
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });
