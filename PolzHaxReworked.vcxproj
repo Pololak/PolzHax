@@ -626,6 +626,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGarageLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJGroundLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJListLayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJMoreGamesLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJScoreCell.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\InfoLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\LeaderboardsLayer.h" />

@@ -125,11 +125,18 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 	if (playLayer && isDown) {
 		if ((!setting().onPauseDuringCompletion ? !playLayer->m_endTriggered : true) && !playLayer->m_showingEndLayer) {
-			if ((key == setting().m_retryKeybind) && setting().onRetryKeybind) {
-				if (PauseLayer::get()) {
-					PauseLayer::get()->onResume(nullptr);
+			if (setting().onRetryKeybind) {
+				if (key == setting().m_retryKeybind) {
+					if (PauseLayer::get()) {
+						PauseLayer::get()->onResume(nullptr);
+					}
+					if (self->getControlKeyPressed()) {
+						playLayer->fullReset();
+					}
+					else {
+						playLayer->resetLevel();
+					}
 				}
-				playLayer->resetLevel();
 			}
 
 			if (setting().onStartPosSwitcher) {

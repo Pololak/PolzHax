@@ -1821,6 +1821,9 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\CreatorLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\GJMoreGamesLayer.h">
+      <Filter>Файлы заголовков\Libraries\gd.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

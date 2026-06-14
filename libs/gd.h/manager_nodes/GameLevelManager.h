@@ -48,6 +48,10 @@ namespace gd {
 			return reinterpret_cast<GameLevelManager*(__stdcall*)()>(base + 0x55850)();
 		}
 
+		static cocos2d::CCDictionary* responseToDict(std::string p0, bool p1) {
+			return reinterpret_cast<cocos2d::CCDictionary * (__stdcall*)(std::string, bool)>(base + 0x61000)(p0, p1);
+		}
+
 		GJGameLevel* createNewLevel() {
 			return reinterpret_cast<GJGameLevel*(__thiscall*)(GameLevelManager*)>(base + 0x56590)(this);
 		}

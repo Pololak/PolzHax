@@ -160,6 +160,10 @@ namespace gd {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1f20)(this);
 		}
 
+		void fullReset() {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*)>(base + 0xf1e00)(this);
+		}
+
 		void togglePracticeMode(bool practice) {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*, bool)>(base + 0xf3610)(this, practice);
 		}
@@ -279,6 +283,10 @@ namespace gd {
 
 		bool objectIntersectsCircle(GameObject* object, GameObject* circle) {
 			return reinterpret_cast<bool(__thiscall*)(PlayLayer*, GameObject*, GameObject*)>(base + 0x90400)(this, object, circle);
+		}
+
+		void updateDualGround(PlayerObject* player, int p0, bool p1) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*, int, bool)>(base + 0xefad0)(this, player, p0, p1);
 		}
 	};
 }
