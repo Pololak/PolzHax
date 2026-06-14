@@ -1,0 +1,306 @@
+#include "EditorUIHook.h"
+#include "LevelEditorLayerHook.h"
+#include "../utils.h"
+
+EditorUI* m_editorUI;
+
+EditorUI* EditorUIHook::get() {
+    return m_editorUI;
+}
+
+void EditorUIHook::updateObjectInfoLabel(EditorUI* self) {
+    auto objectInfoLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(2701));
+    if (objectInfoLabel) {
+        std::stringstream ss;
+
+        if (self->m_selectedObject || self->m_selectedObjects->count() == 1) {
+            GameObject* object = self->m_selectedObject;
+            if (!self->m_selectedObject && self->m_selectedObjects->count() == 1) {
+                object = reinterpret_cast<GameObject*>(self->m_selectedObjects->objectAtIndex(0));
+            }
+
+            ss << "C: " << colorToString(static_cast<int>(object->getColorMode())) << " (" << static_cast<int>(object->getColorMode()) << ")" << "\n";
+            ss << "G: " << object->m_editorGroup << "\n";
+            ss << "Rot: " << object->getRotation() << "\n";
+            ss << "X: " << object->getPositionX() << "\n";
+            ss << "Y: " << object->getPositionY() << "\n";
+            ss << "ID: " << object->m_objectID << "\n";
+            ss << "Type: " << typeToString(object->m_objectType) << "\n";
+            ss << "Time: " << self->m_editorLayer->m_gridLayer->timeForXPos(object->getPositionX()) << "\n";
+            ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(object) << std::dec << "\n";
+        }
+        else if (self->m_selectedObjects->count() > 1) {
+            ss << "Objects: " << self->m_selectedObjects->count() << "\n";
+        }
+        else {
+            ss.clear();
+        }
+
+        objectInfoLabel->setString(ss.str().c_str());
+    }
+}
+
+void EditorUIHook::updateGuideTogglePosition(EditorUI* self) {
+	auto onAllGroup = static_cast<CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(self->m_deselectBtn->getParent())->getChildByTag(2702));
+	if (onAllGroup) {
+		self->m_guideToggle->setPositionX(onAllGroup->isVisible() ? (self->m_groupPrevBtn->getPositionX() - 46.f) : (self->m_groupPrevBtn->getPositionX() - 26.f));
+	}
+}
+
+void EditorUIHook::Callback::onAllGroup(CCObject* sender) {
+    this->m_currentGroupLabel->setString("All");
+    this->m_editorLayer->m_groupIDFilter = -1;
+
+    static_cast<CCMenuItemSpriteExtra*>(sender)->setEnabled(false);
+    static_cast<CCMenuItemSpriteExtra*>(sender)->setVisible(false);
+
+    EditorUIHook::updateGuideTogglePosition(this);
+
+    
+}
+
+void EditorUIHook::Callback::onNextFreeGroup(CCObject*) {
+    auto objs = this->m_editorLayer->getAllObjects();
+
+    std::set<int> layers;
+
+    CCARRAY_FOREACH_B_TYPE(objs, obj, GameObject) {
+        layers.insert(obj->m_editorGroup);
+    }
+
+    int last = -1;
+    for (auto const& layer : layers) {
+        if (last + 1 != layer) break;
+        last = layer;
+    }
+
+    this->m_currentGroupLabel->setString(CCString::createWithFormat("%d", last + 1)->getCString());
+    this->m_editorLayer->m_groupIDFilter = last + 1;
+
+    auto onAllGroup = static_cast<CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(this->m_deselectBtn->getParent())->getChildByTag(2702));
+    if (onAllGroup) {
+        onAllGroup->setVisible(true);
+        onAllGroup->setEnabled(true);
+    }
+
+    EditorUIHook::updateGuideTogglePosition(this);
+
+
+}
+
+void EditorUIHook::Callback::onGoToGroup(CCObject*) {
+    auto objs = this->getSelectedObjects();
+
+    CCARRAY_FOREACH_B_TYPE(objs, obj, GameObject) {
+        if (obj) {
+            int objectGroup = obj->m_editorGroup;
+            this->m_editorLayer->m_groupIDFilter = objectGroup;
+            this->m_currentGroupLabel->setString(CCString::createWithFormat("%d", objectGroup)->getCString());
+
+            auto onAllGroup = static_cast<CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(this->m_deselectBtn->getParent())->getChildByTag(2702));
+            if (onAllGroup) {
+                onAllGroup->setVisible(true);
+                onAllGroup->setEnabled(true);
+            }
+
+            EditorUIHook::updateGuideTogglePosition(this);
+
+
+        }
+    }
+}
+
+bool EditorUIHook::initH(EditorUI* self, LevelEditorLayer* editorLayer) {
+    m_editorUI = self;
+    if (!EditorUIHook::init(self, editorLayer)) return false;
+
+    auto director = CCDirector::sharedDirector();
+    auto winSize = director->getWinSize();
+
+    CCMenu* leftMenu = static_cast<CCMenu*>(self->m_undoBtn->getParent());
+    CCMenu* rightMenu = static_cast<CCMenu*>(self->m_deselectBtn->getParent());
+
+    self->m_positionSlider->setAnchorPoint({ 0.f, 0.f });
+    self->m_positionSlider->setScale(.8f);
+
+    auto objectInfoLabel = CCLabelBMFont::create("", "chatFont.fnt");
+    objectInfoLabel->setAnchorPoint({ 0.f, 1.f });
+    objectInfoLabel->setScale(.6f);
+    objectInfoLabel->setPosition(director->getScreenLeft() + 50.f, director->getScreenTop() - 50.f);
+    //objectInfoLabel->setVisible(setting().onShowObjectInfo);
+    self->addChild(objectInfoLabel, 0, 2701);
+
+    auto onTrashSpr = CCSprite::create("GJ_trashBtn_001.png");
+    onTrashSpr->setScale(.925f);
+    auto onTrash = CCMenuItemSpriteExtra::create(onTrashSpr, self, menu_selector(EditorUI::onDeleteSelected));
+    onTrash->setPosition(self->m_redoBtn->getPositionX() + 50.f, self->m_redoBtn->getPositionY() - 1.f);
+    onTrash->setOpacity(175);
+    onTrash->setColor(ccGRAY);
+    onTrash->setEnabled(false);
+    leftMenu->addChild(onTrash, 0, 201);
+
+    self->m_groupPrevBtn->setPositionX(self->m_groupPrevBtn->getPositionX() - 10.f);
+    self->m_groupNextBtn->setPositionX(self->m_groupNextBtn->getPositionX() - 10.f);
+    self->m_currentGroupLabel->setPositionX(self->m_currentGroupLabel->getPositionX() - 10.f);
+
+    auto onAllGroupSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+    onAllGroupSpr->setScale(.5f);
+    onAllGroupSpr->setOpacity(175);
+    auto onAllGroup = CCMenuItemSpriteExtra::create(onAllGroupSpr, self, menu_selector(EditorUIHook::Callback::onAllGroup));
+    onAllGroup->setPosition(-90.f, -172.f);
+    rightMenu->addChild(onAllGroup, 0, 2702);
+    onAllGroup->setVisible(!(self->m_editorLayer->m_groupIDFilter == -1));
+    onAllGroup->setEnabled(!(self->m_editorLayer->m_groupIDFilter == -1));
+
+    auto onNextFreeGroupSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
+    onNextFreeGroupSpr->setFlipX(true);
+    onNextFreeGroupSpr->setScale(.5f);
+    onNextFreeGroupSpr->setOpacity(175);
+    auto onNextFreeGroup = CCMenuItemSpriteExtra::create(onNextFreeGroupSpr, self, menu_selector(EditorUIHook::Callback::onNextFreeGroup));
+    onNextFreeGroup->setPosition(10.f, -172.f);
+    rightMenu->addChild(onNextFreeGroup);
+
+    EditorUIHook::updateGuideTogglePosition(self);
+
+    auto onGoToGroupSpr = CCSprite::create("GJ_goToGroupBtn_001.png");
+    onGoToGroupSpr->setScale(.85f);
+    onGoToGroupSpr->setPositionY(onGoToGroupSpr->getPositionY() - 1.f);
+    auto onGoToGroup = CCMenuItemSpriteExtra::create(onGoToGroupSpr, self, menu_selector(EditorUIHook::Callback::onGoToGroup));
+    onGoToGroup->setPosition(self->m_editGroupBtn->getPositionX() - 44.f, self->m_editGroupBtn->getPositionY());
+    onGoToGroup->setOpacity(175);
+    onGoToGroup->setColor(ccGRAY);
+    onGoToGroup->setEnabled(false);
+    onGoToGroup->setVisible(false);
+    rightMenu->addChild(onGoToGroup, 0, 2704);
+
+    // // fake buttons lol
+    // auto buttonPageMenu = static_cast<CCMenu*>(static_cast<ButtonPage*>(self->m_editButtonBar->m_pagesArray->objectAtIndex(1))->getChildren()->objectAtIndex(0));
+
+    // if (buttonPageMenu) {
+    //     auto freeRotateBtn = static_cast<CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("21"));
+    //     auto snapRotateBtn = static_cast<CCMenuItemSpriteExtra*>(self->m_editButtonDict->objectForKey("22"));
+
+    //     auto fakeFreeRotate = self->getSpriteButton("edit_freeRotateBtn_001.png", nullptr, nullptr, .9f);
+    //     auto fakeSnapRotate = self->getSpriteButton("edit_rotateSnapBtn_001.png", nullptr, nullptr, .9f);
+        
+    //     fakeFreeRotate->setEnabled(false);
+    //     static_cast<ButtonSprite*>(fakeFreeRotate->getChildren()->objectAtIndex(0))->setColor(ccGRAY);
+    //     fakeSnapRotate->setEnabled(false);
+    //     static_cast<ButtonSprite*>(fakeSnapRotate->getChildren()->objectAtIndex(0))->setColor(ccGRAY);
+
+    //     fakeFreeRotate->setPosition(freeRotateBtn->getPosition());
+    //     fakeSnapRotate->setPosition(snapRotateBtn->getPosition());
+
+    //     buttonPageMenu->addChild(fakeFreeRotate, -1);
+    //     buttonPageMenu->addChild(fakeSnapRotate, -1);
+    // }
+    // //
+
+    return true;
+}
+
+void EditorUIHook::selectObjectH(EditorUI* self, GameObject* object) {
+    EditorUIHook::updateObjectInfoLabel(self);
+
+    EditorUIHook::selectObject(self, object);
+}
+
+void EditorUIHook::selectObjectsH(EditorUI* self, CCArray* objects) {
+    EditorUIHook::updateObjectInfoLabel(self);
+
+    EditorUIHook::selectObjects(self, objects);
+}
+
+void EditorUIHook::moveObjectH(EditorUI* self, GameObject* object, CCPoint pos) {
+    if (object == nullptr) return;
+
+    EditorUIHook::moveObject(self, object, pos);
+
+    EditorUIHook::updateObjectInfoLabel(self);
+
+    LevelEditorLayerHook::moveTrigger(object);
+}
+
+void EditorUIHook::angleChangedH(EditorUI* self, float angle) {
+    EditorUIHook::angleChanged(self, angle);
+
+    EditorUIHook::updateObjectInfoLabel(self);
+}
+
+void EditorUIHook::updateButtonsH(EditorUI* self) {
+    EditorUIHook::updateButtons(self);
+
+    CCMenu* leftMenu = static_cast<CCMenu*>(self->m_undoBtn->getParent());
+    CCMenu* rightMenu = static_cast<CCMenu*>(self->m_deselectBtn->getParent());
+
+    auto onTrash = static_cast<CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(201));
+    if (onTrash) {
+        onTrash->setOpacity(self->getSelectedObjects()->count() ? 255 : 175);
+        onTrash->setColor(self->getSelectedObjects()->count() ? ccWHITE : ccGRAY);
+        onTrash->setEnabled(self->getSelectedObjects()->count());
+    }
+
+    auto onGoToGroup = static_cast<CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(2704));
+    if (onGoToGroup) {
+        onGoToGroup->setOpacity(self->getSelectedObjects()->count() ? 255 : 175);
+        onGoToGroup->setColor(self->getSelectedObjects()->count() ? ccWHITE : ccGRAY);
+        onGoToGroup->setEnabled(self->getSelectedObjects()->count());
+        onGoToGroup->setVisible(self->getSelectedObjects()->count());
+    }
+
+    EditorUIHook::updateObjectInfoLabel(self);
+}
+
+void EditorUIHook::clickOnPositionH(EditorUI* self, CCPoint pos) {
+    EditorUIHook::clickOnPosition(self, pos);
+
+    EditorUIHook::updateObjectInfoLabel(self);
+}
+
+void EditorUIHook::transformObjectH(EditorUI* self, GameObject* object, EditCommand command, bool p0) {
+    EditorUIHook::transformObject(self, object, command, p0);
+
+    EditorUIHook::updateObjectInfoLabel(self);
+}
+
+void EditorUIHook::onGroupDownH(EditorUI* self, CCObject* sender) {
+    EditorUIHook::onGroupDown(self, sender);
+    auto onAllGroup = static_cast<CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(self->m_deselectBtn->getParent())->getChildByTag(2702));
+    if (onAllGroup) {
+        onAllGroup->setVisible(!(self->m_editorLayer->m_groupIDFilter == -1));
+        onAllGroup->setEnabled(!(self->m_editorLayer->m_groupIDFilter == -1));
+    }
+
+    EditorUIHook::updateGuideTogglePosition(self);
+}
+
+void EditorUIHook::onGroupUpH(EditorUI* self, CCObject* sender) {
+    EditorUIHook::onGroupUp(self, sender);
+    auto onAllGroup = static_cast<CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(self->m_deselectBtn->getParent())->getChildByTag(2702));
+    if (onAllGroup) {
+        onAllGroup->setVisible(true);
+        onAllGroup->setEnabled(true);
+    }
+
+    EditorUIHook::updateGuideTogglePosition(self);
+}
+
+void EditorUIHook::destructorH(EditorUI* self) {
+    EditorUIHook::destructor(self);
+    m_editorUI = nullptr;
+}
+
+void EditorUIHook::mem_init() {
+    HOOK("_ZN8EditorUI4initEP16LevelEditorLayer", EditorUIHook::initH, EditorUIHook::init);
+    HOOK("_ZN8EditorUI12selectObjectEP10GameObject", EditorUIHook::selectObjectH, EditorUIHook::selectObject);
+    HOOK("_ZN8EditorUI13selectObjectsEPN7cocos2d7CCArrayE", EditorUIHook::selectObjectsH, EditorUIHook::selectObjects);
+    HOOK("_ZN8EditorUI10moveObjectEP10GameObjectN7cocos2d7CCPointE", EditorUIHook::moveObjectH, EditorUIHook::moveObject);
+    HOOK("_ZN8EditorUI12angleChangedEf", EditorUIHook::angleChangedH, EditorUIHook::angleChanged);
+    HOOK("_ZN8EditorUI13updateButtonsEv", EditorUIHook::updateButtonsH, EditorUIHook::updateButtons);
+    HOOK("_ZN8EditorUI15clickOnPositionEN7cocos2d7CCPointE", EditorUIHook::clickOnPositionH, EditorUIHook::clickOnPosition);
+    HOOK("_ZN8EditorUI15transformObjectEP10GameObject11EditCommandb", EditorUIHook::transformObjectH, EditorUIHook::transformObject);
+    HOOK("_ZN8EditorUI11onGroupDownEPN7cocos2d8CCObjectE", EditorUIHook::onGroupDownH, EditorUIHook::onGroupDown);
+    HOOK("_ZN8EditorUI9onGroupUpEPN7cocos2d8CCObjectE", EditorUIHook::onGroupUpH, EditorUIHook::onGroupUp);
+
+    HOOK("_ZN8EditorUID0Ev", EditorUIHook::destructorH, EditorUIHook::destructor);
+}

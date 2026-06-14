@@ -1,0 +1,139 @@
+#ifndef __PLAYLAYER_H__
+#define __PLAYLAYER_H__
+
+#include "../include/gd.h"
+
+class CCCircleWaveDelegate;
+class GameplayDelegate;
+class StartPosObject;
+class LevelSettingsObject;
+class EndPortalObject;
+class AudioEffectsLayer;
+class GJGroundLayer;
+class GameObject;
+class UILayer;
+class PlayerObject;
+class GJGameLevel;
+class ColorAction;
+
+class PlayLayer : public cocos2d::CCLayer, CCCircleWaveDelegate, GameplayDelegate {
+public:
+    bool m_drawDebug;
+    cocos2d::CCDrawNode* m_drawNode;
+    PAD(32)
+    StartPosObject* m_startPosObject;
+    LevelSettingsObject* m_levelSettings;
+    EndPortalObject* m_endPortalObject;
+    cocos2d::CCArray* m_checkpoints;
+    cocos2d::CCArray* m_activatedSpeedObjects;
+    cocos2d::CCArray* m_levelSpeedObjects;
+    int m_activeEnterEffect;
+    cocos2d::CCSprite* m_backgroundSprite; // 0x164
+    PAD(0x8)
+    cocos2d::CCArray* m_levelSections; // 0x170
+    PAD(0x4)
+    cocos2d::CCArray* m_activeObjects; // 0x178
+    PAD(0x4)
+    cocos2d::CCArray* m_spawnObjects; // 0x180
+    cocos2d::CCArray* m_objects; // 0x184
+    cocos2d::CCArray* m_stateObjects; // 0x188
+    cocos2d::CCParticleSystemQuad* m_glitterParticleSystem; // 0x18c
+    PAD(0x4)
+    cocos2d::CCArray* m_effectObjects; // 0x194
+    AudioEffectsLayer* m_audioEffectsLayer; // 0x198
+    PAD(0x8)
+    GJGroundLayer* m_bottomGround; // 0x1a4
+    GJGroundLayer* m_topGround; // 0x1a8
+    PAD(0x8)
+    bool m_isDead; // 0x1b4
+    PAD(0x1)
+    bool m_cameraMovingX; // 0x1b6
+    bool m_cameraMovingY; // 0x1b7
+    PAD(0x4)
+    int m_firstVisibleSection; // 0x1bc
+    int m_lastVisibleSection; // 0x1c0
+    PAD(0x8)
+    bool m_groundMoving; // 0x1cc
+    float m_levelLength; // 0x1d0
+    float m_realLevelLength; // 0x1d4
+    cocos2d::CCLabelBMFont* m_attemptsLabel; // 0x1d8
+    PAD(24)
+    cocos2d::CCDictionary* m_particlesDict; // 0x1f4
+    PAD(0x4)
+    cocos2d::CCArray* m_particles; // 0x1fc
+    cocos2d::CCNode* m_backgroundFlash; // 0x200 // bg white flash when entering sizing portals
+    cocos2d::CCSprite* m_lineColorRef; // 0x204
+    cocos2d::CCSprite* m_objColorRef; // 0x208
+    cocos2d::CCSprite* m_gColorRef; // 0x20c
+    cocos2d::CCSprite* m_3DLineColorRef; // 0x210
+    cocos2d::CCSprite* m_custom01ColorRef; // 0x214
+    cocos2d::CCSprite* m_custom02ColorRef; // 0x218
+    cocos2d::CCSprite* m_custom03ColorRef; // 0x21c
+    cocos2d::CCSprite* m_custom04ColorRef; // 0x220
+    cocos2d::CCSprite* m_sliderGroove; // 0x224
+    cocos2d::CCSprite* m_sliderBar; // 0x228
+    PAD(44)
+    double m_levelTime; // 0x258
+    bool m_needsReorderColor01; // 0x260
+    bool m_needsReorderColor02; // 0x261
+    bool m_needsReorderColor03; // 0x262
+    bool m_needsReorderColor04; // 0x263
+    bool m_needsReorderColor3D; // 0x264
+    PAD(0x3)
+    PAD(0x8)
+    bool m_inCameraFlip; // 0x288
+    bool m_meteringEnabled; // 0x289
+    bool m_playbackMode; // 0x28a
+    GameObject* m_cameraPortal; // 0x28c
+    GameObject* m_dualModeCamera; // 0x290
+    bool m_isFlipped; // 0x294
+    float m_flipValue; // 0x298
+    bool m_dualMode; // 0x29c
+    UILayer* m_uiLayer; // 0x2a0
+    PlayerObject* m_player; // 0x2a4
+    PlayerObject* m_player2; // 0x2a8
+    GJGameLevel* m_level; // 0x2ac
+    cocos2d::CCPoint m_cameraPos; // 0x2b0
+    bool m_testMode; // 0x2b8
+    bool m_practiceMode; // 0x2b9
+    bool m_isResetting; // 0x2ba
+    cocos2d::CCSpriteBatchNode* m_batchNode; // 0x2bc
+    cocos2d::CCSpriteBatchNode* m_batchNodeBottom; // 0x2c0
+    cocos2d::CCSpriteBatchNode* m_batchNodeAdd; // 0x2c4
+    cocos2d::CCSpriteBatchNode* m_batchNodeAddBottom; // 0x2c8
+    cocos2d::CCSpriteBatchNode* m_batchNodePlayer; // 0x2cc
+    cocos2d::CCSpriteBatchNode* m_batchNodeAddPlayer; // 0x2d0
+    cocos2d::CCLayer* m_gameLayer; // 0x2d4
+    cocos2d::CCArray* m_bigActionContainer; // 0x2d8
+    bool m_cleanReset; // 0x2dc
+    cocos2d::CCPoint m_playerStartPos; // 0x2e0
+    int m_attempts; // 0x2e8
+    int m_jumps; // 0x2ec
+    bool m_didJump; // 0x2f0
+    float m_clkTimer; // 0x2f4
+    bool m_showingEndLayer; // 0x2f8
+    bool m_endTriggered; // 0x2f9
+    bool m_resetQueued; // 0x2fa
+    int m_lastRunPercent; // 0x2fc
+    bool m_didAwardStars; // 0x300
+    ColorAction* m_activeBGColorAction; // 0x304
+    ColorAction* m_activeGColorAction; // 0x308
+    ColorAction* m_activeLineColorAction; // 0x30c
+    ColorAction* m_activeObjColorAction; // 0x310
+    ColorAction* m_active3DLineColorAction; // 0x314
+    ColorAction* m_activeColor01ColorAction; // 0x318
+    ColorAction* m_activeColor02ColorAction; // 0x31c
+    ColorAction* m_activeColor03ColorAction; // 0x320
+    ColorAction* m_activeColor04ColorAction; // 0x324
+    bool m_shouldRestartAfterStopping; // 0x328
+    bool m_customColor01Blend; // 0x329
+    bool m_customColor02Blend; // 0x32a
+    bool m_customColor03Blend; // 0x32b
+    bool m_customColor04Blend; // 0x32c
+    bool m_customColorDLBlend; // 0x32d
+
+    PlayerObject* getPlayer() const;
+    float getLevelLength() const;
+};
+
+#endif
