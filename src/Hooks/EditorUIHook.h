@@ -34,6 +34,12 @@ namespace EditorUIHook {
     inline void(*onGroupUp)(EditorUI*, CCObject*);
     void onGroupUpH(EditorUI*, CCObject*);
 
+    inline CCPoint(*offsetForKey)(EditorUI*, int);
+    CCPoint offsetForKeyH(EditorUI*, int);
+
+    inline CCPoint(*moveForCommand)(EditorUI*, EditCommand);
+    CCPoint moveForCommandH(EditorUI*, EditCommand);
+
     inline void(*destructor)(EditorUI*);
     void destructorH(EditorUI*);
 

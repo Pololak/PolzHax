@@ -42,6 +42,9 @@ namespace LevelEditorLayerHook {
     inline void(*flipGravity)(LevelEditorLayer*, PlayerObject*, bool, bool);
     void flipGravityH(LevelEditorLayer*, PlayerObject*, bool, bool);
 
+    inline void(*onPlaytest)(LevelEditorLayer*);
+    void onPlaytestH(LevelEditorLayer*);
+
     inline void(*destructor)(LevelEditorLayer*);
     void destructorH(LevelEditorLayer*);
 
@@ -67,6 +70,11 @@ namespace LevelEditorLayerHook {
     GDColor getColor03();
     GDColor getColor04();
     GDColor getColor3DL();
+
+    class Callback : public LevelEditorLayer {
+    public:
+        void onHideUI(CCObject*);
+    };
 
     void mem_init();
 }

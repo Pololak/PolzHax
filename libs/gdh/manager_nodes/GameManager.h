@@ -4,7 +4,7 @@
 #include "../include/gd.h"
 
 class PlayLayer;
-class LevelSelectLayer : public cocos2d::CCLayer {};
+class LevelSelectLayer;
 class PremiumPopup : public cocos2d::CCLayer {};
 class GameRateDelegate;
 

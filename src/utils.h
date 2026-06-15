@@ -1,5 +1,7 @@
 #pragma once
 #include "include.h"
+#include <sys/stat.h>
+#include "../libs/cocos2dx/support/base64.h"
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -55,4 +57,46 @@ inline std::string typeToString(GameObjectType type) {
 	case GameObjectType::WavePortal: return "Wave Portal"; break;
 	default: return "Unknown"; break;
 	}
+}
+
+inline bool create_directories(const std::string& path) {
+    std::stringstream ss(path);
+    std::string item;
+    std::string current_path = "";
+
+    while (std::getline(ss, item, '/')) {
+        if (item.empty()) continue;
+        current_path += "/" + item;
+        if (mkdir(current_path.c_str(), 512) != 0) {
+            if (errno != EEXIST) return false;
+        }
+    }
+    return true;
+}
+
+inline std::pair<std::string, std::string> split_once(const std::string& str, char split) {
+	const auto n = str.find(split);
+	return { str.substr(0, n), str.substr(n + 1) };
+}
+
+namespace base64 {
+	inline std::string encode(std::experimental::string_view str) {
+		char* out;
+		const auto size = cocos2d::base64Encode(str.data(), str.size(), &out, false);
+		std::string outs(out);
+		free(out);
+		return outs;
+	}
+
+	inline std::string decode(std::experimental::string_view str) {
+		char* out;
+		const auto size = cocos2d::base64Decode(str.data(), str.size(), &out);
+		std::string outs(out, size);
+		free(out);
+		return outs;
+	}
+}
+
+static constexpr unsigned int h$(const char* str, int h = 0) {
+    return !str[h] ? 5381 : (h$(str, h+1) * 33) ^ str[h];
 }

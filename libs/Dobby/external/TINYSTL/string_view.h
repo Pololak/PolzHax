@@ -27,7 +27,7 @@
 #ifndef TINYSTL_STRING_VIEW_H
 #define TINYSTL_STRING_VIEW_H
 
-#include <TINYSTL/stddef.h>
+#include <stddef.h>
 
 namespace tinystl {
 

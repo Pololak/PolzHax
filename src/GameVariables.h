@@ -1,0 +1,7 @@
+#pragma once
+
+#define PREVIEW_MODE "0036"
+#define SHOW_GROUND "0037"
+#define SHOW_PERCENTAGE "0040"
+#define SHOW_OBJECT_INFO "0041"
+#define SELECT_FILTER "0064"

@@ -106,16 +106,13 @@ public:
     cocos2d::CCPoint m_storedPosition;
     int m_editorGroup;
 
-    void setChildColor(cocos2d::_ccColor3B color); /*{
-        if (m_hasColor) {
-            if (m_colorSprite) {
-                m_colorSprite->setColor(color);
-            }
-        }
-    }*/
+    void setChildColor(cocos2d::_ccColor3B color);
     
     void setObjectColor(cocos2d::_ccColor3B);
+    
     GJCustomColorMode getColorMode();
+
+    bool canRotateFree();
 };
 
 #endif

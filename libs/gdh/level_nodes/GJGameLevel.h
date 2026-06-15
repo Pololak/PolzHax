@@ -72,6 +72,10 @@ public:
     int m_capacity002; // 0x27c
     int m_capacity003; // 0x280
     int m_capacity004; // 0x284
+
+    void setLevelName(std::string);
+    void setLevelDesc(std::string);
+    void setLevelString(std::string);
 };
 
 #endif

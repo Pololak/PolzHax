@@ -70,6 +70,8 @@ public:
 	}
 
 	void addToUndoList(UndoObject*, bool);
+
+	void setStartPosObject(StartPosObject*);
 };
 
 #endif

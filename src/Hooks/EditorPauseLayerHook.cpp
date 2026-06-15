@@ -1,7 +1,9 @@
 #include "EditorPauseLayerHook.h"
 #include "LevelEditorLayerHook.h"
 #include "EditorUIHook.h"
+#include "../GameVariables.h"
 #include "../utils.h"
+#include "../Setting.h"
 
 bool EditorPauseLayerHook::initH(EditorPauseLayer* self, LevelEditorLayer* editorLayer) {
     if (!EditorPauseLayerHook::init(self, editorLayer)) return false;
@@ -189,6 +191,59 @@ void EditorPauseLayerHook::Callback::onAlignX(CCObject*) {
 	alignObjects(false);
 }
 
+void EditorPauseLayerHook::Callback::onSmallEditorStep(CCObject*) {
+    GameManager::sharedState()->toggleGameVariable("0035");
+}
+
+void EditorPauseLayerHook::Callback::onSelectFilter(CCObject*) {
+    GameManager::sharedState()->toggleGameVariable(SELECT_FILTER);
+}
+
+void EditorPauseLayerHook::Callback::onShowObjectInfo(CCObject*) {
+    auto gm = GameManager::sharedState();
+    gm->toggleGameVariable(SHOW_OBJECT_INFO);
+    auto editorUI = this->m_levelEditorLayer->m_uiLayer;
+    if (editorUI) {
+        auto objectInfoLabel = static_cast<CCLabelBMFont*>(editorUI->getChildByTag(2701));
+        if (objectInfoLabel) {
+            objectInfoLabel->setVisible(gm->getGameVariable(SHOW_OBJECT_INFO));
+            EditorUIHook::updateObjectInfoLabel(editorUI);
+        }
+    }
+}
+
+void EditorPauseLayerHook::Callback::onShowGround(CCObject*) {
+    auto gm = GameManager::sharedState();
+    gm->toggleGameVariable(SHOW_GROUND);
+    if (gm->getGameVariable(SHOW_GROUND)) {
+        LevelEditorLayerHook::createGroundLayer();
+    }
+    else {
+        LevelEditorLayerHook::removeGroundLayer();
+    }
+}
+
+void EditorPauseLayerHook::Callback::onPreviewMode(CCObject*) {
+    auto gm = GameManager::sharedState();
+    gm->toggleGameVariable(PREVIEW_MODE);
+    if (gm->getGameVariable(PREVIEW_MODE)) {
+        LevelEditorLayerHook::updatePreviewMode();
+    }
+    else {
+        LevelEditorLayerHook::resetColors();
+    }
+}
+
+void EditorPauseLayerHook::Callback::onResetStartPos(CCObject*) {
+    if (LevelEditorLayerHook::getPlaytestStartPos()) {
+        LevelEditorLayerHook::setPlaytestStartPos(nullptr);
+    }
+}
+
+void EditorPauseLayerHook::Callback::onEditorOptions(CCObject*) {
+    
+}
+
 void EditorPauseLayerHook::customSetupH(EditorPauseLayer* self) {
     EditorPauseLayerHook::customSetup(self);
 
@@ -236,6 +291,78 @@ void EditorPauseLayerHook::customSetupH(EditorPauseLayer* self) {
     auto onAlignX = CCMenuItemSpriteExtra::create(onAlignXSpr, self, menu_selector(EditorPauseLayerHook::Callback::onAlignX));
     onAlignX->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 170.f }));
     bottom_menu->addChild(onAlignX);
+
+    auto gm = GameManager::sharedState();
+
+    GameToolbox::createToggleButton(
+        "Small Editor Step",
+        menu_selector(EditorPauseLayerHook::Callback::onSmallEditorStep),
+        gm->getGameVariable("0035"),
+        bottom_menu,
+        ccp(30.f, director->getScreenBottom() + 120.f),
+        self, self,
+        .7f, .4f, 80.f,
+        ccp(8.f, 0.f),
+        "bigFont.fnt",
+        false
+    );
+
+    GameToolbox::createToggleButton(
+        "Select Filter",
+        menu_selector(EditorPauseLayerHook::Callback::onSelectFilter),
+        gm->getGameVariable(SELECT_FILTER),
+        bottom_menu,
+        ccp(30.f, director->getScreenBottom() + 150.f),
+        self, self,
+        .7f, .4f, 80.f,
+        ccp(8.f, 0.f),
+        "bigFont.fnt",
+        false
+    );
+
+    GameToolbox::createToggleButton(
+        "Show Object Info",
+        menu_selector(EditorPauseLayerHook::Callback::onShowObjectInfo),
+        gm->getGameVariable(SHOW_OBJECT_INFO),
+        bottom_menu,
+        ccp(30.f, director->getScreenBottom() + 180.f),
+        self, self,
+        .7f, .4f, 80.f,
+        ccp(8.f, 0.f),
+        "bigFont.fnt",
+        false
+    );
+
+    GameToolbox::createToggleButton(
+        "Show Ground",
+        menu_selector(EditorPauseLayerHook::Callback::onShowGround),
+        gm->getGameVariable(SHOW_GROUND),
+        bottom_menu,
+        ccp(30.f, director->getScreenBottom() + 210.f),
+        self, self,
+        .7f, .4f, 80.f,
+        ccp(8.f, 0.f),
+        "bigFont.fnt",
+        false
+    );
+
+    GameToolbox::createToggleButton(
+        "Preview Mode",
+        menu_selector(EditorPauseLayerHook::Callback::onPreviewMode),
+        gm->getGameVariable(PREVIEW_MODE),
+        bottom_menu,
+        ccp(30.f, director->getScreenBottom() + 240.f),
+        self, self,
+        .7f, .4f, 80.f,
+        ccp(8.f, 0.f),
+        "bigFont.fnt",
+        false
+    );
+
+    auto onResetStartPosSpr = ButtonSprite::create("Reset\nStartPos", 0x32, 0, .4f, true, "bigFont.fnt", "GJ_button_04.png", 30.f);
+    auto onResetStartPos = CCMenuItemSpriteExtra::create(onResetStartPosSpr, self, menu_selector(EditorPauseLayerHook::Callback::onResetStartPos));
+    onResetStartPos->setPosition(bottom_menu->convertToNodeSpace({ director->getScreenRight() - 50.f, director->getScreenBottom() + 65.f }));
+    bottom_menu->addChild(onResetStartPos);
 }
 
 void EditorPauseLayerHook::FLAlert_ClickedH(EditorPauseLayer* self, FLAlertLayer* layer, bool btn2) {

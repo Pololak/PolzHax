@@ -1,5 +1,6 @@
 #include "LevelEditorLayerHook.h"
 #include "EditorUIHook.h"
+#include "../GameVariables.h"
 #include "../hsv.h"
 #include "../utils.h"
 
@@ -502,9 +503,74 @@ void LevelEditorLayerHook::resetColors() {
 	}
 }
 
+void LevelEditorLayerHook::updateGroundWidth() {
+	if (m_editorLayer) {
+		if (m_groundLayer) {
+			auto director = CCDirector::sharedDirector();
+			auto winSize = director->getWinSize();
+
+			m_groundLayer->setPositionX(m_editorLayer->m_gameLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
+			m_groundLayer->m_line->setPositionX(m_groundLayer->convertToNodeSpace({ winSize.width / 2.f, 0.f }).x);
+
+			float groundWidth = (128.f / m_editorLayer->m_gameLayer->getScale()) * (winSize.width / 128.f) * 1.5f;
+			float groundOffset = m_editorLayer->m_gameLayer->convertToNodeSpace(winSize / 2.f).x;
+			m_groundLayer->m_groundSprite->setTextureRect({ groundOffset, 0.f, groundWidth, 128.f });
+		}
+	}
+}
+
+void LevelEditorLayerHook::removeGroundLayer() {
+	if (m_editorLayer) {
+		if (m_groundLayer != nullptr) {
+			m_groundLayer->removeFromParentAndCleanup(true);
+			m_groundLayer = nullptr;
+		}
+	}
+}
+
+void LevelEditorLayerHook::createGroundLayer() {
+	if (m_editorLayer) {
+		if (m_groundLayer != nullptr) {
+			LevelEditorLayerHook::removeGroundLayer();
+		}
+		m_groundLayer = GJGroundLayer::create(m_editorLayer->m_levelSettings->m_groundIndex);
+		m_groundLayer->hideShadows();
+		m_groundLayer->m_groundSprite->setAnchorPoint({ .5f, 1.f });
+		m_editorLayer->m_gameLayer->addChild(m_groundLayer, 10);
+
+		if (GameManager::sharedState()->getGameVariable(PREVIEW_MODE)) {
+			LevelEditorLayerHook::updatePreviewMode();
+		}
+		else {
+			LevelEditorLayerHook::resetColors();
+		}
+		LevelEditorLayerHook::updateGroundWidth();
+	}
+}
+
+void LevelEditorLayerHook::Callback::onHideUI(CCObject*) {
+	this->m_uiLayer->setVisible(!this->m_uiLayer->isVisible());
+}
+
 bool LevelEditorLayerHook::initH(LevelEditorLayer* self, GJGameLevel* level) {
     m_editorLayer = self;
     if (!LevelEditorLayerHook::init(self, level)) return false;
+
+	auto director = CCDirector::sharedDirector();
+    auto winSize = director->getWinSize();
+
+	auto hideUIMenu = CCMenu::create();
+	hideUIMenu->setPosition(director->getScreenLeft(), director->getScreenTop());
+	self->addChild(hideUIMenu, 100);
+
+	auto hideUIOff = CCSprite::create("BE_eye-off-btn.png");
+	hideUIOff->setOpacity(100);
+	auto hideUIOn = CCSprite::create("BE_eye-on-btn.png");
+
+	auto onHideUI = CCMenuItemToggler::create(hideUIOn, hideUIOff, self, menu_selector(LevelEditorLayerHook::Callback::onHideUI));
+	onHideUI->setScale(.5f);
+	onHideUI->setPosition(165.f, -21.f);
+	hideUIMenu->addChild(onHideUI);
 
     auto& triggers = m_colorTriggers;
     triggers[ColorTriggers::BG];
@@ -522,6 +588,10 @@ bool LevelEditorLayerHook::initH(LevelEditorLayer* self, GJGameLevel* level) {
     m_blendingBatchNode->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
     self->m_gameLayer->addChild(m_blendingBatchNode, 0);
 
+	if (GameManager::sharedState()->getGameVariable(SHOW_GROUND)) {
+		LevelEditorLayerHook::createGroundLayer();
+	}
+
     return true;
 }
 
@@ -538,9 +608,21 @@ void LevelEditorLayerHook::removeSpecialH(LevelEditorLayer* self, GameObject* ob
 void LevelEditorLayerHook::updateVisibilityH(LevelEditorLayer* self, float dt) {
     LevelEditorLayerHook::updateVisibility(self, dt);
 
-    if (!isEditorPaused) {
+    if (!isEditorPaused && GameManager::sharedState()->getGameVariable(PREVIEW_MODE)) {
         LevelEditorLayerHook::updatePreviewMode();
     }
+
+	if (GameManager::sharedState()->getGameVariable(SHOW_GROUND)) {
+		LevelEditorLayerHook::updateGroundWidth();
+	}
+}
+
+void LevelEditorLayerHook::updateH(LevelEditorLayer* self, float dt) {
+	LevelEditorLayerHook::update(self, dt);
+
+	if (GameManager::sharedState()->getGameVariable(SHOW_GROUND)) {
+		LevelEditorLayerHook::updateGroundWidth();
+	}
 }
 
 void LevelEditorLayerHook::destructorH(LevelEditorLayer* self) {
@@ -559,5 +641,6 @@ void LevelEditorLayerHook::mem_init() {
     HOOK("_ZN16LevelEditorLayer10addSpecialEP10GameObject", LevelEditorLayerHook::addSpecialH, LevelEditorLayerHook::addSpecial);
     HOOK("_ZN16LevelEditorLayer13removeSpecialEP10GameObject", LevelEditorLayerHook::removeSpecialH, LevelEditorLayerHook::removeSpecial);
     HOOK("_ZN16LevelEditorLayer16updateVisibilityEf", LevelEditorLayerHook::updateVisibilityH, LevelEditorLayerHook::updateVisibility);
+    HOOK("_ZN16LevelEditorLayer6updateEf", LevelEditorLayerHook::updateH, LevelEditorLayerHook::update);
     HOOK("_ZN16LevelEditorLayerD0Ev", LevelEditorLayerHook::destructorH, LevelEditorLayerHook::destructor);
 }

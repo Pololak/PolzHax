@@ -1,5 +1,7 @@
 #include "EditorUIHook.h"
 #include "LevelEditorLayerHook.h"
+#include "../GlobalClipboard.h"
+#include "../GameVariables.h"
 #include "../utils.h"
 
 EditorUI* m_editorUI;
@@ -9,6 +11,8 @@ EditorUI* EditorUIHook::get() {
 }
 
 void EditorUIHook::updateObjectInfoLabel(EditorUI* self) {
+    if (!GameManager::sharedState()->getGameVariable(SHOW_OBJECT_INFO));
+
     auto objectInfoLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(2701));
     if (objectInfoLabel) {
         std::stringstream ss;
@@ -127,7 +131,7 @@ bool EditorUIHook::initH(EditorUI* self, LevelEditorLayer* editorLayer) {
     objectInfoLabel->setAnchorPoint({ 0.f, 1.f });
     objectInfoLabel->setScale(.6f);
     objectInfoLabel->setPosition(director->getScreenLeft() + 50.f, director->getScreenTop() - 50.f);
-    //objectInfoLabel->setVisible(setting().onShowObjectInfo);
+    objectInfoLabel->setVisible(GameManager::sharedState()->getGameVariable(SHOW_OBJECT_INFO));
     self->addChild(objectInfoLabel, 0, 2701);
 
     auto onTrashSpr = CCSprite::create("GJ_trashBtn_001.png");
@@ -257,7 +261,70 @@ void EditorUIHook::clickOnPositionH(EditorUI* self, CCPoint pos) {
     EditorUIHook::updateObjectInfoLabel(self);
 }
 
+CCPoint EditorUIHook::offsetForKeyH(EditorUI* self, int id) {
+    switch (id) {
+    case 194: return ccp(-4.5f, 4.5f); break;
+    case 406: return ccp(0.f, -8.f); break;
+    case 407: return ccp(0.f, -11.f); break;
+    case 408: return ccp(0.f, -12.5f); break;
+    case 419: return ccp(0.f, -2.5f); break;
+    case 420: return ccp(0.f, -2.5f); break;
+    case 421: return ccp(0.f, -9.f); break;
+    case 422: return ccp(0.f, -9.f); break;
+    default: return EditorUIHook::offsetForKey(self, id); break;
+    }
+}
+
+CCPoint EditorUIHook::moveForCommandH(EditorUI* self, EditCommand command) {
+	float gridSize = self->m_gridSize;
+
+	switch (command) {
+	case static_cast<EditCommand>(101): return ccp(-1.f / 2.f, 0.f) * gridSize;
+	case static_cast<EditCommand>(102): return ccp(1.f / 2.f, 0.f) * gridSize;
+	case static_cast<EditCommand>(103): return ccp(0.f, 1.f / 2.f) * gridSize;
+	case static_cast<EditCommand>(104): return ccp(0.f, -1.f / 2.f) * gridSize;
+
+	case static_cast<EditCommand>(105): return ccp(-1.f / 4.f, 0.f) * gridSize;
+	case static_cast<EditCommand>(106): return ccp(1.f / 4.f, 0.f) * gridSize;
+	case static_cast<EditCommand>(107): return ccp(0.f, 1.f / 4.f) * gridSize;
+	case static_cast<EditCommand>(108): return ccp(0.f, -1.f / 4.f) * gridSize;
+
+	case static_cast<EditCommand>(109): return ccp(-1.f / 8.f, 0.f) * gridSize;
+	case static_cast<EditCommand>(110): return ccp(1.f / 8.f, 0.f) * gridSize;
+	case static_cast<EditCommand>(111): return ccp(0.f, 1.f / 8.f) * gridSize;
+	case static_cast<EditCommand>(112): return ccp(0.f, -1.f / 8.f) * gridSize;
+
+	case static_cast<EditCommand>(113): return ccp(-.5f, 0.f);
+	case static_cast<EditCommand>(114): return ccp(.5f, 0.f);
+	case static_cast<EditCommand>(115): return ccp(0.f, .5f);
+	case static_cast<EditCommand>(116): return ccp(0.f, -.5f);
+
+	case static_cast<EditCommand>(117): return ccp(-.1f, 0.f);
+	case static_cast<EditCommand>(118): return ccp(.1f, 0.f);
+	case static_cast<EditCommand>(119): return ccp(0.f, .1f);
+	case static_cast<EditCommand>(120): return ccp(0.f, -.1f);
+
+	default: return EditorUIHook::moveForCommand(self, command);
+	}
+}
+
 void EditorUIHook::transformObjectH(EditorUI* self, GameObject* object, EditCommand command, bool p0) {
+    CCArray* selectedObjects = self->getSelectedObjects();
+    int selectedObjectsCount = selectedObjects->count();
+
+    if (object->canRotateFree()) {
+        switch (command) {
+        case static_cast<EditCommand>(121):
+            self->rotateObjects(selectedObjects, (45.f / selectedObjectsCount), ccp(0.f, 0.f)); break;
+        case static_cast<EditCommand>(122):
+            self->rotateObjects(selectedObjects, -(45.f / selectedObjectsCount), ccp(0.f, 0.f)); break;
+        case static_cast<EditCommand>(123):
+            self->rotateObjects(selectedObjects, (26.f / selectedObjectsCount), ccp(0.f, 0.f)); break;
+        case static_cast<EditCommand>(124):
+            self->rotateObjects(selectedObjects, -(26.f / selectedObjectsCount), ccp(0.f, 0.f)); break;
+        }
+    }
+
     EditorUIHook::transformObject(self, object, command, p0);
 
     EditorUIHook::updateObjectInfoLabel(self);
@@ -298,6 +365,8 @@ void EditorUIHook::mem_init() {
     HOOK("_ZN8EditorUI12angleChangedEf", EditorUIHook::angleChangedH, EditorUIHook::angleChanged);
     HOOK("_ZN8EditorUI13updateButtonsEv", EditorUIHook::updateButtonsH, EditorUIHook::updateButtons);
     HOOK("_ZN8EditorUI15clickOnPositionEN7cocos2d7CCPointE", EditorUIHook::clickOnPositionH, EditorUIHook::clickOnPosition);
+    HOOK("_ZN8EditorUI12offsetForKeyEi", EditorUIHook::offsetForKeyH, EditorUIHook::offsetForKey);
+    HOOK("_ZN8EditorUI14moveForCommandE11EditCommand", EditorUIHook::moveForCommandH, EditorUIHook::moveForCommand);
     HOOK("_ZN8EditorUI15transformObjectEP10GameObject11EditCommandb", EditorUIHook::transformObjectH, EditorUIHook::transformObject);
     HOOK("_ZN8EditorUI11onGroupDownEPN7cocos2d8CCObjectE", EditorUIHook::onGroupDownH, EditorUIHook::onGroupDown);
     HOOK("_ZN8EditorUI9onGroupUpEPN7cocos2d8CCObjectE", EditorUIHook::onGroupUpH, EditorUIHook::onGroupUp);

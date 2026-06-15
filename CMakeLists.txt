@@ -8,18 +8,8 @@ set(ANDROID_ABI armeabi-v7a)
 
 project(polzhax)
 
-add_library(polzhax SHARED
-    ./src/KittyMemory/KittyMemory.cpp
-    ./src/KittyMemory/MemoryPatch.cpp
-    ./src/KittyMemory/KittyUtils.cpp
-    ./src/KittyMemory/MemoryBackup.cpp
-    ./src/main.cpp
-    ./src/Hooks/CustomizeObjectLayerHook.cpp
-    ./src/Hooks/EditorPauseLayerHook.cpp
-    ./src/Hooks/EditorUIHook.cpp
-    ./src/Hooks/GameObjectHook.cpp
-    ./src/Hooks/LevelEditorLayerHook.cpp
-)
+file(GLOB SOURCES "src/*.cpp" "src/Hooks/*.cpp" "src/Layers/*.cpp" "src/KittyMemory/*.cpp" "src/Menu/*.cpp")
+add_library(polzhax SHARED ${SOURCES})
 
 target_include_directories(polzhax PUBLIC 
     libs/cocos2dx
@@ -33,6 +23,8 @@ target_include_directories(polzhax PUBLIC
     libs/Dobby
     libs/Dobby/include
     libs/KittyMemory
+    libs/rapidJson
+    libs/rapidJson/include
 )
 
 set(DCMAKE_BUILD_TYPE Debug)

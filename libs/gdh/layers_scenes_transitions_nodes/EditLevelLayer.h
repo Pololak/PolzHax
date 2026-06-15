@@ -16,6 +16,8 @@ public:
     bool m_isLoadingLevel; // 0x130
     GJLevelType m_levelType; // 0x134
     std::string m_levelName; // 0x138
+
+    static cocos2d::CCScene* scene(GJGameLevel*);
 };
 
 #endif
