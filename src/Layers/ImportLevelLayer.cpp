@@ -55,11 +55,18 @@ bool ManualImportLevelLayer::init() { // Dev thing
     m_pathInput->setLabelPlaceholderScale(.5f);
     m_pathInput->setLabelPlaceholderColor(ccGRAY);
     layer->addChild(m_pathInput);
-    
+
+    m_fileCheckSprite = CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png");
+    m_fileCheckSprite->setScale(.8f);
+    m_fileCheckSprite->setPosition({winSize.width / 2.f + 113.f, winSize.height / 2.f});
+    layer->addChild(m_fileCheckSprite);
+
     auto onImportSpr = ButtonSprite::create("Import", 84, 0, .8f, true, "goldFont.fnt", "GJ_button_01.png", 30.f);
     auto onImport = CCMenuItemSpriteExtra::create(onImportSpr, this, menu_selector(ManualImportLevelLayer::onImport));
     onImport->setPosition(0.f, -45.f);
     menu->addChild(onImport);
+
+    this->updateSprite();
 
     this->setTouchEnabled(true);
     this->setKeypadEnabled(true);
@@ -79,6 +86,27 @@ void ManualImportLevelLayer::onClose(CCObject*) {
 
 void ManualImportLevelLayer::textChanged(CCTextInputNode* input) {
     defaultPath = input->getString();
+    this->updateSprite();
+}
+
+void ManualImportLevelLayer::updateSprite() {
+    if (m_fileCheckSprite) {
+        if (defaultPath.find(".gmd") == std::string::npos) {
+            m_fileCheckSprite->initWithSpriteFrameName("GJ_deleteIcon_001.png");
+            return;
+        }
+
+        std::ifstream fcheck;
+        fcheck.open(defaultPath.c_str());
+        if (!fcheck.is_open()) {
+            m_fileCheckSprite->initWithSpriteFrameName("GJ_deleteIcon_001.png");
+            fcheck.close();
+            return;
+        }
+        fcheck.close();
+
+        m_fileCheckSprite->initWithSpriteFrameName("GJ_completesIcon_001.png");
+    }
 }
 
 void ManualImportLevelLayer::onImport(CCObject*) {

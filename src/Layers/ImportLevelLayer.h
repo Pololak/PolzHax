@@ -11,11 +11,12 @@ public:
 class ManualImportLevelLayer : public FLAlertLayer, public TextInputDelegate {
 protected:
     CCTextInputNode* m_pathInput;
-    CCLabelBMFont* m_fileSizeLabel;
+    CCSprite* m_fileCheckSprite;
 
     virtual bool init();
     virtual void keyBackClicked();
     virtual void textChanged(CCTextInputNode*);
+    void updateSprite();
     void onClose(CCObject*);
     void onImport(CCObject*);
 public:
