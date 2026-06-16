@@ -19,49 +19,106 @@ SettingStruct& setting() {
 }
 
 void SettingStruct::load() {
-    // freopen("/storage/emulated/0/PolzHaxMobile/19/polzhax.txt", "r", stdin);
-    // int hc;
-    // std::cin >> hc;
-    // for (int i = 0; i < hc; ++i) {
-    //     std::string name;
-    //     std::cin >> name;
-    //     if (name == "onCharacterFilter") std::cin >> setting().onCharacterFilter;
-    //     if (name == "onIcons") std::cin >> setting().onIcons;
-    //     if (name == "onMainLevels") std::cin >> setting().onMainLevels;
-    //     if (name == "onSliderLimit") std::cin >> setting().onSliderLimit;
-    //     if (name == "onTextLength") std::cin >> setting().onTextLength;
-    // }
+    std::ifstream f;
+    f.open("/storage/emulated/0/PolzHaxMobile/19/polzhax.txt");
+    if (!f.is_open()) {
+        f.close();
+        return;
+    }
+    f.close();
 
-    // if (f.is_open()) {
-    //     int count;
-    //     f >> count;
-    //     for (int i = 0; i < count; ++i) {
-    //         std::string name;
-    //         f >> name;
-    //         if (name == SETTING_NAME(setting().onCharacterFilter))  f >> setting().onCharacterFilter;
-    //         if (name == SETTING_NAME(setting().onIcons))            f >> setting().onIcons;
-    //         if (name == SETTING_NAME(setting().onMainLevels))       f >> setting().onMainLevels;
-    //         if (name == SETTING_NAME(setting().onSliderLimit))      f >> setting().onSliderLimit;
-    //         if (name == SETTING_NAME(setting().onTextLength))       f >> setting().onTextLength;
-    //     }
-    // }
+    auto file = readFile("/storage/emulated/0/PolzHaxMobile/19/polzhax.txt");
+    std::string data(file.begin(), file.end());
+
+    tinyxml2::XMLDocument doc;
+    auto parseRes = doc.Parse(data.c_str());
+
+    if (parseRes != tinyxml2::XMLError::XML_SUCCESS) {
+        return;
+    }
+
+    auto child = doc.FirstChildElement("setting");
+    for (child = child->FirstChildElement(); child != nullptr; child = child->NextSiblingElement("name")) {
+        if (strcmp(child->Value(), "name") == 0) {
+            auto key = child->GetText();
+
+            child = child->NextSiblingElement();
+            if (child == nullptr) break;
+
+            auto value = child->GetText();
+            if (value == nullptr) continue;
+
+            // Bypass
+            if (strcmp(key, SETTING_NAME(setting().onCharacterFilter)) == 0) {
+                setting().onCharacterFilter = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onIcons)) == 0) {
+                setting().onIcons = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onMainLevels)) == 0) {
+                setting().onMainLevels = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onSliderLimit)) == 0) {
+                setting().onSliderLimit = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onTextLength)) == 0) {
+                setting().onTextLength = std::atoi(value);
+            }
+            // Cosmetic
+            else if (strcmp(key, SETTING_NAME(setting().onNoDeathEffect)) == 0) {
+                setting().onNoDeathEffect = std::atoi(value);
+            }
+            // Speedhack
+            else if (strcmp(key, SETTING_NAME(setting().onSpeedhack)) == 0) {
+                setting().onSpeedhack = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onSpeedhackMusic)) == 0) {
+                setting().onSpeedhackMusic = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().speedhackValue)) == 0) {
+                setting().speedhackValue = static_cast<float>(std::atof(value));
+            }
+        }
+    }
+
+    LOGD("State loaded...");
 }
 
 void SettingStruct::save() {
-    // std::ofstream f;
-    // f.open("/storage/emulated/0/PolzHaxMobile/19/polzhax.json", std::ofstream::binary);
-    // if (f.is_open()) {
-    //     f << SETTING_COUNT << "\n";
-    //     f << SETTING_NAME(setting().onCharacterFilter) << " "    << setting().onCharacterFilter << "\n";
-    //     f << SETTING_NAME(setting().onIcons) << " "              << setting().onIcons << "\n";
-    //     f << SETTING_NAME(setting().onMainLevels) << " "         << setting().onMainLevels << "\n";
-    //     f << SETTING_NAME(setting().onSliderLimit) << " "        << setting().onSliderLimit << "\n";
-    //     f << SETTING_NAME(setting().onTextLength) << " "         << setting().onTextLength << "\n";
-    //     f.close();
-    // }
+    std::stringstream data;
 
-    // LOGD("SettingStruct size: %i", sizeof(SettingStruct));
-    // for (int i = 0; i < sizeof(SettingStruct); ++i) {
+    {
+        data
+            << "<setting>"
+            // Bypass
+            << "<name>" << SETTING_NAME(setting().onCharacterFilter) << "</name>"
+            << "<val>" << setting().onCharacterFilter << "</val>"
+            << "<name>" << SETTING_NAME(setting().onIcons) << "</name>"
+            << "<val>" << setting().onIcons << "</val>"
+            << "<name>" << SETTING_NAME(setting().onMainLevels) << "</name>"
+            << "<val>" << setting().onMainLevels << "</val>"
+            << "<name>" << SETTING_NAME(setting().onSliderLimit) << "</name>"
+            << "<val>" << setting().onSliderLimit << "</val>"
+            << "<name>" << SETTING_NAME(setting().onTextLength) << "</name>"
+            << "<val>" << setting().onTextLength << "</val>"
+            // Cosmetic
+            << "<name>" << SETTING_NAME(setting().onNoDeathEffect) << "</name>"
+            << "<val>" << setting().onNoDeathEffect << "</val>"
+            // Speedhack
+            << "<name>" << SETTING_NAME(setting().onSpeedhack) << "</name>"
+            << "<val>" << setting().onSpeedhack << "</val>"
+            << "<name>" << SETTING_NAME(setting().onSpeedhackMusic) << "</name>"
+            << "<val>" << setting().onSpeedhackMusic << "</val>"
+            << "<name>" << SETTING_NAME(setting().speedhackValue) << "</name>"
+            << "<val>" << setting().speedhackValue << "</val>"
+            << "</setting>";
+    }
 
-    // }
+    std::ofstream f;
+    f.open("/storage/emulated/0/PolzHaxMobile/19/polzhax.txt", std::ios::out | std::ios::trunc | std::ios::binary);
+    f.clear();
+    f.write(data.str().c_str(), data.str().size());
+    f.close();
+
+    LOGD("State saved...");
 }

@@ -9,5 +9,6 @@
 #include "jni.h"
 
 #define GDBASE "libcocos2dcpp.so"
+#define ANDROID32_OFFSET 0x10000
 
 using namespace cocos2d;

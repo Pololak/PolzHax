@@ -11,15 +11,11 @@ struct SettingStruct {
     bool onMainLevels;
     bool onSliderLimit;
     bool onTextLength;
+
+    bool onNoDeathEffect;
+
+    bool onSpeedhack, onSpeedhackMusic;
+    float speedhackValue = 1.f;
 };
 
 SettingStruct& setting();
-
-DEF_SCHEMA(
-    SettingStruct,
-    onCharacterFilter,
-    onIcons,
-    onMainLevels,
-    onSliderLimit,
-    onTextLength
-)

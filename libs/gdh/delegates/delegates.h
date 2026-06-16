@@ -16,6 +16,12 @@ class CCIndexPath;
 class TableView;
 class TableViewCell;
 
+class AppDelegate : public cocos2d::CCApplication {
+public:
+	static AppDelegate* get();
+	void trySaveGame();
+};
+
 class ColorSelectDelegate {
     virtual void colorSelectClosed(ColorSelectPopup*);
 };

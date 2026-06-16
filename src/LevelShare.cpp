@@ -2,12 +2,6 @@
 #include <fstream>
 #include "utils.h"
 
-std::vector<char> readFile(const char* filename) {
-    std::basic_ifstream<char> file(filename, std::ios::binary);
-
-    return std::vector<char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-}
-
 bool LevelShare::exportLevel(GJGameLevel* level, std::string name, bool replace) {
     const std::string songKey = level->m_songID ?
         ("<k>k45</k><i>" + std::string(CCString::createWithFormat("%i", level->m_songID)->getCString()) + "</i>") :
@@ -54,8 +48,8 @@ bool LevelShare::exportLevel(GJGameLevel* level, std::string name, bool replace)
     }
 
     std::ofstream f;
-    f.open(path.c_str(), std::ios::out | std::ios::binary);
-    f << data.str();
+    f.open(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+    f.write(data.str().c_str(), data.str().size());
     f.close();
 
     FLAlertLayer::create("Success", "The level has been exported.", "OK")->show();

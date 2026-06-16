@@ -5,6 +5,7 @@
 #include "Hooks/EditLevelLayerHook.h"
 #include "Hooks/EditorPauseLayerHook.h"
 #include "Hooks/EditorUIHook.h"
+#include "Hooks/FMODAudioEngineHook.h"
 #include "Hooks/GameObjectHook.h"
 #include "Hooks/LevelBrowserLayerHook.h"
 #include "Hooks/LevelEditorLayerHook.h"
@@ -16,12 +17,51 @@
 
 #include "Setting.h"
 #include "utils.h"
+#include "ModPatches.h"
+#include "Speedhack.h"
+#include "Menu/SpeedHackLayer.h"
 
 namespace MenuLayerHook {
     class Callback : public MenuLayer {
     public:
-        void onImportLevel(CCObject*) {
-            LevelShare::importLevel("/storage/emulated/0/PolzHaxMobile/19/levels/Bloodbath.gmd");
+        void onCharacterFilter(CCObject*) {
+            setting().onCharacterFilter = !setting().onCharacterFilter;
+            ModPatches::onCharacterFilter();
+        }
+
+        void onIcons(CCObject*) {
+            setting().onIcons = !setting().onIcons;
+            ModPatches::onIcons();
+        }
+
+        void onMainLevels(CCObject*) {
+            setting().onMainLevels = !setting().onMainLevels;
+            ModPatches::onMainLevels();
+        }
+
+        void onSliderLimit(CCObject*) {
+            setting().onSliderLimit = !setting().onSliderLimit;
+            ModPatches::onSliderLimit();
+        }
+
+        void onTextLength(CCObject*) {
+            setting().onTextLength = !setting().onTextLength;
+            ModPatches::onTextLength();
+        }
+
+        void onNoDeathEffect(CCObject*) {
+            setting().onNoDeathEffect = !setting().onNoDeathEffect;
+            ModPatches::onNoDeathEffect();
+        }
+
+        void onSpeedhack(CCObject*) {
+            setting().onSpeedhack = !setting().onSpeedhack;
+            Speedhack::updateSpeedhack();
+        }
+
+        void onSpeedhackMusic(CCObject*) {
+            setting().onSpeedhackMusic = !setting().onSpeedhackMusic;
+            Speedhack::updateSpeedhackMusic();
         }
     };
 
@@ -33,17 +73,128 @@ namespace MenuLayerHook {
         auto winSize = director->getWinSize();
 
         auto menu = CCMenu::create();
-        self->addChild(menu);
+        self->addChild(menu, 15);
 
         auto onPolzHaxSpr = CCSprite::create("GJ_polzhaxBtn_001.png");
         onPolzHaxSpr->setScale(.85f);
-        auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, menu_selector(MenuLayerHook::Callback::onImportLevel));
+        auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, 0);
         onPolzHax->setPosition(menu->convertToNodeSpace({director->getScreenLeft() + 30.f, winSize.height / 2.f}));
         menu->addChild(onPolzHax);
+
+        GameToolbox::createToggleButton(
+            "Character Filter",
+            menu_selector(Callback::onCharacterFilter),
+            setting().onCharacterFilter,
+            menu,
+            ccp(75.f, director->getScreenTop() - 90.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Icons",
+            menu_selector(Callback::onIcons),
+            setting().onIcons,
+            menu,
+            ccp(75.f, director->getScreenTop() - 120.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Main Levels",
+            menu_selector(Callback::onMainLevels),
+            setting().onMainLevels,
+            menu,
+            ccp(75.f, director->getScreenTop() - 150.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Slider Limit",
+            menu_selector(Callback::onSliderLimit),
+            setting().onSliderLimit,
+            menu,
+            ccp(75.f, director->getScreenTop() - 180.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Text Length",
+            menu_selector(Callback::onTextLength),
+            setting().onTextLength,
+            menu,
+            ccp(75.f, director->getScreenTop() - 210.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "No Death Effect",
+            menu_selector(Callback::onNoDeathEffect),
+            setting().onNoDeathEffect,
+            menu,
+            ccp(75.f, director->getScreenTop() - 240.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Speedhack",
+            menu_selector(Callback::onSpeedhack),
+            setting().onSpeedhack,
+            menu,
+            ccp(75.f, director->getScreenTop() - 270.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Speedhack Music",
+            menu_selector(Callback::onSpeedhackMusic),
+            setting().onSpeedhackMusic,
+            menu,
+            ccp(75.f, director->getScreenTop() - 300.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        Speedhack::updateSpeedhack();
 
         setting().save();
 
         return true;
+    }
+
+    inline void(*onMoreGames)(MenuLayer*, CCObject*);
+    void onMoreGamesH(MenuLayer* self, CCObject* sender) {
+        SpeedHackLayer::create()->show();
     }
 }
 
@@ -73,13 +224,40 @@ namespace LoadingLayerHook {
     void loadingFinishedH(LoadingLayer* self) {
         LoadingLayerHook::loadingFinished(self);
 
-        setting().load();
+        Speedhack::updateSpeedhack();
+    }
+}
+
+namespace AppDelegateHook {
+    inline void(*applicationDidEnterBackground)(AppDelegate*);
+    void applicationDidEnterBackgroundH(AppDelegate* self) {
+        AppDelegateHook::applicationDidEnterBackground(self);
+
+        setting().save();
+    }
+
+    inline void(*applicationWillEnterForeground)(AppDelegate*);
+    void applicationWillEnterForegroundH(AppDelegate* self) {
+        AppDelegateHook::applicationWillEnterForeground(self);
+
+        setting().save();
+    }
+
+    inline void(*trySaveGame)(AppDelegate*);
+    void trySaveGameH(AppDelegate* self) {
+        AppDelegateHook::trySaveGame(self);
+
+        setting().save();
     }
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     create_directories("/storage/emulated/0/PolzHaxMobile/19");
     create_directories("/storage/emulated/0/PolzHaxMobile/19/levels");
+
+    setting().load();
+
+    ModPatches::loadPatches();
 
     PatchManager patchManager;
 
@@ -92,6 +270,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     EditLevelLayerHook::mem_init();
     EditorPauseLayerHook::mem_init();
     EditorUIHook::mem_init();
+    FMODAudioEngineHook::mem_init();
     GameObjectHook::mem_init();
     LevelBrowserLayerHook::mem_init();
     LevelEditorLayerHook::mem_init();
@@ -99,8 +278,12 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     LevelSettingsLayerHook::mem_init();
     SetGroupIDLayerHook::mem_init();
 
-	HOOK("_ZN12LoadingLayer15loadingFinishedEv", LoadingLayerHook::loadingFinishedH, LoadingLayerHook::loadingFinished);
+	HOOK("_ZN11AppDelegate29applicationDidEnterBackgroundEv", AppDelegateHook::applicationDidEnterBackgroundH, AppDelegateHook::applicationDidEnterBackground);
+	HOOK("_ZN11AppDelegate30applicationWillEnterForegroundEv", AppDelegateHook::applicationWillEnterForegroundH, AppDelegateHook::applicationWillEnterForeground);
+	HOOK("_ZN11AppDelegate11trySaveGameEv", AppDelegateHook::trySaveGameH, AppDelegateHook::trySaveGame);
+	//HOOK("_ZN12LoadingLayer15loadingFinishedEv", LoadingLayerHook::loadingFinishedH, LoadingLayerHook::loadingFinished);
 	HOOK("_ZN9MenuLayer4initEv", MenuLayerHook::initH, MenuLayerHook::init);
+	HOOK("_ZN9MenuLayer11onMoreGamesEPN7cocos2d8CCObjectE", MenuLayerHook::onMoreGamesH, MenuLayerHook::onMoreGames);
 	HOOK("_ZN16LevelSelectLayer4initEi", LevelSelectLayerHook::initH, LevelSelectLayerHook::init);
 
 	return JNI_VERSION_1_6;

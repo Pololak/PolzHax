@@ -97,6 +97,8 @@ namespace base64 {
 	}
 }
 
-static constexpr unsigned int h$(const char* str, int h = 0) {
-    return !str[h] ? 5381 : (h$(str, h+1) * 33) ^ str[h];
+inline std::vector<char> readFile(const char* filename) {
+    std::basic_ifstream<char> file(filename, std::ios::binary);
+
+    return std::vector<char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
