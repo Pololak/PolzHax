@@ -11,6 +11,9 @@ namespace UILayer {
 	inline void(__thiscall* keyUp)(gd::UILayer*, enumKeyCodes);
 	void __fastcall keyUpH(gd::UILayer*, void*, enumKeyCodes);
 
+	inline void(__thiscall* onPause)(gd::UILayer*, CCObject*);
+	void __fastcall onPauseH(gd::UILayer*, void*, CCObject*);
+
 	class Callback : public gd::UILayer {
 	public:
 		void onPrevStartPos(CCObject*);

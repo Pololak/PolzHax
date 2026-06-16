@@ -7,7 +7,7 @@ namespace gd {
 	class GJGameLevel;
 	class CCMenuItemSpriteExtra;
 	enum class GJLevelType;
-	class LoadingLayer;
+	class LoadingCircle;
 
 	class LevelInfoLayer : public cocos2d::CCLayer, LevelDownloadDelegate, LevelUpdateDelegate, RateLevelDelegate, LikeItemDelegate, public FLAlertLayerProtocol, LevelDeleteDelegate, NumberInputDelegate {
 	public:

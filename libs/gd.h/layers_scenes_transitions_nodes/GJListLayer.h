@@ -1,7 +1,7 @@
 #ifndef __GJLISTLAYER_H__
 #define __GJLISTLAYER_H__
 
-#include "gd.h"
+#include <gd.h>
 
 namespace gd {
 	#pragma runtime_checks("s", off)

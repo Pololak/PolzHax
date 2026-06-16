@@ -74,8 +74,17 @@ void __fastcall UILayer::keyUpH(gd::UILayer* self, void*, enumKeyCodes key) {
 	}
 }
 
+void __fastcall UILayer::onPauseH(gd::UILayer* self, void*, CCObject* sender) {
+	UILayer::onPause(self, sender);
+	self->m_p1TouchId = -1;
+	self->m_p2TouchId = -1;
+	self->m_p1Jumping = false;
+	self->m_p2Jumping = false;
+}
+
 void UILayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xfec60), UILayer::initH, reinterpret_cast<void**>(&UILayer::init));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xff130), UILayer::keyDownH, reinterpret_cast<void**>(&UILayer::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xff2c0), UILayer::keyUpH, reinterpret_cast<void**>(&UILayer::keyUp));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xff380), UILayer::onPauseH, reinterpret_cast<void**>(&UILayer::onPause));
 }
