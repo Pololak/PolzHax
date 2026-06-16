@@ -134,6 +134,8 @@ public:
 
     PlayerObject* getPlayer() const;
     float getLevelLength() const;
+    void setStartPosObject(StartPosObject*);
+    void resetLevel();
 };
 
 #endif

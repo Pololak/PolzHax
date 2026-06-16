@@ -113,6 +113,8 @@ public:
     GJCustomColorMode getColorMode();
 
     bool canRotateFree();
+
+    OBB2D* getOrientedBox();
 };
 
 #endif

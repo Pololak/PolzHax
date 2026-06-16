@@ -68,6 +68,13 @@ void SettingStruct::load() {
             else if (strcmp(key, SETTING_NAME(setting().onNoDeathEffect)) == 0) {
                 setting().onNoDeathEffect = std::atoi(value);
             }
+            // Level
+            else if (strcmp(key, SETTING_NAME(setting().onSmartStartPos)) == 0) {
+                setting().onSmartStartPos = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onStartPosSwitcher)) == 0) {
+                setting().onStartPosSwitcher = std::atoi(value);
+            }
             // Speedhack
             else if (strcmp(key, SETTING_NAME(setting().onSpeedhack)) == 0) {
                 setting().onSpeedhack = std::atoi(value);
@@ -104,6 +111,11 @@ void SettingStruct::save() {
             // Cosmetic
             << "<name>" << SETTING_NAME(setting().onNoDeathEffect) << "</name>"
             << "<val>" << setting().onNoDeathEffect << "</val>"
+            // Level
+            << "<name>" << SETTING_NAME(setting().onSmartStartPos) << "</name>"
+            << "<val>" << setting().onSmartStartPos << "</val>"
+            << "<name>" << SETTING_NAME(setting().onStartPosSwitcher) << "</name>"
+            << "<val>" << setting().onStartPosSwitcher << "</val>"
             // Speedhack
             << "<name>" << SETTING_NAME(setting().onSpeedhack) << "</name>"
             << "<val>" << setting().onSpeedhack << "</val>"

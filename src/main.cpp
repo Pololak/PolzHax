@@ -11,7 +11,9 @@
 #include "Hooks/LevelEditorLayerHook.h"
 #include "Hooks/LevelInfoLayerHook.h"
 #include "Hooks/LevelSettingsLayerHook.h"
+#include "Hooks/PlayLayerHook.h"
 #include "Hooks/SetGroupIDLayerHook.h"
+#include "Hooks/UILayerHook.h"
 
 #include "LevelShare.h"
 
@@ -62,6 +64,14 @@ namespace MenuLayerHook {
         void onSpeedhackMusic(CCObject*) {
             setting().onSpeedhackMusic = !setting().onSpeedhackMusic;
             Speedhack::updateSpeedhackMusic();
+        }
+
+        void onSmartStartPos(CCObject*) {
+            setting().onSmartStartPos = !setting().onSmartStartPos;
+        }
+
+        void onStartPosSwitcher(CCObject*) {
+            setting().onStartPosSwitcher = !setting().onStartPosSwitcher;
         }
     };
 
@@ -184,6 +194,32 @@ namespace MenuLayerHook {
             "bigFont.fnt",
             false
         );
+        //
+        GameToolbox::createToggleButton(
+            "Smart StartPos",
+            menu_selector(Callback::onSmartStartPos),
+            setting().onSmartStartPos,
+            menu,
+            ccp(195.f, director->getScreenTop() - 90.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "StartPos Switcher",
+            menu_selector(Callback::onStartPosSwitcher),
+            setting().onStartPosSwitcher,
+            menu,
+            ccp(195.f, director->getScreenTop() - 120.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
 
         Speedhack::updateSpeedhack();
 
@@ -276,7 +312,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     LevelEditorLayerHook::mem_init();
     LevelInfoLayerHook::mem_init();
     LevelSettingsLayerHook::mem_init();
+    PlayLayerHook::mem_init();
     SetGroupIDLayerHook::mem_init();
+    UILayerHook::mem_init();
 
 	HOOK("_ZN11AppDelegate29applicationDidEnterBackgroundEv", AppDelegateHook::applicationDidEnterBackgroundH, AppDelegateHook::applicationDidEnterBackground);
 	HOOK("_ZN11AppDelegate30applicationWillEnterForegroundEv", AppDelegateHook::applicationWillEnterForegroundH, AppDelegateHook::applicationWillEnterForeground);
