@@ -73,6 +73,12 @@ void SettingStruct::load() {
                 setting().onHitboxBugFix = std::atoi(value);
             }
             // Level
+            else if (strcmp(key, SETTING_NAME(setting().onNoclip)) == 0) {
+                setting().onNoclip = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onPracticeMusic)) == 0) {
+                setting().onPracticeMusic = std::atoi(value);
+            }
             else if (strcmp(key, SETTING_NAME(setting().onSmartStartPos)) == 0) {
                 setting().onSmartStartPos = std::atoi(value);
             }
@@ -146,6 +152,10 @@ void SettingStruct::save() {
             << "<name>" << SETTING_NAME(setting().onHitboxBugFix) << "</name>"
             << "<val>" << setting().onHitboxBugFix << "</val>"
             // Level
+            << "<name>" << SETTING_NAME(setting().onNoclip) << "</name>"
+            << "<val>" << setting().onNoclip << "</val>"
+            << "<name>" << SETTING_NAME(setting().onPracticeMusic) << "</name>"
+            << "<val>" << setting().onPracticeMusic << "</val>"
             << "<name>" << SETTING_NAME(setting().onSmartStartPos) << "</name>"
             << "<val>" << setting().onSmartStartPos << "</val>"
             << "<name>" << SETTING_NAME(setting().onStartPosSwitcher) << "</name>"

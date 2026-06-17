@@ -13,4 +13,8 @@ namespace ModPatches {
 
     // Cosmetic
     void onNoDeathEffect();
+
+    // Level
+    void onNoclip();
+    void onPracticeMusic();
 }

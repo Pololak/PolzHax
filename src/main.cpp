@@ -82,6 +82,16 @@ namespace MenuLayerHook {
         void onNoTransition(CCObject*) {
             setting().onNoTransition = !setting().onNoTransition;
         }
+
+        void onNoclip(CCObject*) {
+            setting().onNoclip = !setting().onNoclip;
+            ModPatches::onNoclip();
+        }
+
+        void onPracticeMusic(CCObject*) {
+            setting().onPracticeMusic = !setting().onPracticeMusic;
+            ModPatches::onPracticeMusic();
+        }
     };
 
     inline bool(*init)(MenuLayer*);
@@ -249,6 +259,32 @@ namespace MenuLayerHook {
             setting().onNoTransition,
             menu,
             ccp(195.f, director->getScreenTop() - 180.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Noclip",
+            menu_selector(Callback::onNoclip),
+            setting().onNoclip,
+            menu,
+            ccp(195.f, director->getScreenTop() - 210.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Practice Music",
+            menu_selector(Callback::onPracticeMusic),
+            setting().onPracticeMusic,
+            menu,
+            ccp(195.f, director->getScreenTop() - 240.f),
             self, self,
             .7f, .4f, 80.f,
             ccp(8.f, 0.f),

@@ -67,6 +67,37 @@ namespace ModPatches {
         }
     }
 
+    // Level
+    void onNoclip() {
+        if (setting().onNoclip) {
+            MemoryPatch::createWithHex(GDBASE, 0x1c5f6c - ANDROID32_OFFSET, "00 bf 39 e1").Modify();
+        }
+        else {
+            MemoryPatch::createWithHex(GDBASE, 0x1c5f6c - ANDROID32_OFFSET, "40 f0 3a 81").Modify();
+        }
+    }
+
+    void onPracticeMusic() {
+        if (setting().onPracticeMusic) {
+            MemoryPatch::createWithHex(GDBASE, 0x1c8eba - ANDROID32_OFFSET, "00 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c9050 - ANDROID32_OFFSET, "03 e0").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c60c6 - ANDROID32_OFFSET, "00 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c60f2 - ANDROID32_OFFSET, "00 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c906a - ANDROID32_OFFSET, "00 bf 00 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c757e - ANDROID32_OFFSET, "04 e0").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c7666 - ANDROID32_OFFSET, "00 bf").Modify();
+        }
+        else {
+            MemoryPatch::createWithHex(GDBASE, 0x1c8eba - ANDROID32_OFFSET, "79 d1").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c9050 - ANDROID32_OFFSET, "1d b1").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c60c6 - ANDROID32_OFFSET, "93 b9").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c60f2 - ANDROID32_OFFSET, "1d b9").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c906a - ANDROID32_OFFSET, "e3 f7 eb fe").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c757e - ANDROID32_OFFSET, "23 b1").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1c7666 - ANDROID32_OFFSET, "44 d1").Modify();
+        }
+    }
+
     void loadPatches() {
         // Bypass
         onCharacterFilter();
@@ -77,5 +108,9 @@ namespace ModPatches {
         
         // Cosmetic
         onNoDeathEffect();
+
+        // Level
+        onNoclip();
+        onPracticeMusic();
     }
 }

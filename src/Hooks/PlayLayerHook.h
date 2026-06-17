@@ -17,6 +17,9 @@ namespace PlayLayerHook {
     inline void(*createObjectsFromSetup)(PlayLayer*, std::string);
     void createObjectsFromSetupH(PlayLayer*, std::string);
 
+    inline void(*togglePracticeMode)(PlayLayer*, bool);
+    void togglePracticeModeH(PlayLayer*, bool);
+
     inline void(*updateVisibility)(PlayLayer*, float);
     void updateVisibilityH(PlayLayer*, float);
 

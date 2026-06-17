@@ -225,9 +225,28 @@ void PlayLayerHook::createObjectsFromSetupH(PlayLayer* self, std::string objects
     }
 }
 
+void PlayLayerHook::togglePracticeModeH(PlayLayer* self, bool practice) {
+	if (setting().onPracticeMusic && practice && !self->m_practiceMode) {
+		self->m_practiceMode = practice;
+		self->m_uiLayer->toggleCheckpointsMenu(practice);
+		self->stopActionByTag(18);
+	}
+	else {
+		PlayLayerHook::togglePracticeMode(self, practice);
+	}
+
+	if (practice) {
+		auto startPosSwitcherMenu = static_cast<CCMenu*>(self->m_uiLayer->getChildByTag(125));
+		static_cast<CCLabelBMFont*>(startPosSwitcherMenu->getChildByTag(1))->setVisible(false);
+		static_cast<CCMenuItemSpriteExtra*>(startPosSwitcherMenu->getChildByTag(2))->setVisible(false);
+		static_cast<CCMenuItemSpriteExtra*>(startPosSwitcherMenu->getChildByTag(3))->setVisible(false);
+	}
+}
+
 void PlayLayerHook::mem_init() {
     HOOK("_ZN9PlayLayer4initEP11GJGameLevel", PlayLayerHook::initH, PlayLayerHook::init);
     HOOK("_ZN9PlayLayer10resetLevelEv", PlayLayerHook::resetLevelH, PlayLayerHook::resetLevel);
     HOOK("_ZN9PlayLayer12addToSectionEP10GameObject", PlayLayerHook::addToSectionH, PlayLayerHook::addToSection);
     HOOK("_ZN9PlayLayer22createObjectsFromSetupESs", PlayLayerHook::createObjectsFromSetupH, PlayLayerHook::createObjectsFromSetup);
+    HOOK("_ZN9PlayLayer18togglePracticeModeEb", PlayLayerHook::togglePracticeModeH, PlayLayerHook::togglePracticeMode);
 }

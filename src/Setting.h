@@ -21,6 +21,8 @@ struct SettingStruct {
     bool onHitboxBugFix;
 
     // Level
+    bool onNoclip;
+    bool onPracticeMusic;
     bool onSmartStartPos;
     bool onStartPosSwitcher;
 
