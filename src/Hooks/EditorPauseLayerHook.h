@@ -11,6 +11,9 @@ namespace EditorPauseLayerHook {
     inline void(*FLAlert_Clicked)(EditorPauseLayer*, FLAlertLayer*, bool);
     void FLAlert_ClickedH(EditorPauseLayer*, FLAlertLayer*, bool);
 
+    inline void(*saveLevel)(EditorPauseLayer*);
+    void saveLevelH(EditorPauseLayer*);
+
     inline void(*destructor)(EditorPauseLayer*);
     void destructorH(EditorPauseLayer*);
 

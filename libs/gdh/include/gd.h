@@ -11,6 +11,13 @@ R& from(T base, intptr_t offset) {
 	return *reinterpret_cast<R*>(reinterpret_cast<uintptr_t>(base) + offset);
 }
 
+template<typename T>
+T clamp(T value, T lower, T upper) {
+    if (value < lower) return lower;
+    if (value > upper) return upper;
+    return value;
+}
+
 #include "GDProtocols.h"
 #include "enums.h"
 #include "../delegates/delegates.h"

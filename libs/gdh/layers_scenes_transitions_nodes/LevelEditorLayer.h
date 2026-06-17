@@ -72,6 +72,10 @@ public:
 	void addToUndoList(UndoObject*, bool);
 
 	void setStartPosObject(StartPosObject*);
+
+	void setupLevelStart(LevelSettingsObject*);
+
+	void playMusic();
 };
 
 #endif

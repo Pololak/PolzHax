@@ -3,6 +3,9 @@
 #include "../GlobalClipboard.h"
 #include "../GameVariables.h"
 #include "../utils.h"
+#include "../Setting.h"
+#include "../RotateSaws.h"
+#include "../Layers/NewCustomizeObjectLayer.h"
 
 EditorUI* m_editorUI;
 
@@ -330,6 +333,14 @@ void EditorUIHook::transformObjectH(EditorUI* self, GameObject* object, EditComm
     EditorUIHook::updateObjectInfoLabel(self);
 }
 
+void EditorUIHook::onCopyH(EditorUI* self, CCObject* sender) {
+    if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_editorLayer);
+
+    EditorUIHook::onCopy(self, sender);
+
+    if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_editorLayer);
+}
+
 void EditorUIHook::onGroupDownH(EditorUI* self, CCObject* sender) {
     EditorUIHook::onGroupDown(self, sender);
     auto onAllGroup = static_cast<CCMenuItemSpriteExtra*>(static_cast<CCMenu*>(self->m_deselectBtn->getParent())->getChildByTag(2702));
@@ -352,6 +363,40 @@ void EditorUIHook::onGroupUpH(EditorUI* self, CCObject* sender) {
     EditorUIHook::updateGuideTogglePosition(self);
 }
 
+void EditorUIHook::onDuplicateH(EditorUI* self, CCObject* sender) {
+    // Wacky bug fix
+    int currentEditorLayer = self->m_editorLayer->m_groupIDFilter;
+
+    self->m_editorLayer->m_groupIDFilter = -1;
+
+    if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_editorLayer);
+
+    EditorUIHook::onDuplicate(self, sender);
+
+    if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_editorLayer);
+
+    self->m_editorLayer->m_groupIDFilter = currentEditorLayer;
+}
+
+void EditorUIHook::editObjectH(EditorUI* self, CCObject* sender) {
+	if (setting().onNewColorSelectMenu) {
+		if (self->editButtonUsable()) {
+			if ((self->m_selectedObject == nullptr) || (self->m_selectedObject->m_objectType != GameObjectType::SecretCoin)) {
+				if ((self->m_selectedObject == nullptr) || (self->m_selectedObject->m_objectID != 31)) {
+					if ((self->m_selectedObject == nullptr) || self->m_selectedObject->canChangeCustomColor()) {
+						if ((self->m_selectedObjects->count() != 0) || self->m_selectedObject != nullptr && self->m_selectedObject->canChangeCustomColor()) {
+							NewCustomizeObjectLayer::create(self->m_selectedObject, self->m_selectedObjects)->show();
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	EditorUIHook::editObject(self, sender);
+}
+
 void EditorUIHook::destructorH(EditorUI* self) {
     EditorUIHook::destructor(self);
     m_editorUI = nullptr;
@@ -368,8 +413,11 @@ void EditorUIHook::mem_init() {
     HOOK("_ZN8EditorUI12offsetForKeyEi", EditorUIHook::offsetForKeyH, EditorUIHook::offsetForKey);
     HOOK("_ZN8EditorUI14moveForCommandE11EditCommand", EditorUIHook::moveForCommandH, EditorUIHook::moveForCommand);
     HOOK("_ZN8EditorUI15transformObjectEP10GameObject11EditCommandb", EditorUIHook::transformObjectH, EditorUIHook::transformObject);
+    HOOK("_ZN8EditorUI6onCopyEPN7cocos2d8CCObjectE", EditorUIHook::onCopyH, EditorUIHook::onCopy);
     HOOK("_ZN8EditorUI11onGroupDownEPN7cocos2d8CCObjectE", EditorUIHook::onGroupDownH, EditorUIHook::onGroupDown);
     HOOK("_ZN8EditorUI9onGroupUpEPN7cocos2d8CCObjectE", EditorUIHook::onGroupUpH, EditorUIHook::onGroupUp);
+    HOOK("_ZN8EditorUI11onDuplicateEPN7cocos2d8CCObjectE", EditorUIHook::onDuplicateH, EditorUIHook::onDuplicate);
+    HOOK("_ZN8EditorUI10editObjectEPN7cocos2d8CCObjectE", EditorUIHook::editObjectH, EditorUIHook::editObject);
 
     HOOK("_ZN8EditorUID0Ev", EditorUIHook::destructorH, EditorUIHook::destructor);
 }

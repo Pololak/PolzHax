@@ -37,5 +37,6 @@ target_link_libraries(polzhax PRIVATE dobby)
 target_link_libraries(polzhax PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/libcocos2dcpp.so
     ${CMAKE_CURRENT_SOURCE_DIR}/libfmod.so
+    ${CMAKE_CURRENT_SOURCE_DIR}/libGLESv2.so
 )
 target_compile_options(polzhax PUBLIC -fdebug-prefix-map=${CMAKE_SOURCE_DIR}=.)

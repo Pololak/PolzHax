@@ -115,6 +115,14 @@ public:
     bool canRotateFree();
 
     OBB2D* getOrientedBox();
+    void updateOrientedBox();
+    void calculateOrientedBox();
+
+    cocos2d::CCRepeatForever* createRotateAction(float);
+
+    bool canChangeCustomColor();
+    void updateCustomColorMode(GJCustomColorMode, bool);
+    void resetCustomColorMode();
 };
 
 #endif

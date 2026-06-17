@@ -1,3 +1,4 @@
 build/**
 libcocos2dcpp.so
 libfmod.so
+libGLESv2.so

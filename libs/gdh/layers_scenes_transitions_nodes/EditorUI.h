@@ -136,6 +136,8 @@ public:
     void transformObjectCall(cocos2d::CCObject*);
     void rotateObjects(cocos2d::CCArray*, float, cocos2d::CCPoint);
     CCMenuItemSpriteExtra* getSpriteButton(char const*, cocos2d::SEL_MenuHandler, cocos2d::CCMenu*, float);
+
+    bool editButtonUsable();
 };
 
 #endif

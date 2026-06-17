@@ -28,6 +28,9 @@ namespace EditorUIHook {
     inline void(*transformObject)(EditorUI*, GameObject*, EditCommand, bool);
     void transformObjectH(EditorUI*, GameObject*, EditCommand, bool);
 
+    inline void(*onCopy)(EditorUI*, CCObject*);
+    void onCopyH(EditorUI*, CCObject*);
+
     inline void(*onGroupDown)(EditorUI*, CCObject*);
     void onGroupDownH(EditorUI*, CCObject*);
 
@@ -39,6 +42,12 @@ namespace EditorUIHook {
 
     inline CCPoint(*moveForCommand)(EditorUI*, EditCommand);
     CCPoint moveForCommandH(EditorUI*, EditCommand);
+
+    inline void(*onDuplicate)(EditorUI*, CCObject*);
+    void onDuplicateH(EditorUI*, CCObject*);
+
+    inline void(*editObject)(EditorUI*, CCObject*);
+    void editObjectH(EditorUI*, CCObject*);
 
     inline void(*destructor)(EditorUI*);
     void destructorH(EditorUI*);

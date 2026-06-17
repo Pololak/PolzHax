@@ -68,12 +68,20 @@ void SettingStruct::load() {
             else if (strcmp(key, SETTING_NAME(setting().onNoDeathEffect)) == 0) {
                 setting().onNoDeathEffect = std::atoi(value);
             }
+            // Creator
+            else if (strcmp(key, SETTING_NAME(setting().onHitboxBugFix)) == 0) {
+                setting().onHitboxBugFix = std::atoi(value);
+            }
             // Level
             else if (strcmp(key, SETTING_NAME(setting().onSmartStartPos)) == 0) {
                 setting().onSmartStartPos = std::atoi(value);
             }
             else if (strcmp(key, SETTING_NAME(setting().onStartPosSwitcher)) == 0) {
                 setting().onStartPosSwitcher = std::atoi(value);
+            }
+            // Universal
+            else if (strcmp(key, SETTING_NAME(setting().onNoTransition)) == 0) {
+                setting().onNoTransition = std::atoi(value);
             }
             // Speedhack
             else if (strcmp(key, SETTING_NAME(setting().onSpeedhack)) == 0) {
@@ -84,6 +92,29 @@ void SettingStruct::load() {
             }
             else if (strcmp(key, SETTING_NAME(setting().speedhackValue)) == 0) {
                 setting().speedhackValue = static_cast<float>(std::atof(value));
+            }
+            // Editor options
+            else if (strcmp(key, SETTING_NAME(setting().onDurationLines)) == 0) {
+                setting().onDurationLines = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onExperimentalLayering)) == 0) {
+                setting().onExperimentalLayering = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onPreviewRotations)) == 0) {
+                setting().onPreviewRotations = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onShowClicks)) == 0) {
+                setting().onShowClicks = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onUnusedObjects)) == 0) {
+                setting().onUnusedObjects = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onNewColorSelectMenu)) == 0) {
+                setting().onNewColorSelectMenu = std::atoi(value);
+            }
+            // Other menu things
+            else if (strcmp(key, SETTING_NAME(setting().m_liveColorEnabled)) == 0) {
+                setting().m_liveColorEnabled = std::atoi(value);
             }
         }
     }
@@ -111,11 +142,17 @@ void SettingStruct::save() {
             // Cosmetic
             << "<name>" << SETTING_NAME(setting().onNoDeathEffect) << "</name>"
             << "<val>" << setting().onNoDeathEffect << "</val>"
+            // Creator
+            << "<name>" << SETTING_NAME(setting().onHitboxBugFix) << "</name>"
+            << "<val>" << setting().onHitboxBugFix << "</val>"
             // Level
             << "<name>" << SETTING_NAME(setting().onSmartStartPos) << "</name>"
             << "<val>" << setting().onSmartStartPos << "</val>"
             << "<name>" << SETTING_NAME(setting().onStartPosSwitcher) << "</name>"
             << "<val>" << setting().onStartPosSwitcher << "</val>"
+            // Universal
+            << "<name>" << SETTING_NAME(setting().onNoTransition) << "</name>"
+            << "<val>" << setting().onNoTransition << "</val>"
             // Speedhack
             << "<name>" << SETTING_NAME(setting().onSpeedhack) << "</name>"
             << "<val>" << setting().onSpeedhack << "</val>"
@@ -123,6 +160,22 @@ void SettingStruct::save() {
             << "<val>" << setting().onSpeedhackMusic << "</val>"
             << "<name>" << SETTING_NAME(setting().speedhackValue) << "</name>"
             << "<val>" << setting().speedhackValue << "</val>"
+            // Editor Options
+            << "<name>" << SETTING_NAME(setting().onDurationLines) << "</name>"
+            << "<val>" << setting().onDurationLines << "</val>"
+            << "<name>" << SETTING_NAME(setting().onExperimentalLayering) << "</name>"
+            << "<val>" << setting().onExperimentalLayering << "</val>"
+            << "<name>" << SETTING_NAME(setting().onPreviewRotations) << "</name>"
+            << "<val>" << setting().onPreviewRotations << "</val>"
+            << "<name>" << SETTING_NAME(setting().onShowClicks) << "</name>"
+            << "<val>" << setting().onShowClicks << "</val>"
+            << "<name>" << SETTING_NAME(setting().onUnusedObjects) << "</name>"
+            << "<val>" << setting().onUnusedObjects << "</val>"
+            << "<name>" << SETTING_NAME(setting().onNewColorSelectMenu) << "</name>"
+            << "<val>" << setting().onNewColorSelectMenu << "</val>"
+            // Other menu things
+            << "<name>" << SETTING_NAME(setting().m_liveColorEnabled) << "</name>"
+            << "<val>" << setting().m_liveColorEnabled << "</val>"
             << "</setting>";
     }
 

@@ -1,44 +1,47 @@
 #include "EditButtonBarHook.h"
 #include "EditorUIHook.h"
+#include "../Setting.h"
 
 bool EditButtonBarHook::initH(EditButtonBar* self, CCArray* objs, CCPoint pos, int page, bool isObjects) {
     auto editorUI = EditorUIHook::get();
 
     if (editorUI) {
         if (isObjects) {
-            switch (page) {
-            case 3:
-                objs->addObject(editorUI->getCreateBtn(371, 4));
-                objs->addObject(editorUI->getCreateBtn(372, 4));
-                objs->addObject(editorUI->getCreateBtn(373, 4));
-                objs->addObject(editorUI->getCreateBtn(374, 4));
-                break;
-            case 4:
-                objs->addObject(editorUI->getCreateBtn(421, 4));
-                objs->addObject(editorUI->getCreateBtn(422, 4));
-                break;
-            case 6:
-                objs->addObject(editorUI->getCreateBtn(142, 4));
-                break;
-            case 7:
-                objs->addObject(editorUI->getCreateBtn(419, 4));
-                objs->addObject(editorUI->getCreateBtn(420, 4));
-                break;
-            case 8:
-                objs->addObject(editorUI->getCreateBtn(466, 4));
-                objs->addObject(editorUI->getCreateBtn(461, 4));
-                objs->addObject(editorUI->getCreateBtn(462, 4));
-                objs->addObject(editorUI->getCreateBtn(463, 4));
-                objs->addObject(editorUI->getCreateBtn(464, 4));
-                objs->addObject(editorUI->getCreateBtn(465, 4));
-                objs->addObject(editorUI->getCreateBtn(406, 4));
-                objs->addObject(editorUI->getCreateBtn(407, 4));
-                objs->addObject(editorUI->getCreateBtn(408, 4));
-                objs->addObject(editorUI->getCreateBtn(725, 4));
-                break;
-            case 11:
-                objs->addObject(editorUI->getCreateBtn(55, 4));
-                break;
+            if (setting().onUnusedObjects) {
+                switch (page) {
+                case 3:
+                    objs->addObject(editorUI->getCreateBtn(371, 4));
+                    objs->addObject(editorUI->getCreateBtn(372, 4));
+                    objs->addObject(editorUI->getCreateBtn(373, 4));
+                    objs->addObject(editorUI->getCreateBtn(374, 4));
+                    break;
+                case 4:
+                    objs->addObject(editorUI->getCreateBtn(421, 4));
+                    objs->addObject(editorUI->getCreateBtn(422, 4));
+                    break;
+                case 6:
+                    objs->addObject(editorUI->getCreateBtn(142, 4));
+                    break;
+                case 7:
+                    objs->addObject(editorUI->getCreateBtn(419, 4));
+                    objs->addObject(editorUI->getCreateBtn(420, 4));
+                    break;
+                case 8:
+                    objs->addObject(editorUI->getCreateBtn(466, 4));
+                    objs->addObject(editorUI->getCreateBtn(461, 4));
+                    objs->addObject(editorUI->getCreateBtn(462, 4));
+                    objs->addObject(editorUI->getCreateBtn(463, 4));
+                    objs->addObject(editorUI->getCreateBtn(464, 4));
+                    objs->addObject(editorUI->getCreateBtn(465, 4));
+                    objs->addObject(editorUI->getCreateBtn(406, 4));
+                    objs->addObject(editorUI->getCreateBtn(407, 4));
+                    objs->addObject(editorUI->getCreateBtn(408, 4));
+                    objs->addObject(editorUI->getCreateBtn(725, 4));
+                    break;
+                case 11:
+                    objs->addObject(editorUI->getCreateBtn(55, 4));
+                    break;
+                }
             }
         }
         else {

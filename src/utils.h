@@ -2,6 +2,7 @@
 #include "include.h"
 #include <sys/stat.h>
 #include "../libs/cocos2dx/support/base64.h"
+#include "hsv.h"
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -101,4 +102,23 @@ inline std::vector<char> readFile(const char* filename) {
     std::basic_ifstream<char> file(filename, std::ios::binary);
 
     return std::vector<char>((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+}
+
+inline cocos2d::ccColor3B getLightBGColor(ccColor3B bg, ccColor3B p1) {
+	auto hsv = color_utils::rgb_to_hsv({ bg.r / 255., bg.g / 255., bg.b / 255. });
+	hsv.s = (std::max)(hsv.s - 0.2, 0.0);
+	hsv.v = (std::min)(hsv.v + 0.2, 1.0);
+
+	const auto rgb = color_utils::hsv_to_rgb(hsv);
+
+	const ccColor3B lbg = { static_cast<GLubyte>(rgb.r * 255.), static_cast<GLubyte>(rgb.g * 255.), static_cast<GLubyte>(rgb.b * 255.) };
+
+	const auto amt = (static_cast<float>(bg.r) + static_cast<float>(bg.g) + static_cast<float>(bg.b)) / 150.f;
+
+	if (amt < 1.f) {
+		return GameToolbox::getMixedColor(lbg, p1, amt);
+	}
+	else {
+		return lbg;
+	}
 }

@@ -3,6 +3,9 @@
 #include "../GameVariables.h"
 #include "../hsv.h"
 #include "../utils.h"
+#include "../Setting.h"
+#include "../EditorObjectLayering.h"
+#include "../RotateSaws.h"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -239,6 +242,11 @@ void updateObjectColor(GameObject* object, const GDColor& color) {
 				node->removeFromParent();
 				m_editorLayer->m_objectBatchNode->addChild(node);
 			}
+		}
+
+		if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) {
+			object->stopActionByTag(9957);
+			if (object->m_myAction) object->runAction(object->m_myAction);
 		}
 	}
 }
@@ -503,6 +511,41 @@ void LevelEditorLayerHook::resetColors() {
 	}
 }
 
+void LevelEditorLayerHook::updateOrientedHitboxes(LevelEditorLayer* self) {
+	if (setting().onHitboxBugFix) {
+		CCARRAY_FOREACH_B_TYPE(self->m_levelSections, section, CCArray) {
+			if (section) {
+				CCARRAY_FOREACH_B_TYPE(section, object, GameObject) {
+					if (object && object->canRotateFree()) {
+						switch (object->m_objectType) {
+						case GameObjectType::Hazard:
+						case GameObjectType::InverseGravityPortal:
+						case GameObjectType::NormalGravityPortal:
+						case GameObjectType::ShipPortal:
+						case GameObjectType::CubePortal:
+						case GameObjectType::YellowJumpPad:
+						case GameObjectType::PinkJumpPad:
+						case GameObjectType::GravityPad:
+						case GameObjectType::YellowJumpRing:
+						case GameObjectType::PinkJumpRing:
+						case GameObjectType::GravityRing:
+						case GameObjectType::BallPortal:
+						case GameObjectType::RegularSizePortal:
+						case GameObjectType::MiniSizePortal:
+						case GameObjectType::UfoPortal:
+						case GameObjectType::Modifier:
+						case GameObjectType::DualPortal:
+						case GameObjectType::SoloPortal:
+						case GameObjectType::WavePortal:
+							object->calculateOrientedBox();
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void LevelEditorLayerHook::updateGroundWidth() {
 	if (m_editorLayer) {
 		if (m_groundLayer) {
@@ -588,6 +631,21 @@ bool LevelEditorLayerHook::initH(LevelEditorLayer* self, GJGameLevel* level) {
     m_blendingBatchNode->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
     self->m_gameLayer->addChild(m_blendingBatchNode, 0);
 
+	auto playerDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(playerDrawNode, 1000, 124);
+	auto objectDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(objectDrawNode, 1000, 125);
+
+	// if (setting().onSolidPlayerGlow) {
+	// 	self->m_player->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+	// 	self->m_player->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+	// 	self->m_player2->m_playerFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+	// 	self->m_player2->m_vehicleFrameGlow->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
+	// }
+
+	auto clicksDrawNode = CCDrawNode::create();
+	self->m_gameLayer->addChild(clicksDrawNode, 1000, 126);
+
 	if (GameManager::sharedState()->getGameVariable(SHOW_GROUND)) {
 		LevelEditorLayerHook::createGroundLayer();
 	}
@@ -597,11 +655,17 @@ bool LevelEditorLayerHook::initH(LevelEditorLayer* self, GJGameLevel* level) {
 
 void LevelEditorLayerHook::addSpecialH(LevelEditorLayer* self, GameObject* object) {
     LevelEditorLayerHook::addSpecial(self, object);
+	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::beginRotateSaw(object);
     if (isColorTrigger(object)) insertTrigger(object);
 }
 
 void LevelEditorLayerHook::removeSpecialH(LevelEditorLayer* self, GameObject* object) {
+	if (m_playtestStartPos == object) {
+		m_playtestStartPos = nullptr;
+	}
+
     LevelEditorLayerHook::removeSpecial(self, object);
+	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
     if (isColorTrigger(object)) removeTrigger(object);
 }
 
@@ -625,6 +689,171 @@ void LevelEditorLayerHook::updateH(LevelEditorLayer* self, float dt) {
 	}
 }
 
+GameObject* LevelEditorLayerHook::addObjectFromStringH(LevelEditorLayer* self, std::string object) {
+	auto obj = LevelEditorLayerHook::addObjectFromString(self, object);
+
+	if (obj && setting().onExperimentalLayering) updateObjectLayering(obj);
+
+	return obj;
+}
+
+GameObject* LevelEditorLayerHook::createObjectH(LevelEditorLayer* self, int id, CCPoint position) {
+	auto obj = LevelEditorLayerHook::createObject(self, id, position);
+
+	if (obj && setting().onExperimentalLayering) updateObjectLayering(obj);
+
+	return obj;
+}
+
+void LevelEditorLayerHook::flipGravityH(LevelEditorLayer* self, PlayerObject* acted, bool isFlipped, bool showEffect) { // taken from Zmx https://github.com/qimiko/gdps-public/blob/238b71e9f3cd8fdf855556ce4cc7c498f22cf3c0/src/hooks/LevelEditorLayer.cpp#L21
+	if (acted->m_gravityFlipped == isFlipped) return;
+
+	acted->flipGravity(isFlipped, showEffect);
+
+	if (!self->m_dualMode) return;
+
+	if (self->m_levelSettings->m_twoPlayerMode) return; // Zmx probably forgot something
+
+	auto player = self->m_player;
+	auto secondPlayer = self->m_player2;
+
+	if (!(player->m_flyMode == secondPlayer->m_flyMode)) return;
+	if (!(player->m_rollMode == secondPlayer->m_rollMode)) return;
+	if (!(player->m_birdMode == secondPlayer->m_birdMode)) return;
+
+	auto actedId = acted->m_ID;
+	auto playerId = player->m_ID;
+
+	auto otherPlayer = player;
+	if (actedId == playerId) otherPlayer = secondPlayer;
+
+	otherPlayer->flipGravity(!isFlipped, showEffect);
+}
+
+void runCustomPlaytest(LevelEditorLayer* self, StartPosObject* startPos) {
+	LevelSettingsObject* settingsObject = nullptr;
+	if (startPos) {
+		settingsObject = startPos->m_settings;
+	}
+	else {
+		settingsObject = self->m_levelSettings;
+	}
+
+	if (startPos) {
+		self->setStartPosObject(startPos);
+	}
+	else {
+		self->setStartPosObject(nullptr);
+	}
+
+	if (startPos) {
+		self->m_player->setPosition(startPos->getPosition());
+		self->m_player2->setPosition(startPos->getPosition());
+	}
+	else {
+		self->m_player->setPosition(ccp(0.f, 0.f));
+		self->m_player2->setPosition(ccp(0.f, 0.f));
+	}
+
+	self->setupLevelStart(settingsObject);
+
+	if (settingsObject->m_startMode == 0) {
+		self->m_player->toggleFlyMode(false);
+		self->m_player2->toggleFlyMode(false);
+		self->m_player->toggleRollMode(false);
+		self->m_player2->toggleRollMode(false);
+		self->m_player->toggleBirdMode(false);
+		self->m_player2->toggleBirdMode(false);
+		self->m_player->toggleDartMode(false);
+		self->m_player2->toggleDartMode(false);
+	}
+
+	self->m_player->resumeSchedulerAndActions();
+	self->m_player2->resumeSchedulerAndActions();
+
+	self->m_playerState = 1;
+
+	self->scheduleUpdate();
+
+	self->playMusic();
+}
+
+void LevelEditorLayerHook::onPlaytestH(LevelEditorLayer* self) {
+	StartPosObject* selectedPlaytestStartPos = self->m_startPosObject;
+	LevelEditorLayerHook::onPlaytest(self);
+
+	bool fromSelectedStartPos = false;
+
+	if (selectedPlaytestStartPos) {
+		runCustomPlaytest(self, selectedPlaytestStartPos);
+		fromSelectedStartPos = true;
+	}
+
+	if (m_playtestStartPos) {
+		if (!fromSelectedStartPos) {
+			runCustomPlaytest(self, m_playtestStartPos);
+		}
+	}
+
+	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
+	if (clicksDrawNode) {
+		clicksDrawNode->clear();
+	}
+
+	LevelEditorLayerHook::updateOrientedHitboxes(self);
+
+	if (setting().onPreviewRotations) RotateSaws::beginRotations(self);
+}
+
+void LevelEditorLayerHook::onResumePlaytestH(LevelEditorLayer* self) {
+	LevelEditorLayerHook::onResumePlaytest(self);
+
+	LevelEditorLayerHook::updateOrientedHitboxes(self);
+
+	if (setting().onPreviewRotations) RotateSaws::resumeRotations(self);
+}
+
+void LevelEditorLayerHook::onPausePlaytestH(LevelEditorLayer* self) {
+	LevelEditorLayerHook::onPausePlaytest(self);
+
+	if (setting().onPreviewRotations) RotateSaws::pauseRotations(self);
+}
+
+void LevelEditorLayerHook::onStopPlaytestH(LevelEditorLayer* self) {
+	LevelEditorLayerHook::onStopPlaytest(self);
+
+	if (setting().onPreviewRotations) {
+		RotateSaws::pauseRotations(self);
+		RotateSaws::resumeRotations(self);
+	}
+}
+
+void LevelEditorLayerHook::pushButtonH(LevelEditorLayer* self, int p0, bool p1) {
+	LevelEditorLayerHook::pushButton(self, p0, p1);
+
+	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
+	if (clicksDrawNode && setting().onShowClicks) {
+		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
+
+		if (self->m_player2 && self->m_dualMode) {
+			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(1.f, .5f, 1.f, 1.f));
+		}
+	}
+}
+
+void LevelEditorLayerHook::releaseButtonH(LevelEditorLayer* self, int p0, bool p1) {
+	LevelEditorLayerHook::releaseButton(self, p0, p1);
+
+	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
+	if (clicksDrawNode && setting().onShowClicks) {
+		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+
+		if (self->m_player2 && self->m_dualMode) {
+			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
+		}
+	}
+}
+
 void LevelEditorLayerHook::destructorH(LevelEditorLayer* self) {
     LevelEditorLayerHook::destructor(self);
     m_colorTriggers.clear();
@@ -638,9 +867,23 @@ void LevelEditorLayerHook::destructorH(LevelEditorLayer* self) {
 
 void LevelEditorLayerHook::mem_init() {
     HOOK("_ZN16LevelEditorLayer4initEP11GJGameLevel", LevelEditorLayerHook::initH, LevelEditorLayerHook::init);
+    HOOK("_ZN16LevelEditorLayer11flipGravityEP12PlayerObjectbb", LevelEditorLayerHook::flipGravityH, LevelEditorLayerHook::flipGravity);
+
+    HOOK("_ZN16LevelEditorLayer19addObjectFromStringESs", LevelEditorLayerHook::addObjectFromStringH, LevelEditorLayerHook::addObjectFromString);
+    HOOK("_ZN16LevelEditorLayer12createObjectEiN7cocos2d7CCPointE", LevelEditorLayerHook::createObjectH, LevelEditorLayerHook::createObject);
+
     HOOK("_ZN16LevelEditorLayer10addSpecialEP10GameObject", LevelEditorLayerHook::addSpecialH, LevelEditorLayerHook::addSpecial);
     HOOK("_ZN16LevelEditorLayer13removeSpecialEP10GameObject", LevelEditorLayerHook::removeSpecialH, LevelEditorLayerHook::removeSpecial);
     HOOK("_ZN16LevelEditorLayer16updateVisibilityEf", LevelEditorLayerHook::updateVisibilityH, LevelEditorLayerHook::updateVisibility);
     HOOK("_ZN16LevelEditorLayer6updateEf", LevelEditorLayerHook::updateH, LevelEditorLayerHook::update);
+
+	HOOK("_ZN16LevelEditorLayer10onPlaytestEv", LevelEditorLayerHook::onPlaytestH, LevelEditorLayerHook::onPlaytest);
+	HOOK("_ZN16LevelEditorLayer16onResumePlaytestEv", LevelEditorLayerHook::onResumePlaytestH, LevelEditorLayerHook::onResumePlaytest);
+	HOOK("_ZN16LevelEditorLayer15onPausePlaytestEv", LevelEditorLayerHook::onPausePlaytestH, LevelEditorLayerHook::onPausePlaytest);
+	HOOK("_ZN16LevelEditorLayer14onStopPlaytestEv", LevelEditorLayerHook::onStopPlaytestH, LevelEditorLayerHook::onStopPlaytest);
+
+	HOOK("_ZN16LevelEditorLayer10pushButtonEib", LevelEditorLayerHook::pushButtonH, LevelEditorLayerHook::pushButton);
+	HOOK("_ZN16LevelEditorLayer13releaseButtonEib", LevelEditorLayerHook::releaseButtonH, LevelEditorLayerHook::releaseButton);
+
     HOOK("_ZN16LevelEditorLayerD0Ev", LevelEditorLayerHook::destructorH, LevelEditorLayerHook::destructor);
 }

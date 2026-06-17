@@ -1,6 +1,7 @@
 #include "include.h"
 
 #include "Hooks/CustomizeObjectLayerHook.h"
+#include "Hooks/DrawGridLayerHook.h"
 #include "Hooks/EditButtonBarHook.h"
 #include "Hooks/EditLevelLayerHook.h"
 #include "Hooks/EditorPauseLayerHook.h"
@@ -72,6 +73,14 @@ namespace MenuLayerHook {
 
         void onStartPosSwitcher(CCObject*) {
             setting().onStartPosSwitcher = !setting().onStartPosSwitcher;
+        }
+
+        void onHitboxBugFix(CCObject*) {
+            setting().onHitboxBugFix = !setting().onHitboxBugFix;
+        }
+
+        void onNoTransition(CCObject*) {
+            setting().onNoTransition = !setting().onNoTransition;
         }
     };
 
@@ -221,7 +230,31 @@ namespace MenuLayerHook {
             false
         );
 
-        Speedhack::updateSpeedhack();
+        GameToolbox::createToggleButton(
+            "Hitbox Bug Fix",
+            menu_selector(Callback::onHitboxBugFix),
+            setting().onHitboxBugFix,
+            menu,
+            ccp(195.f, director->getScreenTop() - 150.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "No Transition",
+            menu_selector(Callback::onNoTransition),
+            setting().onNoTransition,
+            menu,
+            ccp(195.f, director->getScreenTop() - 180.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
 
         setting().save();
 
@@ -287,6 +320,13 @@ namespace AppDelegateHook {
     }
 }
 
+namespace CCTransitionSceneHook {
+    inline bool(*initWithDuration)(CCTransitionScene*, float, CCScene*);
+    bool initWithDurationH(CCTransitionScene* self, float duration, CCScene* scene) {
+        return CCTransitionSceneHook::initWithDuration(self, setting().onNoTransition ? 0.f : duration, scene);
+    }
+}
+
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     create_directories("/storage/emulated/0/PolzHaxMobile/19");
     create_directories("/storage/emulated/0/PolzHaxMobile/19/levels");
@@ -302,6 +342,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     patchManager.Modify();
 
     CustomizeObjectLayerHook::mem_init();
+    DrawGridLayerHook::mem_init();
     EditButtonBarHook::mem_init();
     EditLevelLayerHook::mem_init();
     EditorPauseLayerHook::mem_init();
@@ -319,10 +360,11 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 	HOOK("_ZN11AppDelegate29applicationDidEnterBackgroundEv", AppDelegateHook::applicationDidEnterBackgroundH, AppDelegateHook::applicationDidEnterBackground);
 	HOOK("_ZN11AppDelegate30applicationWillEnterForegroundEv", AppDelegateHook::applicationWillEnterForegroundH, AppDelegateHook::applicationWillEnterForeground);
 	HOOK("_ZN11AppDelegate11trySaveGameEv", AppDelegateHook::trySaveGameH, AppDelegateHook::trySaveGame);
-	//HOOK("_ZN12LoadingLayer15loadingFinishedEv", LoadingLayerHook::loadingFinishedH, LoadingLayerHook::loadingFinished);
+	HOOK("_ZN12LoadingLayer15loadingFinishedEv", LoadingLayerHook::loadingFinishedH, LoadingLayerHook::loadingFinished);
 	HOOK("_ZN9MenuLayer4initEv", MenuLayerHook::initH, MenuLayerHook::init);
 	HOOK("_ZN9MenuLayer11onMoreGamesEPN7cocos2d8CCObjectE", MenuLayerHook::onMoreGamesH, MenuLayerHook::onMoreGames);
 	HOOK("_ZN16LevelSelectLayer4initEi", LevelSelectLayerHook::initH, LevelSelectLayerHook::init);
+	HOOK("_ZN7cocos2d17CCTransitionScene16initWithDurationEfPNS_7CCSceneE", CCTransitionSceneHook::initWithDurationH, CCTransitionSceneHook::initWithDuration);
 
 	return JNI_VERSION_1_6;
 }   

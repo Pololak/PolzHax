@@ -113,6 +113,13 @@ public:
     GameplayDelegate* m_gameDelegate; // 0x4c4
     float m_audioScale; // 0x4c8
     float m_groundHeight; // 0x4cc
+
+    void flipGravity(bool, bool);
+
+    void toggleFlyMode(bool);
+    void toggleRollMode(bool);
+    void toggleBirdMode(bool);
+    void toggleDartMode(bool);
 };
 
 #endif

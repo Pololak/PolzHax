@@ -45,6 +45,21 @@ namespace LevelEditorLayerHook {
     inline void(*onPlaytest)(LevelEditorLayer*);
     void onPlaytestH(LevelEditorLayer*);
 
+    inline void(*onResumePlaytest)(LevelEditorLayer*);
+    void onResumePlaytestH(LevelEditorLayer*);
+
+    inline void(*onPausePlaytest)(LevelEditorLayer*);
+    void onPausePlaytestH(LevelEditorLayer*);
+
+    inline void(*onStopPlaytest)(LevelEditorLayer*);
+    void onStopPlaytestH(LevelEditorLayer*);
+
+    inline void(*pushButton)(LevelEditorLayer*, int, bool);
+    void pushButtonH(LevelEditorLayer*, int, bool);
+
+    inline void(*releaseButton)(LevelEditorLayer*, int, bool);
+    void releaseButtonH(LevelEditorLayer*, int, bool);
+
     inline void(*destructor)(LevelEditorLayer*);
     void destructorH(LevelEditorLayer*);
 

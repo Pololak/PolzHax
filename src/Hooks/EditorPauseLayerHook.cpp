@@ -1,9 +1,11 @@
 #include "EditorPauseLayerHook.h"
 #include "LevelEditorLayerHook.h"
 #include "EditorUIHook.h"
+#include "../Layers/EditorOptionsLayer.h"
 #include "../GameVariables.h"
 #include "../utils.h"
 #include "../Setting.h"
+#include "../RotateSaws.h"
 
 bool EditorPauseLayerHook::initH(EditorPauseLayer* self, LevelEditorLayer* editorLayer) {
     if (!EditorPauseLayerHook::init(self, editorLayer)) return false;
@@ -241,7 +243,7 @@ void EditorPauseLayerHook::Callback::onResetStartPos(CCObject*) {
 }
 
 void EditorPauseLayerHook::Callback::onEditorOptions(CCObject*) {
-    
+    EditorOptionsLayer::create()->show();
 }
 
 void EditorPauseLayerHook::customSetupH(EditorPauseLayer* self) {
@@ -291,6 +293,12 @@ void EditorPauseLayerHook::customSetupH(EditorPauseLayer* self) {
     auto onAlignX = CCMenuItemSpriteExtra::create(onAlignXSpr, self, menu_selector(EditorPauseLayerHook::Callback::onAlignX));
     onAlignX->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 170.f }));
     bottom_menu->addChild(onAlignX);
+
+    auto onOptionsSpr = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
+    onOptionsSpr->setScale(.8f);
+    auto onOptions = CCMenuItemSpriteExtra::create(onOptionsSpr, self, menu_selector(EditorPauseLayerHook::Callback::onEditorOptions));
+    onOptions->setPosition(bottom_menu->convertToNodeSpace({ winSize.width - 115.f, director->getScreenBottom() + 205.f }));
+    bottom_menu->addChild(onOptions);
 
     auto gm = GameManager::sharedState();
 
@@ -372,6 +380,14 @@ void EditorPauseLayerHook::FLAlert_ClickedH(EditorPauseLayer* self, FLAlertLayer
     EditorPauseLayerHook::FLAlert_Clicked(self, layer, btn2);
 }
 
+void EditorPauseLayerHook::saveLevelH(EditorPauseLayer* self) {
+    if (setting().onPreviewRotations) RotateSaws::stopRotations(self->m_levelEditorLayer);
+
+    EditorPauseLayerHook::saveLevel(self);
+
+    if (setting().onPreviewRotations) RotateSaws::beginRotations(self->m_levelEditorLayer);
+}
+
 void EditorPauseLayerHook::destructorH(EditorPauseLayer* self) {
     LevelEditorLayerHook::setIsEditorPaused(false);
     EditorPauseLayerHook::destructor(self);
@@ -381,5 +397,6 @@ void EditorPauseLayerHook::mem_init() {
     HOOK("_ZN16EditorPauseLayer4initEP16LevelEditorLayer", EditorPauseLayerHook::initH, EditorPauseLayerHook::init);
     HOOK("_ZN16EditorPauseLayer11customSetupEv", EditorPauseLayerHook::customSetupH, EditorPauseLayerHook::customSetup);
     HOOK("_ZN16EditorPauseLayer15FLAlert_ClickedEP12FLAlertLayerb", EditorPauseLayerHook::FLAlert_ClickedH, EditorPauseLayerHook::FLAlert_Clicked);
+    HOOK("_ZN16EditorPauseLayer9saveLevelEv", EditorPauseLayerHook::saveLevelH, EditorPauseLayerHook::saveLevel);
     HOOK("_ZN16EditorPauseLayerD0Ev", EditorPauseLayerHook::destructorH, EditorPauseLayerHook::destructor);
 }
