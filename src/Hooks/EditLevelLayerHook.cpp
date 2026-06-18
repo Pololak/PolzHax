@@ -1,5 +1,6 @@
 #include "EditLevelLayerHook.h"
 #include "../Layers/ExportLevelLayer.h"
+#include "../Menu/PolzHaxLayer.h"
 
 void EditLevelLayerHook::Callback::onLevelID(CCObject*) {
     return;
@@ -78,6 +79,10 @@ void EditLevelLayerHook::Callback::onMoveToTop(CCObject*) {
 	flalert->show();
 }
 
+void EditLevelLayerHook::Callback::onPolzHax(CCObject*) {
+    PolzHaxLayer::create()->show();
+}
+
 bool EditLevelLayerHook::initH(EditLevelLayer* self, GJGameLevel* level) {
     if (!EditLevelLayerHook::init(self, level)) return false;
 
@@ -101,7 +106,7 @@ bool EditLevelLayerHook::initH(EditLevelLayer* self, GJGameLevel* level) {
 
     auto onPolzHaxSpr = CCSprite::create("GJ_polzhaxBtn_001.png");
     onPolzHaxSpr->setScale(.85f);
-    auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, 0);
+    auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, menu_selector(EditLevelLayerHook::Callback::onPolzHax));
     onPolzHax->setPosition(menu->convertToNodeSpace({director->getScreenLeft() + 30.f, winSize.height / 2.f}));
     menu->addChild(onPolzHax);
 

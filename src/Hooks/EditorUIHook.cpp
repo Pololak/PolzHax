@@ -397,6 +397,10 @@ void EditorUIHook::editObjectH(EditorUI* self, CCObject* sender) {
 	EditorUIHook::editObject(self, sender);
 }
 
+void EditorUIHook::constrainGameLayerPositionH(EditorUI* self, float p0, float p1) {
+    if (!setting().onFreeScroll) EditorUIHook::constrainGameLayerPosition(self, p0, p1);
+}
+
 void EditorUIHook::destructorH(EditorUI* self) {
     EditorUIHook::destructor(self);
     m_editorUI = nullptr;
@@ -418,6 +422,7 @@ void EditorUIHook::mem_init() {
     HOOK("_ZN8EditorUI9onGroupUpEPN7cocos2d8CCObjectE", EditorUIHook::onGroupUpH, EditorUIHook::onGroupUp);
     HOOK("_ZN8EditorUI11onDuplicateEPN7cocos2d8CCObjectE", EditorUIHook::onDuplicateH, EditorUIHook::onDuplicate);
     HOOK("_ZN8EditorUI10editObjectEPN7cocos2d8CCObjectE", EditorUIHook::editObjectH, EditorUIHook::editObject);
+    HOOK("_ZN8EditorUI26constrainGameLayerPositionEff", EditorUIHook::constrainGameLayerPositionH, EditorUIHook::constrainGameLayerPosition);
 
     HOOK("_ZN8EditorUID0Ev", EditorUIHook::destructorH, EditorUIHook::destructor);
 }

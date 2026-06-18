@@ -69,8 +69,17 @@ void SettingStruct::load() {
                 setting().onNoDeathEffect = std::atoi(value);
             }
             // Creator
+            else if (strcmp(key, SETTING_NAME(setting().onEditorExtension)) == 0) {
+                setting().onEditorExtension = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onFreeScroll)) == 0) {
+                setting().onFreeScroll = std::atoi(value);
+            }
             else if (strcmp(key, SETTING_NAME(setting().onHitboxBugFix)) == 0) {
                 setting().onHitboxBugFix = std::atoi(value);
+            }
+            else if (strcmp(key, SETTING_NAME(setting().onObjectBypass)) == 0) {
+                setting().onObjectBypass = std::atoi(value);
             }
             // Level
             else if (strcmp(key, SETTING_NAME(setting().onNoclip)) == 0) {
@@ -149,8 +158,14 @@ void SettingStruct::save() {
             << "<name>" << SETTING_NAME(setting().onNoDeathEffect) << "</name>"
             << "<val>" << setting().onNoDeathEffect << "</val>"
             // Creator
+            << "<name>" << SETTING_NAME(setting().onEditorExtension) << "</name>"
+            << "<val>" << setting().onEditorExtension << "</val>"
+            << "<name>" << SETTING_NAME(setting().onFreeScroll) << "</name>"
+            << "<val>" << setting().onFreeScroll << "</val>"
             << "<name>" << SETTING_NAME(setting().onHitboxBugFix) << "</name>"
             << "<val>" << setting().onHitboxBugFix << "</val>"
+            << "<name>" << SETTING_NAME(setting().onObjectBypass) << "</name>"
+            << "<val>" << setting().onObjectBypass << "</val>"
             // Level
             << "<name>" << SETTING_NAME(setting().onNoclip) << "</name>"
             << "<val>" << setting().onNoclip << "</val>"

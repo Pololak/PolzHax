@@ -159,9 +159,43 @@ bool PlayLayerHook::initH(PlayLayer* self, GJGameLevel* level) {
 
     if (!PlayLayerHook::init(self, level)) return false;
 
+	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
+
+	auto gm = GameManager::sharedState();
+
+    float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
+
+    auto percentageLabel = CCLabelBMFont::create("", "bigFont.fnt");
+    percentageLabel->setAnchorPoint({ (gm->m_showProgressBar ? 0.f : .5f), .5f });
+    percentageLabel->setScale(.5f);
+    percentageLabel->setVisible(gm->getGameVariable(SHOW_PERCENTAGE));
+    percentageLabel->setPosition(winSize.width / 2.f + (gm->m_showProgressBar ? 110.2f : 0.f), winSize.height - 8.f);
+    std::string percentageString = "%.0f%%";
+    percentageLabel->setString(CCString::createWithFormat(percentageString.c_str(), playerPercentPos)->getCString());
+    self->addChild(percentageLabel, 15, 301);
+
     PlayLayerHook::updateStartPosSwitcherLabel();
 
     return true;
+}
+
+void PlayLayerHook::updateH(PlayLayer* self, float dt) {
+	PlayLayerHook::update(self, dt);
+
+	
+}
+
+void PlayLayerHook::updateProgressbarH(PlayLayer* self) {
+	PlayLayerHook::updateProgressbar(self);
+
+	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
+    std::string percentageString = "%.0f%%";
+
+    auto percentageLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(301));
+    if (percentageLabel) {
+		percentageLabel->setString(CCString::createWithFormat(percentageString.c_str(), (playerPercentPos < 100.f) ? playerPercentPos : 100.f)->getCString());
+    }
 }
 
 void PlayLayerHook::resetLevelH(PlayLayer* self) {
@@ -245,6 +279,8 @@ void PlayLayerHook::togglePracticeModeH(PlayLayer* self, bool practice) {
 
 void PlayLayerHook::mem_init() {
     HOOK("_ZN9PlayLayer4initEP11GJGameLevel", PlayLayerHook::initH, PlayLayerHook::init);
+    HOOK("_ZN9PlayLayer6updateEf", PlayLayerHook::updateH, PlayLayerHook::update);
+    HOOK("_ZN9PlayLayer17updateProgressbarEv", PlayLayerHook::updateProgressbarH, PlayLayerHook::updateProgressbar);
     HOOK("_ZN9PlayLayer10resetLevelEv", PlayLayerHook::resetLevelH, PlayLayerHook::resetLevel);
     HOOK("_ZN9PlayLayer12addToSectionEP10GameObject", PlayLayerHook::addToSectionH, PlayLayerHook::addToSection);
     HOOK("_ZN9PlayLayer22createObjectsFromSetupESs", PlayLayerHook::createObjectsFromSetupH, PlayLayerHook::createObjectsFromSetup);

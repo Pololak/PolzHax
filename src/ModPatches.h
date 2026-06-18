@@ -11,6 +11,10 @@ namespace ModPatches {
     void onSliderLimit();
     void onTextLength();
 
+    // Editor
+    void onEditorExtension();
+    void onObjectBypass();
+
     // Cosmetic
     void onNoDeathEffect();
 

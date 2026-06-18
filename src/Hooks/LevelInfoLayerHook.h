@@ -19,6 +19,8 @@ namespace LevelInfoLayerHook {
 
     class Callback : public LevelInfoLayer {
     public:
+        void onPolzHax(CCObject*);
+
         void onExportLevel(CCObject*);
         void onMoveToTop(CCObject*);
     };

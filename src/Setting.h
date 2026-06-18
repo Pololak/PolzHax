@@ -18,7 +18,10 @@ struct SettingStruct {
     bool onNoDeathEffect;
 
     // Creator
+    bool onEditorExtension;
+    bool onFreeScroll;
     bool onHitboxBugFix;
+    bool onObjectBypass;
 
     // Level
     bool onNoclip;

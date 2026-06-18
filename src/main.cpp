@@ -12,9 +12,12 @@
 #include "Hooks/LevelEditorLayerHook.h"
 #include "Hooks/LevelInfoLayerHook.h"
 #include "Hooks/LevelSettingsLayerHook.h"
+#include "Hooks/PauseLayerHook.h"
 #include "Hooks/PlayLayerHook.h"
 #include "Hooks/SetGroupIDLayerHook.h"
 #include "Hooks/UILayerHook.h"
+
+#include "Menu/PolzHaxLayer.h"
 
 #include "LevelShare.h"
 
@@ -27,6 +30,10 @@
 namespace MenuLayerHook {
     class Callback : public MenuLayer {
     public:
+        void onPolzHax(CCObject*) {
+            PolzHaxLayer::create()->show();
+        }
+
         void onCharacterFilter(CCObject*) {
             setting().onCharacterFilter = !setting().onCharacterFilter;
             ModPatches::onCharacterFilter();
@@ -92,6 +99,20 @@ namespace MenuLayerHook {
             setting().onPracticeMusic = !setting().onPracticeMusic;
             ModPatches::onPracticeMusic();
         }
+
+        void onEditorExtension(CCObject*) {
+            setting().onEditorExtension = !setting().onEditorExtension;
+            ModPatches::onEditorExtension();
+        }
+
+        void onFreeScroll(CCObject*) {
+            setting().onFreeScroll = !setting().onFreeScroll;
+        }
+
+        void onObjectBypass(CCObject*) {
+            setting().onObjectBypass = !setting().onObjectBypass;
+            ModPatches::onObjectBypass();
+        }
     };
 
     inline bool(*init)(MenuLayer*);
@@ -106,7 +127,7 @@ namespace MenuLayerHook {
 
         auto onPolzHaxSpr = CCSprite::create("GJ_polzhaxBtn_001.png");
         onPolzHaxSpr->setScale(.85f);
-        auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, 0);
+        auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, menu_selector(MenuLayerHook::Callback::onPolzHax));
         onPolzHax->setPosition(menu->convertToNodeSpace({director->getScreenLeft() + 30.f, winSize.height / 2.f}));
         menu->addChild(onPolzHax);
 
@@ -292,6 +313,45 @@ namespace MenuLayerHook {
             false
         );
 
+        GameToolbox::createToggleButton(
+            "Editor Extension",
+            menu_selector(Callback::onEditorExtension),
+            setting().onEditorExtension,
+            menu,
+            ccp(195.f, director->getScreenTop() - 270.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Free Scroll",
+            menu_selector(Callback::onFreeScroll),
+            setting().onFreeScroll,
+            menu,
+            ccp(195.f, director->getScreenTop() - 300.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
+        GameToolbox::createToggleButton(
+            "Object Bypass",
+            menu_selector(Callback::onObjectBypass),
+            setting().onObjectBypass,
+            menu,
+            ccp(315.f, director->getScreenTop() - 90.f),
+            self, self,
+            .7f, .4f, 80.f,
+            ccp(8.f, 0.f),
+            "bigFont.fnt",
+            false
+        );
+
         setting().save();
 
         return true;
@@ -304,6 +364,13 @@ namespace MenuLayerHook {
 }
 
 namespace LevelSelectLayerHook {
+    class Callback : public LevelSelectLayer {
+    public:
+        void onPolzHax(CCObject*) {
+            PolzHaxLayer::create()->show();
+        }
+    };
+
     inline bool(*init)(LevelSelectLayer*, int);
     bool initH(LevelSelectLayer* self, int p0) {
         if (!LevelSelectLayerHook::init(self, p0)) return false;
@@ -316,7 +383,7 @@ namespace LevelSelectLayerHook {
 
         auto onPolzHaxSpr = CCSprite::create("GJ_polzhaxBtn_001.png");
         onPolzHaxSpr->setScale(.85f);
-        auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, 0);
+        auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, menu_selector(LevelSelectLayerHook::Callback::onPolzHax));
         onPolzHax->setPosition(menu->convertToNodeSpace({director->getScreenLeft() + 30.f, director->getScreenTop() - 70.f}));
         menu->addChild(onPolzHax);
 
@@ -373,8 +440,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     PatchManager patchManager;
 
-    patchManager.addPatch(GDBASE, 0x1ac4fc, "00 20");
-    patchManager.addPatch(GDBASE, 0x205b98, "01 21 00 bf");
+    patchManager.addPatch(GDBASE, 0x1ac4fc, "00 20"); // RGBA8888
+    patchManager.addPatch(GDBASE, 0x205b98, "01 21 00 bf"); // Play Music Button on CustomSongWidget
+    patchManager.addPatch(GDBASE, 0x48a9de, "42 61 72 00 00 00 00 00 00 00 00 00"); // Progress Bar -> Bar
     patchManager.Modify();
 
     CustomizeObjectLayerHook::mem_init();
@@ -389,6 +457,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     LevelEditorLayerHook::mem_init();
     LevelInfoLayerHook::mem_init();
     LevelSettingsLayerHook::mem_init();
+    PauseLayerHook::mem_init();
     PlayLayerHook::mem_init();
     SetGroupIDLayerHook::mem_init();
     UILayerHook::mem_init();

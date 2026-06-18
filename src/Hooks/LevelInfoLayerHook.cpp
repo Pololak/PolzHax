@@ -1,5 +1,6 @@
 #include "LevelInfoLayerHook.h"
 #include "../Layers/ExportLevelLayer.h"
+#include "../Menu/PolzHaxLayer.h"
 
 void LevelInfoLayerHook::Callback::onMoveToTop(CCObject*) {
     auto layer = FLAlertLayer::create(this, "Move To Top", "Move this level to the top of the levels list?", "NO", "YES", 300.f);
@@ -11,6 +12,10 @@ void LevelInfoLayerHook::Callback::onExportLevel(CCObject*) {
     if (!this->shouldDownloadLevel()) {
         ExportLevelLayer::create(this->m_level)->show();
     }
+}
+
+void LevelInfoLayerHook::Callback::onPolzHax(CCObject*) {
+    PolzHaxLayer::create()->show();
 }
 
 bool LevelInfoLayerHook::initH(LevelInfoLayer* self, GJGameLevel* level) {
@@ -33,7 +38,7 @@ bool LevelInfoLayerHook::initH(LevelInfoLayer* self, GJGameLevel* level) {
 
     auto onPolzHaxSpr = CCSprite::create("GJ_polzhaxBtn_001.png");
     onPolzHaxSpr->setScale(.85f);
-    auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, 0);
+    auto onPolzHax = CCMenuItemSpriteExtra::create(onPolzHaxSpr, self, menu_selector(LevelInfoLayerHook::Callback::onPolzHax));
     onPolzHax->setPosition(actionsMenu->convertToNodeSpace({director->getScreenLeft() + 70.f, director->getScreenTop() - 25.f}));
     actionsMenu->addChild(onPolzHax);
 

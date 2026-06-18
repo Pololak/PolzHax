@@ -38,6 +38,9 @@ namespace PlayLayerHook {
     inline void(*loadLastCheckpoint)(PlayLayer*);
     void loadLastCheckpointH(PlayLayer*);
 
+    inline void(*updateProgressbar)(PlayLayer*);
+    void updateProgressbarH(PlayLayer*);
+
     inline void(*destructor)(PlayLayer*);
     void destructorH(PlayLayer*);
 

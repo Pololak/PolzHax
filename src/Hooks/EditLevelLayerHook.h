@@ -15,6 +15,8 @@ namespace EditLevelLayerHook {
 
     class Callback : public EditLevelLayer {
     public:
+        void onPolzHax(CCObject*);
+
         void onMoveToTop(CCObject*);
         void onExportLevel(CCObject*);
         void onLevelOrderUp(CCObject*);

@@ -30,7 +30,7 @@ bool UILayerHook::initH(UILayer* self) {
     auto onPrevStartPos = CCMenuItemSpriteExtra::create(onPrevStartPosSpr, self, menu_selector(UILayerHook::Callback::onPrevStartPos));
     onPrevStartPos->setOpacity(0);
     onPrevStartPos->setVisible(false);
-    onPrevStartPos->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f - 35.f, director->getScreenBottom() + 20.f }));
+    onPrevStartPos->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f - 40.f, director->getScreenBottom() + 20.f }));
     startPosSwitcherMenu->addChild(onPrevStartPos, 0, 2);
 
     auto onNextStartPosSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
@@ -39,7 +39,7 @@ bool UILayerHook::initH(UILayer* self) {
     auto onNextStartPos = CCMenuItemSpriteExtra::create(onNextStartPosSpr, self, menu_selector(UILayerHook::Callback::onNextStartPos));
     onNextStartPos->setOpacity(0);
     onNextStartPos->setVisible(false);
-    onNextStartPos->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f + 35.f, director->getScreenBottom() + 20.f }));
+    onNextStartPos->setPosition(startPosSwitcherMenu->convertToNodeSpace({ winSize.width / 2.f + 40.f, director->getScreenBottom() + 20.f }));
     startPosSwitcherMenu->addChild(onNextStartPos, 0, 3);
 
     return true;

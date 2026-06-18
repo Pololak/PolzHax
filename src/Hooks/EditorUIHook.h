@@ -49,6 +49,9 @@ namespace EditorUIHook {
     inline void(*editObject)(EditorUI*, CCObject*);
     void editObjectH(EditorUI*, CCObject*);
 
+    inline void(*constrainGameLayerPosition)(EditorUI*, float, float);
+    void constrainGameLayerPositionH(EditorUI*, float, float);
+
     inline void(*destructor)(EditorUI*);
     void destructorH(EditorUI*);
 

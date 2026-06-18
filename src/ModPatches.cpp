@@ -67,6 +67,55 @@ namespace ModPatches {
         }
     }
 
+    // Creator
+    void onEditorExtension() {
+        if (setting().onEditorExtension) {
+            MemoryPatch::createWithHex(GDBASE, 0x1f3776 - ANDROID32_OFFSET, "08 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1f3788 - ANDROID32_OFFSET, "08 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1f37a2 - ANDROID32_OFFSET, "08 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1f37b4 - ANDROID32_OFFSET, "08 bf").Modify();
+
+            MemoryPatch::createWithHex(GDBASE, 0x1faeac - ANDROID32_OFFSET, "08 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1faebe - ANDROID32_OFFSET, "08 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1faed4 - ANDROID32_OFFSET, "18 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1faeee - ANDROID32_OFFSET, "18 bf").Modify();
+
+            MemoryPatch::createWithHex(GDBASE, 0x1eac20 - ANDROID32_OFFSET, "00 00 00 00").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1eac24 - ANDROID32_OFFSET, "00 60 ea 4a").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1eb054 - ANDROID32_OFFSET, "00 00 00 00").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1eb058 - ANDROID32_OFFSET, "00 60 ea 4a").Modify();
+        }
+        else {
+            MemoryPatch::createWithHex(GDBASE, 0x1f3776 - ANDROID32_OFFSET, "d8 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1f3788 - ANDROID32_OFFSET, "58 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1f37a2 - ANDROID32_OFFSET, "d8 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1f37b4 - ANDROID32_OFFSET, "58 bf").Modify();
+
+            MemoryPatch::createWithHex(GDBASE, 0x1faeac - ANDROID32_OFFSET, "48 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1faebe - ANDROID32_OFFSET, "48 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1faed4 - ANDROID32_OFFSET, "c8 bf").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1faeee - ANDROID32_OFFSET, "c8 bf").Modify();
+
+            MemoryPatch::createWithHex(GDBASE, 0x1eac20 - ANDROID32_OFFSET, "00 00 96 43").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1eac24 - ANDROID32_OFFSET, "00 60 6a 47").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1eb054 - ANDROID32_OFFSET, "00 00 96 43").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1eb058 - ANDROID32_OFFSET, "00 60 6a 47").Modify();
+        }
+    }
+
+    void onObjectBypass() {
+        if (setting().onObjectBypass) {
+            MemoryPatch::createWithHex(GDBASE, 0x1fb0ec - ANDROID32_OFFSET, "04 e0").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1fbb9c - ANDROID32_OFFSET, "c3 e7").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x49ca15 - ANDROID32_OFFSET, "25 69 20 6f 62 6a 65 63 74 73 00 00 00 00").Modify();
+        }
+        else {
+            MemoryPatch::createWithHex(GDBASE, 0x1fb0ec - ANDROID32_OFFSET, "04 dd").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x1fbb9c - ANDROID32_OFFSET, "c3 dd").Modify();
+            MemoryPatch::createWithHex(GDBASE, 0x49ca15 - ANDROID32_OFFSET, "25 69 2f 25 69 20 6f 62 6a 65 63 74 73 00").Modify();
+        }
+    }
+
     // Level
     void onNoclip() {
         if (setting().onNoclip) {
@@ -105,6 +154,10 @@ namespace ModPatches {
         onMainLevels();
         onSliderLimit();
         onTextLength();
+
+        // Creator
+        onEditorExtension();
+        onObjectBypass();
         
         // Cosmetic
         onNoDeathEffect();
