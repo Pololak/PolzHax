@@ -15,6 +15,10 @@ namespace gd {
 		bool m_toggled; // 0x110
 		bool m_notClickable; // 0x114
 
+		virtual bool init(cocos2d::CCNode* off, cocos2d::CCNode* on, cocos2d::CCObject* target, cocos2d::SEL_MenuHandler callback) {
+			return reinterpret_cast<bool(__thiscall*)(CCMenuItemToggler*, cocos2d::CCNode*, cocos2d::CCNode*, cocos2d::CCObject*, cocos2d::SEL_MenuHandler)>(base + 0xd810)(this, off, on, target, callback);
+		}
+
 		static CCMenuItemToggler* create(cocos2d::CCNode* off, cocos2d::CCNode* on,
 			cocos2d::CCObject* target, cocos2d::SEL_MenuHandler callback) {
 			auto pRet = reinterpret_cast<CCMenuItemToggler* (__fastcall*)(cocos2d::CCNode*,

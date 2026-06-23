@@ -10,45 +10,54 @@ namespace gd {
 
 	class CCScrollLayerExt : public cocos2d::CCLayer {
 	public:
-		cocos2d::CCTouch* m_touch;
-		cocos2d::CCPoint m_touchPosition;
-		cocos2d::CCPoint m_touchStartPosition;
-		cocos2d::cc_timeval m_timeValue;
-		bool m_touchDown; // m_isTouch
-		bool m_notAtEndOfScroll; // m_isScrolling
-		cocos2d::CCLayerColor* m_verticalScrollbar; // m_verticalScrollIndicator
-		cocos2d::CCLayerColor* m_horizontalScrollbar; // m_horizontalScrollIndicator
-		CCScrollLayerExtDelegate* m_delegate; // m_scrollDelegate
-		CCContentLayer* m_contentLayer; // m_contentLayer
-		bool m_cutContent; // m_clipsToBounds
-		bool m_hScrollbarVisible; // m_showsHorizontalScrollIndicator
-		bool m_vScrollbarVisible; // m_showsVerticalScrollIndicator
-		bool m_disableHorizontal; // m_lockHorizontal
-		bool m_disableVertical; // m_lockVertical
-		bool m_disableMovement; // m_touchDispatch
-		float m_scrollLimitTop; // m_topPadding
-		float m_scrollLimitBottom; // m_bottomPadding
-		float m_peekLimitTop; // m_maxOffsetTop
-		float m_peekLimitBottom; // m_maxOffsetBottom
+		cocos2d::CCTouch* m_touch; // 0x118
+		cocos2d::CCPoint m_touchPosition; // 0x11c
+		cocos2d::CCPoint m_touchStartPosition; // 0x124
+		cocos2d::cc_timeval m_timeValue; // 0x12c
+		bool m_touchDown; // 0x134
+		bool m_notAtEndOfScroll; // 0x135
+		cocos2d::CCLayerColor* m_verticalScrollbar; // 0x138
+		cocos2d::CCLayerColor* m_horizontalScrollbar; // 0x13c
+		CCScrollLayerExtDelegate* m_delegate; // 0x140
+		CCContentLayer* m_contentLayer; // 0x144
+		bool m_cutContent; // 0x148
+		bool m_hScrollbarVisible; // 0x149
+		bool m_vScrollbarVisible; // 0x14a
+		bool m_disableHorizontal; // 0x14b
+		bool m_disableVertical; // 0x14c
+		bool m_disableMovement; // 0x14d
+		float m_scrollLimitTop; // 0x150
+		float m_scrollLimitBottom; // 0x154
+		float m_peekLimitTop; // 0x158
+		float m_peekLimitBottom; // 0x15c
 
-	protected:
 		CCScrollLayerExt(cocos2d::CCRect rect) {
-			reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*, cocos2d::CCRect)>(
-				base + 0x1B020
-				)(this, rect);
+			reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*, cocos2d::CCRect)>(base + 0xdd70)(this, rect);
 		}
 
-	public:
-		//own vtable
-		virtual void preVisitWithClippingRect(cocos2d::CCRect rect) {
-			return reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*, cocos2d::CCRect)>(
-				base + 0x1C000
-				)(this, rect);
+		virtual void visit() {
+			reinterpret_cast<void(__fastcall*)(CCScrollLayerExt*)>(base + 0xec90)(this);
 		}
-		virtual void postVisit() {
-			return reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*)>(
-				base + 0x1C090
-				)(this);
+
+		virtual bool ccTouchBegan(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
+			auto self = reinterpret_cast<CCScrollLayerExt*>(reinterpret_cast<uintptr_t>(this) + 0xe8);
+			return reinterpret_cast<bool(__thiscall*)(CCScrollLayerExt*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(base + 0xe720)(self, pTouch, pEvent);
+		}
+		virtual void ccTouchMoved(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
+			auto self = reinterpret_cast<CCScrollLayerExt*>(reinterpret_cast<uintptr_t>(this) + 0xe8);
+			return reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(base + 0xea80)(self, pTouch, pEvent);
+		}
+		virtual void ccTouchEnded(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
+			auto self = reinterpret_cast<CCScrollLayerExt*>(reinterpret_cast<uintptr_t>(this) + 0xe8);
+			return reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(base + 0xe820)(self, pTouch, pEvent);
+		}
+		virtual void ccTouchCancelled(cocos2d::CCTouch* pTouch, cocos2d::CCEvent* pEvent) {
+			auto self = reinterpret_cast<CCScrollLayerExt*>(reinterpret_cast<uintptr_t>(this) + 0xe8);
+			return reinterpret_cast<void(__thiscall*)(CCScrollLayerExt*, cocos2d::CCTouch*, cocos2d::CCEvent*)>(base + 0xea60)(self, pTouch, pEvent);
+		}
+
+		void scrollLayer(float p0) {
+			reinterpret_cast<void(__fastcall*)(CCScrollLayerExt*, float)>(base + 0xebe0)(this, p0);
 		}
 	};
 

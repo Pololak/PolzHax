@@ -23,6 +23,18 @@ namespace gd {
 		float m_height; // 0x164
 		cocos2d::CCLayerColor* m_backgroundLayer; // 0x168
 		cocos2d::CCLayer* m_mainLayer; // 0x16c
+
+		virtual void draw() {
+			reinterpret_cast<void(__fastcall*)(TableViewCell*)>(base + 0x30170)(this);
+		}
+
+		TableViewCell(char const* identifier, float width, float height) {
+			__asm {
+				movss xmm2, width
+				movss xmm3, height
+			}
+			reinterpret_cast<void(__thiscall*)(TableViewCell*, char const*)>(base + 0x1f9e0)(this, identifier);
+		}
 	};
 	
 	class TableView : public CCScrollLayerExt, CCScrollLayerExtDelegate {

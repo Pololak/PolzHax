@@ -84,7 +84,7 @@ namespace gd {
 		bool m_player2ReleaseSaved; // 0x24c
 		std::string m_replayString; // 0x250
 		cocos2d::CCArray* m_replayActions; // 0x268
-		float m_idk; // 0x26c
+		//float m_idk; // 0x26c
 		double m_levelTime; // 0x270
 		bool m_needsReorderColor01; // 0x278
 		bool m_needsReorderColor02; // 0x279

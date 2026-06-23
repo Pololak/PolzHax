@@ -76,10 +76,13 @@ void __fastcall UILayer::keyUpH(gd::UILayer* self, void*, enumKeyCodes key) {
 
 void __fastcall UILayer::onPauseH(gd::UILayer* self, void*, CCObject* sender) {
 	UILayer::onPause(self, sender);
-	self->m_p1TouchId = -1;
-	self->m_p2TouchId = -1;
-	self->m_p1Jumping = false;
-	self->m_p2Jumping = false;
+
+	if (setting().onVoidClickFix) {
+		self->m_p1TouchId = -1;
+		self->m_p2TouchId = -1;
+		self->m_p1Jumping = false;
+		self->m_p2Jumping = false;
+	}
 }
 
 void UILayer::mem_init() {

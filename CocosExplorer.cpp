@@ -114,7 +114,7 @@ void render_node_properties(CCNode* node) {
 
 	if (ImGui::BeginPopupModal("Add Child")) {
 		static int item = 0;
-		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0CCScale9Sprite\0ButtonSprite\0SearchButton\0");
+		ImGui::Combo("Node", &item, "CCNode\0CCLabelBMFont\0CCLabelTTF\0CCSprite\0CCMenuItemSpriteExtra\0CCScale9Sprite\0ButtonSprite\0SearchButton\0CCMenu\0CCLayer\0");
 
 		static int tag = -1;
 		ImGui::InputInt("Tag", &tag);
@@ -219,6 +219,14 @@ void render_node_properties(CCNode* node) {
 				gd::SearchButton* child;
 				child = gd::SearchButton::create(buttonTexture, text, textScale, iconTexture);
 				_child = child;
+				break;
+			}
+			case 8: {
+				_child = CCMenu::create();
+				break;
+			}
+			case 9: {
+				_child = CCLayer::create();
 				break;
 			}
 			}
@@ -364,6 +372,12 @@ void render_node_properties(CCNode* node) {
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
+
+	if (auto layer = dynamic_cast<CCLayer*>(node)) {
+		auto value = layer->m_bTouchEnabled;
+		ImGui::Checkbox("Touch Enabled", &value);
+		if (value != layer->m_bTouchEnabled) layer->setTouchEnabled(value);
+	}
 
 	if (auto delegate = dynamic_cast<CCTouchDelegate*>(node)) {
 		if (auto handler = CCDirector::sharedDirector()->m_pTouchDispatcher->findHandler(delegate)) {

@@ -613,6 +613,16 @@ inline std::vector<std::string> explode(std::string& string, char separator) {
 	return splitlist;
 }
 
+inline bool nodeIsVisible(CCNode* node) {
+	if (!node->isVisible()) {
+		return false;
+	}
+	if (auto parent = node->getParent()) {
+		return nodeIsVisible(parent);
+	}
+	return true;
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

@@ -1143,24 +1143,24 @@ void imgui_render() {
 		}
 
 		if (setting().onTransparentLists) {
-			sequence_patch((uint32_t)gd::base + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
-			sequence_patch((uint32_t)gd::base + 0x31c82, { 0x00 });
-			sequence_patch((uint32_t)gd::base + 0x31c89, { 0x00, 0x00 });
-			sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x00 });
-			sequence_patch((uint32_t)gd::base + 0x31cba, { 0x00 });
+			sequence_patch(gd::base + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
+			sequence_patch(gd::base + 0x31c82, { 0x00 });
+			sequence_patch(gd::base + 0x31c89, { 0x00, 0x00 });
+			sequence_patch(gd::base + 0x31c8c, { 0x00 });
+			sequence_patch(gd::base + 0x31cba, { 0x00 });
 
-			sequence_patch((uint32_t)gd::base + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
-			sequence_patch((uint32_t)gd::base + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
+			sequence_patch(gd::base + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
+			sequence_patch(gd::base + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
 		}
 		else {
-			sequence_patch((uint32_t)gd::base + 0x31c7f, { 0xc2, 0x72 });
-			sequence_patch((uint32_t)gd::base + 0x31c82, { 0x3e });
-			sequence_patch((uint32_t)gd::base + 0x31c89, { 0xa1, 0x58 });
-			sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x2c });
-			sequence_patch((uint32_t)gd::base + 0x31cba, { 0xff });
+			sequence_patch(gd::base + 0x31c7f, { 0xc2, 0x72 });
+			sequence_patch(gd::base + 0x31c82, { 0x3e });
+			sequence_patch(gd::base + 0x31c89, { 0xa1, 0x58 });
+			sequence_patch(gd::base + 0x31c8c, { 0x2c });
+			sequence_patch(gd::base + 0x31cba, { 0xff });
 
-			sequence_patch((uint32_t)gd::base + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
-			sequence_patch((uint32_t)gd::base + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+			sequence_patch(gd::base + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
+			sequence_patch(gd::base + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
 		}
 
 		if (setting().onZeroDelay) {
@@ -1188,7 +1188,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.1 (Vanilla)");
+			ImGui::Text("1.920 - v1.3.2 (Vanilla)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -2239,7 +2239,7 @@ void imgui_render() {
 					sequence_patch(gd::base + 0x93b6e, { 0x96 });
 				}
 			}
-			ImGui::Tooltip("Hide the editor grid.");
+			ImGui::Tooltip("Hides the editor grid.");
 
 			if (ImGui::CheckboxF("Hide Trigger Lines", &setting().onHideTriggerLines)) {
 				if (setting().onHideTriggerLines) {
@@ -2256,7 +2256,7 @@ void imgui_render() {
 					EditorUI::get()->setVisible(!setting().onHideUI);
 				}
 			}
-			ImGui::Tooltip("Hide the editor UI.");
+			ImGui::Tooltip("Hides the editor UI.");
 
 			ImGui::CheckboxF("Hitbox Bug Fix", &setting().onHitboxBugFix);
 			ImGui::Tooltip("Fixes oriented hitboxes in the editor.");
@@ -2301,7 +2301,7 @@ void imgui_render() {
 					sequence_patch(gd::base + 0x9442c, { 0xff });
 				}
 			}
-			ImGui::Tooltip("Remove the editor trail.");
+			ImGui::Tooltip("Removes the editor trail.");
 
 			if (ImGui::CheckboxF("Object Bypass", &setting().onObjectBypass)) {
 				if (setting().onObjectBypass) {
@@ -2985,6 +2985,9 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
+			ImGui::CheckboxF("Void Click Fix", &setting().onVoidClickFix);
+			ImGui::Tooltip("Fixes clicks getting voided when pausing.");
+
 			if (ImGui::CheckboxF("Wave Slide", &setting().onWaveSlide)) {
 				if (setting().onWaveSlide) {
 					sequence_patch(gd::base + 0xdba98, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
@@ -3253,24 +3256,24 @@ void imgui_render() {
 
 			if (ImGui::CheckboxF("Transparent Lists", &setting().onTransparentLists)) {
 				if (setting().onTransparentLists) {
-					sequence_patch((uint32_t)gd::base + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
-					sequence_patch((uint32_t)gd::base + 0x31c82, { 0x00 });
-					sequence_patch((uint32_t)gd::base + 0x31c89, { 0x00, 0x00 });
-					sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x00 });
-					sequence_patch((uint32_t)gd::base + 0x31cba, { 0x00 });
+					sequence_patch(gd::base + 0x31c7f, { 0x00, 0x00 }); // LevelCell::updateBGColor
+					sequence_patch(gd::base + 0x31c82, { 0x00 });
+					sequence_patch(gd::base + 0x31c89, { 0x00, 0x00 });
+					sequence_patch(gd::base + 0x31c8c, { 0x00 });
+					sequence_patch(gd::base + 0x31cba, { 0x00 });
 
-					sequence_patch((uint32_t)gd::base + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
-					sequence_patch((uint32_t)gd::base + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
+					sequence_patch(gd::base + 0x88a4f, { 0x00, 0x00, 0x00, 0x00 }); // LeaderboardsLayer::setupLevelBrowser
+					sequence_patch(gd::base + 0x8a945, { 0x00, 0x00, 0x00, 0x00 }); // LevelBrowserLayer::setupLevelBrowser
 				}
 				else {
-					sequence_patch((uint32_t)gd::base + 0x31c7f, { 0xc2, 0x72 });
-					sequence_patch((uint32_t)gd::base + 0x31c82, { 0x3e });
-					sequence_patch((uint32_t)gd::base + 0x31c89, { 0xa1, 0x58 });
-					sequence_patch((uint32_t)gd::base + 0x31c8c, { 0x2c });
-					sequence_patch((uint32_t)gd::base + 0x31cba, { 0xff });
+					sequence_patch(gd::base + 0x31c7f, { 0xc2, 0x72 });
+					sequence_patch(gd::base + 0x31c82, { 0x3e });
+					sequence_patch(gd::base + 0x31c89, { 0xa1, 0x58 });
+					sequence_patch(gd::base + 0x31c8c, { 0x2c });
+					sequence_patch(gd::base + 0x31cba, { 0xff });
 
-					sequence_patch((uint32_t)gd::base + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
-					sequence_patch((uint32_t)gd::base + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
+					sequence_patch(gd::base + 0x88a4f, { 0xbf, 0x72, 0x3e, 0xff });
+					sequence_patch(gd::base + 0x8a945, { 0xbf, 0x72, 0x3e, 0xff });
 				}
 			}
 			ImGui::Tooltip("Makes the menu lists transparent.");

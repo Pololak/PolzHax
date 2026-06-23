@@ -5,7 +5,6 @@
 
 namespace gd {
 	class CCContentLayer : public cocos2d::CCLayerColor {
-		//no members
 	public:
 		static CCContentLayer* create(const cocos2d::ccColor4B& color, float width, float height) {
 			__asm {
@@ -15,6 +14,10 @@ namespace gd {
 			return reinterpret_cast<CCContentLayer* (__fastcall*)(const cocos2d::ccColor4B&)>(
 				base + 0x172A0
 				)(color);
+		}
+
+		virtual void setPosition(cocos2d::CCPoint const& position) {
+			reinterpret_cast<void(__thiscall*)(CCContentLayer*, cocos2d::CCPoint const&)>(base + 0xb7b0)(this, position);
 		}
 	};
 }

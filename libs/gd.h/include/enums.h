@@ -175,6 +175,19 @@ namespace gd {
 		LoginFailed = -2,
 		GenericError = -1
 	};
+
+	enum class BoomListType {
+		Default = 0x0,
+		Stats = 0x3,
+		Achievement = 0x4,
+		Level = 0x5,
+		Level2 = 0x6,
+		Comment = 0x7,
+		Song = 0xa,
+		Score = 0xb,
+		MapPack = 0xc,
+		CustomSong = 0xd
+	};
 }
 
 #endif // !__ENUMS_H__

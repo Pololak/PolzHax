@@ -147,6 +147,11 @@ void renderDebugModule() {
 
 			ImGui::Text("m_fromColor: %i %i %i", pl->m_activeBGColorAction->m_fromColor.r, pl->m_activeBGColorAction->m_fromColor.g, pl->m_activeBGColorAction->m_fromColor.b);
 			ImGui::Text("m_toColor: %i %i %i", pl->m_activeBGColorAction->m_toColor.r, pl->m_activeBGColorAction->m_toColor.g, pl->m_activeBGColorAction->m_toColor.b);
+
+			ImGui::Text("m_cameraPortal: %p", pl->m_cameraPortal);
+			if (ImGui::Button("updateDualGround")) {
+				pl->updateDualGround(pl->m_player, 5, true);
+			}
 		}
 
 		ImGui::Text("VSync: %i", CCApplication::sharedApplication()->getVerticalSyncEnabled());
@@ -205,6 +210,10 @@ void renderDebugModule() {
 				
 			}
 		}
+
+		ImGui::Text("%p", &gd::PlayLayer::m_replayActions);
+		//ImGui::Text("%p", &gd::PlayLayer::m_idk);
+		ImGui::Text("%p", &gd::PlayLayer::m_levelTime);
 
 		//auto mdm = gd::MusicDownloadManager::sharedState();
 

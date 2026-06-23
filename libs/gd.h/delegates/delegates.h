@@ -16,6 +16,7 @@ namespace gd {
 	class CCIndexPath;
 	class TableView;
 	class TableViewCell;
+	class BoomScrollLayer;
 
 	class AppDelegate : public cocos2d::CCApplication {
 	public:
@@ -178,6 +179,16 @@ namespace gd {
 	class GJAccountSyncDelegate {
 		virtual void syncAccountFinished();
 		virtual void syncAccountFailed(BackupAccountError);
+	};
+
+	class BoomScrollLayerDelegate {
+		virtual void scrollLayerScrollingStarted(BoomScrollLayer*) {}
+		virtual void scrollLayerScrolledToPage(BoomScrollLayer*, int) {}
+		virtual void scrollLayerMoved(cocos2d::CCPoint) {}
+	};
+
+	class DynamicScrollDelegate {
+		virtual void updatePageWithObject(cocos2d::CCObject*, cocos2d::CCObject*) {}
 	};
 }
 

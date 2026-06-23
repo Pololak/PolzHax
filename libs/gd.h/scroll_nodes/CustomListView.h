@@ -13,17 +13,16 @@ namespace gd {
 			reinterpret_cast<void(__thiscall*)(CustomListView*)>(base + 0x2e890)(this);
 		}
 
-		static CustomListView* create(cocos2d::CCArray* entries, int type, float width, float height) {
+		static CustomListView* create(cocos2d::CCArray* entries, float width, float height, BoomListType type) {
 			__asm {
-				movss xmm1, height
-				movss xmm2, width
+				movss xmm1, width
+				movss xmm2, height
 			}
-
-			auto pRet = reinterpret_cast<CustomListView* (__thiscall*)(cocos2d::CCArray*, int)>(base + 0x2e970)(entries, type);
+			auto ret = reinterpret_cast<CustomListView * (__thiscall*)(cocos2d::CCArray*, BoomListType)>(base + 0x2e970)(entries, type);
 
 			__asm add esp, 0x4
 
-			return pRet;
+			return ret;
 		}
 	};
 	#pragma runtime_checks("s", restore)
