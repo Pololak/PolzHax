@@ -101,19 +101,18 @@ namespace gd {
 		GameObject* m_portalObject; // 0x49c
 		bool m_hasJumped; // 0x4a0
 		bool m_hasRingJumped; // 0x4a1
+		cocos2d::ccColor3B m_glowColor1; // 0x4a2
+		cocos2d::ccColor3B m_glowColor2; // 0x4a5
+		cocos2d::CCPoint m_realPlayerPos; // 0x4a8
+		bool m_isSecondPlayer; // 0x4b0
+		bool m_dualMode; // 0x4b1
 		PAD(2)
-		cocos2d::ccColor3B m_glowColor1; // 0x4a4
-		cocos2d::ccColor3B m_glowColor2; // 0x4a8
-		cocos2d::CCPoint m_realPlayerPos; // 0x4ac
-		bool m_isSecondPlayer; // 0x4b4
-		bool m_dualMode; // 0x4b5
-		PAD(2)
-		double m_clkTimer; // 0x4b8
-		bool m_disableEffects; // 0x4c0
+		double m_clkTimer; // 0x4b4
+		bool m_disableEffects; // 0x4bc
 		PAD(3)
-		GameplayDelegate* m_gameDelegate; // 0x4c4
-		float m_audioScale; // 0x4c8
-		float m_groundHeight; // 0x4cc
+		GameplayDelegate* m_gameDelegate; // 0x4c0
+		float m_audioScale; // 0x4c4
+		float m_groundHeight; // 0x4c8
 
 		static PlayerObject* create(int player, int ship, cocos2d::CCLayer* layer) {
 			auto ret = reinterpret_cast<PlayerObject * (__fastcall*)(int, int, cocos2d::CCLayer*)>(base + 0xd8bf0)(player, ship, layer);

@@ -2,6 +2,8 @@
 #include "pch.h"
 
 namespace PlayLayer {
+	inline int m_currentFrame;
+
 	inline bool(__thiscall* init)(gd::PlayLayer*, gd::GJGameLevel*);
 	bool __fastcall initH(gd::PlayLayer*, void*, gd::GJGameLevel*);
 

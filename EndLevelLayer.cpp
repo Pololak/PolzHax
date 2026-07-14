@@ -126,7 +126,7 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 
 	updateCheatIndicator2(self);
 
-	auto versionLabel = CCLabelBMFont::create("v1.3.2 (V)", "chatFont.fnt");
+	auto versionLabel = CCLabelBMFont::create("v1.3.3 (V) 140726", "chatFont.fnt");
 	versionLabel->setScale(.6f);
 	versionLabel->setAnchorPoint({ 0.f, 1.f });
 	versionLabel->setColor(ccc3(100, 100, 100));

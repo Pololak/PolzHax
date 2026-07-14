@@ -153,11 +153,12 @@ public:
      you might need to load different resources for a given file in the different platforms.
 
      @since v2.1
+     @note Robtop Addition: added a bool parameter
      */
-    RT_REMOVE(  virtual std::string fullPathForFilename(const char* pszFileName);       )
-    RT_ADD(     virtual std::string fullPathForFilename(const char* pszFileName, bool); )
-    
-    RT_ADD(virtual void removeFullPath(const char* path));
+    virtual std::string fullPathForFilename(const char* pszFileName, bool skipSuffix);
+
+    // @note RobTop Addition
+    virtual void removeFullPath(const char* path);
 
     /**
      * Loads the filenameLookup dictionary from the contents of a filename.
@@ -301,9 +302,10 @@ public:
      *  @return  The path that can be write/read a file in
      *  @lua NA
      */
-    virtual std::string getWritablePath() = 0;
+    virtual std::string getWritablePath() { return ""; }
 
-    RT_ADD(virtual std::string getWritablePath2();)
+    // @note RobTop Addition
+    virtual std::string getWritablePath2();
     
     /**
      *  Checks whether a file exists.
@@ -313,7 +315,7 @@ public:
      *  @return true if the file exists, otherwise it will return false.
      *  @lua NA
      */
-    virtual bool isFileExist(const std::string& strFilePath) = 0;
+    virtual bool isFileExist(const std::string& strFilePath) { return false; }
     
     /**
      *  Checks whether the path is an absolute path.
@@ -358,8 +360,10 @@ protected:
      */
     virtual std::string getNewFilename(const char* pszFileName);
 
-    RT_ADD(virtual bool shouldUseHD();)
-    RT_ADD(virtual std::string addSuffix(std::string, std::string);)
+    // @note RobTop Addition
+    virtual bool shouldUseHD();
+    // @note RobTop Addition
+    virtual std::string addSuffix(std::string, std::string);
     
     /**
      *  Gets full path for filename, resolution directory and search path.
@@ -401,6 +405,7 @@ protected:
      */
     virtual CCArray* createCCArrayWithContentsOfFile(const std::string& filename);
     
+public:
     /** Dictionary used to lookup filenames based on a key.
      *  It is used internally by the following methods:
      *
@@ -436,12 +441,18 @@ protected:
      *  This variable is used for improving the performance of file search.
      */
     std::map<std::string, std::string> m_fullPathCache;
+
+    std::string m_strAndroidPath;
     
+protected:
     /**
      *  The singleton pointer of CCFileUtils.
      */
     static CCFileUtils* s_sharedFileUtils;
-    
+
+public:
+    virtual std::string getAndroidPath() const;
+    virtual void setAndroidPath(std::string);
 };
 
 // end of platform group

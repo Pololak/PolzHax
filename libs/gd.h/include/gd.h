@@ -139,6 +139,7 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/ShareLevelLayer.h"
 #include "layers_scenes_transitions_nodes/CreatorLayer.h"
 #include "layers_scenes_transitions_nodes/GJMoreGamesLayer.h"
+#include "layers_scenes_transitions_nodes/VideoOptionsLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
 

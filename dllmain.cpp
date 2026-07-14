@@ -38,6 +38,7 @@
 #include "SetGroupIDLayer.hpp"
 #include "ShareLevelLayer.hpp"
 #include "SimplePlayer.hpp"
+#include "VideoOptionsLayer.hpp"
 #include "UILayer.hpp"
 
 // Utils
@@ -45,10 +46,12 @@
 #include "CrashLogger.hpp"
 #include "SpeedHack.h"
 #include "PitchShifter.hpp"
+#include "PolzBot.hpp"
 
 // Menu
 #include "Menu.hpp"
 #include "Setting.hpp"
+#include "TextureManager.hpp"
 
 #include <imgui-hook.hpp>
 
@@ -283,6 +286,17 @@ void __fastcall AppDelegate_applicationWillEnterForegroundH(gd::AppDelegate* sel
 	if (setting().onAutoSave) {
 		setting().save();
 	}
+
+	texturePacks.clear();
+	texturePacks.push_back("Base");
+	auto texturePacksPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/texturepacks";
+	for (const auto& directory : std::filesystem::directory_iterator(texturePacksPath)) {
+		if (directory.is_directory()) {
+			texturePacks.push_back(directory.path().filename().string());
+		}
+	}
+
+	PolzBot::updateReplayList();
 }
 
 bool debugCheck() {
@@ -309,7 +323,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	}
 
 	ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<void*>(gd::base + 0x11f338), &originalServerURL, 33, NULL);
-	sequence_patch(gd::base + 0x28bd5, { 0x6a, 0x00 }); // RGBA8888 format.
+	//sequence_patch(gd::base + 0x28bd5, { 0x6a, 0x00 }); // RGBA8888 format.
 	sequence_patch(gd::base + 0x3a49b, { 0xb8, 0x01, 0x00, 0x00, 0x00, 0x90, 0x90 }); // Play Music Button.
 	sequence_patch(gd::base + 0x145128, { 0x42, 0x61, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }); // Progress Bar -> Bar
 	sequence_patch(gd::base + 0x3a669, { 0x00, 0x00, 0x00, 0x43 }); // CustomSongWidget m_artistLabel->limitLabelWidth(120.f, ...)
@@ -373,6 +387,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	SetGroupIDLayer::mem_init();
 	//ShareLevelLayer::mem_init();
 	SimplePlayer::mem_init();
+	VideoOptionsLayer::mem_init();
 	UILayer::mem_init();
 
 	setupImGuiMenu();

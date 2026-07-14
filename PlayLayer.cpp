@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include <numeric>
 #include <unordered_map>
+#include "PolzBot.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -606,6 +607,8 @@ void updateMetaLabel() {
 		if (setting().playerRot) ss << "Rot: " << playLayer->m_player->getRotation() << "\n";
 		if (setting().playerGrav) ss << "Gravity: " << playLayer->m_player->m_gravity << "\n";
 		if (setting().playerSpd) ss << "Speed: " << playLayer->m_player->m_timeMod << "\n";
+		if (setting().currentFrame) ss << "Frame: " << PlayLayer::m_currentFrame << "\n";
+		if (setting().attemptTime) ss << "Time: " << playLayer->m_levelTime << "\n";
 
 		m_metaLabel->setString(ss.str().c_str());
 	}
@@ -839,6 +842,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_totalDelta = 0;
 	m_prevX = 0;
 
+	m_currentFrame = 0;
+
 	if (!PlayLayer::init(self, level)) return false;
 
 	//
@@ -992,6 +997,33 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 
 	PlayLayer::update(self, dt);
 
+	if (!self->m_isDead) {
+		m_currentFrame++;
+	}
+
+	if (setting().onPlayMacro) {
+		for (auto action : PolzBot::m_replayEvents) {
+			if (action.first == m_currentFrame) {
+				if (!action.second.first) {
+					if (action.second.second) {
+						self->pushButton(1, true);
+					}
+					else {
+						self->releaseButton(1, true);
+					}
+				}
+				else {
+					if (action.second.second) {
+						self->pushButton(1, false);
+					}
+					else {
+						self->releaseButton(1, false);
+					}
+				}
+			}
+		}
+	}
+
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";
 
@@ -1111,6 +1143,11 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	m_clickFrames.clear();
 	m_totalClicks = 0;
 	m_maxClicks = 0;
+	m_currentFrame = 0;
+
+	if (setting().onRecordMacro) {
+		PolzBot::m_replayEvents.clear();
+	}
 
 	if (self->m_endTriggered) {
 		self->m_endTriggered = false;
@@ -1179,6 +1216,10 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 						}
 					}
 				}
+
+				m_currentFrame = currentCheckpointStorage.m_currentFrame;
+
+				PolzBot::m_replayEvents = currentCheckpointStorage.m_replayEvents;
 			}
 		}
 	}
@@ -1477,6 +1518,16 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
 		keybd_event(setting().m_autoDeafenKey, 0x50, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 		keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 	}
+
+	if (setting().onRecordMacro) {
+		setting().onRecordMacro = false;
+		setting().onRealTime = false;
+		setting().onTPSBypass = false;
+		if (setting().onAutoSaveReplay) {
+			PolzBot::save();
+		}
+		PlayLayer::updateStatusLabels();
+	}
 }
 
 void __fastcall PlayLayer::pauseGameH(gd::PlayLayer* self, void*, bool idk) {
@@ -1552,6 +1603,10 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 		}
 	}
 
+	m_checkpointStorage[ret].m_currentFrame = m_currentFrame;
+
+	m_checkpointStorage[ret].m_replayEvents = PolzBot::m_replayEvents;
+
 	return ret;
 }
 
@@ -1602,12 +1657,22 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 		m_totalClicks++;
 		m_hasClicked = true;
 	}
+	
 	PlayLayer::pushButton(self, p0, p1);
+
+	if (setting().onRecordMacro) {
+		PolzBot::m_replayEvents[m_currentFrame] = { !p1, true };
+	}
 }
 
 void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bool p1) {
 	m_isHolding = false;
+
 	PlayLayer::releaseButton(self, p0, p1);
+
+	if (setting().onRecordMacro) {
+		PolzBot::m_replayEvents[m_currentFrame] = { !p1, false };
+	}
 }
 
 //void __fastcall PlayLayer::checkCollisionsH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {

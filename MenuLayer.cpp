@@ -67,6 +67,11 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 
 	//setPitch(.8f);
 
+	std::cout << "CCFileUtils search paths:\n";
+	for (auto str : CCFileUtils::sharedFileUtils()->m_searchPathArray) {
+		std::cout << str.c_str() << std::endl;
+	}
+
 	return true;
 }
 

@@ -1,8 +1,8 @@
 #pragma once
 #include "pch.h"
 #include <unordered_map>
-
-//inline std::unordered_map<gd::GameObject*, std::pair<bool, bool>> m_activatedObjects;
+#include "PolzBot.hpp"
+#include <map>
 
 struct CheckpointStorage {
     gd::GameObject* m_cameraPortal;
@@ -18,4 +18,7 @@ struct CheckpointStorage {
     double m_yVelocityP2;
 
     std::unordered_map<gd::GameObject*, std::pair<bool, bool>> m_activatedObjects;
+
+    int m_currentFrame;
+    std::map<int, std::pair<bool, bool>> m_replayEvents;
 };

@@ -10,7 +10,7 @@ namespace gd {
 		cocos2d::CCDictionary* m_loopedSounds; // 0xe8
 		cocos2d::CCDictionary* m_uniqueEffects; // 0xec
 		double m_effectResetTime; // 0xf0
-		bool m_bUnused; // 0xf8
+		bool m_preloaded; // 0xf8
 		int m_state; // 0xfc
 		std::string m_activeBGMusic; // 0x100
 
@@ -38,6 +38,10 @@ namespace gd {
 
 		void stopBackgroundMusic() {
 			reinterpret_cast<void(__fastcall*)(GameSoundManager*)>(base + 0x17940)(this);
+		}
+
+		void preload() {
+			reinterpret_cast<void(__fastcall*)(GameSoundManager*)>(base + 0x173a0)(this);
 		}
 	};
 }

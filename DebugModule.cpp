@@ -2,13 +2,24 @@
 #include "ColorChannelSprite.hpp"
 #include "LevelEditorLayer.hpp"
 #include "Setting.hpp"
+#include "PlayLayer.hpp"
+#include "PolzBot.hpp"
 
 #include <imgui-hook.hpp>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 #include <string>
+#include <vector>
 #include <support/zip_support/ZipUtils.h>
 
 #include "utils.hpp"
+
+std::vector<int> m_a = {
+	1,1,1,
+	1,0,1,
+	1,1,1,
+	1,0,1,
+	1,0,1,3
+};
 
 void renderDebugModule() {
 	ImGui::SetNextWindowSize(ImVec2(300.f * setting().UISize, 300.f * setting().UISize));
@@ -45,6 +56,18 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", glm)->getCString());
 		}
 
+		auto gsm = gd::GameSoundManager::sharedState();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("GameSoundManager: 0x%p", gsm);
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - 50.f);
+		if (ImGui::Button("Copy##GameSoundManager", ImVec2(50.f, 0.f))) {
+			clipboard::write(CCString::createWithFormat("%p", gsm)->getCString());
+		}
+
+		ImGui::Text("Active BG Music: %s", gsm->m_activeBGMusic.c_str());
+		ImGui::Checkbox("Preloaded", &gsm->m_preloaded);
+
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("LocalLevelManager: 0x%p", gd::LocalLevelManager::sharedState());
 		ImGui::SameLine();
@@ -78,6 +101,10 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", fme)->getCString());
 		}
 
+		ImGui::Text("filePath: %s", fme->m_filePath.c_str());
+
+		ImGui::Text("PlayerObject::m_isSecondPlayer: %p", &gd::PlayerObject::m_isSecondPlayer);
+
 		auto gjam = gd::GJAccountManager::sharedState();
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("GJAccountManager: 0x%p", gjam);
@@ -106,8 +133,65 @@ void renderDebugModule() {
 
 		ImGui::Checkbox("No DrawNode Clear", &setting().m_clearHitboxes);
 
+		ImGui::Checkbox("Fix Slabs Y Offset", &setting().m_fixSlabOffset);
+		
+		if (ImGui::Button("Reload Sounds")) {
+			gd::GameSoundManager::sharedState()->preload();
+		}
+
+		if (ImGui::Button("Fade in Music")) {
+			gd::GameManager::sharedState()->fadeInMusic();
+		}
+
+		if (ImGui::Button("Play effect")) {
+			gd::GameSoundManager::playSound("playSound_01.ogg");
+		}
+
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
+			int currentFrame = PlayLayer::m_currentFrame;
+
+			ImGui::Text("update() isScheduled: %i", pl->isRunning());
+			if (ImGui::Button("Unschedule update")) {
+				pl->unscheduleUpdate();
+			}
+			if (ImGui::Button("Schedule update")) {
+				pl->scheduleUpdate();
+			}
+			if (ImGui::Button("Step")) {
+				pl->scheduleUpdate();
+				if (currentFrame == currentFrame++) {
+					pl->unscheduleUpdate();
+				}
+			}
+
+			ImGui::Text("onGround: %i", pl->m_player->m_onGround);
+			ImGui::Text("isJumping: %i", pl->m_player->m_isJumping);
+			ImGui::Text("m_realPlayerPos: %f/%f", pl->m_player->m_realPlayerPos.x, pl->m_player->m_realPlayerPos.y);
+			ImGui::Text("m_realPlayerPos 2: %f/%f", from<cocos2d::CCPoint>(pl->m_player, 0x4a8).x, from<cocos2d::CCPoint>(pl->m_player, 0x4a8).y);
+			
+			ImGui::Text("isSecondPlayer: %i", pl->m_player2->m_isSecondPlayer);
+			ImGui::Text("dualMode: %i", pl->m_player2->m_dualMode);
+
+			if (ImGui::CollapsingHeader("Replay Actions")) {
+				for (auto pushFrame : PolzBot::m_replayEvents) {
+					ImGui::Text("Frame: %i P2: %s Down: %s", pushFrame.first, pushFrame.second.first ? "true" : "false", pushFrame.second.second ? "true" : "false");
+				}
+			}
+
+			if (ImGui::Button("pushButton true")) {
+				pl->pushButton(1, true);
+			}
+			if (ImGui::Button("releaseButton true")) {
+				pl->releaseButton(1, true);
+			}
+			if (ImGui::Button("pushButton false")) {
+				pl->pushButton(1, false);
+			}
+			if (ImGui::Button("releaseButton false")) {
+				pl->releaseButton(1, false);
+			}
+
 			static bool cl = false;
 			if (ImGui::Checkbox("Disable No Collision on Playback", &cl)) {
 				if (cl) {
@@ -118,6 +202,7 @@ void renderDebugModule() {
 				}
 			}
 
+			ImGui::Text("Level time: %.12f", pl->m_levelTime);
 			ImGui::TextWrapped("m_replayString: %s", pl->m_replayString.c_str());
 			
 			//ImGui::TextWrapped("IDK: %s", cocos2d::ZipUtils::decompressString(pl->m_level->m_levelString.c_str(), false));
@@ -167,6 +252,8 @@ void renderDebugModule() {
 
 		auto editorLayer = LevelEditorLayer::get();
 		if (editorLayer) {
+			auto editorUI = editorLayer->m_uiLayer;
+
 			static int colorID = 0;
 			static int idk = 0;
 			static int idk2 = 0;
@@ -184,6 +271,27 @@ void renderDebugModule() {
 			float screenBorderLeft = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenLeft(), 0.f }).x;
 			float screenBorderRight = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenRight(), 0.f }).x;
 			ImGui::Text("Screen Borders: %f/%f", screenBorderLeft, screenBorderRight);
+
+			if (ImGui::Button("Build Letter")) {
+				std::cout << m_a.size() << std::endl;
+				for (int i = 1; i < m_a.size(); i++) {
+					std::cout << m_a[i - 1];
+					if (i % 3 == 0) {
+						std::cout << std::endl;
+					}
+				}
+				std::cout << m_a.back() << std::endl;
+
+				if (editorUI->m_selectedObject) {
+					for (int i = 1; i < m_a.size(); i++) {
+						editorUI->onDuplicate(nullptr);
+						editorUI->moveObject(editorUI->m_selectedObject, { 30.f + (30.f * m_a[i]), 0.f});
+						if (i % 3 == 0) {
+							editorUI->moveObject(editorUI->m_selectedObject, { -90.f, -30.f });
+						}
+					}
+				}
+			}
 		}
 
 		ImGui::InputText("Favorites", &setting().m_favoritedLevelsIDs);

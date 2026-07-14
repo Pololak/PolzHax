@@ -126,6 +126,7 @@ struct SettingStruct {
 	bool onEverythingHurts;
 	bool onEverythingPulses;
 	bool onForceBlockType;
+	bool onFrameStepper; int m_toggleStepper, m_backStepper, m_forwardStepper;
 	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
 	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0; bool onTriggerHitboxes;
@@ -192,7 +193,7 @@ struct SettingStruct {
 	bool onBestRunLabel, bestRunPrefix = true; int bestRunPos = 0, bestRunOrder = 2;
 	bool onAttemptsLabel, attemptsPrefix = true; int attemptsPos = 0, attemptsOrder = 3;
 	bool onJumpsLabel, jumpsPrefix = true; int jumpsPos = 0, jumpsOrder = 6;
-	bool onMetaLabel, playerXPos = true, playerYPos = true, playerYVel, playerRot, playerGrav, playerSpd; int metaPos = 0;
+	bool onMetaLabel, playerXPos = true, playerYPos = true, playerYVel, playerRot, playerGrav, playerSpd, currentFrame, attemptTime; int metaPos = 0;
 
 	// Icons
 	bool onIconEffects;
@@ -236,13 +237,20 @@ struct SettingStruct {
 	int m_openMenuKey;
 	bool m_liveColorEnabled; // newcustomizeobjectlayer
 	bool m_clearHitboxes;
+	bool m_fixSlabOffset;
 
 	// GDPS Switcher
 	std::string originalServerURL;
 	bool onGDPSSwitcher, onEnableSwitcher; int m_serverIndex = 0; std::string m_customServerURL;
 
+	// Texture Manager
+	bool onTextureManager;
+	int m_texturePackIndex;
+	std::string m_customTexturePackPath;
+
 	// PolzBot
-	bool onPlayMacro, onRecordMacro, onAutoSaveReplay;
+	bool onPlayMacro, onRecordMacro, onAutoSaveReplay, onLockDelta, onRealTime;
+	std::string m_selectedMacro;
 
 	// Screenshot
 	bool onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard;
@@ -363,6 +371,7 @@ DEF_SCHEMA(
 	onEverythingHurts,
 	onEverythingPulses,
 	onForceBlockType,
+	onFrameStepper, m_toggleStepper, m_backStepper, m_forwardStepper,
 	onFreezePlayer,
 	onHighFPSRotationFix,
 	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB, onTriggerHitboxes,
@@ -428,7 +437,7 @@ DEF_SCHEMA(
 	onBestRunLabel, bestRunPrefix, bestRunPos, bestRunOrder,
 	onAttemptsLabel, attemptsPrefix, attemptsPos, attemptsOrder,
 	onJumpsLabel, jumpsPrefix, jumpsPos, jumpsOrder,
-	onMetaLabel, playerXPos, playerYPos, playerYVel, playerRot, playerGrav, playerSpd, metaPos,
+	onMetaLabel, playerXPos, playerYPos, playerYVel, playerRot, playerGrav, playerSpd, currentFrame, attemptTime, metaPos,
 
 	// Icons
 	onIconEffects,
@@ -468,8 +477,11 @@ DEF_SCHEMA(
 	onExtraLong,
 	m_openMenuKey,
 	m_liveColorEnabled,
+	m_fixSlabOffset,
 
 	onEnableSwitcher, m_serverIndex, m_customServerURL,
+
+	m_texturePackIndex, m_customTexturePackPath,
 
 	onAutoSaveReplay,
 

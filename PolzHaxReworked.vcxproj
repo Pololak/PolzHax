@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -97,7 +97,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)libs\cocos-headers\extensions;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\third_party\win32\OGLES;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\third_party\win32;$(SolutionDir)libs\cocos-headers\cocos2dx\platform\win32;$(SolutionDir)libs\cocos-headers\cocos2dx\kazmath\include;$(SolutionDir)libs\cocos-headers\cocos2dx\include;$(SolutionDir)libs\cocos-headers\cocos2dx\robtop\xml;$(SolutionDir)libs\cocos-headers\cocos2dx\robtop;$(SolutionDir)libs\cocos-headers\cocos2dx;$(SolutionDir)libs\MinHook;$(SolutionDir)libs\gd.h\include;$(SolutionDir)libs\gd.h;$(SolutionDir)libs\imgui-hook;$(SolutionDir)libs\imgui-hook\imgui;$(SolutionDir)libs\fmod-headers;$(SolutionDir)libs\detours;$(SolutionDir)libs\nfd;$(SolutionDir)libs\nfd\src;$(SolutionDir)libs\nfd\src\include;$(SolutionDir)libs\discord-game-sdk;$(SolutionDir)libs\discord-game-sdk\cpp;$(SolutionDir)libs\discord-game-sdk\lib\x86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalOptions>-D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -182,6 +182,7 @@
     <ClInclude Include="Icons.hpp" />
     <ClInclude Include="ImGuiUtils.hpp" />
     <ClInclude Include="InfoLayer.hpp" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="LeaderboardsLayer.hpp" />
     <ClInclude Include="LevelBrowserLayer.hpp" />
     <ClInclude Include="LevelCell.hpp" />
@@ -648,6 +649,7 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\SetGroupIDLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\ShareLevelLayer.h" />
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\UILayer.h" />
+    <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\VideoOptionsLayer.h" />
     <ClInclude Include="libs\gd.h\level_nodes\EndPortalObject.h" />
     <ClInclude Include="libs\gd.h\level_nodes\GJGameLevel.h" />
     <ClInclude Include="libs\gd.h\level_nodes\LevelSettingsObject.h" />
@@ -720,6 +722,7 @@
     <ClInclude Include="PitchShifter.hpp" />
     <ClInclude Include="PlayerObject.hpp" />
     <ClInclude Include="PlayLayer.hpp" />
+    <ClInclude Include="PolzBot.hpp" />
     <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="PracticeFix.hpp" />
     <ClInclude Include="PulseBuilderPopup.hpp" />
@@ -732,7 +735,9 @@
     <ClInclude Include="SimplePlayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
     <ClInclude Include="SURVEY_PROGRAM.hpp" />
+    <ClInclude Include="TextureManager.hpp" />
     <ClInclude Include="utils.hpp" />
+    <ClInclude Include="VideoOptionsLayer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCSchedulerHook.cpp" />
@@ -819,6 +824,7 @@
     <ClCompile Include="PitchShifter.cpp" />
     <ClCompile Include="PlayerObject.cpp" />
     <ClCompile Include="PlayLayer.cpp" />
+    <ClCompile Include="PolzBot.cpp" />
     <ClCompile Include="PulseBuilderPopup.cpp" />
     <ClCompile Include="RemapTriggerWidget.cpp" />
     <ClCompile Include="RGBColorInputWidget.cpp" />
@@ -829,7 +835,9 @@
     <ClCompile Include="SimplePlayer.cpp" />
     <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="SURVEY_PROGRAM.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="UILayer.cpp" />
+    <ClCompile Include="VideoOptionsLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\discord-game-sdk\lib\x86\discord_game_sdk.dll.lib" />

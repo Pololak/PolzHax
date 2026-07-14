@@ -144,6 +144,10 @@ namespace gd {
 		bool m_customColor04Blend; // 0x32c
 		bool m_customColorDLBlend; // 0x32d
 
+		virtual void update(float dt) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, float)>(base + 0xe9360)(this, dt);
+		}
+
 		static PlayLayer* create(GJGameLevel* level) {
 			return reinterpret_cast<PlayLayer * (__fastcall*)(GJGameLevel*)>(base + 0xe3530)(level);
 		}

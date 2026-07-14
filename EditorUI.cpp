@@ -505,6 +505,21 @@ void __fastcall EditorUI::toggleSpecialEditButtonsH(gd::EditorUI* self) {
 CCPoint* __fastcall EditorUI::offsetForKeyH(gd::EditorUI* self, void*, int id) {
 	CCPoint* ret = EditorUI::offsetForKey(self, id);
 
+	if (setting().m_fixSlabOffset) {
+		switch (id) {
+		case 31:
+			*ret = ccp(0.f, 8.25f); return ret; break;
+		case 138:
+			*ret = ccp(0.f, 8.25f); return ret; break;
+		case 206:
+			*ret = ccp(0.f, 8.25f); return ret; break;
+		case 360:
+			*ret = ccp(0.f, 8.25f); return ret; break;
+		case 361:
+			*ret = ccp(0.f, 8.25f); return ret; break;
+		}
+	}
+
 	switch (id) {
 	case 185:
 		*ret = ccp(-4.5f, 4.5f); return ret; break;

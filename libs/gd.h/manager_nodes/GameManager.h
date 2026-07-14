@@ -121,6 +121,10 @@ namespace gd {
 		PlayLayer* getPlayLayer() {
 			return m_playLayer;
 		}
+
+		void fadeInMusic() {
+			reinterpret_cast<void(__thiscall*)(GameManager*)>(base + 0x66890)(this);
+		}
 	};
 }
 
