@@ -13,8 +13,9 @@ void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, floa
 
 		const float target_dt = 1.f / fps / speedhack;
 
-		if (setting().onRealTime)
+		if (!setting().onRealTime && !setting().onTPSBypass) {
 			return CCSchedulerHook::update(self, target_dt);
+		}
 
 		unsigned times = static_cast<int>((dt + g_left_over) / target_dt);
 		if (dt == 0.f) {

@@ -264,7 +264,7 @@ void PlayLayer::updateShowHitboxes() {
 	playerDrawNode->clear();
 	objectDrawNode->clear();
 
-	if ((self->m_player->m_isDead && setting().onHitboxesOnDeath) || setting().onHitboxes) {
+	if ((self->m_isDead && setting().onHitboxesOnDeath) || setting().onHitboxes) {
 		if (setting().onPlayerHitboxes) {
 			if (self->m_player) Hitboxes::drawPlayerHitbox(self->m_player, playerDrawNode);
 			if (self->m_player2) Hitboxes::drawPlayerHitbox(self->m_player2, playerDrawNode);

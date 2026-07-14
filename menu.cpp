@@ -1191,7 +1191,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (Vanilla) 140726");
+			ImGui::Text("1.920 - v1.3.3 (Vanilla) 150726");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1298,8 +1298,6 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Replay", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::TextWrapped("It's not really accurate, but you still can bot levels pretty good. Please, don't turn on Real Time without bot running.\n.pgdr files are just .json files so you can edit them with any text editor.\nPolzBot v1.0");
-
 			ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
 			if (ImGui::Combo("##selectedMacro", &selectedReplay, PolzBot::replayNames, PolzBot::replayNames.size())) {
 				if (PolzBot::replayNames.size()) {
@@ -1318,7 +1316,6 @@ void imgui_render() {
 
 				setting().tpsValue = setting().fpsValue;
 
-				setting().onRealTime = true;
 				setting().onLockDelta = true;
 
 				if (playLayer) {
@@ -1334,7 +1331,6 @@ void imgui_render() {
 
 				setting().tpsValue = setting().fpsValue;
 
-				setting().onRealTime = true;
 				setting().onLockDelta = true;
 
 				if (playLayer) {
@@ -1379,12 +1375,12 @@ void imgui_render() {
 				ImGui::BeginDisabled();
 			}
 			ImGui::Checkbox("Lock Delta", &setting().onLockDelta);
-			ImGui::SameLine(0.f, 0.f);
-			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			ImGui::Checkbox("Real Time", &setting().onRealTime);
 			if (setting().onPlayMacro || setting().onRecordMacro) {
 				ImGui::EndDisabled();
 			}
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			ImGui::Checkbox("Real Time", &setting().onRealTime);
 
 			if (setting().onDeveloperMode) {
 				ImGui::Text("Events size: %i", PolzBot::m_replayEvents.size());
