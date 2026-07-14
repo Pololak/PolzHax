@@ -1316,10 +1316,10 @@ void imgui_render() {
 				setting().onPracticeFix = true;
 				setting().onClassicMode = true;
 
-				setting().onTPSBypass = setting().onRecordMacro;
 				setting().tpsValue = setting().fpsValue;
 
-				setting().onRealTime = setting().onRecordMacro;
+				setting().onRealTime = true;
+				setting().onLockDelta = true;
 
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();
@@ -1329,12 +1329,13 @@ void imgui_render() {
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			if (ImGui::CheckboxF("Replay", &setting().onPlayMacro)) {
 				setting().onRecordMacro = false;
+				setting().onPracticeFix = true;
 				setting().onClassicMode = true;
 
-				setting().onTPSBypass = setting().onPlayMacro;
 				setting().tpsValue = setting().fpsValue;
 
-				setting().onRealTime = setting().onPlayMacro;
+				setting().onRealTime = true;
+				setting().onLockDelta = true;
 
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();
@@ -1377,6 +1378,9 @@ void imgui_render() {
 			if (setting().onPlayMacro || setting().onRecordMacro) {
 				ImGui::BeginDisabled();
 			}
+			ImGui::Checkbox("Lock Delta", &setting().onLockDelta);
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			ImGui::Checkbox("Real Time", &setting().onRealTime);
 			if (setting().onPlayMacro || setting().onRecordMacro) {
 				ImGui::EndDisabled();

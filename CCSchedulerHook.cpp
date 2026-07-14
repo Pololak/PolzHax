@@ -7,10 +7,11 @@ float g_left_over = 0.f; // tps bypass by Mat ig (taken from ReplayBot https://g
 void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, float dt) {
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 
-	if (playLayer && setting().onTPSBypass) {
+	if (playLayer && (setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass)) {
+		const auto fps = setting().tpsValue;
 		auto speedhack = self->getTimeScale();
 
-		const float target_dt = 1.f / setting().tpsValue / speedhack;
+		const float target_dt = 1.f / fps / speedhack;
 
 		if (setting().onRealTime)
 			return CCSchedulerHook::update(self, target_dt);

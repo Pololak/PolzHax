@@ -995,7 +995,14 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		_frames = 0;
 	}
 
-	PlayLayer::update(self, dt);
+	float deltaTime = dt;
+	if (setting().onLockDelta) {
+		deltaTime = 1 / setting().tpsValue;
+		PlayLayer::update(self, deltaTime);
+	}
+	else {
+		PlayLayer::update(self, dt);
+	}
 
 	if (!self->m_isDead) {
 		m_currentFrame++;
@@ -1526,13 +1533,12 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
 
 	if (setting().onRecordMacro) {
 		setting().onRecordMacro = false;
-		setting().onRealTime = false;
-		setting().onTPSBypass = false;
-		if (setting().onAutoSaveReplay) {
+		if (setting().onAutoSaveReplay && !setting().m_selectedMacro.empty()) {
 			PolzBot::save();
 		}
 		PlayLayer::updateStatusLabels();
 	}
+	setting().onPlayMacro = false;
 }
 
 void __fastcall PlayLayer::pauseGameH(gd::PlayLayer* self, void*, bool idk) {
