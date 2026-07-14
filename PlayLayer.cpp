@@ -1149,6 +1149,11 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 		PolzBot::m_replayEvents.clear();
 	}
 
+	if (setting().onPlayMacro) {
+		self->releaseButton(1, false);
+		self->releaseButton(1, true);
+	}
+
 	if (self->m_endTriggered) {
 		self->m_endTriggered = false;
 		self->stopAllActions();

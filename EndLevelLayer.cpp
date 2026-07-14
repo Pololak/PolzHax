@@ -100,6 +100,10 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 			safeModeLabel->setScale(1.25f);
 			self->m_mainLayer->addChild(safeModeLabel, 15);
 		}
+
+		if (setting().onPlayMacro) {
+			m_completeSprite->setScale(.95f); // hehehe
+		}
 	}
 
 	auto onHideEndLayerSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");

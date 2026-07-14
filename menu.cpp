@@ -1236,11 +1236,11 @@ void imgui_render() {
 				if (ImGui::Button("GDPS Switcher", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 					setting().onGDPSSwitcher = !setting().onGDPSSwitcher;
 				}
+			}
 
-				ImGui::SetCursorPosX(LONG_CENTER_X());
-				if (ImGui::Button("Texture Manager", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
-					setting().onTextureManager = !setting().onTextureManager;
-				}
+			ImGui::SetCursorPosX(LONG_CENTER_X());
+			if (ImGui::Button("Texture Manager", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
+				setting().onTextureManager = !setting().onTextureManager;
 			}
 
 			if (GetAsyncKeyState(0x31) && GetAsyncKeyState(0x37) && GetAsyncKeyState(0x30) && GetAsyncKeyState(0x33)) { // Don't say anything about this
@@ -1298,6 +1298,8 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Replay", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			ImGui::TextWrapped("It's not really accurate, but you still can bot levels pretty good. Please, don't turn on Real Time without bot running.\n.pgdr files are just .json files so you can edit them with any text editor.\nPolzBot v1.0");
+
 			ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
 			if (ImGui::Combo("##selectedMacro", &selectedReplay, PolzBot::replayNames, PolzBot::replayNames.size())) {
 				if (PolzBot::replayNames.size()) {
@@ -1347,6 +1349,7 @@ void imgui_render() {
 			}
 
 			if (setting().onDeveloperMode) {
+				ImGui::SetCursorPosX(LONG_CENTER_X());
 				if (ImGui::Button("Force Load", ImVec2(LONG_ITEM_WIDTH(), 0))) {
 					PolzBot::load();
 				}
@@ -1366,6 +1369,7 @@ void imgui_render() {
 				selectedReplay = -1;
 			}
 
+			ImGui::SetCursorPosX(LONG_CENTER_X());
 			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/replays").c_str(), NULL, NULL, SW_SHOW);
 			}
