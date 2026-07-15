@@ -175,7 +175,7 @@ void renderDebugModule() {
 
 			if (ImGui::CollapsingHeader("Replay Actions")) {
 				for (auto pushFrame : PolzBot::m_replayEvents) {
-					ImGui::Text("Frame: %i P2: %s Down: %s", pushFrame.first, pushFrame.second.first ? "true" : "false", pushFrame.second.second ? "true" : "false");
+					ImGui::Text("Frame: %i P2: %s Down: %s", pushFrame.first, pushFrame.second.p2 ? "true" : "false", pushFrame.second.down ? "true" : "false");
 				}
 			}
 

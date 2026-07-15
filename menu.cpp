@@ -1191,7 +1191,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (Vanilla) 150726");
+			ImGui::Text("1.920 - v1.3.3 (V) 150726 (2)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1381,6 +1381,15 @@ void imgui_render() {
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			ImGui::Checkbox("Real Time", &setting().onRealTime);
+
+			if (setting().onPlayMacro) {
+				ImGui::BeginDisabled();
+			}
+			ImGui::Checkbox("Click Fixes (Experimental)", &setting().onClickFixes);
+			ImGui::Tooltip("Applies recorded position, rotation and velocity to player (More accuracy).");
+			if (setting().onPlayMacro) {
+				ImGui::EndDisabled();
+			}
 
 			if (setting().onDeveloperMode) {
 				ImGui::Text("Events size: %i", PolzBot::m_replayEvents.size());
@@ -3075,6 +3084,7 @@ void imgui_render() {
 			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
 				if (setting().fpsValue < 1.f) setting().fpsValue = 1.f;
+				if (setting().tpsValue < setting().fpsValue) setting().tpsValue = setting().fpsValue;
 
 				PolzHax::updateFPSBypass();
 			}
@@ -3086,6 +3096,7 @@ void imgui_render() {
 			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			if (ImGui::DragFloat("##tpsBypass", &setting().tpsValue, 1.f, 1.f, 480.f, "%.0f TPS")) {
 				if (setting().tpsValue < 1.f) setting().tpsValue = 1.f;
+				if (setting().tpsValue < setting().fpsValue) setting().tpsValue = setting().fpsValue;
 			}
 			ImGui::SameLine();
 			ImGui::CheckboxF("Unlock TPS", &setting().onTPSBypass);

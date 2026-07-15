@@ -21,14 +21,18 @@ void PolzBot::save() {
 	std::stringstream buf;
 	o.open(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/replays/" + setting().m_selectedMacro + ".pgdr");
 	
-	j["_"] = "PolzHax 1.920 - v1.3.3 (Vanilla) Build 140726";
+	j["_"] = "PolzHax 1.920 - v1.3.3 (Vanilla) Build 150726 (2)";
 	j["fps"] = static_cast<int>(setting().fpsValue);
 	j["events"] = json::array();
-	for (const auto pushFrame : PolzBot::m_replayEvents) {
+	for (const auto& pushFrame : PolzBot::m_replayEvents) {
 		json push;
 		push["frame"] = pushFrame.first;
-		push["p2"] =	pushFrame.second.first;
-		push["down"] =	pushFrame.second.second;
+		push["down"] =	pushFrame.second.down;
+		push["p2"] =	pushFrame.second.p2;
+		push["rot"] =	pushFrame.second.rotation;
+		push["x"] =		pushFrame.second.xPosition;
+		push["y"] =		pushFrame.second.yPosition;
+		push["yVel"] =	pushFrame.second.yVelocity;
 		j["events"].push_back(push);
 	}
 
@@ -66,7 +70,12 @@ void PolzBot::load() {
 	PolzBot::m_replayEvents.clear();
 	for (int z = 0; z < j["events"].size(); z++) {
 		auto event = j["events"][z];
-		PolzBot::m_replayEvents[event["frame"]] = { event["p2"], event["down"] };
+		PolzBot::m_replayEvents[event["frame"]].down =		event["down"];
+		PolzBot::m_replayEvents[event["frame"]].p2 =		event["p2"];
+		PolzBot::m_replayEvents[event["frame"]].rotation =	event["rot"];
+		PolzBot::m_replayEvents[event["frame"]].xPosition =	event["x"];
+		PolzBot::m_replayEvents[event["frame"]].yPosition = event["y"];
+		PolzBot::m_replayEvents[event["frame"]].yVelocity = event["yVel"];
 	}
 
 	i.close();

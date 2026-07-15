@@ -249,7 +249,7 @@ struct SettingStruct {
 	std::string m_customTexturePackPath;
 
 	// PolzBot
-	bool onPlayMacro, onRecordMacro, onAutoSaveReplay, onLockDelta, onRealTime;
+	bool onPlayMacro, onRecordMacro, onAutoSaveReplay, onLockDelta, onRealTime, onClickFixes;
 	std::string m_selectedMacro;
 
 	// Screenshot
@@ -483,7 +483,7 @@ DEF_SCHEMA(
 
 	m_texturePackIndex, m_customTexturePackPath,
 
-	onAutoSaveReplay,
+	onAutoSaveReplay, onLockDelta, onRealTime, onClickFixes,
 
 	onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard,
 

@@ -83,6 +83,7 @@ namespace PlayLayer {
 	bool getCheatingBeforeRestart();
 	int getCurrentStartPos();
 	std::vector<gd::StartPosObject*> getStartPositions();
+	unsigned int getCurrentFrame();
 
 	void updateShowHitboxes();
 	void clearHitboxes();

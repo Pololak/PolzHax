@@ -72,6 +72,7 @@ int m_deathsFull;
 float m_totalDelta;
 float m_prevX;
 CCLabelBMFont* m_metaLabel = nullptr;
+unsigned int m_frameOffset;
 
 bool m_cheatingBeforeRestart;
 
@@ -607,6 +608,7 @@ void updateMetaLabel() {
 		if (setting().playerRot) ss << "Rot: " << playLayer->m_player->getRotation() << "\n";
 		if (setting().playerGrav) ss << "Gravity: " << playLayer->m_player->m_gravity << "\n";
 		if (setting().playerSpd) ss << "Speed: " << playLayer->m_player->m_timeMod << "\n";
+		if (setting().currentFrame) ss << "Frame by Time: " << PlayLayer::getCurrentFrame() << "\n";
 		if (setting().currentFrame) ss << "Frame: " << PlayLayer::m_currentFrame << "\n";
 		if (setting().attemptTime) ss << "Time: " << playLayer->m_levelTime << "\n";
 
@@ -796,6 +798,13 @@ void PlayLayer::setupReplay(gd::PlayLayer* self, std::string replayString) {
 	std::cout << "Replay Actions count: " << self->m_replayActions->count() << std::endl;
 }
 
+unsigned int PlayLayer::getCurrentFrame() {
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+	if (playLayer) {
+		return static_cast<unsigned int>(playLayer->m_levelTime * setting().fpsValue) + m_frameOffset;
+	}
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpointStorage.clear();
@@ -843,6 +852,7 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_prevX = 0;
 
 	m_currentFrame = 0;
+	m_frameOffset = 0;
 
 	if (!PlayLayer::init(self, level)) return false;
 
@@ -1009,22 +1019,42 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	if (setting().onPlayMacro) {
-		for (auto action : PolzBot::m_replayEvents) {
-			if (action.first == m_currentFrame) {
-				if (!action.second.first) {
-					if (action.second.second) {
-						self->pushButton(1, true);
-					}
-					else {
-						self->releaseButton(1, true);
+		auto it = PolzBot::m_replayEvents.find(PlayLayer::getCurrentFrame());
+		if (it != PolzBot::m_replayEvents.end()) {
+			auto& event = it->second;
+			if (!event.p2) {
+				if (event.down) {
+					self->pushButton(1, true);
+					if (setting().onClickFixes) {
+						self->m_player->setRotation(event.rotation);
+						self->m_player->setPosition({ event.xPosition, event.yPosition });
+						self->m_player->m_yVelocity = event.yVelocity;
 					}
 				}
 				else {
-					if (action.second.second) {
-						self->pushButton(1, false);
+					self->releaseButton(1, true);
+					if (setting().onClickFixes) {
+						self->m_player->setRotation(event.rotation);
+						self->m_player->setPosition({ event.xPosition, event.yPosition });
+						self->m_player->m_yVelocity = event.yVelocity;
 					}
-					else {
-						self->releaseButton(1, false);
+				}
+			}
+			else {
+				if (event.down) {
+					self->pushButton(1, false);
+					if (setting().onClickFixes) {
+						self->m_player2->setRotation(event.rotation);
+						self->m_player2->setPosition({ event.xPosition, event.yPosition });
+						self->m_player2->m_yVelocity = event.yVelocity;
+					}
+				}
+				else {
+					self->releaseButton(1, false);
+					if (setting().onClickFixes) {
+						self->m_player2->setRotation(event.rotation);
+						self->m_player2->setPosition({ event.xPosition, event.yPosition });
+						self->m_player2->m_yVelocity = event.yVelocity;
 					}
 				}
 			}
@@ -1151,6 +1181,7 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	m_totalClicks = 0;
 	m_maxClicks = 0;
 	m_currentFrame = 0;
+	m_frameOffset = 0;
 
 	if (setting().onRecordMacro) {
 		PolzBot::m_replayEvents.clear();
@@ -1185,14 +1216,10 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 				self->m_cameraPortal = currentCheckpointStorage.m_cameraPortal;
 				self->m_dualModeCamera = currentCheckpointStorage.m_dualPortal;
 
-				from<float>(self->m_player, 0x18) = currentCheckpointStorage.m_rotationX;
-				from<float>(self->m_player2, 0x18) = currentCheckpointStorage.m_rotationXP2;
-				from<float>(self->m_player, 0x1c) = currentCheckpointStorage.m_rotationY;
-				from<float>(self->m_player2, 0x1c) = currentCheckpointStorage.m_rotationYP2;
-				self->m_player->m_slopeYVel = currentCheckpointStorage.m_slopeYVelocity;
-				self->m_player2->m_slopeYVel = currentCheckpointStorage.m_slopeYVelocityP2;
 				self->m_player->m_yVelocity = currentCheckpointStorage.m_yVelocity;
 				self->m_player2->m_yVelocity = currentCheckpointStorage.m_yVelocityP2;
+				self->m_player->setRotation(currentCheckpointStorage.m_rotation);
+				self->m_player2->setRotation(currentCheckpointStorage.m_rotationP2);
 
 				if (setting().onStoreObjects) {
 					for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
@@ -1230,6 +1257,7 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 				}
 
 				m_currentFrame = currentCheckpointStorage.m_currentFrame;
+				m_frameOffset = currentCheckpointStorage.m_frameOffset;
 
 				PolzBot::m_replayEvents = currentCheckpointStorage.m_replayEvents;
 			}
@@ -1416,37 +1444,6 @@ void __fastcall PlayLayer::processItemsH(gd::PlayLayer* self) {
 
 void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
 	PlayLayer::destroyPlayer(self, player);
-
-	//if (setting().onDeathObjectOnly) {
-	//	if (self->m_hazardObjects) {
-	//		for (int i = 0; i < self->m_hazardObjects->count(); ++i) {
-	//			auto object = reinterpret_cast<gd::GameObject*>(self->m_hazardObjects->objectAtIndex(i));
-	//			if (object) {
-	//				object->updateOrientedBox();
-
-	//				if (object->m_objectRadius > 0.f) {
-	//					if (self->objectIntersectsCircle(self->m_player, object)) {
-	//						std::cout << "Circle object: " << object << std::endl;
-	//						if (m_deathObject) {
-	//							m_deathObject = nullptr;
-	//						}
-	//						m_deathObject = object;
-	//					}
-	//				}
-	//				else {
-	//					if (self->m_player->m_objectRect2.intersectsRect(object->m_objectRect2)) {
-	//						std::cout << "Hazard object: " << object << std::endl;
-	//						if (m_deathObject) {
-	//							m_deathObject = nullptr;
-	//						}
-	//						m_deathObject = object;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
 	m_wouldDie = true;
 
 	if (setting().onNoclipTint && setting().onNoclip) {
@@ -1542,7 +1539,15 @@ void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
 }
 
 void __fastcall PlayLayer::pauseGameH(gd::PlayLayer* self, void*, bool idk) {
+	if (setting().onPlayMacro) {
+		sequence_patch(gd::base + 0xf3922, { 0x83, 0xc4, 0x04, 0x90, 0x90 });
+	}
+
 	PlayLayer::pauseGame(self, idk);
+
+	if (setting().onPlayMacro) {
+		sequence_patch(gd::base + 0xf3922, { 0xe8, 0x29, 0xa8, 0xfe, 0xff });
+	}
 
 	if (setting().onPauseUndeafen && m_deafenPressed) {
 		m_deafenPressed = false;
@@ -1575,14 +1580,10 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 	m_checkpointStorage[ret] = {
 		self->m_cameraPortal,
 		self->m_dualModeCamera,
-		from<float>(self->m_player, 0x18),
-		from<float>(self->m_player2, 0x18),
-		from<float>(self->m_player, 0x1c),
-		from<float>(self->m_player2, 0x1c),
-		self->m_player->m_slopeYVel,
-		self->m_player2->m_slopeYVel,
 		self->m_player->m_yVelocity,
-		self->m_player2->m_yVelocity
+		self->m_player2->m_yVelocity,
+		self->m_player->getRotation(),
+		self->m_player2->getRotation()
 	};
 
 	for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
@@ -1615,6 +1616,7 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 	}
 
 	m_checkpointStorage[ret].m_currentFrame = m_currentFrame;
+	m_checkpointStorage[ret].m_frameOffset = PlayLayer::getCurrentFrame();
 
 	m_checkpointStorage[ret].m_replayEvents = PolzBot::m_replayEvents;
 
@@ -1672,7 +1674,13 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 	PlayLayer::pushButton(self, p0, p1);
 
 	if (setting().onRecordMacro) {
-		PolzBot::m_replayEvents[m_currentFrame] = { !p1, true };
+		auto frame = PlayLayer::getCurrentFrame();
+		PolzBot::m_replayEvents[frame].down = true;
+		PolzBot::m_replayEvents[frame].p2 = !p1;
+		PolzBot::m_replayEvents[frame].rotation = !p1 ? self->m_player2->getRotation() : self->m_player->getRotation();
+		PolzBot::m_replayEvents[frame].xPosition = !p1 ? self->m_player2->m_realPlayerPos.x : self->m_player->m_realPlayerPos.x;
+		PolzBot::m_replayEvents[frame].yPosition = !p1 ? self->m_player2->m_realPlayerPos.y : self->m_player->m_realPlayerPos.y;
+		PolzBot::m_replayEvents[frame].yVelocity = !p1 ? self->m_player2->m_yVelocity : self->m_player->m_yVelocity;
 	}
 }
 
@@ -1682,7 +1690,13 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 	PlayLayer::releaseButton(self, p0, p1);
 
 	if (setting().onRecordMacro) {
-		PolzBot::m_replayEvents[m_currentFrame] = { !p1, false };
+		auto frame = PlayLayer::getCurrentFrame();
+		PolzBot::m_replayEvents[frame].down = false;
+		PolzBot::m_replayEvents[frame].p2 = !p1;
+		PolzBot::m_replayEvents[frame].rotation = !p1 ? self->m_player2->getRotation() : self->m_player->getRotation();
+		PolzBot::m_replayEvents[frame].xPosition = !p1 ? self->m_player2->m_realPlayerPos.x : self->m_player->m_realPlayerPos.x;
+		PolzBot::m_replayEvents[frame].yPosition = !p1 ? self->m_player2->m_realPlayerPos.y : self->m_player->m_realPlayerPos.y;
+		PolzBot::m_replayEvents[frame].yVelocity = !p1 ? self->m_player2->m_yVelocity : self->m_player->m_yVelocity;
 	}
 }
 
