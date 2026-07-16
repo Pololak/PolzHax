@@ -1,4 +1,5 @@
 #include "CCSchedulerHook.hpp"
+#include "PauseLayer.hpp"
 #include "Setting.hpp"
 #include <chrono>
 
@@ -7,18 +8,18 @@ float g_left_over = 0.f; // tps bypass by Mat ig (taken from ReplayBot https://g
 void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, float dt) {
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 
-	if (playLayer && (setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass)) {
+	if (playLayer && (setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass) && !PauseLayer::get()) {
 		const auto fps = setting().tpsValue;
 		auto speedhack = self->getTimeScale();
 
 		const float target_dt = 1.f / fps / speedhack;
 
-		if (!setting().onRealTime && !setting().onTPSBypass) {
+		if (!setting().onRealTime) {
 			return CCSchedulerHook::update(self, target_dt);
 		}
 
 		unsigned times = static_cast<int>((dt + g_left_over) / target_dt);
-		if (dt == 0.f) {
+		if (dt <= 0.f) {
 			return CCSchedulerHook::update(self, target_dt);
 		}
 		auto start = std::chrono::high_resolution_clock::now();

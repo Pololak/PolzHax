@@ -1005,19 +1005,6 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		_frames = 0;
 	}
 
-	float deltaTime = dt;
-	if (setting().onLockDelta) {
-		deltaTime = 1 / setting().tpsValue;
-		PlayLayer::update(self, deltaTime);
-	}
-	else {
-		PlayLayer::update(self, dt);
-	}
-
-	if (!self->m_isDead) {
-		m_currentFrame++;
-	}
-
 	if (setting().onPlayMacro) {
 		auto it = PolzBot::m_replayEvents.find(PlayLayer::getCurrentFrame());
 		if (it != PolzBot::m_replayEvents.end()) {
@@ -1060,6 +1047,8 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 			}
 		}
 	}
+
+	PlayLayer::update(self, dt);
 
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";

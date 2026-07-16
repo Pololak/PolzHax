@@ -1191,7 +1191,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (V) 150726 (2)");
+			ImGui::Text("1.920 - v1.3.3 (V) 160726");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1303,6 +1303,7 @@ void imgui_render() {
 				if (PolzBot::replayNames.size()) {
 					setting().m_selectedMacro = PolzBot::replayNames[selectedReplay];
 					PolzBot::load();
+					PolzHax::updateFPSBypass();
 				}
 			}
 
@@ -1313,10 +1314,7 @@ void imgui_render() {
 				setting().onPlayMacro = false;
 				setting().onPracticeFix = true;
 				setting().onClassicMode = true;
-
 				setting().tpsValue = setting().fpsValue;
-
-				setting().onLockDelta = true;
 
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();
@@ -1328,10 +1326,7 @@ void imgui_render() {
 				setting().onRecordMacro = false;
 				setting().onPracticeFix = true;
 				setting().onClassicMode = true;
-
 				setting().tpsValue = setting().fpsValue;
-
-				setting().onLockDelta = true;
 
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();
@@ -1371,29 +1366,19 @@ void imgui_render() {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/replays").c_str(), NULL, NULL, SW_SHOW);
 			}
 				
-			if (setting().onPlayMacro || setting().onRecordMacro) {
+			if (setting().onPlayMacro) {
 				ImGui::BeginDisabled();
 			}
-			ImGui::Checkbox("Lock Delta", &setting().onLockDelta);
-			if (setting().onPlayMacro || setting().onRecordMacro) {
+			ImGui::Checkbox("Click Fixes", &setting().onClickFixes);
+			ImGui::Tooltip("Experimental. Applies recorded position, rotation and velocity to player (More accuracy).");
+			if (setting().onPlayMacro) {
 				ImGui::EndDisabled();
 			}
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			ImGui::Checkbox("Real Time", &setting().onRealTime);
 
-			if (setting().onPlayMacro) {
-				ImGui::BeginDisabled();
-			}
-			ImGui::Checkbox("Click Fixes (Experimental)", &setting().onClickFixes);
-			ImGui::Tooltip("Applies recorded position, rotation and velocity to player (More accuracy).");
-			if (setting().onPlayMacro) {
-				ImGui::EndDisabled();
-			}
-
-			if (setting().onDeveloperMode) {
-				ImGui::Text("Events size: %i", PolzBot::m_replayEvents.size());
-			}
+			ImGui::Text("Events size: %i", PolzBot::m_replayEvents.size());
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
@@ -1764,7 +1749,7 @@ void imgui_render() {
 					sequence_patch(gd::base + 0xebece, { 0x0f, 0x84, 0xd1, 0x02, 0x00, 0x00 });
 				}
 			}
-			ImGui::Tooltip("Disables fading when objects leave the viewable play area.");
+			ImGui::Tooltip("Makes all objects act as invisible ones.");
 
 			if (ImGui::CheckboxF("Hide Attempts", &setting().onHideAttempts)) {
 				if (playLayer) {
@@ -3263,7 +3248,7 @@ void imgui_render() {
 			ImGui::Tooltip("Tries to place checkpoints more often (like in 2.1).");
 
 			ImGui::CheckboxF("Retry Keybind", &setting().onRetryKeybind);
-			ImGui::Tooltip("Lets you restart level by pressing R.");
+			ImGui::Tooltip("Lets you restart level by pressing keybind (Holding ctrl lets you fully restart level).");
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##retryKeySettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());

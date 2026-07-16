@@ -21,7 +21,7 @@ void PolzBot::save() {
 	std::stringstream buf;
 	o.open(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/replays/" + setting().m_selectedMacro + ".pgdr");
 	
-	j["_"] = "PolzHax 1.920 - v1.3.3 (Vanilla) Build 150726 (2)";
+	j["_"] = "PolzHax 1.920 - v1.3.3 (Vanilla) Build 160726";
 	j["fps"] = static_cast<int>(setting().fpsValue);
 	j["events"] = json::array();
 	for (const auto& pushFrame : PolzBot::m_replayEvents) {
