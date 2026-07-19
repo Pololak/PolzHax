@@ -1191,7 +1191,7 @@ void imgui_render() {
 		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (V) 160726");
+			ImGui::Text("1.920 - v1.3.3 (V) 190726");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1323,6 +1323,8 @@ void imgui_render() {
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			if (ImGui::CheckboxF("Replay", &setting().onPlayMacro)) {
+				PolzBot::m_eventIndex = 0;
+
 				setting().onRecordMacro = false;
 				setting().onPracticeFix = true;
 				setting().onClassicMode = true;
@@ -1349,7 +1351,7 @@ void imgui_render() {
 
 			if (ImGui::Button("Clear & New", ImVec2(SHORT_ITEM_WIDTH(), 0))) {
 				setting().m_selectedMacro.clear();
-				PolzBot::m_replayEvents.clear();
+				PolzBot::m_replayEventsVec.clear();
 				selectedReplay = -1;
 			}
 			ImGui::SameLine(0.f, 0.f);
@@ -1365,20 +1367,16 @@ void imgui_render() {
 			if (ImGui::Button("Open Folder", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/replays").c_str(), NULL, NULL, SW_SHOW);
 			}
-				
-			if (setting().onPlayMacro) {
-				ImGui::BeginDisabled();
-			}
+
+			ImGui::BeginDisabled();
 			ImGui::Checkbox("Click Fixes", &setting().onClickFixes);
 			ImGui::Tooltip("Experimental. Applies recorded position, rotation and velocity to player (More accuracy).");
-			if (setting().onPlayMacro) {
-				ImGui::EndDisabled();
-			}
+			ImGui::EndDisabled();
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			ImGui::Checkbox("Real Time", &setting().onRealTime);
 
-			ImGui::Text("Events size: %i", PolzBot::m_replayEvents.size());
+			ImGui::Text("Events size: %i", PolzBot::m_replayEventsVec.size());
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));

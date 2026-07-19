@@ -2,6 +2,8 @@
 #include "Setting.hpp"
 #include "Icons.hpp"
 #include "ColorChannelSprite.hpp"
+#include <fstream>
+#include "json.hpp"
 //#include <discord.h>
 //
 //class DiscordManager {

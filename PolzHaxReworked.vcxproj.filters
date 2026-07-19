@@ -1839,6 +1839,9 @@
     <ClInclude Include="libs\gd.h\layers_scenes_transitions_nodes\VideoOptionsLayer.h">
       <Filter>Файлы заголовков\Libraries\gd.h</Filter>
     </ClInclude>
+    <ClInclude Include="DemonListLayer.hpp">
+      <Filter>Файлы заголовков\Layers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2119,6 +2122,9 @@
     </ClCompile>
     <ClCompile Include="PolzBot.cpp">
       <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="DemonListLayer.cpp">
+      <Filter>Исходные файлы\Layers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

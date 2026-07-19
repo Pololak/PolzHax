@@ -6,6 +6,7 @@
 #include "FindLevelPopup.hpp"
 #include "GoToPagePopup.hpp"
 #include "Setting.hpp"
+#include "json.hpp"
 
 std::string m_customSearchQuery;
 
@@ -322,6 +323,7 @@ void __fastcall LevelBrowserLayer::loadPageH(gd::LevelBrowserLayer* self, void*,
 		}
 	}
 
+ARROW_BUTTONS:
 	auto menu = static_cast<CCMenu*>(self->getChildByTag(10));
 	if (menu) {
 		auto onFirstPage = static_cast<gd::CCMenuItemSpriteExtra*>(menu->getChildByTag(11));

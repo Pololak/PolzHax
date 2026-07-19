@@ -238,6 +238,7 @@ struct SettingStruct {
 	bool m_liveColorEnabled; // newcustomizeobjectlayer
 	bool m_clearHitboxes;
 	bool m_fixSlabOffset;
+	bool m_smallSawHitbox;
 
 	// GDPS Switcher
 	std::string originalServerURL;

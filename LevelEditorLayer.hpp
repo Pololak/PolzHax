@@ -94,6 +94,7 @@ namespace LevelEditorLayer {
 	GDColor getColor03();
 	GDColor getColor04();
 	GDColor getColor3DL();
+	unsigned int getCurrentFrame();
 
 	class LevelEditorLayerExt : public gd::LevelEditorLayer {
 	public:

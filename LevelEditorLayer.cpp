@@ -7,6 +7,7 @@
 #include "utils.hpp"
 #include "Hitboxes.hpp"
 #include "RotateSaws.hpp"
+#include "PolzBot.hpp"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -629,6 +630,12 @@ void LevelEditorLayer::createGroundLayer() {
 	}
 }
 
+unsigned int LevelEditorLayer::getCurrentFrame() {
+	if (m_editorLayer) {
+		return static_cast<unsigned int>(m_editorLayer->m_clkTimer * setting().fpsValue);
+	}
+}
+
 bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::GJGameLevel* level) {
 	m_editorLayer = self;
 	if (!LevelEditorLayer::init(self, level)) return false;
@@ -703,6 +710,18 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 }
 
 void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, float dt) {
+	if (setting().onPlayMacro) {
+		auto events = PolzBot::m_replayEventsVec;
+		if (events.size()) {
+			PolzBot::Event event;
+			while (LevelEditorLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame) { // partially from ReplayBot by Mat.
+				if (event.down) self->pushButton(0, !event.p2);
+				else self->releaseButton(0, !event.p2);
+				++PolzBot::m_eventIndex;
+			}
+		}
+	}
+
 	LevelEditorLayer::update(self, dt);
 
 	LevelEditorLayer::updateShowHitboxes();
@@ -861,6 +880,8 @@ void __fastcall LevelEditorLayer::onStopPlaytestH(gd::LevelEditorLayer* self) {
 		RotateSaws::pauseRotations(self);
 		RotateSaws::resumeRotations(self);
 	}
+
+	PolzBot::m_eventIndex = 0;
 }
 
 void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*, int p0, bool p1) {

@@ -6,7 +6,7 @@
 using namespace nlohmann;
 
 void PolzBot::save() {
-	if (PolzBot::m_replayEvents.empty()) {
+	if (PolzBot::m_replayEventsVec.empty()) {
 		gd::FLAlertLayer::create("Error", "Macro is empty.", "OK")->show();
 		return;
 	}
@@ -21,19 +21,21 @@ void PolzBot::save() {
 	std::stringstream buf;
 	o.open(CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/replays/" + setting().m_selectedMacro + ".pgdr");
 	
-	j["_"] = "PolzHax 1.920 - v1.3.3 (Vanilla) Build 160726";
+	j["_"] = "PolzHax 1.920 - v1.3.3 (Vanilla) Build 190726";
 	j["fps"] = static_cast<int>(setting().fpsValue);
 	j["events"] = json::array();
-	for (const auto& pushFrame : PolzBot::m_replayEvents) {
-		json push;
-		push["frame"] = pushFrame.first;
-		push["down"] =	pushFrame.second.down;
-		push["p2"] =	pushFrame.second.p2;
-		push["rot"] =	pushFrame.second.rotation;
-		push["x"] =		pushFrame.second.xPosition;
-		push["y"] =		pushFrame.second.yPosition;
-		push["yVel"] =	pushFrame.second.yVelocity;
-		j["events"].push_back(push);
+	for (const auto& event : PolzBot::m_replayEventsVec) {
+		json jEvent;
+
+		jEvent["frame"] =	event.frame;
+		jEvent["down"] =	event.down;
+		jEvent["p2"] =		event.p2;
+		jEvent["rot"] =		event.rotation;
+		jEvent["x"] =		event.xPosition;
+		jEvent["y"] =		event.yPosition;
+		jEvent["yVel"] =	event.yVelocity;
+
+		j["events"].push_back(jEvent);
 	}
 
 	buf << j.dump(1);
@@ -67,15 +69,20 @@ void PolzBot::load() {
 
 	std::cout << j["events"].size() << std::endl;
 
-	PolzBot::m_replayEvents.clear();
+	PolzBot::m_replayEventsVec.clear();
 	for (int z = 0; z < j["events"].size(); z++) {
-		auto event = j["events"][z];
-		PolzBot::m_replayEvents[event["frame"]].down =		event["down"];
-		PolzBot::m_replayEvents[event["frame"]].p2 =		event["p2"];
-		PolzBot::m_replayEvents[event["frame"]].rotation =	event["rot"];
-		PolzBot::m_replayEvents[event["frame"]].xPosition =	event["x"];
-		PolzBot::m_replayEvents[event["frame"]].yPosition = event["y"];
-		PolzBot::m_replayEvents[event["frame"]].yVelocity = event["yVel"];
+		auto jEvent = j["events"][z];
+		PolzBot::Event event;
+		
+		event.down =		jEvent["down"];
+		event.p2 =			jEvent["p2"];
+		event.frame =		jEvent["frame"];
+		event.rotation =	jEvent["rot"];
+		event.xPosition =	jEvent["x"];
+		event.yPosition =	jEvent["y"];
+		event.yVelocity =	jEvent["yVel"];
+
+		PolzBot::m_replayEventsVec.push_back(event);
 	}
 
 	i.close();

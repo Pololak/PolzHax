@@ -3,6 +3,16 @@
 #include "Setting.hpp"
 #include "PracticeFix.hpp"
 
+void __fastcall GameObject::customSetupH(gd::GameObject* self) {
+	GameObject::customSetup(self);
+
+	if (setting().m_smallSawHitbox) {
+		if (self->m_objectID == 183) {
+			self->m_objectRadius = 15.f;
+		}
+	}
+}
+
 ccColor3B __fastcall GameObject::getEditorColorH(gd::GameObject* self) {
 	int color = static_cast<int>(self->m_customColorMode);
 	
@@ -66,6 +76,7 @@ void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
 //}
 
 void GameObject::mem_init() {
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject::customSetupH, reinterpret_cast<void**>(&GameObject::customSetup));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ece0), GameObject::shouldBlendColorH, reinterpret_cast<void**>(&GameObject::shouldBlendColor));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x736e0), GameObject::playShineEffectH, reinterpret_cast<void**>(&GameObject::playShineEffect));

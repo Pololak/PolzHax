@@ -8,6 +8,9 @@ struct CheckpointStorage {
     gd::GameObject* m_cameraPortal;
     gd::GameObject* m_dualPortal;
 
+    cocos2d::CCPoint m_player1RealPos;
+    cocos2d::CCPoint m_player2RealPos;
+
     double m_yVelocity;
     double m_yVelocityP2;
     float m_rotation;
@@ -17,5 +20,5 @@ struct CheckpointStorage {
 
     int m_currentFrame;
     unsigned int m_frameOffset;
-    std::map<int, PolzBot::Event> m_replayEvents;
+    std::vector<PolzBot::Event> m_replayEventsVec;
 };

@@ -78,9 +78,9 @@ namespace gd {
 	};
 
 	class LevelManagerDelegate {
-		virtual void loadLevelsFinished(cocos2d::CCArray*, char const*);
-		virtual void loadLevelsFailed(char const*);
-		virtual void setupPageInfo(std::string, char const*);
+		virtual void loadLevelsFinished(cocos2d::CCArray*, char const*) {};
+		virtual void loadLevelsFailed(char const*) {};
+		virtual void setupPageInfo(std::string, char const*) {};
 	};
 
 	class LevelDownloadDelegate {

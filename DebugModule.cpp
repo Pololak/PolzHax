@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 #include <support/zip_support/ZipUtils.h>
+#include "json.hpp"
+#include <fstream>
 
 #include "utils.hpp"
 
@@ -134,6 +136,8 @@ void renderDebugModule() {
 		ImGui::Checkbox("No DrawNode Clear", &setting().m_clearHitboxes);
 
 		ImGui::Checkbox("Fix Slabs Y Offset", &setting().m_fixSlabOffset);
+
+		ImGui::Checkbox("Small Saw Hitbox", &setting().m_smallSawHitbox);
 		
 		if (ImGui::Button("Reload Sounds")) {
 			gd::GameSoundManager::sharedState()->preload();
@@ -146,6 +150,23 @@ void renderDebugModule() {
 		if (ImGui::Button("Play effect")) {
 			gd::GameSoundManager::playSound("playSound_01.ogg");
 		}
+
+		for (auto idk : CCArrayExt<CCString*>(glm->m_storedLevels->allKeys())) {
+			for (auto level : CCArrayExt<gd::GJGameLevel*>(static_cast<CCArray*>(glm->m_storedLevels->objectForKey(idk->getCString())))) {
+				ImGui::Text("Level: %s", level->m_levelName.c_str());
+			}
+		}
+
+		//std::ifstream i;
+		//i.open(CCFileUtils::sharedFileUtils()->getWritablePath2() + "demonlist.json");
+		//if (i.is_open()) {
+		//	nlohmann::json json = nlohmann::json::parse(i);
+
+		//	for (int z = 0; z < json.size(); z++) {
+		//		auto level = json[z];
+		//		ImGui::Text("ID: %i", level["levelID"]);
+		//	}
+		//}
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
@@ -173,9 +194,17 @@ void renderDebugModule() {
 			ImGui::Text("isSecondPlayer: %i", pl->m_player2->m_isSecondPlayer);
 			ImGui::Text("dualMode: %i", pl->m_player2->m_dualMode);
 
-			if (ImGui::CollapsingHeader("Replay Actions")) {
-				for (auto pushFrame : PolzBot::m_replayEvents) {
-					ImGui::Text("Frame: %i P2: %s Down: %s", pushFrame.first, pushFrame.second.p2 ? "true" : "false", pushFrame.second.down ? "true" : "false");
+			if (ImGui::CollapsingHeader("Replay Events")) {
+				auto& events = PolzBot::m_replayEventsVec;
+				for (int i = 0; i < events.size(); i++) {
+					if (ImGui::CollapsingHeader(std::string("Event " + std::to_string(i) + " [Frame " + std::to_string(events[i].frame) + "]").c_str())) {
+						ImGui::Text("Down: %s", events[i].down ? "true" : "false");
+						ImGui::Text("P2: %s", events[i].p2 ? "true" : "false");
+						ImGui::Text("Rot: %f", events[i].rotation);
+						ImGui::Text("XPos: %f", events[i].xPosition);
+						ImGui::Text("YPos: %f", events[i].yPosition);
+						ImGui::Text("YVel: %f", events[i].yVelocity);
+					}
 				}
 			}
 

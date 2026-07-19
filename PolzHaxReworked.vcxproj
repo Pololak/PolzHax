@@ -157,6 +157,7 @@
     <ClInclude Include="CustomizeObjectLayer.hpp" />
     <ClInclude Include="CustomSongWidget.hpp" />
     <ClInclude Include="DebugModule.hpp" />
+    <ClInclude Include="DemonListLayer.hpp" />
     <ClInclude Include="DrawGridLayer.hpp" />
     <ClInclude Include="EditButtonBar.hpp" />
     <ClInclude Include="EditLevelLayer.hpp" />
@@ -750,6 +751,7 @@
     <ClCompile Include="CustomizeObjectLayer.cpp" />
     <ClCompile Include="CustomSongWidget.cpp" />
     <ClCompile Include="DebugModule.cpp" />
+    <ClCompile Include="DemonListLayer.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DrawGridLayer.cpp" />
     <ClCompile Include="EditButtonBar.cpp" />

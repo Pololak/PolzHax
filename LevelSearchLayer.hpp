@@ -11,6 +11,8 @@ namespace LevelSearchLayer {
 	class Callback : public gd::LevelSearchLayer {
 	public:
 		void onSearchPlayer(CCObject*);
+		void onTestDemonlist(CCObject*);
+		void onProcessHttpRequestCompleted(extension::CCHttpClient*, extension::CCHttpResponse*);
 	};
 
 	void mem_init();

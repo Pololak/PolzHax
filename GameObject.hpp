@@ -2,6 +2,9 @@
 #include "pch.h"
 
 namespace GameObject {
+	inline void(__thiscall* customSetup)(gd::GameObject*);
+	void __fastcall customSetupH(gd::GameObject*);
+
 	inline ccColor3B(__thiscall* getEditorColor)(gd::GameObject*);
 	ccColor3B __fastcall getEditorColorH(gd::GameObject*);
 

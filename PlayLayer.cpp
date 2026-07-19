@@ -73,6 +73,7 @@ float m_totalDelta;
 float m_prevX;
 CCLabelBMFont* m_metaLabel = nullptr;
 unsigned int m_frameOffset;
+CCLabelBMFont* m_botEventsOddAlert = nullptr;
 
 bool m_cheatingBeforeRestart;
 
@@ -102,7 +103,8 @@ bool PlayLayer::isCheating() {
 		setting().onHidePauseMenu ||
 		setting().onKrazyManMode ||
 		setting().onForceBlockType ||
-		setting().onNoHitbox;
+		setting().onNoHitbox ||
+		setting().m_smallSawHitbox;
 }
 
 static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
@@ -244,8 +246,30 @@ void PlayLayer::updateShowLayout() {
 
 		for (int j = 0; j < objArr->count(); j++) {
 			auto obj = reinterpret_cast<gd::GameObject*>(objArr->objectAtIndex(j));
-			if ((obj->m_objectType == gd::GameObjectType::Decoration || obj->m_objectType == gd::GameObjectType::PulsingDecoration) && obj->isVisible()/* && (obj->m_objectID == 50 && obj->m_objectID == 51 && obj->m_objectID == 52 && obj->m_objectID == 53 && obj->m_objectID == 54 && obj->m_objectID == 60 && obj->m_objectID == 148 && obj->m_objectID == 149 && obj->m_objectID == 405) */ && (obj->m_objectID != 10 && obj->m_objectID != 11 && obj->m_objectID != 12 && obj->m_objectID != 13 && obj->m_objectID != 38 && obj->m_objectID != 44 && obj->m_objectID != 45 && obj->m_objectID != 46 && obj->m_objectID != 47 && obj->m_objectID != 99 && obj->m_objectID != 101 && obj->m_objectID != 111 && obj->m_objectID != 286 && obj->m_objectID != 287 && obj->m_objectID != 660 && obj->m_objectID != 745 && obj->m_objectID != 749) && obj != self->m_endPortalObject) {
-				obj->setVisible(false);
+			if (
+				(obj->m_objectType == gd::GameObjectType::Decoration || obj->m_objectType == gd::GameObjectType::PulsingDecoration) && 
+				obj->isVisible() &&
+				(
+				obj->m_objectID != 10 &&
+				obj->m_objectID != 11 &&
+				obj->m_objectID != 12 &&
+				obj->m_objectID != 13 &&
+				obj->m_objectID != 38 &&
+				obj->m_objectID != 44 &&
+				obj->m_objectID != 45 &&
+				obj->m_objectID != 46 &&
+				obj->m_objectID != 47 &&
+				obj->m_objectID != 99 &&
+				obj->m_objectID != 101 &&
+				obj->m_objectID != 111 &&
+				obj->m_objectID != 286 &&
+				obj->m_objectID != 287 &&
+				obj->m_objectID != 660 &&
+				obj->m_objectID != 745 &&
+				obj->m_objectID != 749) &&
+				obj != self->m_endPortalObject
+				) {
+					obj->setVisible(false);
 			}
 
 			obj->setObjectColor(ccWHITE);
@@ -854,6 +878,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_currentFrame = 0;
 	m_frameOffset = 0;
 
+	PolzBot::m_eventIndex = 0;
+
 	if (!PlayLayer::init(self, level)) return false;
 
 	//
@@ -978,6 +1004,15 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 		self->m_batchNodeAddPlayer->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA });
 	}
 
+	m_botEventsOddAlert = CCLabelBMFont::create("The size of push/release events is odd!\nRoll back a couple of checkpoints until this message disappears.", "bigFont.fnt");
+	m_botEventsOddAlert->m_pAlignment = kCCTextAlignmentCenter;
+	m_botEventsOddAlert->setOpacity(100);
+	m_botEventsOddAlert->setColor({ 255, 64, 64 });
+	m_botEventsOddAlert->setPosition(winSize.width / 2.f, director->getScreenBottom() + 15.f);
+	m_botEventsOddAlert->setScale(.25f);
+	m_botEventsOddAlert->setVisible(false);
+	self->addChild(m_botEventsOddAlert, 35);
+
 	return true;
 }
 
@@ -1006,44 +1041,13 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	if (setting().onPlayMacro) {
-		auto it = PolzBot::m_replayEvents.find(PlayLayer::getCurrentFrame());
-		if (it != PolzBot::m_replayEvents.end()) {
-			auto& event = it->second;
-			if (!event.p2) {
-				if (event.down) {
-					self->pushButton(1, true);
-					if (setting().onClickFixes) {
-						self->m_player->setRotation(event.rotation);
-						self->m_player->setPosition({ event.xPosition, event.yPosition });
-						self->m_player->m_yVelocity = event.yVelocity;
-					}
-				}
-				else {
-					self->releaseButton(1, true);
-					if (setting().onClickFixes) {
-						self->m_player->setRotation(event.rotation);
-						self->m_player->setPosition({ event.xPosition, event.yPosition });
-						self->m_player->m_yVelocity = event.yVelocity;
-					}
-				}
-			}
-			else {
-				if (event.down) {
-					self->pushButton(1, false);
-					if (setting().onClickFixes) {
-						self->m_player2->setRotation(event.rotation);
-						self->m_player2->setPosition({ event.xPosition, event.yPosition });
-						self->m_player2->m_yVelocity = event.yVelocity;
-					}
-				}
-				else {
-					self->releaseButton(1, false);
-					if (setting().onClickFixes) {
-						self->m_player2->setRotation(event.rotation);
-						self->m_player2->setPosition({ event.xPosition, event.yPosition });
-						self->m_player2->m_yVelocity = event.yVelocity;
-					}
-				}
+		auto events = PolzBot::m_replayEventsVec;
+		if (events.size()) {
+			PolzBot::Event event;
+			while (PlayLayer::getCurrentFrame() == (event = events[PolzBot::m_eventIndex]).frame) { // partially from ReplayBot by Mat.
+				if (event.down) self->pushButton(0, !event.p2);
+				else self->releaseButton(0, !event.p2);
+				++PolzBot::m_eventIndex;
 			}
 		}
 	}
@@ -1169,16 +1173,10 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	m_clickFrames.clear();
 	m_totalClicks = 0;
 	m_maxClicks = 0;
-	m_currentFrame = 0;
 	m_frameOffset = 0;
 
 	if (setting().onRecordMacro) {
-		PolzBot::m_replayEvents.clear();
-	}
-
-	if (setting().onPlayMacro) {
-		self->releaseButton(1, false);
-		self->releaseButton(1, true);
+		PolzBot::m_replayEventsVec.clear();
 	}
 
 	if (self->m_endTriggered) {
@@ -1205,6 +1203,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 				self->m_cameraPortal = currentCheckpointStorage.m_cameraPortal;
 				self->m_dualModeCamera = currentCheckpointStorage.m_dualPortal;
 
+				self->m_player->m_realPlayerPos = currentCheckpointStorage.m_player1RealPos;
+				self->m_player2->m_realPlayerPos = currentCheckpointStorage.m_player2RealPos;
 				self->m_player->m_yVelocity = currentCheckpointStorage.m_yVelocity;
 				self->m_player2->m_yVelocity = currentCheckpointStorage.m_yVelocityP2;
 				self->m_player->setRotation(currentCheckpointStorage.m_rotation);
@@ -1248,9 +1248,15 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 				m_currentFrame = currentCheckpointStorage.m_currentFrame;
 				m_frameOffset = currentCheckpointStorage.m_frameOffset;
 
-				PolzBot::m_replayEvents = currentCheckpointStorage.m_replayEvents;
+				PolzBot::m_replayEventsVec = currentCheckpointStorage.m_replayEventsVec;
 			}
 		}
+	}
+
+	if (setting().onPlayMacro) {
+		self->releaseButton(0, false);
+		self->releaseButton(0, true);
+		PolzBot::m_eventIndex = 0;
 	}
 
 	if (m_deafenPressed) {
@@ -1313,6 +1319,10 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	//	self->m_player->updatePlayerFrame(cubeIcon);
 	//	self->m_player2->updatePlayerFrame(cubeIcon);
 	//}
+
+	if (m_botEventsOddAlert && setting().onRecordMacro) {
+		m_botEventsOddAlert->setVisible(PolzBot::m_replayEventsVec.size() % 2 != 0);
+	}
 }
 
 void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObject* object) {
@@ -1569,6 +1579,8 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 	m_checkpointStorage[ret] = {
 		self->m_cameraPortal,
 		self->m_dualModeCamera,
+		self->m_player->m_realPlayerPos,
+		self->m_player2->m_realPlayerPos,
 		self->m_player->m_yVelocity,
 		self->m_player2->m_yVelocity,
 		self->m_player->getRotation(),
@@ -1607,7 +1619,7 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 	m_checkpointStorage[ret].m_currentFrame = m_currentFrame;
 	m_checkpointStorage[ret].m_frameOffset = PlayLayer::getCurrentFrame();
 
-	m_checkpointStorage[ret].m_replayEvents = PolzBot::m_replayEvents;
+	m_checkpointStorage[ret].m_replayEventsVec = PolzBot::m_replayEventsVec;
 
 	return ret;
 }
@@ -1659,34 +1671,46 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 		m_totalClicks++;
 		m_hasClicked = true;
 	}
-	
-	PlayLayer::pushButton(self, p0, p1);
 
 	if (setting().onRecordMacro) {
-		auto frame = PlayLayer::getCurrentFrame();
-		PolzBot::m_replayEvents[frame].down = true;
-		PolzBot::m_replayEvents[frame].p2 = !p1;
-		PolzBot::m_replayEvents[frame].rotation = !p1 ? self->m_player2->getRotation() : self->m_player->getRotation();
-		PolzBot::m_replayEvents[frame].xPosition = !p1 ? self->m_player2->m_realPlayerPos.x : self->m_player->m_realPlayerPos.x;
-		PolzBot::m_replayEvents[frame].yPosition = !p1 ? self->m_player2->m_realPlayerPos.y : self->m_player->m_realPlayerPos.y;
-		PolzBot::m_replayEvents[frame].yVelocity = !p1 ? self->m_player2->m_yVelocity : self->m_player->m_yVelocity;
+		bool isTwoPlayer = self->m_levelSettings->m_twoPlayerMode && !p1;
+
+		PolzBot::Event event;
+
+		event.down = true;
+		event.p2 = isTwoPlayer;
+		event.frame = PlayLayer::getCurrentFrame();
+		event.rotation = isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
+		event.xPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
+		event.yPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
+		event.yVelocity = isTwoPlayer ? self->m_player->m_yVelocity : self->m_player2->m_yVelocity;
+
+		PolzBot::m_replayEventsVec.push_back(event);
 	}
+	
+	PlayLayer::pushButton(self, p0, p1);
 }
 
 void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bool p1) {
 	m_isHolding = false;
 
-	PlayLayer::releaseButton(self, p0, p1);
-
 	if (setting().onRecordMacro) {
-		auto frame = PlayLayer::getCurrentFrame();
-		PolzBot::m_replayEvents[frame].down = false;
-		PolzBot::m_replayEvents[frame].p2 = !p1;
-		PolzBot::m_replayEvents[frame].rotation = !p1 ? self->m_player2->getRotation() : self->m_player->getRotation();
-		PolzBot::m_replayEvents[frame].xPosition = !p1 ? self->m_player2->m_realPlayerPos.x : self->m_player->m_realPlayerPos.x;
-		PolzBot::m_replayEvents[frame].yPosition = !p1 ? self->m_player2->m_realPlayerPos.y : self->m_player->m_realPlayerPos.y;
-		PolzBot::m_replayEvents[frame].yVelocity = !p1 ? self->m_player2->m_yVelocity : self->m_player->m_yVelocity;
+		bool isTwoPlayer = self->m_levelSettings->m_twoPlayerMode && !p1;
+
+		PolzBot::Event event;
+
+		event.down = false;
+		event.p2 = isTwoPlayer;
+		event.frame = PlayLayer::getCurrentFrame();
+		event.rotation = isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
+		event.xPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
+		event.yPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
+		event.yVelocity = isTwoPlayer ? self->m_player->m_yVelocity : self->m_player2->m_yVelocity;
+
+		PolzBot::m_replayEventsVec.push_back(event);
 	}
+
+	PlayLayer::releaseButton(self, p0, p1);
 }
 
 //void __fastcall PlayLayer::checkCollisionsH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
@@ -1718,6 +1742,7 @@ void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	m_noclipAccuracyLabel = nullptr;
 	m_noclipDeathsLabel = nullptr;
 	m_metaLabel = nullptr;
+	m_botEventsOddAlert = nullptr;
 }
 
 void PlayLayer::mem_init() {

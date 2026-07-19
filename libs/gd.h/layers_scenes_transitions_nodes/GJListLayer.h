@@ -4,22 +4,22 @@
 #include <gd.h>
 
 namespace gd {
-	#pragma runtime_checks("s", off)
-	class GJListLayer : public cocos2d::CCLayerColor {
-	protected:
-		CCObject* m_pTarget;
+	class BoomListView;
 
+	class GJListLayer : public cocos2d::CCLayerColor {
 	public:
-		static GJListLayer* create(CCObject* target, const char* title, cocos2d::ccColor4B color, float width, float height) {
+		BoomListView* m_listView;
+
+		static GJListLayer* create(BoomListView* target, char const* title, cocos2d::ccColor4B color, float width, float height) {
 			__asm movss xmm3, width
-			auto pRet = reinterpret_cast<GJListLayer * (__fastcall*)(CCObject*, const char*, cocos2d::ccColor4B, float)>(
-				base + 0x12E000
-				)(target, title, color, height);
+			
+			auto ret = reinterpret_cast<GJListLayer * (__fastcall*)(BoomListView*, char const*, cocos2d::ccColor4B, float)>(base + 0x81720)(target, title, color, height);
+
 			__asm add esp, 0x8
-			return pRet;
+
+			return ret;
 		}
 	};
-	#pragma runtime_checks("s", restore)
 }
 
 #endif

@@ -14,6 +14,7 @@ namespace gd {
 	class LevelDeleteDelegate;
 	enum class SearchType;
 	class GJGameLevel;
+	class GJSearchObject;
 
 	class GameLevelManager : public cocos2d::CCNode {
 	public:
@@ -79,6 +80,14 @@ namespace gd {
 
 		cocos2d::CCArray* getSavedLevels() {
 			return reinterpret_cast<cocos2d::CCArray * (__fastcall*)(GameLevelManager*)>(base + 0x57640)(this);
+		}
+
+		void getOnlineLevels(GJSearchObject* searchObject) {
+			reinterpret_cast<void(__thiscall*)(GameLevelManager*, GJSearchObject*)>(base + 0x59cb0)(this, searchObject);
+		}
+
+		cocos2d::CCArray* getStoredOnlineLevels(char const* key) {
+			return reinterpret_cast<cocos2d::CCArray * (__thiscall*)(GameLevelManager*, char const*)>(base + 0x57ef0)(this, key);
 		}
 	};
 }
