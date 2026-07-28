@@ -8,7 +8,7 @@ namespace SimplePlayer {
 	inline void(__thiscall* updatePlayerFrame)(gd::SimplePlayer*, int, gd::IconType);
 	void __fastcall updatePlayerFrameH(gd::SimplePlayer*, void*, int, gd::IconType);
 
-	void newExtraFrame(gd::SimplePlayer*, char const*);
+	void updateExtraSprite(gd::SimplePlayer*, std::string);
 
 	void mem_init();
 }

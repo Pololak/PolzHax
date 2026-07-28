@@ -107,24 +107,6 @@ bool PlayLayer::isCheating() {
 		setting().m_smallSawHitbox;
 }
 
-static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
-	gd::GameObject* closest = nullptr;
-
-	std::ranges::sort(vec, [](gd::GameObject* a, gd::GameObject* b) {
-		return a->getPositionX() < b->getPositionX();
-		});
-
-	for (auto obj : vec) {
-		if (obj->getPositionX() - 10 > startPos->getPositionX())
-			break;
-		if (obj->getPositionX() - 10 < startPos->getPositionX())
-			closest = obj;
-	}
-
-	return closest;
-}
-
-
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
 	if (playLayer->m_practiceMode) return;
 
@@ -827,6 +809,7 @@ unsigned int PlayLayer::getCurrentFrame() {
 	if (playLayer) {
 		return static_cast<unsigned int>(playLayer->m_levelTime * setting().fpsValue) + m_frameOffset;
 	}
+	return 0;
 }
 
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
@@ -1041,13 +1024,23 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	if (setting().onPlayMacro) {
-		auto events = PolzBot::m_replayEventsVec;
+		auto x = self->m_player->m_realPlayerPos.x;
+		auto& events = PolzBot::m_replayEventsVec;
 		if (events.size()) {
 			PolzBot::Event event;
-			while (PlayLayer::getCurrentFrame() == (event = events[PolzBot::m_eventIndex]).frame) { // partially from ReplayBot by Mat.
-				if (event.down) self->pushButton(0, !event.p2);
-				else self->releaseButton(0, !event.p2);
-				++PolzBot::m_eventIndex;
+			if (setting().m_macroMode == 0) {
+				while (PolzBot::m_eventIndex < events.size() && PlayLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame) {
+					if (event.down) self->pushButton(0, !event.p2);
+					else self->releaseButton(0, !event.p2);
+					++PolzBot::m_eventIndex;
+				}
+			}
+			else {
+				while (PolzBot::m_eventIndex < events.size() && self->m_player->m_realPlayerPos.x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
+					if (event.down) self->pushButton(0, !event.p2);
+					else self->releaseButton(0, !event.p2);
+					++PolzBot::m_eventIndex;
+				}
 			}
 		}
 	}
@@ -1680,10 +1673,10 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 		event.down = true;
 		event.p2 = isTwoPlayer;
 		event.frame = PlayLayer::getCurrentFrame();
-		event.rotation = isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
-		event.xPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
-		event.yPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
-		event.yVelocity = isTwoPlayer ? self->m_player->m_yVelocity : self->m_player2->m_yVelocity;
+		event.rotation = !isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
+		event.xPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
+		event.yPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
+		event.yVelocity = !isTwoPlayer ? self->m_player->m_yVelocity : self->m_player2->m_yVelocity;
 
 		PolzBot::m_replayEventsVec.push_back(event);
 	}
@@ -1702,10 +1695,10 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 		event.down = false;
 		event.p2 = isTwoPlayer;
 		event.frame = PlayLayer::getCurrentFrame();
-		event.rotation = isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
-		event.xPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
-		event.yPosition = isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
-		event.yVelocity = isTwoPlayer ? self->m_player->m_yVelocity : self->m_player2->m_yVelocity;
+		event.rotation = !isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
+		event.xPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
+		event.yPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
+		event.yVelocity = !isTwoPlayer ? self->m_player->m_yVelocity : self->m_player2->m_yVelocity;
 
 		PolzBot::m_replayEventsVec.push_back(event);
 	}

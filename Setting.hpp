@@ -252,6 +252,7 @@ struct SettingStruct {
 	// PolzBot
 	bool onPlayMacro, onRecordMacro, onAutoSaveReplay, onLockDelta, onRealTime, onClickFixes;
 	std::string m_selectedMacro;
+	int m_macroMode; // 0 - frame, 1 - xpos
 
 	// Screenshot
 	bool onHidePauseMenuOnShot, onHideStatusLabelsOnShot, onHideBackgroundOnShot, onHidePlayerOnShot, onCopyShotToClipboard;

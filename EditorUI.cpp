@@ -114,7 +114,10 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 			ss << "ID: " << object->m_objectID << "\n";
 			ss << "Type: " << typeToString(object->m_objectType) << "\n";
 			ss << "Time: " << self->m_editorLayer->m_gridLayer->timeForXPos(object->getPositionX()) << "\n";
-			ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(object) << std::dec << "\n";
+			if (setting().onDeveloperMode) {
+				ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(object) << std::dec << "\n";
+				ss << "m_ID: " << object->m_ID << "\n";
+			}
 
 			objectInfoLabel->setString(ss.str().c_str());
 		}
@@ -245,6 +248,35 @@ void EditorUI::Callback::onGridSize(CCObject* sender) {
 	}
 	else {
 		incrementGridSize(this);
+	}
+}
+
+void EditorUI::setupStartPos(gd::EditorUI* self, gd::StartPosObject* startPos) {
+	if (!startPos) return;
+
+	gd::LevelSettingsObject* startPosSettings = startPos->m_settings;
+	gd::LevelSettingsObject* levelSettings = self->m_editorLayer->m_levelSettings;
+
+	startPosSettings->m_startDual = levelSettings->m_startDual;
+	startPosSettings->m_startMode = levelSettings->m_startMode;
+	startPosSettings->m_startMini = levelSettings->m_startMini;
+	startPosSettings->m_startSpeed = levelSettings->m_startSpeed;
+
+	gd::GameObject* obj = getClosestObject(LevelEditorLayer::m_gamemodePortals, startPos);
+	if (obj) {
+		switch (obj->m_objectID) {
+		case 12:
+			startPosSettings->m_startMode = 0; break;
+		case 13:
+			startPosSettings->m_startMode = 1; break;
+		case 74:
+			startPosSettings->m_startMode = 2; break;
+		case 111:
+			startPosSettings->m_startMode = 3; break;
+		case 660:
+			startPosSettings->m_startMode = 4; break;
+		default: break;
+		}
 	}
 }
 
@@ -754,15 +786,11 @@ void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key)
 	bool ctrlAltPressed = kb->getControlKeyPressed() && kb->getAltKeyPressed();
 	bool shiftPressed = kb->getShiftKeyPressed();
 
-	if ((key == KEY_Up) || (key == setting().m_p1click)) {
-		if (self->m_editorLayer->m_playerState == 1) {
-			self->m_editorLayer->pushButton(1, true);
-		}
+	if ((key == KEY_Up) || (key == setting().m_p1click) && self->m_editorLayer->m_playerState == 1) {
+		self->m_editorLayer->pushButton(1, true);
 	}
-	else if (key == setting().m_p2click) {
-		if (self->m_editorLayer->m_playerState == 1) {
-			self->m_editorLayer->pushButton(1, false);
-		}
+	else if (key == setting().m_p2click && self->m_editorLayer->m_playerState == 1) {
+		self->m_editorLayer->pushButton(1, false);
 	}
 	else if (key == KEY_W && ctrlAltPressed) {
 		self->moveObjectCall(static_cast<gd::EditCommand>(103));
@@ -799,15 +827,11 @@ void __fastcall EditorUI::keyDownH(gd::EditorUI* _self, void*, enumKeyCodes key)
 void __fastcall EditorUI::keyUpH(gd::EditorUI* _self, void*, enumKeyCodes key) {
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xf4);
 
-	if ((key == KEY_Up) || (key == setting().m_p1click)) {
-		if (self->m_editorLayer->m_playerState == 1) {
-			self->m_editorLayer->releaseButton(1, true);
-		}
+	if ((key == KEY_Up) || (key == setting().m_p1click) && self->m_editorLayer->m_playerState == 1) {
+		self->m_editorLayer->releaseButton(1, true);
 	}
-	else if (key == setting().m_p2click) {
-		if (self->m_editorLayer->m_playerState == 1) {
-			self->m_editorLayer->releaseButton(1, false);
-		}
+	else if (key == setting().m_p2click && self->m_editorLayer->m_playerState == 1) {
+		self->m_editorLayer->releaseButton(1, false);
 	}
 	else {
 		EditorUI::keyUp(_self, key);

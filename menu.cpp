@@ -1376,6 +1376,25 @@ void imgui_render() {
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
 			ImGui::Checkbox("Real Time", &setting().onRealTime);
 
+			if (setting().onRecordMacro || setting().onPlayMacro) {
+				ImGui::BeginDisabled();
+			}
+			bool frame = setting().m_macroMode == 0;
+			bool xPos = setting().m_macroMode == 1;
+			if (ImGui::Checkbox("Frame", &frame)) {
+				xPos = false;
+				setting().m_macroMode = 0;
+			}
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			if (ImGui::Checkbox("X Pos", &xPos)) {
+				frame = false;
+				setting().m_macroMode = 1;
+			}
+			if (setting().onRecordMacro || setting().onPlayMacro) {
+				ImGui::EndDisabled();
+			}
+
 			ImGui::Text("Events size: %i", PolzBot::m_replayEventsVec.size());
 		}
 

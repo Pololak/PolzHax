@@ -1,18 +1,16 @@
 #include "SimplePlayer.hpp"
 #include "Icons.hpp"
 
-void SimplePlayer::newExtraFrame(gd::SimplePlayer* simplePlayer, char const* extra) {
-	CCSprite* extraSpr = static_cast<CCSprite*>(simplePlayer->m_firstLayer->getChildByTag(69));
-	auto spriteFrameCache = CCSpriteFrameCache::sharedSpriteFrameCache();
-	if (!extraSpr) return;
-
-	if (spriteFrameCache->spriteFrameByName(extra)) {
-		extraSpr->setPosition(simplePlayer->m_secondLayer->getPosition());
-		extraSpr->setDisplayFrame(spriteFrameCache->spriteFrameByName(extra));
-		extraSpr->setVisible(true);
+void SimplePlayer::updateExtraSprite(gd::SimplePlayer* self, std::string frameName) {
+	auto extraSprite = static_cast<CCSprite*>(self->m_firstLayer->getChildByTag(6556));
+	auto spriteFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
+	if (spriteFrame) {
+		extraSprite->setDisplayFrame(spriteFrame);
+		extraSprite->setVisible(true);
+		extraSprite->setPosition(self->m_firstLayer->getContentSize() / 2.f);
 	}
 	else {
-		extraSpr->setVisible(false);
+		extraSprite->setVisible(false);
 	}
 }
 
@@ -22,14 +20,12 @@ bool __fastcall SimplePlayer::initH(gd::SimplePlayer* self, void*, int frameID) 
 	int limit = Icons::getCount("player", "001");
 	if (frameID > limit) frameID = limit;
 
-	CCSprite* extraSprite = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("player_%02d_glow_001.png", frameID)->getCString());
-	extraSprite->setTag(69);
-	extraSprite->setVisible(false);
-	extraSprite->setZOrder(99);
-	extraSprite->setPosition(self->m_secondLayer->getPosition());
-	self->m_firstLayer->addChild(extraSprite);
+	auto extraSprite = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("player_%02d_001.png", frameID)->getCString());
+	self->m_firstLayer->addChild(extraSprite, 2, 6556);
+	extraSprite->setPosition(self->m_firstLayer->convertToNodeSpace(self->m_firstLayer->getContentSize()));
 
-	SimplePlayer::newExtraFrame(self, CCString::createWithFormat("player_%02d_extra_001.png", frameID)->getCString());
+	auto extraFrameName = CCString::createWithFormat("player_%02d_extra_001.png", frameID);
+	SimplePlayer::updateExtraSprite(self, extraFrameName->getCString());
 
 	return true;
 }
@@ -52,7 +48,7 @@ void __fastcall SimplePlayer::updatePlayerFrameH(gd::SimplePlayer* self, void*, 
 
 	int limit = Icons::getCount(prefix, "001");
 	if (frameID > limit) frameID = limit;
-	SimplePlayer::newExtraFrame(self, CCString::createWithFormat(std::string(prefix + std::string("_%02d_extra_001.png")).c_str(), frameID)->getCString());
+	SimplePlayer::updateExtraSprite(self, CCString::createWithFormat(std::string(prefix + std::string("_%02d_extra_001.png")).c_str(), frameID)->getCString());
 }
 
 void SimplePlayer::mem_init() {

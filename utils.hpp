@@ -623,6 +623,23 @@ inline bool nodeIsVisible(CCNode* node) {
 	return true;
 }
 
+inline static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec, gd::StartPosObject* startPos) {
+	gd::GameObject* closest = nullptr;
+
+	std::ranges::sort(vec, [](gd::GameObject* a, gd::GameObject* b) {
+		return a->getPositionX() < b->getPositionX();
+		});
+
+	for (auto obj : vec) {
+		if (obj->getPositionX() - 10 > startPos->getPositionX())
+			break;
+		if (obj->getPositionX() - 10 < startPos->getPositionX())
+			closest = obj;
+	}
+
+	return closest;
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

@@ -634,6 +634,7 @@ unsigned int LevelEditorLayer::getCurrentFrame() {
 	if (m_editorLayer) {
 		return static_cast<unsigned int>(m_editorLayer->m_clkTimer * setting().fpsValue);
 	}
+	return 0;
 }
 
 bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::GJGameLevel* level) {
@@ -693,6 +694,12 @@ void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, voi
 
 	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
 	if (isColorTrigger(object)) removeTrigger(object);
+
+	auto gamemodeObject = std::find(m_gamemodePortals.begin(), m_gamemodePortals.end(), object);
+	if (gamemodeObject != m_gamemodePortals.end()) {
+		std::cout << "Object exists. Deleting object." << std::endl;
+		m_gamemodePortals.erase(gamemodeObject);
+	}
 }
 
 void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, void*, float dt) {
@@ -711,13 +718,23 @@ void __fastcall LevelEditorLayer::updateVisibilityH(gd::LevelEditorLayer* self, 
 
 void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, float dt) {
 	if (setting().onPlayMacro) {
-		auto events = PolzBot::m_replayEventsVec;
+		auto x = self->m_player->getOrientedBox()->m_center.x;
+		auto& events = PolzBot::m_replayEventsVec;
 		if (events.size()) {
 			PolzBot::Event event;
-			while (LevelEditorLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame) { // partially from ReplayBot by Mat.
-				if (event.down) self->pushButton(0, !event.p2);
-				else self->releaseButton(0, !event.p2);
-				++PolzBot::m_eventIndex;
+			if (setting().m_macroMode == 0) {
+				while (PolzBot::m_eventIndex < events.size() && LevelEditorLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame) {
+					if (event.down) self->pushButton(0, !event.p2);
+					else self->releaseButton(0, !event.p2);
+					++PolzBot::m_eventIndex;
+				}
+			}
+			else {
+				while (PolzBot::m_eventIndex < events.size() && self->m_player->m_realPlayerPos.x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
+					if (event.down) self->pushButton(0, !event.p2);
+					else self->releaseButton(0, !event.p2);
+					++PolzBot::m_eventIndex;
+				}
 			}
 		}
 	}
@@ -889,9 +906,10 @@ void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*,
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
 	if (clicksDrawNode && setting().onShowClicks) {
-		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
-
-		if (self->m_player2 && self->m_dualMode) {
+		if (p1) {
+			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
+		}
+		else {
 			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(1.f, .5f, 1.f, 1.f));
 		}
 	}
@@ -902,9 +920,10 @@ void __fastcall LevelEditorLayer::releaseButtonH(gd::LevelEditorLayer* self, voi
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
 	if (clicksDrawNode && setting().onShowClicks) {
-		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
-
-		if (self->m_player2 && self->m_dualMode) {
+		if (p1) {
+			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+		}
+		else {
 			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
 		}
 	}
@@ -939,6 +958,20 @@ void __fastcall LevelEditorLayer::playMusicH(gd::LevelEditorLayer* self) {
 	std::cout << "playMusic()" << std::endl;
 }
 
+void __fastcall LevelEditorLayer::addToSectionH(gd::LevelEditorLayer* self, void*, gd::GameObject* object) {
+	LevelEditorLayer::addToSection(self, object);
+
+	switch (object->m_objectID) {
+	case 12:
+	case 13:
+	case 47:
+	case 111:
+	case 660:
+		m_gamemodePortals.push_back(object); break;
+	default: break;
+	}
+}
+
 void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	LevelEditorLayer::destructor(self);
 	m_colorTriggers.clear();
@@ -969,6 +1002,8 @@ void LevelEditorLayer::mem_init() {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90800), LevelEditorLayer::pushButtonH, reinterpret_cast<void**>(&LevelEditorLayer::pushButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x908f0), LevelEditorLayer::releaseButtonH, reinterpret_cast<void**>(&LevelEditorLayer::releaseButton));
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x8d220), LevelEditorLayer::addToSectionH, reinterpret_cast<void**>(&LevelEditorLayer::addToSection));
 
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x90d70), LevelEditorLayer::playMusicH, reinterpret_cast<void**>(&LevelEditorLayer::playMusic));
 

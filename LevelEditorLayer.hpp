@@ -16,6 +16,8 @@ struct GDColor {
 };
 
 namespace LevelEditorLayer {
+	inline std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges;
+
 	inline bool(__thiscall* init)(gd::LevelEditorLayer*, gd::GJGameLevel*);
 	bool __fastcall initH(gd::LevelEditorLayer*, void*, gd::GJGameLevel*);
 
@@ -66,6 +68,9 @@ namespace LevelEditorLayer {
 
 	inline void(__thiscall* draw)(gd::LevelEditorLayer*);
 	void __fastcall drawH(gd::LevelEditorLayer*);
+
+	inline void(__thiscall* addToSection)(gd::LevelEditorLayer*, gd::GameObject*);
+	void __fastcall addToSectionH(gd::LevelEditorLayer*, void*, gd::GameObject*);
 
 	inline void(__thiscall* destructor)(gd::LevelEditorLayer*);
 	void __fastcall destructorH(gd::LevelEditorLayer*);

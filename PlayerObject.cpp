@@ -4,29 +4,6 @@
 #include "Icons.hpp"
 #include "LevelEditorLayer.hpp"
 
-int cubeIcon, shipIcon, rollIcon, birdIcon, dartIcon;
-int cubeFrameID;
-
-void PlayerObject::setCubeIcon(int val) {
-	cubeIcon = val;
-}
-
-void PlayerObject::setShipIcon(int val) {
-	shipIcon = val;
-}
-
-void PlayerObject::setRollIcon(int val) {
-	rollIcon = val;
-}
-
-void PlayerObject::setBirdIcon(int val) {
-	birdIcon = val;
-}
-
-void PlayerObject::setDartIcon(int val) {
-	dartIcon = val;
-}
-
 void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // https://github.com/adafcaefc/SwingCopter/blob/master/SwingCopter/main.cpp
 	const auto direction = self->m_gravityFlipped ? -1.f : 1.f;
 
@@ -48,163 +25,108 @@ void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // h
 	}
 }
 
-void PlayerObject::newPlayerExtraFrame(gd::PlayerObject* playerObject, const char* playerFrame) {
-	CCSprite* playerExtraSpr = static_cast<CCSprite*>(playerObject->m_playerFrame->getChildByTag(69));
-	auto spriteFrameCache = CCSpriteFrameCache::sharedSpriteFrameCache();
-	if (!playerExtraSpr) return;
-
-	if (spriteFrameCache->spriteFrameByName(playerFrame)) {
-		playerExtraSpr->setPosition(playerObject->m_playerFrameSecondary->getPosition());
-		playerExtraSpr->setDisplayFrame(spriteFrameCache->spriteFrameByName(playerFrame));
-		playerExtraSpr->setVisible(true);
+void PlayerObject::updatePlayerSpriteExtra(gd::PlayerObject* self, std::string frameName) { // Fuck you Capeling.
+	auto playerSpriteExtra = static_cast<CCSprite*>(self->m_playerFrame->getChildByTag(6556));
+	auto spriteFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
+	if (spriteFrame) {
+		playerSpriteExtra->setDisplayFrame(spriteFrame);
+		playerSpriteExtra->setVisible(true);
+		playerSpriteExtra->setPosition(self->m_playerFrame->getContentSize() / 2.f);
 	}
 	else {
-		playerExtraSpr->setVisible(false);
+		playerSpriteExtra->setVisible(false);
 	}
 }
 
-void PlayerObject::newVehicleExtraFrame(gd::PlayerObject* playerObject, const char* shipFrame) {
-	CCSprite* vehicleExtraSpr = static_cast<CCSprite*>(playerObject->m_vehicleFrame->getChildByTag(69));
-	auto spriteFrameCache = CCSpriteFrameCache::sharedSpriteFrameCache();
-	if (!vehicleExtraSpr) return;
-
-	if (spriteFrameCache->spriteFrameByName(shipFrame)) {
-		vehicleExtraSpr->setPosition(playerObject->m_vehicleFrameSecondary->getPosition());
-		vehicleExtraSpr->setDisplayFrame(spriteFrameCache->spriteFrameByName(shipFrame));
-		vehicleExtraSpr->setVisible(true);
+void PlayerObject::updateShipSpriteExtra(gd::PlayerObject* self, std::string frameName) {
+	auto shipSpriteExtra = static_cast<CCSprite*>(self->m_vehicleFrame->getChildByTag(6556));
+	auto spriteFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
+	if (spriteFrame) {
+		shipSpriteExtra->setDisplayFrame(spriteFrame);
+		shipSpriteExtra->setVisible(true);
+		shipSpriteExtra->setPosition(self->m_vehicleFrame->getContentSize() / 2.f);
 	}
 	else {
-		vehicleExtraSpr->setVisible(false);
+		shipSpriteExtra->setVisible(false);
 	}
 }
 
-bool __fastcall PlayerObject::initH(gd::PlayerObject* self, void*, int frameID, gd::IconType iconType, CCLayer* gameLayer) {
-	cubeFrameID = 0;
-	if (!PlayerObject::init(self, frameID, iconType, gameLayer)) return false;
-	cubeFrameID = frameID;
+bool __fastcall PlayerObject::initH(gd::PlayerObject* self, void*, int playerFrameID, int vehicleFrameID, CCLayer* gameLayer) {
+	if (!PlayerObject::init(self, playerFrameID, vehicleFrameID, gameLayer)) return false;
+	
+	auto playerSpriteExtra = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("player_%02d_001.png", playerFrameID)->getCString());
+	self->m_playerFrame->addChild(playerSpriteExtra, 2, 6556);
+	playerSpriteExtra->setPosition(self->m_playerFrame->convertToNodeSpace(self->m_playerFrame->getContentSize()));
+	
+	auto playerExtraFrameName = CCString::createWithFormat("player_%02d_extra_001.png", playerFrameID);
+	PlayerObject::updatePlayerSpriteExtra(self, playerExtraFrameName->getCString());
+
+	auto shipSpriteExtra = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("ship_%02d_001.png", vehicleFrameID)->getCString());
+	self->m_vehicleFrame->addChild(shipSpriteExtra, 2, 6556);
+	shipSpriteExtra->setPosition(self->m_vehicleFrame->convertToNodeSpace(self->m_vehicleFrame->getContentSize()));
+
+	auto shipExtraFrameName = CCString::createWithFormat("ship_%02d_extra_001.png", vehicleFrameID);
+	PlayerObject::updateShipSpriteExtra(self, shipExtraFrameName->getCString());
 
 	auto gm = gd::GameManager::sharedState();
 
-	if (setting().onNoMiniIcon || setting().onMiniCubeIcon) {
-		self->updatePlayerFrame(frameID);
+	if (gm->getPlayLayer() || LevelEditorLayer::get()) {
+		if (setting().onMiniCubeIcon) self->updatePlayerFrame(gm->m_playerFrame);
 	}
-
-	CCSprite* playerExtraSprite = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("player_%02d_glow_001.png", frameID)->getCString());
-	playerExtraSprite->setTag(69);
-	playerExtraSprite->setVisible(false);
-	playerExtraSprite->setZOrder(99);
-	playerExtraSprite->setPosition(self->m_playerFrameSecondary->getPosition());
-	self->m_playerFrame->addChild(playerExtraSprite);
-
-	CCSprite* vehicleExtraSprite = CCSprite::createWithSpriteFrameName(CCString::createWithFormat("ship_%02d_glow_001.png", gm->m_playerShip)->getCString());
-	vehicleExtraSprite->setTag(69);
-	vehicleExtraSprite->setVisible(false);
-	vehicleExtraSprite->setZOrder(99);
-	vehicleExtraSprite->setPosition(self->m_vehicleFrameSecondary->getPosition());
-	self->m_vehicleFrame->addChild(vehicleExtraSprite);
-
-	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_%02d_extra_001.png", frameID)->getCString());
-	PlayerObject::newVehicleExtraFrame(self, CCString::createWithFormat("ship_%02d_extra_001.png", gm->m_playerShip)->getCString());
 
 	return true;
 }
 
 void __fastcall PlayerObject::updatePlayerFrameH(gd::PlayerObject* self, void*, int frameID) {
-	cubeFrameID = frameID;
 	auto gm = gd::GameManager::sharedState();
 
-	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_%02d_extra_001.png", frameID)->getCString());
-
-	//if (setting().onIconRandomizer && setting().onRandomizeCube) return PlayerObject::updatePlayerFrame(self, frameID);
-
 	if (gm->getPlayLayer() || LevelEditorLayer::get()) {
-		if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerFrame(self, 0);
+		if (setting().onMiniCubeIcon) frameID = 0;
 
-		if (setting().onNoMiniIcon) return PlayerObject::updatePlayerFrame(self, gm->m_playerFrame);
+		if (setting().onNoMiniIcon) frameID = gm->m_playerFrame;
 	}
 
 	PlayerObject::updatePlayerFrame(self, frameID);
+
+	auto extraFrameName = CCString::createWithFormat("player_%02d_extra_001.png", frameID);
+	PlayerObject::updatePlayerSpriteExtra(self, extraFrameName->getCString());
 }
 
 void __fastcall PlayerObject::updatePlayerShipFrameH(gd::PlayerObject* self, void*, int frameID) {
-	auto gm = gd::GameManager::sharedState();
-
 	PlayerObject::updatePlayerShipFrame(self, frameID);
 
-	PlayerObject::newVehicleExtraFrame(self, CCString::createWithFormat("ship_%02d_extra_001.png", frameID)->getCString());
+	auto extraFrameName = CCString::createWithFormat("ship_%02d_extra_001.png", frameID);
+	PlayerObject::updateShipSpriteExtra(self, extraFrameName->getCString());
 }
 
 void __fastcall PlayerObject::updatePlayerRollFrameH(gd::PlayerObject* self, void*, int frameID) {
 	auto gm = gd::GameManager::sharedState();
 
-	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("player_ball_%02d_extra_001.png", frameID)->getCString());
-
 	if (gm->getPlayLayer() || LevelEditorLayer::get()) {
-		if (setting().onMiniCubeIcon) return PlayerObject::updatePlayerRollFrame(self, 0);
+		if (setting().onMiniCubeIcon) frameID = 0;
 
-		if (setting().onNoMiniIcon) return PlayerObject::updatePlayerRollFrame(self, gm->m_playerBall);
+		if (setting().onNoMiniIcon) frameID = gm->m_playerBall;
 	}
 
 	PlayerObject::updatePlayerRollFrame(self, frameID);
+
+	auto extraFrameName = CCString::createWithFormat("player_ball_%02d_extra_001.png", frameID);
+	PlayerObject::updatePlayerSpriteExtra(self, extraFrameName->getCString());
 }
 
 void __fastcall PlayerObject::updatePlayerBirdFrameH(gd::PlayerObject* self, void*, int frameID) {
-	auto gm = gd::GameManager::sharedState();
-
 	PlayerObject::updatePlayerBirdFrame(self, frameID);
 
-	PlayerObject::newVehicleExtraFrame(self, CCString::createWithFormat("bird_%02d_extra_001.png", frameID)->getCString());
+	auto extraFrameName = CCString::createWithFormat("bird_%02d_extra_001.png", frameID);
+	PlayerObject::updateShipSpriteExtra(self, extraFrameName->getCString());
 }
 
 void __fastcall PlayerObject::updatePlayerDartFrameH(gd::PlayerObject* self, void*, int frameID) { // it's funny how frameID is there but unused
-	auto gm = gd::GameManager::sharedState();
-
 	PlayerObject::updatePlayerDartFrame(self, frameID);
 
-	PlayerObject::newPlayerExtraFrame(self, CCString::createWithFormat("dart_%02d_extra_001.png", setting().selectedDartIdx)->getCString());
+	auto extraFrameName = CCString::createWithFormat("dart_%02d_extra_001.png", setting().selectedDartIdx);
+	PlayerObject::updatePlayerSpriteExtra(self, extraFrameName->getCString());
 }
-
-//void __fastcall PlayerObject::updateGlowColorH(gd::PlayerObject* self) {
-//	PlayerObject::updateGlowColor(self);
-//
-//	
-//}
-//
-//void __fastcall PlayerObject::updatePlayerGlowH(gd::PlayerObject* self) {
-//	PlayerObject::updatePlayerGlow(self);
-//
-//	
-//}
-//
-//void __fastcall PlayerObject::toggleFlyModeH(gd::PlayerObject* self, void*, bool p0) {
-//	PlayerObject::toggleFlyMode(self, p0);
-//
-//	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-//
-//	if (setting().onIconRandomizer && setting().onRandomizeShip && p0) {
-//		self->updatePlayerShipFrame(shipIcon);
-//	}
-//}
-//
-//void __fastcall PlayerObject::toggleRollModeH(gd::PlayerObject* self, void*, bool p0) {
-//	PlayerObject::toggleRollMode(self, p0);
-//
-//	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-//
-//	if (setting().onIconRandomizer && setting().onRandomizeBall && p0) {
-//		self->updatePlayerRollFrame(rollIcon);
-//	}
-//}
-//
-//void __fastcall PlayerObject::toggleBirdModeH(gd::PlayerObject* self, void*, bool p0) {
-//	PlayerObject::toggleBirdMode(self, p0);
-//
-//	if (!gd::GameManager::sharedState()->getPlayLayer()) return;
-//
-//	if (setting().onIconRandomizer && setting().onRandomizeUFO && p0) {
-//		self->updatePlayerBirdFrame(birdIcon);
-//	}
-//}
 
 void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::toggleDartMode(self, p0);
@@ -212,22 +134,6 @@ void __fastcall PlayerObject::toggleDartModeH(gd::PlayerObject* self, void*, boo
 	if (setting().onNoWaveTrailBehind) {
 		self->m_playerStreak->stopStroke();
 	}
-
-	//if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
-
-	//if (setting().onIconRandomizer) {
-	//	if (setting().onRandomizeDart && p0) {
-	//		self->updatePlayerDartFrame(dartIcon);
-	//	}
-	//	else if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-	//		self->updatePlayerFrame(cubeIcon);
-	//	}
-	//}
-	//else {
-	//	if (!p0 && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-	//		self->updatePlayerFrame(setting().onNoMiniIcon ? gd::GameManager::sharedState()->m_playerFrame : cubeFrameID);
-	//	}
-	//}
 }
 
 void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, bool p0) {
@@ -288,15 +194,6 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 		}
 	}
 
-	//if (setting().onNoMiniIcon && p0) {
-	//	if (self->m_rollMode) {
-	//		self->updatePlayerRollFrame(gd::GameManager::sharedState()->m_playerBall);
-	//	}
-	//	if (!self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-	//		self->updatePlayerFrame(gd::GameManager::sharedState()->m_playerFrame);
-	//	}
-	//}
-
 	if (setting().onWaveTrailBugFix) {
 		self->placeStreakPoint();
 	}
@@ -304,20 +201,6 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 	if (setting().onTrailBugFix && !p0 && (gd::GameManager::sharedState()->m_playerStreak == 2)) {
 		self->m_playerStreak->m_fMinSeg = 14.f;
 	}
-
-	//if (!gd::GameManager::sharedState()->getPlayLayer() && !LevelEditorLayer::get()) return;
-
-	//if (setting().onIconRandomizer && setting().onRandomizeCube && !self->m_flyMode && !self->m_rollMode && !self->m_birdMode && !self->m_dartMode) {
-	//	if (!p0) {
-	//		self->updatePlayerFrame(cubeIcon);
-	//	}
-	//	else if (p0 && setting().onNoMiniIcon) {
-	//		self->updatePlayerFrame(cubeIcon);
-	//	}
-	//	else if (p0 && !setting().onNoMiniIcon) {
-	//		self->updatePlayerFrame(0);
-	//	}
-	//}
 }
 
 void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
@@ -326,13 +209,6 @@ void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
 	}
 	PlayerObject::runBallRotation2(self);
 }
-
-//void __fastcall PlayerObject::collidedWithObjectH(gd::PlayerObject* self, void*, gd::GameObject* object, CCRect rect) {
-//	PlayerObject::collidedWithObject(self, object, rect);
-//
-//	std::cout << "collidedWithObject: " << object << std::endl;
-//	PlayLayer::setDeathObject(object);
-//}
 
 void __fastcall PlayerObject::loadFromCheckpointH(gd::PlayerObject* self, void*, gd::PlayerCheckpoint* playerCheckpoint) {
 	PlayerObject::loadFromCheckpoint(self, playerCheckpoint);
@@ -366,26 +242,36 @@ void __fastcall PlayerObject::activateStreakH(gd::PlayerObject* self) {
 void __fastcall PlayerObject::playerDestroyedH(gd::PlayerObject* self, void*, bool p0) {
 	PlayerObject::playerDestroyed(self, p0);
 
-	CCSprite* playerExtraSpr = static_cast<CCSprite*>(self->m_playerFrame->getChildByTag(69));
-	CCSprite* vehicleExtraSpr = static_cast<CCSprite*>(self->m_vehicleFrame->getChildByTag(69));
+	CCSprite* playerExtraSprite = static_cast<CCSprite*>(self->m_playerFrame->getChildByTag(6556));
+	CCSprite* vehicleExtraSprite = static_cast<CCSprite*>(self->m_vehicleFrame->getChildByTag(6556));
 
 	if (!setting().onNoDeathEffect) {
-		if (playerExtraSpr) {
-			playerExtraSpr->runAction(CCFadeTo::create(.05f, 0));
+		if (playerExtraSprite) {
+			playerExtraSprite->runAction(CCFadeTo::create(.05f, 0));
 		}
-		if (vehicleExtraSpr) {
-			vehicleExtraSpr->runAction(CCFadeTo::create(.05f, 0));
+		if (vehicleExtraSprite) {
+			vehicleExtraSprite->runAction(CCFadeTo::create(.05f, 0));
 		}
 	}
 }
 
-//void __fastcall PlayerObject::ringJumpH(gd::PlayerObject* self) {
-//	PlayerObject::ringJump(self);
-//
-//	if (self->m_flyMode || self->m_birdMode) {
-//		self->runRotateAction(false);
-//	}
-//}
+void __fastcall PlayerObject::resetObjectH(gd::PlayerObject* self) {
+	PlayerObject::resetObject(self);
+
+	CCSprite* playerExtraSprite = static_cast<CCSprite*>(self->m_playerFrame->getChildByTag(6556));
+	CCSprite* vehicleExtraSprite = static_cast<CCSprite*>(self->m_vehicleFrame->getChildByTag(6556));
+
+	if (playerExtraSprite) {
+		playerExtraSprite->setOpacity(255);
+	}
+	if (vehicleExtraSprite) {
+		vehicleExtraSprite->setOpacity(255);
+	}
+}
+
+void __fastcall PlayerObject::destructorH(gd::PlayerObject* self) {
+	PlayerObject::destructor(self);
+}
 
 void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd8ca0), PlayerObject::initH, reinterpret_cast<void**>(&PlayerObject::init));
@@ -410,4 +296,7 @@ void PlayerObject::mem_init() {
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xde1c0), PlayerObject::ringJumpH, reinterpret_cast<void**>(&PlayerObject::ringJump));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayerObject::collidedWithObjectH, reinterpret_cast<void**>(&PlayerObject::collidedWithObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xddda0), PlayerObject::playerDestroyedH, reinterpret_cast<void**>(&PlayerObject::playerDestroyed));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9f80), PlayerObject::resetObjectH, reinterpret_cast<void**>(&PlayerObject::resetObject));
+
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd8a30), PlayerObject::destructorH, reinterpret_cast<void**>(&PlayerObject::destructor));
 }

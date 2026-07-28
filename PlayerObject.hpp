@@ -2,8 +2,8 @@
 #include "pch.h"
 
 namespace PlayerObject {
-	inline bool(__thiscall* init)(gd::PlayerObject*, int, gd::IconType, CCLayer*);
-	bool __fastcall initH(gd::PlayerObject*, void*, int, gd::IconType, CCLayer*);
+	inline bool(__thiscall* init)(gd::PlayerObject*, int, int, CCLayer*);
+	bool __fastcall initH(gd::PlayerObject*, void*, int, int, CCLayer*);
 
 	inline void(__thiscall* updatePlayerFrame)(gd::PlayerObject*, int);
 	void __fastcall updatePlayerFrameH(gd::PlayerObject*, void*, int);
@@ -62,10 +62,19 @@ namespace PlayerObject {
 	inline void(__thiscall* playerDestroyed)(gd::PlayerObject*, bool);
 	void __fastcall playerDestroyedH(gd::PlayerObject*, void*, bool);
 
+	inline void(__thiscall* resetObject)(gd::PlayerObject*);
+	void __fastcall resetObjectH(gd::PlayerObject*);
+
+	inline void(__thiscall* destructor)(gd::PlayerObject*);
+	void __fastcall destructorH(gd::PlayerObject*);
+
 	inline void updateSwing(gd::PlayerObject* self, const float delta);
 
 	void newPlayerExtraFrame(gd::PlayerObject*, const char*);
 	void newVehicleExtraFrame(gd::PlayerObject*, const char*);
+
+	void updatePlayerSpriteExtra(gd::PlayerObject*, std::string);
+	void updateShipSpriteExtra(gd::PlayerObject*, std::string);
 
 	void setCubeIcon(int);
 	void setShipIcon(int);

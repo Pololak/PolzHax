@@ -97,6 +97,8 @@ namespace EditorUI {
 
 	bool isColorTriggersSelected(gd::EditorUI*);
 
+	void setupStartPos(gd::EditorUI*, gd::StartPosObject*);
+
 	class Callback : public gd::EditorUI {
 	public:
 		void onAllGroup(CCObject*);
