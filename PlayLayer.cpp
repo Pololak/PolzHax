@@ -74,6 +74,8 @@ float m_prevX;
 CCLabelBMFont* m_metaLabel = nullptr;
 unsigned int m_frameOffset;
 CCLabelBMFont* m_botEventsOddAlert = nullptr;
+bool m_botPush;
+bool m_botRelease;
 
 bool m_cheatingBeforeRestart;
 
@@ -479,7 +481,7 @@ void updateCPSLabel() {
 			cpsTotal = "/" + std::to_string(m_totalClicks);
 		}
 
-		if (m_isHolding) {
+		if (m_isHolding && !m_botPush) {
 			m_cpsCounterLabel->setColor(ccc3(64, 255, 64));
 		}
 		else {
@@ -881,6 +883,9 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	PolzBot::m_eventIndex = 0;
 
+	m_botPush = false;
+	m_botRelease = false;
+
 	if (!PlayLayer::init(self, level)) return false;
 
 	//
@@ -1048,15 +1053,31 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 			PolzBot::Event event;
 			if (setting().m_macroMode == 0) {
 				while (PolzBot::m_eventIndex < events.size() && PlayLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame) {
-					if (event.down) self->pushButton(0, !event.p2);
-					else self->releaseButton(0, !event.p2);
+					if (event.down) {
+						m_botPush = true;
+						m_botRelease = false;
+						self->pushButton(0, !event.p2);
+					}
+					else {
+						m_botPush = false;
+						m_botRelease = true;
+						self->releaseButton(0, !event.p2);
+					}
 					++PolzBot::m_eventIndex;
 				}
 			}
 			else {
 				while (PolzBot::m_eventIndex < events.size() && self->m_player->m_realPlayerPos.x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
-					if (event.down) self->pushButton(0, !event.p2);
-					else self->releaseButton(0, !event.p2);
+					if (event.down) {
+						m_botPush = true;
+						m_botRelease = false;
+						self->pushButton(0, !event.p2);
+					}
+					else {
+						m_botPush = false;
+						m_botRelease = true;
+						self->releaseButton(0, !event.p2);
+					}
 					++PolzBot::m_eventIndex;
 				}
 			}
@@ -1707,6 +1728,7 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 		PolzBot::m_replayEventsVec.push_back(event);
 	}
 	
+	if (setting().onPlayMacro && !m_botPush) return;
 	PlayLayer::pushButton(self, p0, p1);
 }
 
@@ -1729,6 +1751,7 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 		PolzBot::m_replayEventsVec.push_back(event);
 	}
 
+	if (setting().onPlayMacro && !m_botRelease) return;
 	PlayLayer::releaseButton(self, p0, p1);
 }
 
