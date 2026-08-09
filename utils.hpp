@@ -640,6 +640,16 @@ inline static gd::GameObject* getClosestObject(std::vector<gd::GameObject*>& vec
 	return closest;
 }
 
+inline bool compareCCArrays(CCArray* firstArray, CCArray* secondArray) {
+	if (!firstArray || !secondArray) return false;
+	if (firstArray->count() != secondArray->count()) return false;
+	for (int i = 0; i < firstArray->count(); i++) {
+		if (!firstArray->objectAtIndex(i)->isEqual(secondArray->objectAtIndex(i)))
+			return false;
+	}
+	return true;
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

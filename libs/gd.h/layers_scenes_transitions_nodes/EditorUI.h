@@ -248,6 +248,14 @@ namespace gd {
 		void selectBuildTab(int p0) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, int)>(base + 0x494e0)(this, p0);
 		}
+
+		void deselectAll() {
+			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x48380)(this);
+		}
+
+		void selectObject(GameObject* object) {
+			reinterpret_cast<void(__thiscall*)(EditorUI*, GameObject*)>(base + 0x47f10)(this, object);
+		}
 	};
 }
 

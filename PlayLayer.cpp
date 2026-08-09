@@ -203,6 +203,24 @@ void setupStartPos(gd::StartPosObject* startPos) { // Eclipse menu https://githu
 	}
 }
 
+void updateStartPosCamera(gd::StartPosObject* startPos) {
+	gd::PlayLayer* playLayer = gd::GameManager::sharedState()->m_playLayer;
+	gd::LevelSettingsObject* startPosSettings = startPos->m_settings;
+
+	gd::GameObjectType mode;
+
+	switch (startPosSettings->m_startMode) {
+	default:
+	case 0: mode = gd::GameObjectType::CubePortal; break;
+	case 1: mode = gd::GameObjectType::ShipPortal; break;
+	case 2: mode = gd::GameObjectType::BallPortal; break;
+	case 3: mode = gd::GameObjectType::UfoPortal; break;
+	case 4: mode = gd::GameObjectType::WavePortal; break;
+	}
+
+	playLayer->updateDualGround(playLayer->m_player, static_cast<int>(mode), true);
+}
+
 void PlayLayer::updateShowLayout() {
 	auto self = gd::GameManager::sharedState()->getPlayLayer();
 
@@ -1186,6 +1204,14 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	PlayLayer::resetLevel(self);
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
+
+	//if (setting().onSmartStartPos) {
+	//	for (gd::StartPosObject* obj : m_startPositions) {
+	//		if (obj) {
+	//			//setupStartPos(obj);
+	//		}
+	//	}
+	//}
 
 	if (setting().onPracticeFix) {
 		if (self->m_practiceMode && m_checkpointStorage.size()) {

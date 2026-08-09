@@ -15,6 +15,13 @@ void EditorOptionsLayer::onExperimentalLayering(CCObject*) {
 	setting().onExperimentalLayering = !setting().onExperimentalLayering;
 }
 
+void EditorOptionsLayer::onLinkControls(CCObject*) {
+	setting().onLinkControls = !setting().onLinkControls;
+	if (LevelEditorLayer::get()) {
+		LevelEditorLayer::get()->m_uiLayer->updateButtons();
+	}
+}
+
 void EditorOptionsLayer::onUnusedObjects(CCObject*) {
 	setting().onUnusedObjects = !setting().onUnusedObjects;
 }
@@ -35,6 +42,24 @@ void EditorOptionsLayer::onNewColorSelect(CCObject*) {
 
 void EditorOptionsLayer::onShowClicks(CCObject*) {
 	setting().onShowClicks = !setting().onShowClicks;
+}
+
+void EditorOptionsLayer::createToggleButton(std::string caption, cocos2d::SEL_MenuHandler callback, bool toggle, cocos2d::CCMenu* menu, cocos2d::CCPoint position) {
+	CCSprite* toggleOff = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+	toggleOff->setScale(.8f);
+	CCSprite* toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+	toggleOn->setScale(.8f);
+
+	auto toggler = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, callback);
+	toggler->toggle(toggle);
+	toggler->setPosition(position);
+	menu->addChild(toggler);
+	auto label = CCLabelBMFont::create(caption.c_str(), "bigFont.fnt");
+	label->limitLabelWidth(130.f, .5f, 0.f);
+	label->setAnchorPoint({ 0.f, .5f });
+	auto convertedPos = menu->convertToWorldSpace(toggler->getPosition());
+	label->setPosition(convertedPos.x + 18.f, convertedPos.y);
+	this->m_mainLayer->addChild(label);
 }
 
 bool EditorOptionsLayer::init() {
@@ -73,75 +98,69 @@ bool EditorOptionsLayer::init() {
 	CCSprite* toggleOn = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
 	toggleOn->setScale(.8f);
 
-	auto onCopyString = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onCopyString));
-	onCopyString->toggle(setting().onCopyString);
-	onCopyString->setPosition(-160.f, 80.f);
-	menu->addChild(onCopyString);
-	auto onCopyStringLabel = CCLabelBMFont::create("Copy String", "bigFont.fnt");
-	onCopyStringLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onCopyStringLabel->setAnchorPoint({ 0.f, .5f });
-	onCopyStringLabel->setPosition(winSize.width / 2.f - 138.f, winSize.height / 2.f + 80.f);
-	layer->addChild(onCopyStringLabel);
+	this->createToggleButton(
+		"Copy String",
+		menu_selector(EditorOptionsLayer::onCopyString),
+		setting().onCopyString,
+		menu,
+		ccp(-160.f, 80.f)
+	);
 
-	auto onDurationLines = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onDurationLines));
-	onDurationLines->toggle(setting().onDurationLines);
-	onDurationLines->setPosition(32.f, 80.f);
-	menu->addChild(onDurationLines);
-	auto onDurationLinesLabel = CCLabelBMFont::create("Duration Lines", "bigFont.fnt");
-	onDurationLinesLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onDurationLinesLabel->setAnchorPoint({ 0.f, .5f });
-	onDurationLinesLabel->setPosition(winSize.width / 2.f + 54.f, winSize.height / 2.f + 80.f);
-	layer->addChild(onDurationLinesLabel);
+	this->createToggleButton(
+		"Duration Lines",
+		menu_selector(EditorOptionsLayer::onDurationLines),
+		setting().onDurationLines,
+		menu,
+		ccp(32.f, 80.f)
+	);
 
-	auto onExperimentalLayering = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onExperimentalLayering));
-	onExperimentalLayering->toggle(setting().onExperimentalLayering);
-	onExperimentalLayering->setPosition(-160.f, 40.f);
-	menu->addChild(onExperimentalLayering);
-	auto onExperimentalLayeringLabel = CCLabelBMFont::create("Experimental Layering", "bigFont.fnt");
-	onExperimentalLayeringLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onExperimentalLayeringLabel->setAnchorPoint({ 0.f, .5f });
-	onExperimentalLayeringLabel->setPosition(winSize.width / 2.f - 138.f, winSize.height / 2.f + 40.f);
-	layer->addChild(onExperimentalLayeringLabel);
+	this->createToggleButton(
+		"Experimental Layering",
+		menu_selector(EditorOptionsLayer::onExperimentalLayering),
+		setting().onExperimentalLayering,
+		menu,
+		ccp(-160.f, 40.f)
+	);
 
-	auto onNewColorSelect = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onNewColorSelect));
-	onNewColorSelect->toggle(setting().onNewColorSelectMenu);
-	onNewColorSelect->setPosition(32.f, 40.f);
-	menu->addChild(onNewColorSelect);
-	auto onNewColorSelectLabel = CCLabelBMFont::create("New Color Select", "bigFont.fnt");
-	onNewColorSelectLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onNewColorSelectLabel->setAnchorPoint({ 0.f, .5f });
-	onNewColorSelectLabel->setPosition(winSize.width / 2.f + 54.f, winSize.height / 2.f + 40.f);
-	layer->addChild(onNewColorSelectLabel);
+	this->createToggleButton(
+		"Link Controls (Exp)",
+		menu_selector(EditorOptionsLayer::onLinkControls),
+		setting().onLinkControls,
+		menu,
+		ccp(32.f, 40.f)
+	);
 
-	auto onPreviewRotations = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onPreviewRotations));
-	onPreviewRotations->toggle(setting().onPreviewRotations);
-	onPreviewRotations->setPosition(-160.f, 0.f);
-	menu->addChild(onPreviewRotations);
-	auto onPreviewRotationsLabel = CCLabelBMFont::create("Preview Rotations", "bigFont.fnt");
-	onPreviewRotationsLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onPreviewRotationsLabel->setAnchorPoint({ 0.f, .5f });
-	onPreviewRotationsLabel->setPosition(winSize.width / 2.f - 138.f, winSize.height / 2.f);
-	layer->addChild(onPreviewRotationsLabel);
+	this->createToggleButton(
+		"New Color Select",
+		menu_selector(EditorOptionsLayer::onNewColorSelect),
+		setting().onNewColorSelectMenu,
+		menu,
+		ccp(-160.f, 0.f)
+	);
 
-	auto onShowClicks = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onShowClicks));
-	onShowClicks->toggle(setting().onShowClicks);
-	onShowClicks->setPosition(32.f, 0.f);
-	menu->addChild(onShowClicks);
-	auto onShowClicksLabel = CCLabelBMFont::create("Show Clicks", "bigFont.fnt");
-	onShowClicksLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onShowClicksLabel->setAnchorPoint({ 0.f, .5f });
-	onShowClicksLabel->setPosition(winSize.width / 2.f + 54.f, winSize.height / 2.f);
-	layer->addChild(onShowClicksLabel);
+	this->createToggleButton(
+		"Preview Rotations",
+		menu_selector(EditorOptionsLayer::onPreviewRotations),
+		setting().onPreviewRotations,
+		menu,
+		ccp(32.f, 0.f)
+	);
 
-	auto onUnusedObjects = gd::CCMenuItemToggler::create(toggleOff, toggleOn, this, menu_selector(EditorOptionsLayer::onUnusedObjects));
-	onUnusedObjects->toggle(setting().onUnusedObjects);
-	onUnusedObjects->setPosition(-160.f, -40.f);
-	menu->addChild(onUnusedObjects);
-	auto onUnusedObjectsLabel = CCLabelBMFont::create("Show Unused Objects", "bigFont.fnt");
-	onUnusedObjectsLabel->limitLabelWidth(130.f, .5f, 0.f);
-	onUnusedObjectsLabel->setAnchorPoint({ 0.f, .5f });
-	onUnusedObjectsLabel->setPosition(winSize.width / 2.f - 138.f, winSize.height / 2.f - 40.f);
-	layer->addChild(onUnusedObjectsLabel);
+	this->createToggleButton(
+		"Show Clicks",
+		menu_selector(EditorOptionsLayer::onShowClicks),
+		setting().onShowClicks,
+		menu,
+		ccp(-160.f, -40.f)
+	);
+
+	this->createToggleButton(
+		"Unused Objects",
+		menu_selector(EditorOptionsLayer::onUnusedObjects),
+		setting().onUnusedObjects,
+		menu,
+		ccp(32.f, -40.f)
+	);
 
 	this->setKeypadEnabled(true);
 	this->setTouchEnabled(true);

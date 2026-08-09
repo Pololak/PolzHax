@@ -219,6 +219,7 @@ struct SettingStruct {
 	bool onCopyString;
 	bool onDurationLines;
 	bool onExperimentalLayering;
+	bool onLinkControls;
 	bool onHideUIOnPlaytest;
 	bool onPreviewRotations;
 	bool onShowClicks;
@@ -465,6 +466,7 @@ DEF_SCHEMA(
 	onCopyString,
 	onDurationLines,
 	onExperimentalLayering,
+	onLinkControls,
 	onHideUIOnPlaytest,
 	onShowClicks,
 	onPreviewRotations,

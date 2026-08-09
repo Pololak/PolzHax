@@ -107,12 +107,12 @@ namespace gd {
 		bool m_isSecondPlayer; // 0x4b0
 		bool m_dualMode; // 0x4b1
 		PAD(2)
-		double m_clkTimer; // 0x4b4
-		bool m_disableEffects; // 0x4bc
+		double m_clkTimer; // 0x4b8
+		bool m_disableEffects; // 0x4c0
 		PAD(3)
-		GameplayDelegate* m_gameDelegate; // 0x4c0
-		float m_audioScale; // 0x4c4
-		float m_groundHeight; // 0x4c8
+		GameplayDelegate* m_gameDelegate; // 0x4c4
+		float m_audioScale; // 0x4c8
+		float m_groundHeight; // 0x4cc
 
 		static PlayerObject* create(int player, int ship, cocos2d::CCLayer* layer) {
 			auto ret = reinterpret_cast<PlayerObject * (__fastcall*)(int, int, cocos2d::CCLayer*)>(base + 0xd8bf0)(player, ship, layer);

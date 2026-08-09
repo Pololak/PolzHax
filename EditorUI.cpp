@@ -117,6 +117,8 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 			if (setting().onDeveloperMode) {
 				ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(object) << std::dec << "\n";
 				ss << "m_ID: " << object->m_ID << "\n";
+				auto& objectCache = m_gameObjectStickyCache[object];
+				ss << "Linked group: " << objectCache.m_linkedGroup << "\n";
 			}
 
 			objectInfoLabel->setString(ss.str().c_str());
@@ -280,6 +282,41 @@ void EditorUI::setupStartPos(gd::EditorUI* self, gd::StartPosObject* startPos) {
 	}
 }
 
+bool EditorUI::isObjectLinked(gd::EditorUI* self) {
+	if (setting().onLinkControls) {
+		if (self->m_selectedObject) {
+			auto& objectCache = m_gameObjectStickyCache[self->m_selectedObject];
+			if (objectCache.m_linkedGroup > 0) {
+				return true;
+			}
+		}
+		else if (self->m_selectedObjects) {
+			for (auto object : CCArrayExt<gd::GameObject*>(self->m_selectedObjects)) {
+				auto& objectCache = m_gameObjectStickyCache[object];
+				if (objectCache.m_linkedGroup > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	return false;
+}
+
+void EditorUI::Callback::onUngroupSticky(CCObject*) {
+	if (this->m_selectedObjects->count()) {
+		LevelEditorLayer::ungroupStickyObjects(this->m_editorLayer, this->m_selectedObjects);
+		this->updateButtons();
+	}
+}
+
+void EditorUI::Callback::onGroupSticky(CCObject*) {
+	if (this->m_selectedObjects->count()) {
+		LevelEditorLayer::groupStickyObjects(this->m_editorLayer, this->m_selectedObjects);
+		this->updateButtons();
+	}
+}
+
 bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer* editorLayer) {
 	m_editorUI = self;
 	if (!EditorUI::init(self, editorLayer)) return false;
@@ -298,7 +335,7 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	auto objectInfoLabel = CCLabelBMFont::create("", "chatFont.fnt");
 	objectInfoLabel->setAnchorPoint({ 0.f, 1.f });
 	objectInfoLabel->setScale(.6f);
-	objectInfoLabel->setPosition(director->getScreenLeft() + 50.f, director->getScreenTop() - 50.f);
+	objectInfoLabel->setPosition(director->getScreenLeft() + 50.f, director->getScreenTop() - 45.f);
 	objectInfoLabel->setVisible(setting().onShowObjectInfo);
 	self->addChild(objectInfoLabel, 0, 2701);
 
@@ -308,7 +345,6 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	onTrash->setPosition(self->m_redoBtn->getPositionX() + 50.f, self->m_redoBtn->getPositionY() - 1.f);
 	onTrash->setOpacity(175);
 	onTrash->setColor(ccGRAY);
-	onTrash->setEnabled(false);
 	leftMenu->addChild(onTrash, 0, 201);
 
 	self->m_groupPrevBtn->setPositionX(self->m_groupPrevBtn->getPositionX() - 10.f);
@@ -343,7 +379,7 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	onGoToGroupSpr->setScale(.85f);
 	onGoToGroupSpr->setPositionY(onGoToGroupSpr->getPositionY() - 1.f);
 	auto onGoToGroup = gd::CCMenuItemSpriteExtra::create(onGoToGroupSpr, self, menu_selector(EditorUI::Callback::onGoToGroup));
-	onGoToGroup->setPosition(self->m_editGroupBtn->getPositionX() - 44.f, self->m_editGroupBtn->getPositionY());
+	onGoToGroup->setPosition(self->m_editGroupBtn->getPositionX() - 44.f, self->m_editGroupBtn->getPositionY() - 1.f);
 	onGoToGroup->setOpacity(175);
 	onGoToGroup->setColor(ccGRAY);
 	onGoToGroup->setEnabled(false);
@@ -403,6 +439,16 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 	m_gridSizeLabel->setScale(.35f);
 	gridSizeMenu->addChild(m_gridSizeLabel);
 
+	auto onLinkObjectsSpr = CCSprite::create("gj_linkBtn_001.png");
+	auto onLinkObjects = gd::CCMenuItemSpriteExtra::create(onLinkObjectsSpr, self, menu_selector(EditorUI::Callback::onGroupSticky));
+	onLinkObjects->setPosition(leftMenu->convertToNodeSpace({ director->getScreenLeft() + 65.f, director->getScreenTop() - 156.f }));
+	leftMenu->addChild(onLinkObjects, 0, 2705);
+
+	auto onUnlinkObjectsSpr = CCSprite::create("gj_linkBtnOff_001.png");
+	auto onUnlinkObjects = gd::CCMenuItemSpriteExtra::create(onUnlinkObjectsSpr, self, menu_selector(EditorUI::Callback::onUngroupSticky));
+	onUnlinkObjects->setPosition(leftMenu->convertToNodeSpace({ director->getScreenLeft() + 65.f, director->getScreenTop() - 191.f }));
+	leftMenu->addChild(onUnlinkObjects, 0, 2706);
+
 	if (setting().onDeveloperMode) {
 		auto selectedObjectInToolboxIdLabel = CCLabelBMFont::create("ID: ", "chatFont.fnt");
 		selectedObjectInToolboxIdLabel->setAnchorPoint({ 0.f, .5f });
@@ -412,6 +458,8 @@ bool __fastcall EditorUI::initH(gd::EditorUI* self, void*, gd::LevelEditorLayer*
 		self->addChild(selectedObjectInToolboxIdLabel, 10, 756);
 	}
 
+	self->updateButtons(); // Need to call it because of custom buttons.
+
 	return true;
 }
 
@@ -420,17 +468,31 @@ void __fastcall EditorUI::selectObjectH(gd::EditorUI* self, void*, gd::GameObjec
 	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
 	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
 
-	updateObjectInfoLabel(self);
+	if (setting().onLinkControls) {
+		auto& objectCache = m_gameObjectStickyCache[object];
 
-	if ((selectFilterObject != 0) && setting().onSelectFilter) {
-		if (object->m_objectID == selectFilterObject) return EditorUI::selectObject(self, object);
+		if (objectCache.m_linkedGroup > 0) {
+			auto stickyObjects = static_cast<CCArray*>(LevelEditorLayer::m_stickyGroups->objectForKey(objectCache.m_linkedGroup));
+			if (stickyObjects && stickyObjects->count() > 1) {
+				self->deselectAll();
+				self->selectObjects(CCArray::createWithObject(object));
+				return;
+			}
+		}
 	}
-	else if ((setting().colorFilter != 0) && setting().onSelectFilter) {
-		if (object->getColorMode() == static_cast<gd::GJCustomColorMode>(setting().colorFilter)) return EditorUI::selectObject(self, object);
+
+	if (setting().onSelectFilter) {
+		if (selectFilterObject && object->m_objectID != selectFilterObject) {
+			return;
+		}
+		else if (setting().colorFilter && static_cast<int>(object->getColorMode()) != setting().colorFilter) {
+			return;
+		}
 	}
-	else {
-		EditorUI::selectObject(self, object);
-	}
+
+	EditorUI::selectObject(self, object);
+
+	updateObjectInfoLabel(self);
 }
 
 void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void*, CCArray* objects) {
@@ -438,31 +500,53 @@ void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void*, CCArray* obj
 	if (selectedCustomMode != 3) gd::GameManager::sharedState()->setIntGameVariable("0006", 0);
 	int selectFilterObject = gd::GameManager::sharedState()->getIntGameVariable("0006");
 
-	updateObjectInfoLabel(self);
+	if (setting().onLinkControls) {
+		auto filteredLinkedObjects = CCArray::create();
 
-	if ((selectFilterObject != 0) && setting().onSelectFilter) {
-		auto filteredObjects = CCArray::create();
-		for (int i = 0; i < objects->count(); i++) {
-			if (reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i))->m_objectID == selectFilterObject) {
-				filteredObjects->addObject(objects->objectAtIndex(i));
+		for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
+			auto& objectCache = m_gameObjectStickyCache[object];
+
+			if (objectCache.m_linkedGroup) {
+				auto stickyObjects = static_cast<CCArray*>(LevelEditorLayer::m_stickyGroups->objectForKey(objectCache.m_linkedGroup));
+				if (stickyObjects && stickyObjects->count()) {
+					for (auto stickyObject : CCArrayExt<gd::GameObject*>(stickyObjects)) {
+						if (!objects->containsObject(stickyObject)) {
+							objects->addObject(stickyObject);
+						}
+					}
+				}
 			}
 		}
-		return EditorUI::selectObjects(self, filteredObjects);
 	}
-	else if ((setting().colorFilter != 0) && setting().onSelectFilter) {
+
+	if (setting().onSelectFilter) {
 		auto filteredObjects = CCArray::create();
-		for (int i = 0; i < objects->count(); i++) {
-			if (reinterpret_cast<gd::GameObject*>(objects->objectAtIndex(i))->getColorMode() == static_cast<gd::GJCustomColorMode>(setting().colorFilter)) {
-				filteredObjects->addObject(objects->objectAtIndex(i));
+
+		if (selectFilterObject) {
+			for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
+				if (object->m_objectID == selectFilterObject) {
+					filteredObjects->addObject(object);
+				}
 			}
+			EditorUI::selectObjects(self, filteredObjects);
+			updateObjectInfoLabel(self);
+			return;
 		}
-		return EditorUI::selectObjects(self, filteredObjects);
-	}
-	else {
-		return EditorUI::selectObjects(self, objects);
+		else if (setting().colorFilter) {
+			for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
+				if (setting().colorFilter && static_cast<int>(object->getColorMode()) != setting().colorFilter) {
+					filteredObjects->addObject(object);
+				}
+			}
+			EditorUI::selectObjects(self, filteredObjects);
+			updateObjectInfoLabel(self);
+			return;
+		}
 	}
 
 	EditorUI::selectObjects(self, objects);
+
+	updateObjectInfoLabel(self);
 }
 
 void __fastcall EditorUI::moveObjectH(gd::EditorUI* self, void*, gd::GameObject* object, CCPoint pos) {
@@ -485,26 +569,28 @@ void __fastcall EditorUI::angleChangedH(gd::EditorUI* _self, void*, float angle)
 void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self, void*) {
 	EditorUI::updateButtons(self);
 
+	bool hasObjectSelected = self->m_selectedObject || self->m_selectedObjects->count() != 0;
+
 	CCMenu* leftMenu = static_cast<CCMenu*>(self->m_undoBtn->getParent());
 	CCMenu* rightMenu = static_cast<CCMenu*>(self->m_deselectBtn->getParent());
 
 	auto onTrash = static_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(201));
 	if (onTrash) {
-		if (self->getSelectedObjects()->count()) {
+		if (hasObjectSelected) {
+			onTrash->m_animationEnabled = true;
 			onTrash->setOpacity(255);
 			onTrash->setColor(ccWHITE);
-			onTrash->setEnabled(true);
 		}
 		else {
+			onTrash->m_animationEnabled = false;
 			onTrash->setOpacity(175);
 			onTrash->setColor(ccGRAY);
-			onTrash->setEnabled(false);
 		}
 	}
 
 	auto onGoToGroup = static_cast<gd::CCMenuItemSpriteExtra*>(rightMenu->getChildByTag(2704));
 	if (onGoToGroup) {
-		if (self->getSelectedObjects()->count()) {
+		if (hasObjectSelected) {
 			onGoToGroup->setOpacity(255);
 			onGoToGroup->setColor(ccWHITE);
 			onGoToGroup->setEnabled(true);
@@ -515,6 +601,40 @@ void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self, void*) {
 			onGoToGroup->setColor(ccGRAY);
 			onGoToGroup->setEnabled(false);
 			onGoToGroup->setVisible(false);
+		}
+	}
+
+	auto onLinkObjects = static_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(2705));
+	if (onLinkObjects) {
+		onLinkObjects->setVisible(setting().onLinkControls);
+		onLinkObjects->setEnabled(setting().onLinkControls);
+
+		if (self->getSelectedObjects()->count() > 1) {
+			onLinkObjects->m_animationEnabled = true;
+			onLinkObjects->setOpacity(255);
+			onLinkObjects->setColor(ccWHITE);
+		}
+		else {
+			onLinkObjects->m_animationEnabled = false;
+			onLinkObjects->setOpacity(175);
+			onLinkObjects->setColor(ccGRAY);
+		}
+	}
+
+	auto onUnlinkObjects = static_cast<gd::CCMenuItemSpriteExtra*>(leftMenu->getChildByTag(2706));
+	if (onUnlinkObjects) {
+		onUnlinkObjects->setVisible(setting().onLinkControls);
+		onUnlinkObjects->setEnabled(setting().onLinkControls);
+
+		if (hasObjectSelected && isObjectLinked(self)) {
+			onUnlinkObjects->m_animationEnabled = true;
+			onUnlinkObjects->setOpacity(255);
+			onUnlinkObjects->setColor(ccWHITE);
+		}
+		else {
+			onUnlinkObjects->m_animationEnabled = false;
+			onUnlinkObjects->setOpacity(175);
+			onUnlinkObjects->setColor(ccGRAY);
 		}
 	}
 

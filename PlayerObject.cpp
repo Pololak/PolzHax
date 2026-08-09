@@ -194,7 +194,7 @@ void __fastcall PlayerObject::togglePlayerScaleH(gd::PlayerObject* self, void*, 
 		}
 	}
 
-	if (setting().onWaveTrailBugFix) {
+	if (setting().onWaveTrailBugFix && self->m_dartMode) {
 		self->placeStreakPoint();
 	}
 
@@ -213,7 +213,7 @@ void __fastcall PlayerObject::runBallRotation2H(gd::PlayerObject* self) {
 void __fastcall PlayerObject::loadFromCheckpointH(gd::PlayerObject* self, void*, gd::PlayerCheckpoint* playerCheckpoint) {
 	PlayerObject::loadFromCheckpoint(self, playerCheckpoint);
 
-	if (setting().onWaveTrailBugFix) {
+	if (setting().onWaveTrailBugFix && self->m_dartMode) {
 		self->placeStreakPoint();
 	}
 }

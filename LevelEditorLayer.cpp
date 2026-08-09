@@ -637,9 +637,69 @@ unsigned int LevelEditorLayer::getCurrentFrame() {
 	return 0;
 }
 
+void LevelEditorLayer::ungroupStickyObjects(gd::LevelEditorLayer* self, CCArray* objects) {
+	if (objects->count() == 0) return;
+
+	for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
+		auto& objectCache = m_gameObjectStickyCache[object];
+
+		auto stickyObjects = static_cast<CCArray*>(m_stickyGroups->objectForKey(objectCache.m_linkedGroup));
+		if (stickyObjects) {
+			stickyObjects->removeObject(object, true);
+
+			if (stickyObjects->count() == 0) {
+				m_stickyGroups->removeObjectForKey(objectCache.m_linkedGroup);
+			}
+		}
+
+		objectCache.m_linkedGroup = 0;
+	}
+}
+
+void LevelEditorLayer::groupStickyObjects(gd::LevelEditorLayer* self, CCArray* objects) {
+	auto stickyObjects = CCArray::createWithCapacity(objects->count());
+
+	unsigned int stickyGroup = 0;
+
+	if (objects->count()) {
+		for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
+			auto& objectCache = m_gameObjectStickyCache[object];
+
+			if (stickyGroup == 0) {
+				stickyGroup = objectCache.m_linkedGroup;
+			}
+			else if ((0 < objectCache.m_linkedGroup) && objectCache.m_linkedGroup != stickyGroup) {
+				LevelEditorLayer::ungroupStickyObjects(self, objects);
+				std::cout << "goto" << std::endl;
+				goto LAB_140224be1;
+			}
+		}
+		if (stickyGroup != 0) {
+			goto LAB_140224bef;
+		}
+	}
+LAB_140224be1:
+	m_stickyGroupID++;
+	stickyGroup = m_stickyGroupID;
+LAB_140224bef:
+	if (objects->count()) {
+		for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
+			auto& objectCache = m_gameObjectStickyCache[object];
+
+			objectCache.m_linkedGroup = stickyGroup;
+			stickyObjects->addObject(object);
+		}
+	}
+	m_stickyGroups->setObject(stickyObjects, stickyGroup);
+}
+
 bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::GJGameLevel* level) {
 	m_editorLayer = self;
 	if (!LevelEditorLayer::init(self, level)) return false;
+
+	m_stickyGroups = CCDictionary::create();
+	m_stickyGroups->retain();
+	m_stickyGroupID = 0;
 
 	auto& triggers = m_colorTriggers;
 	triggers[ColorTriggers::BG];
@@ -683,6 +743,8 @@ void __fastcall LevelEditorLayer::addSpecialH(gd::LevelEditorLayer* self, void*,
 	LevelEditorLayer::addSpecial(self, object);
 	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::beginRotateSaw(object);
 	if (isColorTrigger(object)) insertTrigger(object);
+
+	m_gameObjectStickyCache[object].m_linkedGroup = 0;
 }
 
 void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, void*, gd::GameObject* object) {
@@ -695,10 +757,19 @@ void __fastcall LevelEditorLayer::removeSpecialH(gd::LevelEditorLayer* self, voi
 	if (setting().onPreviewRotations && RotateSaws::objectIsSaw(object)) RotateSaws::stopRotateSaw(object);
 	if (isColorTrigger(object)) removeTrigger(object);
 
-	auto gamemodeObject = std::find(m_gamemodePortals.begin(), m_gamemodePortals.end(), object);
-	if (gamemodeObject != m_gamemodePortals.end()) {
-		std::cout << "Object exists. Deleting object." << std::endl;
-		m_gamemodePortals.erase(gamemodeObject);
+	auto& objectCache = m_gameObjectStickyCache[object];
+	if (objectCache.m_linkedGroup > 0) { // temp thing actually
+		auto stickyObjects = static_cast<CCArray*>(LevelEditorLayer::m_stickyGroups->objectForKey(objectCache.m_linkedGroup));
+		if (stickyObjects && stickyObjects->count() > 1) {
+			if (stickyObjects->containsObject(object)) {
+				stickyObjects->removeObject(object);
+			}
+		}
+	}
+
+	auto it = m_gameObjectStickyCache.find(object);
+	if (it != m_gameObjectStickyCache.end()) {
+		m_gameObjectStickyCache.erase(it);
 	}
 }
 
@@ -981,6 +1052,14 @@ void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	m_playtestStartPos = nullptr;
 	m_groundLayer = nullptr;
 	m_editorLayer = nullptr;
+	m_gameObjectStickyCache.clear();
+
+	if (m_stickyGroups != nullptr) {
+		m_stickyGroups->release();
+		m_stickyGroups = nullptr;
+	}
+
+	m_stickyGroupID = 0;
 }
 
 void LevelEditorLayer::mem_init() {

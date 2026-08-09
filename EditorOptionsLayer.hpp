@@ -7,9 +7,12 @@ protected:
 	virtual void keyBackClicked();
 	void onClose(CCObject*);
 
+	void createToggleButton(std::string, cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, cocos2d::CCPoint);
+
 	void onCopyString(CCObject*);
 	void onDurationLines(CCObject*);
 	void onExperimentalLayering(CCObject*);
+	void onLinkControls(CCObject*);
 	void onHideUIOnPlaytest(CCObject*);
 	void onUnusedObjects(CCObject*);
 	void onPreviewRotations(CCObject*);

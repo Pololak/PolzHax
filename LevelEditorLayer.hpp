@@ -15,8 +15,16 @@ struct GDColor {
 	bool operator==(const GDColor& other) { return std::tie(r, g, b, blending) == std::tie(other.r, other.g, other.b, other.blending); }
 };
 
+struct GameObjectStickyCache {
+	int m_linkedGroup;
+};
+
+inline std::unordered_map<gd::GameObject*, GameObjectStickyCache> m_gameObjectStickyCache;
+
 namespace LevelEditorLayer {
 	inline std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_speedChanges;
+	inline cocos2d::CCDictionary* m_stickyGroups;
+	inline int m_stickyGroupID;
 
 	inline bool(__thiscall* init)(gd::LevelEditorLayer*, gd::GJGameLevel*);
 	bool __fastcall initH(gd::LevelEditorLayer*, void*, gd::GJGameLevel*);
@@ -88,8 +96,9 @@ namespace LevelEditorLayer {
 	void createGroundLayer();
 	void removeGroundLayer();
 	void updateGroundWidth();
-
 	void updateShowHitboxes();
+	void groupStickyObjects(gd::LevelEditorLayer*, cocos2d::CCArray*);
+	void ungroupStickyObjects(gd::LevelEditorLayer*, cocos2d::CCArray*);
 
 	gd::LevelEditorLayer* get();
 	gd::StartPosObject* getPlaytestStartPos();

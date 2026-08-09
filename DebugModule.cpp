@@ -4,6 +4,7 @@
 #include "Setting.hpp"
 #include "PlayLayer.hpp"
 #include "PolzBot.hpp"
+#include "EditorUI.hpp"
 
 #include <imgui-hook.hpp>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -104,8 +105,6 @@ void renderDebugModule() {
 		}
 
 		ImGui::Text("filePath: %s", fme->m_filePath.c_str());
-
-		ImGui::Text("PlayerObject::m_isSecondPlayer: %p", &gd::PlayerObject::m_isSecondPlayer);
 
 		auto gjam = gd::GJAccountManager::sharedState();
 		ImGui::AlignTextToFramePadding();

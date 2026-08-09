@@ -104,7 +104,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(SolutionDir)libs\MinHook\libMinHook-x86-v141-mtd.lib;$(SolutionDir)libs\cocos-headers\cocos2dx\libcocos2d.lib;$(SolutionDir)libs\cocos-headers\extensions\libExtensions.lib;$(SolutionDir)libs\glew32.lib;$(SolutionDir)libs\fmod-headers\fmod.lib;$(SolutionDir)libs\detours\libdetours.lib;$(SolutionDir)libs\discord-game-sdk\lib\x86\discord_game_sdk.dll.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)libs\MinHook\libMinHook-x86-v141-mtd.lib;$(SolutionDir)libs\cocos-headers\cocos2dx\libcocos2d.lib;$(SolutionDir)libs\cocos-headers\extensions\libExtensions.lib;$(SolutionDir)libs\glew32.lib;$(SolutionDir)libs\fmod-headers\fmod.lib;$(SolutionDir)libs\detours\libdetours.lib;$(SolutionDir)libs\discord-game-sdk\lib\x86\discord_game_sdk.dll.lib;opengl32.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y /F "$(TargetPath)" "D:\GD PC Builds\GeometryDash"</Command>
@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BoomScrollLayer.hpp" />
     <ClInclude Include="CCSchedulerHook.hpp" />
     <ClInclude Include="CircleToolPopup.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
@@ -741,6 +742,7 @@
     <ClInclude Include="VideoOptionsLayer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BoomScrollLayer.cpp" />
     <ClCompile Include="CCSchedulerHook.cpp" />
     <ClCompile Include="CircleToolPopup.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />

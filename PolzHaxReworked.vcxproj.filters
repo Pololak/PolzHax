@@ -1842,6 +1842,9 @@
     <ClInclude Include="DemonListLayer.hpp">
       <Filter>Файлы заголовков\Layers</Filter>
     </ClInclude>
+    <ClInclude Include="BoomScrollLayer.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2125,6 +2128,9 @@
     </ClCompile>
     <ClCompile Include="DemonListLayer.cpp">
       <Filter>Исходные файлы\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="BoomScrollLayer.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

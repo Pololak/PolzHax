@@ -96,7 +96,23 @@ namespace gd {
 
 #include "sprite_nodes/CCSpritePlus.h"
 #include "sprite_nodes/GameObject.h"
+#include "sprite_nodes/ButtonSprite.h"
+#include "sprite_nodes/CCAnimatedSprite.h"
+#include "sprite_nodes/PlayerObject.h"
+#include "sprite_nodes/TextArea.h"
+#include "sprite_nodes/HardStreak.h"
+#include "sprite_nodes/SimplePlayer.h"
+#include "sprite_nodes/SearchButton.h"
+
 #include "other_nodes/StartPosObject.h"
+#include "other_nodes/SongInfoObject.h"
+#include "other_nodes/UndoObject.h"
+#include "other_nodes/OBB2D.h"
+#include "other_nodes/SettingsColorObject.h"
+#include "other_nodes/GhostTrailEffect.h"
+#include "other_nodes/CheckpointObject.h"
+#include "other_nodes/ColorAction.h"
+#include "other_nodes/GJSearchObject.h"
 
 #include "layers_scenes_transitions_nodes/LevelCell.h"
 #include "layers_scenes_transitions_nodes/FLAlertLayer.h"
@@ -147,24 +163,7 @@ namespace gd {
 #include "level_nodes/GJGameLevel.h"
 #include "level_nodes/LevelSettingsObject.h"
 
-#include "sprite_nodes/ButtonSprite.h"
-#include "sprite_nodes/CCAnimatedSprite.h"
-#include "sprite_nodes/PlayerObject.h"
-#include "sprite_nodes/TextArea.h"
-#include "sprite_nodes/HardStreak.h"
-#include "sprite_nodes/SimplePlayer.h"
-#include "sprite_nodes/SearchButton.h"
-
 #include "text_input_nodes/CCTextInputNode.h"
-
-#include "other_nodes/SongInfoObject.h"
-#include "other_nodes/UndoObject.h"
-#include "other_nodes/OBB2D.h"
-#include "other_nodes/SettingsColorObject.h"
-#include "other_nodes/GhostTrailEffect.h"
-#include "other_nodes/CheckpointObject.h"
-#include "other_nodes/ColorAction.h"
-#include "other_nodes/GJSearchObject.h"
 
 #include "GameToolbox.h"
 

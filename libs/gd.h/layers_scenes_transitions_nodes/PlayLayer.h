@@ -292,6 +292,49 @@ namespace gd {
 		void updateDualGround(PlayerObject* player, int p0, bool p1) {
 			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*, int, bool)>(base + 0xefad0)(this, player, p0, p1);
 		}
+
+		void switchToFlyMode(PlayerObject* player, GameObject* object, bool noPortal, int type) { // noPortal seems like unused
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*, GameObject*, bool, int)>(base + 0xefd50)(this, player, object, noPortal, type);
+		}
+
+		void switchToRollMode(PlayerObject* player, GameObject* object, bool noPortal) { // noPortal is used here???
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*, GameObject*, bool)>(base + 0xefe70)(this, player, object, noPortal);
+		}
+
+		void setupLevelStart(LevelSettingsObject* settingsObject) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, LevelSettingsObject*)>(base + 0xf30a0)(this, settingsObject);
+		}
+
+		void playerWillSwitchMode(PlayerObject* player, GameObject* object) {
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*, GameObject*)>(base + 0xef9a0)(this, player, object);
+		}
+
+		void toggleGlitter(bool toggle) {
+			reinterpret_cast<void(__fastcall*)(PlayLayer*, bool)>(base + 0xefcb0)(this, toggle);
+		}
+
+		void exitAirMode() {
+			this->toggleGlitter(false);
+		}
+
+		void exitBirdMode(PlayerObject* player) {
+			player->toggleBirdMode(false);
+			this->exitAirMode();
+		}
+
+		void exitDartMode(PlayerObject* player) {
+			player->toggleDartMode(false);
+			this->exitAirMode();
+		}
+
+		void exitFlyMode(PlayerObject* player) {
+			player->toggleFlyMode(false);
+			this->exitAirMode();
+		}
+
+		void exitRollMode(PlayerObject* player) {
+			player->toggleRollMode(false);
+		}
 	};
 }
 

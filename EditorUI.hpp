@@ -99,6 +99,8 @@ namespace EditorUI {
 
 	void setupStartPos(gd::EditorUI*, gd::StartPosObject*);
 
+	bool isObjectLinked(gd::EditorUI*);
+
 	class Callback : public gd::EditorUI {
 	public:
 		void onAllGroup(CCObject*);
@@ -108,6 +110,11 @@ namespace EditorUI {
 		void onGridSize(CCObject*);
 		void onCircleTool(CCObject*);
 		void onStartPos(CCObject*);
+		void onLinkObjects(CCObject*);
+		void onUnlinkObjects(CCObject*);
+
+		void onGroupSticky(CCObject*);
+		void onUngroupSticky(CCObject*);
 	};
 
 	void mem_init();

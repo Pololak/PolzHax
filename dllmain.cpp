@@ -4,6 +4,7 @@
 #pragma comment(lib, "dbghelp.lib")
 
 // Hooks
+#include "BoomScrollLayer.hpp"
 #include "CCSchedulerHook.hpp"
 #include "ColorSelectPopup.hpp"
 #include "CustomizeObjectLayer.hpp"
@@ -352,6 +353,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x599b0), GameLevelManager_getLengthStrH, reinterpret_cast<void**>(&GameLevelManager_getLengthStr));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x613f0), GJGameLevel_createH, reinterpret_cast<void**>(&GJGameLevel_create));
 
+	//BoomScrollLayer::mem_init();
 	CCSchedulerHook::mem_init();
 	ColorSelectPopup::mem_init();
 	CustomizeObjectLayer::mem_init();
