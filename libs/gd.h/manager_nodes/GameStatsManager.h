@@ -38,6 +38,14 @@ namespace gd {
 		const char* getStarLevelKey(int levelID) {
 			return cocos2d::CCString::createWithFormat("star_%i", levelID)->getCString();
 		}
+
+		std::string getLevelKey(int levelID, bool isOnline) {
+			return cocos2d::CCString::createWithFormat(isOnline ? "c_%i" : "n_%i", levelID)->getCString();
+		}
+
+		std::string getLevelKey(GJGameLevel* level) {
+			return this->getLevelKey(level->m_levelID, level->m_levelType != gd::GJLevelType::Local);
+		}
 	};
 }
 

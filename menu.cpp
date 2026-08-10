@@ -1475,9 +1475,14 @@ void imgui_render() {
 					auto level = playLayer->m_level;
 
 					if (level->m_normalPercent >= 100 && gsm->hasCompletedLevel(level)) {
-						gsm->setStat("4", gsm->getStat("4") - 1); // Completed levels
+						if (level->m_levelType == gd::GJLevelType::Local) {
+							gsm->setStat("3", gsm->getStat("3") - 1);
+						}
+						else {
+							gsm->setStat("4", gsm->getStat("4") - 1);
+						}
 
-						gsm->m_completedLevels->removeObjectForKey(CCString::createWithFormat("n_%i", level->m_levelID)->getCString());
+						gsm->m_completedLevels->removeObjectForKey(gsm->getLevelKey(level));
 						if (level->m_stars > 0) {
 							gsm->m_completedLevels->removeObjectForKey(gsm->getStarLevelKey(level->m_levelID));
 							gsm->m_completedLevels->removeObjectForKey(gsm->getDemonLevelKey(level->m_levelID));
@@ -1491,6 +1496,10 @@ void imgui_render() {
 
 					level->m_normalPercent = 0;
 					level->m_practicePercent = 0;
+					
+					if (level->m_levelType == gd::GJLevelType::Editor) {
+						level->m_isVerified = false;
+					}
 
 					gd::FLAlertLayer::create("Success", "Save & Load your data to apply the changes.", "OK")->show();
 				}

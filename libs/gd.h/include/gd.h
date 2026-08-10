@@ -76,24 +76,6 @@ namespace gd {
 #include "menu_nodes/CCMenuItemToggler.h"
 #include "menu_nodes/Slider.h"
 
-#include "manager_nodes/GManager.h"
-#include "manager_nodes/GameManager.h"
-#include "manager_nodes/GameSoundManager.h"
-#include "manager_nodes/AchievementManager.h"
-#include "manager_nodes/GameLevelManager.h"
-#include "manager_nodes/GameStatsManager.h"
-#include "manager_nodes/LocalLevelManager.h"
-#include "manager_nodes/ObjectToolbox.h"
-#include "manager_nodes/MusicDownloadManager.h"
-#include "manager_nodes/GJAccountManager.h"
-
-#include "scroll_nodes/CCContentLayer.h"
-#include "scroll_nodes/CCIndexPath.h"
-#include "scroll_nodes/CCScrollLayerExt.h"
-#include "scroll_nodes/TableView.h"
-#include "scroll_nodes/BoomListView.h"
-#include "scroll_nodes/CustomListView.h"
-
 #include "sprite_nodes/CCSpritePlus.h"
 #include "sprite_nodes/GameObject.h"
 #include "sprite_nodes/ButtonSprite.h"
@@ -113,6 +95,28 @@ namespace gd {
 #include "other_nodes/CheckpointObject.h"
 #include "other_nodes/ColorAction.h"
 #include "other_nodes/GJSearchObject.h"
+
+#include "level_nodes/EndPortalObject.h"
+#include "level_nodes/GJGameLevel.h"
+#include "level_nodes/LevelSettingsObject.h"
+
+#include "manager_nodes/GManager.h"
+#include "manager_nodes/GameManager.h"
+#include "manager_nodes/GameSoundManager.h"
+#include "manager_nodes/AchievementManager.h"
+#include "manager_nodes/GameLevelManager.h"
+#include "manager_nodes/GameStatsManager.h"
+#include "manager_nodes/LocalLevelManager.h"
+#include "manager_nodes/ObjectToolbox.h"
+#include "manager_nodes/MusicDownloadManager.h"
+#include "manager_nodes/GJAccountManager.h"
+
+#include "scroll_nodes/CCContentLayer.h"
+#include "scroll_nodes/CCIndexPath.h"
+#include "scroll_nodes/CCScrollLayerExt.h"
+#include "scroll_nodes/TableView.h"
+#include "scroll_nodes/BoomListView.h"
+#include "scroll_nodes/CustomListView.h"
 
 #include "layers_scenes_transitions_nodes/LevelCell.h"
 #include "layers_scenes_transitions_nodes/FLAlertLayer.h"
@@ -158,10 +162,6 @@ namespace gd {
 #include "layers_scenes_transitions_nodes/VideoOptionsLayer.h"
 
 #include "audio_nodes/FMODAudioEngine.h"
-
-#include "level_nodes/EndPortalObject.h"
-#include "level_nodes/GJGameLevel.h"
-#include "level_nodes/LevelSettingsObject.h"
 
 #include "text_input_nodes/CCTextInputNode.h"
 

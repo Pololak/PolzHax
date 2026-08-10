@@ -74,6 +74,12 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 		std::cout << str.c_str() << std::endl;
 	}
 
+	for (auto str : CCArrayExt<CCString*>(gd::GameStatsManager::sharedState()->m_completedLevels->allKeys())) {
+		if (str) {
+			std::cout << str->getCString() << std::endl;
+		}
+	}
+
 	return true;
 }
 
