@@ -23,6 +23,12 @@ namespace GameObject {
 	inline CCRect* (__thiscall* getObjectRect)(gd::GameObject*, CCRect*, float, float);
 	CCRect* __fastcall getObjectRectH(gd::GameObject*, void*, CCRect*, float, float);
 
+	inline CCRect* (__thiscall* getObjectRect2)(gd::GameObject*, CCRect*, float, float);
+	CCRect* __fastcall getObjectRect2H(gd::GameObject*, void*, CCRect*, float, float);
+
+	inline float(__thiscall* getRadius)(gd::GameObject*);
+	float __fastcall getRadiusH(gd::GameObject*);
+
 	void mem_init();
 }
 

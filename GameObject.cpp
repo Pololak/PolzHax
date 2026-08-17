@@ -77,8 +77,59 @@ void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
 //}
 
 CCRect* __fastcall GameObject::getObjectRectH(gd::GameObject* self, void*, CCRect* rect, float x, float y) {
+	auto ret = GameObject::getObjectRect(self, rect, x, y);
 
-	return GameObject::getObjectRect(self, rect, x, y);
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+	auto editorLayer = LevelEditorLayer::get();
+
+	if (setting().onHitboxMultiplier && ((playLayer && ((playLayer->m_player != self) && (playLayer->m_player2 != self))) || (editorLayer && ((editorLayer->m_player != self) && (editorLayer->m_player2 != self))))) {
+		switch (self->m_objectType) {
+		case gd::GameObjectType::Hazard:
+			if (self->m_objectRadius <= 0.f) {
+				ret->origin.x += ret->size.width / 2.f;
+				ret->origin.y += ret->size.height / 2.f;
+				ret->size.width *= setting().hazardHitboxesMult;
+				ret->size.height *= setting().hazardHitboxesMult;
+				ret->origin.x += ret->size.width / 2.f;
+				ret->origin.y += ret->size.height / 2.f;
+			}
+			break;
+		default: break;
+		}
+	}
+
+	return ret;
+}
+
+CCRect* __fastcall GameObject::getObjectRect2H(gd::GameObject* self, void*, CCRect* rect, float x, float y) {
+	auto ret = GameObject::getObjectRect2(self, rect, x, y);
+
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+	auto editorLayer = LevelEditorLayer::get();
+
+	if (setting().onHitboxMultiplier && ((playLayer && ((playLayer->m_player != self) && (playLayer->m_player2 != self))) || (editorLayer && ((editorLayer->m_player != self) && (editorLayer->m_player2 != self))))) {
+		switch (self->m_objectType) {
+		case gd::GameObjectType::Hazard:
+			if (self->m_objectRadius <= 0.f) {
+				ret->origin.x += ret->size.width / 2.f;
+				ret->origin.y += ret->size.height / 2.f;
+				ret->size.width *= setting().hazardHitboxesMult;
+				ret->size.height *= setting().hazardHitboxesMult;
+				ret->origin.x += ret->size.width / 2.f;
+				ret->origin.y += ret->size.height / 2.f;
+			}
+			break;
+		default: break;
+		}
+	}
+
+	return ret;
+}
+
+float __fastcall GameObject::getRadiusH(gd::GameObject* self) {
+
+
+	return GameObject::getRadius(self);
 }
 
 void GameObject::mem_init() {
@@ -89,6 +140,8 @@ void GameObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6e230), GameObject::triggerObjectH, reinterpret_cast<void**>(&GameObject::triggerObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x75980), GameObject::activatedByPlayerH, reinterpret_cast<void**>(&GameObject::activatedByPlayer));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x722e0), GameObject::getObjectRectH, reinterpret_cast<void**>(&GameObject::getObjectRect));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x723b0), GameObject::getObjectRect2H, reinterpret_cast<void**>(&GameObject::getObjectRect2));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x52960), GameObject::getRadiusH, reinterpret_cast<void**>(&GameObject::getRadius));
 }
 
 void RingObject::mem_init() {

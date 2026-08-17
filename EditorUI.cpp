@@ -96,30 +96,39 @@ void EditorUI::updateObjectInfoLabel(gd::EditorUI* self) {
 
 	auto objectInfoLabel = static_cast<CCLabelBMFont*>(self->getChildByTag(2701));
 	if (objectInfoLabel) {
+		auto director = CCDirector::sharedDirector();
+		objectInfoLabel->setPositionX(setting().onLinkControls ? director->getScreenLeft() + 90.f : director->getScreenLeft() + 50.f);
+
 		if (self->m_selectedObject || self->m_selectedObjects->count() == 1) {
 			std::stringstream ss;
 
-			gd::GameObject* object;
+			gd::GameObject* object = self->m_selectedObject;
 			if (self->m_selectedObjects->count() == 1) {
 				object = reinterpret_cast<gd::GameObject*>(self->m_selectedObjects->objectAtIndex(0));
-			}
-			else {
-				object = self->m_selectedObject;
 			}
 
 			ss << "C: " << colorToString(static_cast<int>(object->getColorMode())) << " (" << static_cast<int>(object->getColorMode()) << ")" << "\n";
 			ss << "G: " << object->m_editorGroup << "\n";
-			ss << "Rot: " << object->getRotation() << "\n";
+			if (object->getRotation() != 0.f) {
+				ss << "Rot: " << object->getRotation() << "\n";
+			}
 			ss << "X: " << object->getPositionX() << "\n";
 			ss << "Y: " << object->getPositionY() << "\n";
 			ss << "ID: " << object->m_objectID << "\n";
+			if (object->m_objectRadius > 0.f) {
+				ss << "Radius: " << object->m_objectRadius << "\n";
+			}
 			ss << "Type: " << typeToString(object->m_objectType) << "\n";
 			ss << "Time: " << self->m_editorLayer->m_gridLayer->timeForXPos(object->getPositionX()) << "\n";
 			if (setting().onDeveloperMode) {
 				ss << "Addr: 0x" << std::hex << reinterpret_cast<uintptr_t>(object) << std::dec << "\n";
+				auto& rect = object->getObjectRect();
+				ss << "Size: " << rect.size.width << ", " << rect.size.height << "\n";
 				ss << "m_ID: " << object->m_ID << "\n";
 				auto& objectCache = m_gameObjectStickyCache[object];
-				ss << "Linked group: " << objectCache.m_linkedGroup << "\n";
+				if (objectCache.m_linkedGroup != 0) {
+					ss << "Linked group: " << objectCache.m_linkedGroup << "\n";
+				}
 			}
 
 			objectInfoLabel->setString(ss.str().c_str());
