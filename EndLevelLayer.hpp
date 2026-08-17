@@ -20,6 +20,7 @@ namespace EndLevelLayer {
 		void onHideEndLayer(CCObject*);
 		void onShowEndLayer(CCObject*);
 		void updateCheatIndicator(float);
+		void onNoclipAccuracy(CCObject*);
 	};
 
 	void mem_init();

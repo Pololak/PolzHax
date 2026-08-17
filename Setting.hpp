@@ -129,8 +129,10 @@ struct SettingStruct {
 	bool onFrameStepper; int m_toggleStepper, m_backStepper, m_forwardStepper;
 	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
+	bool onHitboxMultiplier; float solidHitboxesMult = .5f, hazardHitboxesMult = .5f, sawHitboxesMult = .5f, specialHitboxesMult = .5f;
 	bool onHitboxes; bool onSolidHitboxes = true; bool onHazardHitboxes = true; bool onSpecialHitboxes = true; bool onPlayerHitboxes = true; int hitboxesOpacity = 255; int solidR = 0, solidG = 0, solidB = 255; int hazardR = 255, hazardG = 0, hazardB = 0; int specialR = 0, specialG = 255, specialB = 0; bool onTriggerHitboxes;
 	bool onHitboxesOnDeath, onDeathObjectOnly;
+	bool onHitboxTrail, onRequireShowHitboxes; int trailDrawLength = 120, hitboxTrailOpacity = 255;
 	bool onInstantComplete;
 	bool onInvisibleDualFix;
 	bool onJumpHack;
@@ -155,6 +157,7 @@ struct SettingStruct {
 	bool onAllowLowVolume;
 	bool onAutoSafeMode;
 	bool onDisableSongAlert;
+	bool onDiscordRichPresence;
 	bool onFastAltTab;
 	bool onForceVisibility;
 	bool onFreeWindowResize;
@@ -377,8 +380,10 @@ DEF_SCHEMA(
 	onFrameStepper, m_toggleStepper, m_backStepper, m_forwardStepper,
 	onFreezePlayer,
 	onHighFPSRotationFix,
+	onHitboxMultiplier, solidHitboxesMult, hazardHitboxesMult, sawHitboxesMult, specialHitboxesMult,
 	onHitboxes, onSolidHitboxes, onHazardHitboxes, onSpecialHitboxes, onPlayerHitboxes, hitboxesOpacity, solidR, solidG, solidB, hazardR, hazardG, hazardB, specialR, specialG, specialB, onTriggerHitboxes,
 	onHitboxesOnDeath, onDeathObjectOnly,
+	onHitboxTrail, onRequireShowHitboxes, trailDrawLength, hitboxTrailOpacity,
 	onInstantComplete,
 	onInvisibleDualFix,
 	onJumpHack,
@@ -402,6 +407,7 @@ DEF_SCHEMA(
 	onAllowLowVolume,
 	onAutoSafeMode,
 	onDisableSongAlert,
+	onDiscordRichPresence,
 	onFastAltTab,
 	onForceVisibility,
 	onFreeWindowResize,

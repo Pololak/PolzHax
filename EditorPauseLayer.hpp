@@ -40,6 +40,10 @@ namespace EditorPauseLayer {
 		void onEditorOptions(CCObject*);
 
 		void onResetStartPos(CCObject*);
+		void onFillDLines(CCObject*);
+
+		void onFixDefaultColors(CCObject*);
+		void onFixSlabsOffset(CCObject*);
 	};
 
 	void mem_init();

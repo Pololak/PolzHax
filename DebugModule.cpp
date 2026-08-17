@@ -134,6 +134,17 @@ void renderDebugModule() {
 			gd::GameSoundManager::playSound("playSound_01.ogg");
 		}
 
+		auto mdm = gd::MusicDownloadManager::sharedState();
+
+		static int songID = 0;
+		ImGui::InputInt("Song ID", &songID);
+		if (mdm->isSongDownloaded(songID)) {
+			auto songObject = mdm->getSongInfoObject(songID);
+			ImGui::Text("Name: %s", songObject->m_songName.c_str());
+			ImGui::Text("Artist: %s", songObject->m_artistName.c_str());
+			ImGui::Text("File Size: %.02fMB", songObject->m_fileSize);
+		}
+
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
 			if (ImGui::CollapsingHeader("Replay Events")) {
@@ -174,11 +185,29 @@ void renderDebugModule() {
 			}
 
 			ImGui::Text("Level time: %.12f", pl->m_levelTime);
+
+			if (ImGui::CollapsingHeader("Noclip Percentage")) {
+				auto noclipRuns = PlayLayer::getNoclipPercentage();
+				for (auto run : noclipRuns) {
+					ImGui::Text("%.2f%% - %.2f%%", run.first, run.second);
+				}
+			}
+
+			ImGui::Text("Accuracy: %.2f%%", PlayLayer::getNoclipAccuracy());
+
+			if (ImGui::CollapsingHeader("BG Color Action")) {
+				ImGui::Text("Duration: %.2f", pl->m_activeBGColorAction->m_duration);
+				ImGui::Text("TimeStamp: %.4f", pl->m_activeBGColorAction->m_timeStamp);
+				ImGui::Text("Blend: %s", pl->m_activeBGColorAction->m_blend ? "true" : "false");
+			}
 		}
 
 		auto editorLayer = LevelEditorLayer::get();
 		if (editorLayer) {
 			auto editorUI = editorLayer->m_uiLayer;
+
+			ImGui::DragFloat("Grid Size", &setting().m_customEditorGridSize);
+			ImGui::DragFloat("EditorUI::m_gridSize", &editorUI->m_gridSize);
 
 			ImGui::Text("Section: %i", editorLayer->sectionForPos(-(editorLayer->m_gameLayer->getPositionX()) / editorLayer->m_gameLayer->getScale() + CCDirector::sharedDirector()->getWinSize().width / 2.f));
 

@@ -20,6 +20,9 @@ namespace GameObject {
 	inline void(__thiscall* activatedByPlayer)(gd::GameObject*, gd::GameObject*);
 	void __fastcall activatedByPlayerH(gd::GameObject*, void*, gd::GameObject*);
 
+	inline CCRect* (__thiscall* getObjectRect)(gd::GameObject*, CCRect*, float, float);
+	CCRect* __fastcall getObjectRectH(gd::GameObject*, void*, CCRect*, float, float);
+
 	void mem_init();
 }
 

@@ -1,5 +1,8 @@
 #include "Hitboxes.hpp"
 #include "Setting.hpp"
+#include "LevelEditorLayer.hpp"
+
+std::deque<std::pair<CCRect, CCRect>> playerTrail;
 
 void Hitboxes::drawRect(CCDrawNode* drawer, CCRect const& rect, ccColor4F col) {
     constexpr size_t N = 4;
@@ -95,6 +98,25 @@ void Hitboxes::drawPlayerHitbox(gd::PlayerObject* player, CCDrawNode* drawNode)
     Hitboxes::drawRect(drawNode, rectRectangleSmall, { setting().solidR / 255.f, setting().solidG / 255.f, setting().solidB / 255.f, setting().hitboxesOpacity / 255.f });
     drawNode->drawPolygon(pointRectangle, 4, { 0, 0, 0, 0 }, 0.5, { (setting().hazardR / 255.f) / 2.f, (setting().hazardG / 255.f) / 2.f, (setting().hazardB / 255.f) / 2.f, setting().hitboxesOpacity / 255.f });
     Hitboxes::drawRect(drawNode, rectRectangle, { setting().hazardR / 255.f, setting().hazardG / 255.f, setting().hazardB / 255.f, setting().hitboxesOpacity / 255.f });
+
+    auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+    auto editorLayer = LevelEditorLayer::get();
+
+    if ((playLayer && !playLayer->m_isDead) || (editorLayer && editorLayer->m_playerState == 1)) {
+        if (playerTrail.size() > 0 && playerTrail.size() >= (setting().trailDrawLength * 2)) {
+            playerTrail.pop_front();
+        }
+        playerTrail.push_back({ rectRectangle, rectRectangleSmall });
+    }
+
+    if (setting().onHitboxTrail) {
+        if (playerTrail.size() > 0) {
+            for (int i = 0; i < playerTrail.size(); ++i) {
+                Hitboxes::drawRect(drawNode, playerTrail[i].second, { setting().solidR / 255.f, setting().solidG / 255.f, setting().solidB / 255.f, setting().hitboxTrailOpacity / 255.f });
+                Hitboxes::drawRect(drawNode, playerTrail[i].first, { setting().hazardR / 255.f, setting().hazardG / 255.f, setting().hazardB / 255.f, setting().hitboxTrailOpacity / 255.f });
+            }
+        }
+    }
 }
 
 void Hitboxes::drawSolidsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode) {
@@ -147,4 +169,8 @@ void Hitboxes::drawSpecialsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNod
     case 203:
         Hitboxes::drawRectObj(drawNode, obj, { setting().specialR / 255.f, setting().specialG / 255.f, setting().specialB / 255.f, setting().hitboxesOpacity / 255.f });
     }
+}
+
+void Hitboxes::clearHitboxTrail() {
+    playerTrail.clear();
 }

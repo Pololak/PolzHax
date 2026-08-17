@@ -1,6 +1,7 @@
 #include "EndLevelLayer.hpp"
 #include "PlayLayer.hpp"
 #include "Setting.hpp"
+#include "NoclipInfoLayer.hpp"
 
 cocos2d::CCSprite* m_completeSprite;
 
@@ -43,6 +44,12 @@ void EndLevelLayer::Callback::onLastCheckpoint(CCObject*) {
 		pl->resetLevel();
 		CCEGLView::sharedOpenGLView()->showCursor(gd::GameManager::sharedState()->getGameVariable("0024"));
 	}
+}
+
+void EndLevelLayer::Callback::onNoclipAccuracy(CCObject*) {
+	if (PlayLayer::getNoclipAccuracy() >= 100.f) return;
+
+	NoclipInfoLayer::create()->show();
 }
 
 void updateCheatIndicator2(gd::EndLevelLayer* self) {
@@ -99,6 +106,10 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 			safeModeLabel->setPosition(m_completeSprite->getPosition());
 			safeModeLabel->setScale(1.25f);
 			self->m_mainLayer->addChild(safeModeLabel, 15);
+
+			if (setting().onPlayMacro) {
+				safeModeLabel->setScale(1.20f); // hehehe
+			}
 		}
 
 		if (setting().onPlayMacro) {
@@ -130,7 +141,7 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 
 	updateCheatIndicator2(self);
 
-	auto versionLabel = CCLabelBMFont::create("v1.3.3 (V) 090826", "chatFont.fnt");
+	auto versionLabel = CCLabelBMFont::create("v1.3.3 (V) 170826", "chatFont.fnt");
 	versionLabel->setScale(.6f);
 	versionLabel->setAnchorPoint({ 0.f, 1.f });
 	versionLabel->setColor(ccc3(100, 100, 100));
@@ -138,21 +149,69 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	versionLabel->setPosition(winSize.width / 2.f - 162.f, winSize.height / 2.f + 105.25f);
 	self->m_mainLayer->addChild(versionLabel, 15);
 
-	if (playLayer->m_testMode && !playLayer->m_practiceMode) {
-		auto attemptsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(0);
-		auto jumpsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(1);
-		auto timeLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(2);
+	auto attemptsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(0);
+	auto jumpsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(1);
+	auto timeLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(2);
 
+	auto startPosLabel = CCLabelBMFont::create("", "goldFont.fnt");
+	startPosLabel->setScale(.8f);
+
+	auto noclipDeathsLabel = CCLabelBMFont::create("", "goldFont.fnt");
+	noclipDeathsLabel->setScale(.8f);
+
+	auto noclipAccuracyLabel = CCLabelBMFont::create("", "goldFont.fnt");
+	noclipAccuracyLabel->setScale(.8f);
+
+	if (playLayer->m_testMode && !playLayer->m_practiceMode && setting().onNoclip) {
+		attemptsLabel->setPosition(winSize.width / 2.f - 80.f, winSize.height / 2.f + 35.f);
+		jumpsLabel->setPosition(winSize.width / 2.f + 80.f, winSize.height / 2.f + 35.f);
+		timeLabel->setPosition(winSize.width / 2.f - 80.f, winSize.height / 2.f + 11.f);
+
+		startPosLabel->setPosition(winSize.width / 2.f + 80.f, winSize.height / 2.f + 11.f);
+		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
+		startPosLabel->setString(CCString::createWithFormat("StartPos: %i%%", startPosLevelPos)->getCString());
+		self->m_mainLayer->addChild(startPosLabel, 3);
+
+		noclipDeathsLabel->setPosition(winSize.width / 2.f - 80.f, winSize.height / 2.f - 13.f);
+		noclipDeathsLabel->setString(CCString::createWithFormat("Deaths: %i", PlayLayer::getDeathsFull())->getCString());
+		self->m_mainLayer->addChild(noclipDeathsLabel, 3);
+
+		noclipAccuracyLabel->setString(CCString::createWithFormat("Noclip: %.2f%%", PlayLayer::getNoclipAccuracy())->getCString());
+		auto onNoclipAccuracy = gd::CCMenuItemSpriteExtra::create(noclipAccuracyLabel, self, 0/*menu_selector(EndLevelLayer::Callback::onNoclipAccuracy)*/);
+		onNoclipAccuracy->setPosition(80.f, -13.f);
+		self->m_actionsMenu->addChild(onNoclipAccuracy, 3);
+
+		if (PlayLayer::getNoclipAccuracy() >= 100.f) {
+			onNoclipAccuracy->setEnabled(false);
+		}
+	}
+	else if (playLayer->m_testMode && !playLayer->m_practiceMode) {
 		attemptsLabel->setPositionY(attemptsLabel->getPositionY() + 10.f);
 		jumpsLabel->setPositionY(jumpsLabel->getPositionY() + 10.f);
 		timeLabel->setPositionY(timeLabel->getPositionY() + 10.f);
 
-		auto startPosLabel = CCLabelBMFont::create("", "goldFont.fnt");
-		startPosLabel->setScale(.8f);
 		startPosLabel->setPosition(winSize.width / 2.f, winSize.height / 2.f - 29.f);
 		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
 		startPosLabel->setString(CCString::createWithFormat("StartPos: %i%%", startPosLevelPos)->getCString());
 		self->m_mainLayer->addChild(startPosLabel, 3);
+	}
+	else if (setting().onNoclip) {
+		attemptsLabel->setPosition(winSize.width / 2.f - 80.f, winSize.height / 2.f + 35.f);
+		jumpsLabel->setPosition(winSize.width / 2.f + 80.f, winSize.height / 2.f + 35.f);
+		timeLabel->setPosition(winSize.width / 2.f - 80.f, winSize.height / 2.f + 11.f);
+
+		noclipDeathsLabel->setPosition(winSize.width / 2.f + 80.f, winSize.height / 2.f + 11.f);
+		noclipDeathsLabel->setString(CCString::createWithFormat("Deaths: %i", PlayLayer::getDeathsFull())->getCString());
+		self->m_mainLayer->addChild(noclipDeathsLabel, 3);
+
+		noclipAccuracyLabel->setString(CCString::createWithFormat("Noclip: %.2f%%", PlayLayer::getNoclipAccuracy())->getCString());
+		auto onNoclipAccuracy = gd::CCMenuItemSpriteExtra::create(noclipAccuracyLabel, self, 0/*menu_selector(EndLevelLayer::Callback::onNoclipAccuracy)*/);
+		onNoclipAccuracy->setPositionY(-13.f);
+		self->m_actionsMenu->addChild(onNoclipAccuracy, 3);
+
+		if (PlayLayer::getNoclipAccuracy() >= 100.f) {
+			onNoclipAccuracy->setEnabled(false);
+		}
 	}
 }
 

@@ -24,6 +24,7 @@
 #include "SpeedHack.h"
 #include "PitchShifter.hpp"
 #include "PolzBot.hpp"
+#include "DiscordManager.hpp"
 
 #include "portable-file-dialogs.h"
 #include <fstream>
@@ -1173,25 +1174,9 @@ void imgui_render() {
 	}
 
 	if (setting().show) {
-		if (setting().onCocosExplorer) {
-			renderCocosExplorer(setting().onCocosExplorer);
-		}
-
-		if (setting().onGDPSSwitcher) {
-			renderGDPSSwitcher(setting().onGDPSSwitcher);
-		}
-
-		if (setting().onDeveloperMode) {
-			renderDebugModule();
-		}
-
-		if (setting().onTextureManager) {
-			renderTextureManager(setting().onTextureManager);
-		}
-		
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (V) 090826");
+			ImGui::Text("1.920 - v1.3.3 (V) 170826");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -2669,6 +2654,41 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Fixed vehicles rotation on high fps (affects hitboxes).");
 
+			ImGui::CheckboxF("Hitbox Multiplier", &setting().onHitboxMultiplier);
+			ImGui::Tooltip("Changes the size of hitboxes.");
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##hitboxMultiplierSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragFloat("Solids", &setting().solidHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+					if (setting().solidHitboxesMult < .1f) setting().solidHitboxesMult = .1f;
+					if (setting().solidHitboxesMult > 5.f) setting().solidHitboxesMult = 5.f;
+				}
+
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragFloat("Hazards", &setting().hazardHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+					if (setting().hazardHitboxesMult < .1f) setting().hazardHitboxesMult = .1f;
+					if (setting().hazardHitboxesMult > 5.f) setting().hazardHitboxesMult = 5.f;
+				}
+
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragFloat("Saws", &setting().sawHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+					if (setting().sawHitboxesMult < .1f) setting().sawHitboxesMult = .1f;
+					if (setting().sawHitboxesMult > 5.f) setting().sawHitboxesMult = 5.f;
+				}
+
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragFloat("Specials", &setting().specialHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+					if (setting().specialHitboxesMult < .1f) setting().specialHitboxesMult = .1f;
+					if (setting().specialHitboxesMult > 5.f) setting().specialHitboxesMult = 5.f;
+				}
+
+				ImGui::TreePop();
+			}
+
 			if (ImGui::CheckboxF("Hitboxes", &setting().onHitboxes)) {
 				if (setting().onHitboxes) {
 					if (playLayer) {
@@ -2837,6 +2857,40 @@ void imgui_render() {
 
 					ImGui::TreePop();
 				}
+			}
+
+			ImGui::CheckboxF("Hitbox Trail", &setting().onHitboxTrail);
+			ImGui::Tooltip("Draw trail from player hitbox.");
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##hitboxTrailSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragInt("Length", &setting().trailDrawLength, 1, 0, 1000, "%d Frames")) {
+					if (setting().trailDrawLength < 0) setting().trailDrawLength = 0;
+
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
+
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragInt("Opacity", &setting().hitboxTrailOpacity, 1.f, 0, 255)) {
+					if (setting().hitboxTrailOpacity < 0) setting().hitboxTrailOpacity = 0;
+					if (setting().hitboxTrailOpacity > 255) setting().hitboxTrailOpacity = 255;
+
+					if (playLayer) {
+						PlayLayer::updateShowHitboxes();
+					}
+					if (editorLayer) {
+						LevelEditorLayer::updateShowHitboxes();
+					}
+				}
+
+				ImGui::TreePop();
 			}
 
 			if (ImGui::CheckboxF("Instant Complete", &setting().onInstantComplete)) {
@@ -3141,6 +3195,23 @@ void imgui_render() {
 				}
 			}
 			ImGui::Tooltip("Disables song alert when trying to play a level without downloaded song.");
+
+			if (ImGui::CheckboxF("Discord Rich Presence", &setting().onDiscordRichPresence)) {
+				auto& discordManager = DiscordManager::get();
+				if (setting().onDiscordRichPresence) {
+					discordManager.start();
+				}
+				else {
+					discordManager.stop();
+				}
+
+				if (playLayer) {
+					PlayLayer::updateDiscordPresence();
+				}
+				if (editorLayer) {
+					discordManager.updatePresence(discordManager.settingsForEditor(editorLayer));
+				}
+			}
 
 			if (ImGui::CheckboxF("Fast Alt-Tab", &setting().onFastAltTab)) {
 				if (setting().onFastAltTab) {
@@ -3892,6 +3963,22 @@ void imgui_render() {
 
 			//	ImGui::TreePop();
 			//}
+		}
+
+		if (setting().onCocosExplorer) {
+			renderCocosExplorer(setting().onCocosExplorer);
+		}
+
+		if (setting().onGDPSSwitcher) {
+			renderGDPSSwitcher(setting().onGDPSSwitcher);
+		}
+
+		if (setting().onDeveloperMode) {
+			renderDebugModule();
+		}
+
+		if (setting().onTextureManager) {
+			renderTextureManager(setting().onTextureManager);
 		}
 	}
 

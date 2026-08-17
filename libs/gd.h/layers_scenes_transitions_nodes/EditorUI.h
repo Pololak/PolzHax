@@ -256,6 +256,10 @@ namespace gd {
 		void selectObject(GameObject* object) {
 			reinterpret_cast<void(__thiscall*)(EditorUI*, GameObject*)>(base + 0x47f10)(this, object);
 		}
+
+		void tryUpdateTimeMarkers() {
+			reinterpret_cast<void(__fastcall*)(EditorUI*)>(base + 0x49610)(this);
+		}
 	};
 }
 

@@ -80,6 +80,8 @@ bool __fastcall MenuLayer::initH(gd::MenuLayer* self, void*) {
 		}
 	}
 
+	std::cout << getExeName() << std::endl;
+
 	return true;
 }
 

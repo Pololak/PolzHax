@@ -5,6 +5,7 @@
 #include "EditorOptionsLayer.hpp"
 #include "LevelEditorLayer.hpp"
 #include "RotateSaws.hpp"
+#include <unordered_set>
 
 bool __fastcall EditorPauseLayer::initH(gd::EditorPauseLayer* self, void*, gd::LevelEditorLayer* editorLayer) {
 	if (!EditorPauseLayer::init(self, editorLayer)) return false;
@@ -250,6 +251,46 @@ void EditorPauseLayer::Callback::onResetStartPos(CCObject*) {
 	}
 }
 
+std::unordered_set<int> m_dlOutlineObjects = {
+	506, 507, 508, 509, 510, 511, 512, 513, 514
+};
+
+void EditorPauseLayer::Callback::onFillDLines(CCObject*) {
+	auto editorLayer = this->m_levelEditorLayer;
+
+	if (editorLayer) {
+		auto editorUI = editorLayer->m_uiLayer;
+		auto selectedObjects = editorUI->m_selectedObjects;
+		for (auto object : CCArrayExt<gd::GameObject*>(selectedObjects)) {
+			if (object && m_dlOutlineObjects.contains(object->m_objectID)) {
+				if (object->m_objectID == 506) {
+					
+				}
+			}
+		}
+	}
+}
+
+void EditorPauseLayer::Callback::onFixDefaultColors(CCObject*) {
+	auto editorLayer = this->m_levelEditorLayer;
+
+	if (editorLayer) {
+		for (auto section : CCArrayExt<CCArray*>(editorLayer->m_levelSections)) {
+			if (section) {
+				for (auto object : CCArrayExt<gd::GameObject*>(section)) {
+					if (object && object->m_defaultColorMode == object->m_customColorMode) {
+						object->updateCustomColorMode(gd::GJCustomColorMode::Default, false);
+					}
+				}
+			}
+		}
+	}
+}
+
+void EditorPauseLayer::Callback::onFixSlabsOffset(CCObject*) {
+	setting().m_fixSlabOffset = !setting().m_fixSlabOffset;
+}
+
 void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 	EditorPauseLayer::customSetup(self);
 
@@ -378,6 +419,38 @@ void __fastcall EditorPauseLayer::customSetupH(gd::EditorPauseLayer* self) {
 	auto onResetStartPos = gd::CCMenuItemSpriteExtra::create(onResetStartPosSpr, self, menu_selector(EditorPauseLayer::Callback::onResetStartPos));
 	onResetStartPos->setPosition(bottom_menu->convertToNodeSpace({ director->getScreenRight() - 50.f, director->getScreenBottom() + 65.f }));
 	bottom_menu->addChild(onResetStartPos);
+
+	if (CCDirector::sharedDirector()->getKeyboardDispatcher()->getShiftKeyPressed() && setting().onDeveloperMode) {
+		auto developerLabel = CCLabelBMFont::create("Dev Options", "goldFont.fnt");
+		developerLabel->setScale(.4f);
+		developerLabel->setPosition(director->getScreenRight() - 50.f, director->getScreenTop() - 20.f);
+		self->addChild(developerLabel);
+
+		auto developerBackground = extension::CCScale9Sprite::create("square02_small.png");
+		developerBackground->setContentSize({ 80.f, 90.f });
+		developerBackground->setPosition(director->getScreenRight() - 50.f, director->getScreenTop() - 10.f);
+		developerBackground->setAnchorPoint({ .5f, 1.f });
+		developerBackground->setOpacity(100);
+		self->addChild(developerBackground, -1);
+
+		auto onFixDefaultColorsSpr = gd::ButtonSprite::create("Fix Def.  \nColors", 0x32, 0, .4f, true, "bigFont.fnt", "GJ_button_04.png", 30.f);
+		auto onFixDefaultColors = gd::CCMenuItemSpriteExtra::create(onFixDefaultColorsSpr, self, menu_selector(EditorPauseLayer::Callback::onFixDefaultColors));
+		onFixDefaultColors->setPosition(bottom_menu->convertToNodeSpace({ director->getScreenRight() - 50.f, director->getScreenTop() - 45.f }));
+		bottom_menu->addChild(onFixDefaultColors);
+
+		gd::GameToolbox::createToggleButton(
+			menu_selector(EditorPauseLayer::Callback::onFixSlabsOffset),
+			setting().m_fixSlabOffset,
+			bottom_menu,
+			self, self,
+			.7f, .4f, 40.f,
+			"bigFont.fnt",
+			false,
+			"Fix Slabs\nY Offset",
+			ccp(director->getScreenRight() - 72.5f, director->getScreenTop() - 80.f),
+			ccp(4.f, 0.f)
+		);
+	}
 }
 
 void __fastcall EditorPauseLayer::FLAlert_ClickedH(gd::EditorPauseLayer* _self, void*, gd::FLAlertLayer* layer, bool btn2) {

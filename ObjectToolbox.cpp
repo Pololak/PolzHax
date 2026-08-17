@@ -1,12 +1,17 @@
 #include "ObjectToolbox.hpp"
 #include "Setting.hpp"
 
-float __fastcall ObjectToolbox::gridNodeSizeForKeyH(gd::ObjectToolbox* self, void*, int id) {
-	auto size = setting().m_customEditorGridSize;
-	if (size < 1 || roundf(size) == 30) {
-		return ObjectToolbox::gridNodeSizeForKey(self, id);
+void __stdcall ObjectToolbox::gridNodeSizeForKeyH(int id) {
+	float gridSize = setting().m_customEditorGridSize;
+
+	if (gridSize < 1.f || roundf(gridSize) == 30.f) {
+		return ObjectToolbox::gridNodeSizeForKey(id);
 	}
-	return size;
+
+	__asm {
+		movss xmm0, gridSize
+		add esp, 0x4
+	}
 }
 
 void ObjectToolbox::mem_init() {

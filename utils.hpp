@@ -20,6 +20,12 @@ inline auto getExePath() {
 	return std::filesystem::path(buffer).parent_path();
 }
 
+inline auto getExeName() {
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(GetModuleHandleA(NULL), buffer, MAX_PATH);
+	return std::filesystem::path(buffer).stem().string();
+}
+
 inline std::pair<std::string, std::string> split_once(const std::string& str, char split) {
 	const auto n = str.find(split);
 	return { str.substr(0, n), str.substr(n + 1) };
@@ -649,6 +655,38 @@ inline bool compareCCArrays(CCArray* firstArray, CCArray* secondArray) {
 	}
 	return true;
 }
+
+inline float getFps(bool only_read) {
+	static auto lastTime = std::chrono::high_resolution_clock::now();
+	static float frameTimes[240] = {}, frameTimeSum = 0.0f, accumulatedTime = 0.0f, cachedFps = 0.0f;
+	static int index = 0, count = 0;
+	static bool ready = false;
+
+	if (only_read) {
+		return cachedFps;
+	}
+
+	auto now = std::chrono::high_resolution_clock::now();
+	float deltaTime = std::chrono::duration<float>(now - lastTime).count();
+	lastTime = now;
+
+	frameTimeSum -= frameTimes[index];
+	frameTimeSum += frameTimes[index] = deltaTime;
+	index = (index + 1) % 240;
+	if (count < 240) count++;
+
+	accumulatedTime += deltaTime;
+	if (!ready || accumulatedTime >= 1.0f) {
+		cachedFps = static_cast<float>(count) / frameTimeSum;
+		if (accumulatedTime >= 1.0f) {
+			accumulatedTime = 0.0f;
+			ready = true;
+		}
+	}
+
+	return cachedFps;
+}
+
 
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });

@@ -1,10 +1,10 @@
 #include "LoadingLayer.hpp"
 #include "Setting.hpp"
 #include <filesystem>
+#include "DiscordManager.hpp"
+#include "utils.hpp"
 
 bool __fastcall LoadingLayer::initH(gd::LoadingLayer* self, void*, bool reload) {
-	CCTexture2D::setDefaultAlphaPixelFormat(cocos2d::CCTexture2DPixelFormat::kCCTexture2DPixelFormat_RGBA8888);
-	
 	auto fileUtils = CCFileUtils::sharedFileUtils();
 	fileUtils->removeAllPaths();
 	fileUtils->addSearchPath((fileUtils->getWritablePath2() + "PolzHax\\texturePacks").c_str());
@@ -21,6 +21,10 @@ bool __fastcall LoadingLayer::initH(gd::LoadingLayer* self, void*, bool reload) 
 		gd::FMODAudioEngine::sharedEngine()->m_filePath.clear();
 		gd::GameSoundManager::sharedState()->m_preloaded = false;
 		gd::GameSoundManager::sharedState()->preload();
+	}
+
+	if (setting().onDiscordRichPresence) {
+		DiscordManager::get().start();
 	}
 
 	if (!LoadingLayer::init(self, reload)) return false;

@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <deque>
 
 namespace Hitboxes {
 	void drawRect(CCDrawNode* drawer, CCRect const& rect, ccColor4F col);
@@ -11,4 +12,6 @@ namespace Hitboxes {
 	void drawHazardsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode);
 	void drawSpecialsObjectHitbox(gd::GameObject* obj, CCDrawNode* drawNode);
 	void drawObjectHitbox(CCDrawNode*, gd::GameObject*);
+	void drawPlayerHitboxTrail(CCDrawNode*);
+	void clearHitboxTrail();
 }

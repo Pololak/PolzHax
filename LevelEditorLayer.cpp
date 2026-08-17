@@ -8,6 +8,7 @@
 #include "Hitboxes.hpp"
 #include "RotateSaws.hpp"
 #include "PolzBot.hpp"
+#include "DiscordManager.hpp"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -736,6 +737,10 @@ bool __fastcall LevelEditorLayer::initH(gd::LevelEditorLayer* self, void*, gd::G
 		createGroundLayer();
 	}
 
+	if (setting().onDiscordRichPresence) {
+		DiscordManager::get().updatePresence(DiscordManager::get().settingsForEditor(self));
+	}
+
 	return true;
 }
 
@@ -801,7 +806,7 @@ void __fastcall LevelEditorLayer::updateH(gd::LevelEditorLayer* self, void*, flo
 				}
 			}
 			else {
-				while (PolzBot::m_eventIndex < events.size() && self->m_player->m_realPlayerPos.x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
+				while (PolzBot::m_eventIndex < events.size() && x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
 					if (event.down) self->pushButton(0, !event.p2);
 					else self->releaseButton(0, !event.p2);
 					++PolzBot::m_eventIndex;
@@ -917,6 +922,8 @@ void runCustomPlaytest(gd::LevelEditorLayer* self, gd::StartPosObject* startPos)
 
 void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
 	gd::StartPosObject* selectedPlaytestStartPos = self->m_startPosObject;
+	Hitboxes::clearHitboxTrail();
+
 	LevelEditorLayer::onPlaytest(self);
 
 	bool fromSelectedStartPos = false;
@@ -945,6 +952,10 @@ void __fastcall LevelEditorLayer::onPlaytestH(gd::LevelEditorLayer* self) {
 	LevelEditorLayer::updateOrientedHitboxes(self);
 
 	if (setting().onPreviewRotations) RotateSaws::beginRotations(self);
+
+	if (setting().onDiscordRichPresence) {
+		DiscordManager::get().updatePresence(DiscordManager::get().settingsForEditor(self));
+	}
 }
 
 void __fastcall LevelEditorLayer::onResumePlaytestH(gd::LevelEditorLayer* self) {
@@ -970,6 +981,10 @@ void __fastcall LevelEditorLayer::onStopPlaytestH(gd::LevelEditorLayer* self) {
 	}
 
 	PolzBot::m_eventIndex = 0;
+
+	if (setting().onDiscordRichPresence) {
+		DiscordManager::get().updatePresence(DiscordManager::get().settingsForEditor(self));
+	}
 }
 
 void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*, int p0, bool p1) {
@@ -1048,18 +1063,25 @@ void __fastcall LevelEditorLayer::destructorH(gd::LevelEditorLayer* self) {
 	m_colorTriggers.clear();
 	m_currentColor.clear();
 	m_lastPos = 0.f;
+	isEditorPaused = false;
+	wasPreviewModeEnabled = false;
 	m_blendingBatchNode = nullptr;
 	m_playtestStartPos = nullptr;
 	m_groundLayer = nullptr;
-	m_editorLayer = nullptr;
 	m_gameObjectStickyCache.clear();
 
 	if (m_stickyGroups != nullptr) {
 		m_stickyGroups->release();
 		m_stickyGroups = nullptr;
 	}
-
 	m_stickyGroupID = 0;
+	
+	m_editorLayer = nullptr;
+
+	if (setting().onDiscordRichPresence) {
+		PresenceSettings settings;
+		DiscordManager::get().updatePresence(settings);
+	}
 }
 
 void LevelEditorLayer::mem_init() {

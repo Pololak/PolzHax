@@ -7,6 +7,7 @@
 
 static CCNode* selected_node = nullptr;
 static bool reached_selected_node;
+static CCNode* hovered_node = nullptr;
 
 bool operator!=(const cocos2d::CCSize& a, const cocos2d::CCSize& b) { return a.width != b.width || a.height != b.height; }
 ImVec2 operator*(const ImVec2& vec, const float m) { return { vec.x * m, vec.y * m }; }
@@ -58,8 +59,17 @@ void render_node_tree(CCNode* node, const size_t index) {
 	const auto children_count = node->getChildrenCount();
 	const bool open = ImGui::TreeNodeEx(node, flags, "[%d] %s {%d}", index, name_for_node(node), children_count);
 	if (ImGui::IsItemClicked()) {
-		selected_node = node;
-		reached_selected_node = true;
+		if (node == selected_node && ImGui::GetIO().KeyAlt) {
+			selected_node = nullptr;
+			reached_selected_node = false;
+		}
+		else {
+			selected_node = node;
+			reached_selected_node = true;
+		}
+	}
+	if (ImGui::IsItemHovered()) {
+		hovered_node = node;
 	}
 	if (open) {
 		const auto children = node->getChildren();
@@ -446,12 +456,45 @@ void render_node_properties(CCNode* node) {
 	}
 }
 
+void render_node_highlight(CCNode* node, bool selected) {
+	auto& foreground = *ImGui::GetForegroundDrawList();
+	auto parent = node->getParent();
+	auto bounding_box = node->boundingBox();
+	CCPoint bb_min(bounding_box.getMinX(), bounding_box.getMinY());
+	CCPoint bb_max(bounding_box.getMaxX(), bounding_box.getMaxY());
+
+	auto camera_parent = node;
+	while (camera_parent) {
+		auto camera = camera_parent->getCamera();
+
+		float off_x, off_y, off_z;
+		camera->getEyeXYZ(&off_x, &off_y, &off_z);
+		const CCPoint offset(off_x, off_y);
+		bb_min -= offset;
+		bb_max -= offset;
+
+		camera_parent = camera_parent->getParent();
+	}
+
+	auto min = cocos_to_vec2(parent ? parent->convertToWorldSpace(bb_min) : bb_min);
+	auto max = cocos_to_vec2(parent ? parent->convertToWorldSpace(bb_max) : bb_max);
+	foreground.AddRectFilled(min, max, selected ? IM_COL32(200, 200, 255, 60) : IM_COL32(255, 255, 255, 70));
+}
+
 void renderCocosExplorer(bool& open) {
 	ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Cocos Explorer", &open)) {
+	static bool highlight = false;
+	hovered_node = nullptr;
+
+	if (ImGui::Begin("Cocos Explorer", &open, ImGuiWindowFlags_HorizontalScrollbar/* | ImGuiWindowFlags_MenuBar*/)) {
 		reached_selected_node = false;
 		auto node = CCDirector::sharedDirector()->getRunningScene();
+
+		//if (ImGui::BeginMenuBar()) {
+		//	ImGui::MenuItem("Highlight", nullptr, &highlight);
+		//	ImGui::EndMenuBar();
+		//}
 
 		const auto avail = ImGui::GetContentRegionAvail();
 
@@ -477,4 +520,13 @@ void renderCocosExplorer(bool& open) {
 		ImGui::EndChild();
 	}
 	ImGui::End();
+
+	if (highlight && (selected_node || hovered_node)) {
+		if (selected_node) {
+			render_node_highlight(selected_node, true);
+		}
+		if (hovered_node) {
+			render_node_highlight(hovered_node, false);
+		}
+	}
 }

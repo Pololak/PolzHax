@@ -2,8 +2,8 @@
 #include "pch.h"
 
 namespace ObjectToolbox {
-	inline float(__thiscall* gridNodeSizeForKey)(gd::ObjectToolbox*, int);
-	float __fastcall gridNodeSizeForKeyH(gd::ObjectToolbox*, void*, int);
+	inline void(__stdcall* gridNodeSizeForKey)(int);
+	void __stdcall gridNodeSizeForKeyH(int);
 
 	void mem_init();
 }

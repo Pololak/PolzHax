@@ -16,6 +16,10 @@ namespace gd {
 		const char* intKeyToFrame(int key) {
 			return m_keyToFrameDict->valueForKey(key)->getCString();
 		}
+
+		float gridNodeSizeForKey(int key) {
+			return reinterpret_cast<float(__thiscall*)(ObjectToolbox*, int)>(base + 0xcfc90)(this, key);
+		}
 	};
 }
 

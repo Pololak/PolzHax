@@ -11,6 +11,7 @@
 #include <numeric>
 #include <unordered_map>
 #include "PolzBot.hpp"
+#include "DiscordManager.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -34,6 +35,11 @@ std::vector<gd::GameObject*> m_dualPortals, m_gamemodePortals, m_miniPortals, m_
 std::unordered_map<gd::StartPosObject*, std::pair<float, float>> m_startPositionsBestRun; // first = best run, second = compare best run
 
 std::unordered_map<gd::CheckpointObject*, CheckpointStorage> m_checkpointStorage;
+
+std::vector<std::pair<float, float>> m_noclipPercentage;
+std::vector<std::pair<float, float>> PlayLayer::getNoclipPercentage() {
+	return m_noclipPercentage;
+}
 
 gd::GameObject* m_portalRef;
 gd::GameObject* m_dualPortalRef;
@@ -71,11 +77,21 @@ int m_deaths;
 int m_deathsFull;
 float m_totalDelta;
 float m_prevX;
+float m_noclipAccuracy;
 CCLabelBMFont* m_metaLabel = nullptr;
 unsigned int m_frameOffset;
 CCLabelBMFont* m_botEventsOddAlert = nullptr;
 bool m_botPush;
 bool m_botRelease;
+float m_postNoclipDeathValueIdk;
+
+float PlayLayer::getNoclipAccuracy() {
+	return m_noclipAccuracy;
+}
+
+int PlayLayer::getDeathsFull() {
+	return m_deathsFull;
+}
 
 bool m_cheatingBeforeRestart;
 
@@ -593,14 +609,7 @@ void updateNoclipAccuracyLabel(bool tintRed = false) {
 			m_noclipAccuracyLabel->runAction(CCTintTo::create(.1f, 255, 255, 255));
 		}
 
-		float accuracy = 100.f;
-		if (m_noclipFrames != 0) {
-			accuracy = (float(m_noclipFrames - m_deaths) / float(m_noclipFrames)) * 100.f;
-		}
-
-		if (!playLayer->m_endTriggered) {
-			m_noclipAccuracyLabel->setString(CCString::createWithFormat((prefix + "%.2f%%").c_str(), accuracy)->getCString());
-		}
+		m_noclipAccuracyLabel->setString(CCString::createWithFormat((prefix + "%.2f%%").c_str(), m_noclipAccuracy)->getCString());
 	}
 }
 
@@ -832,6 +841,26 @@ unsigned int PlayLayer::getCurrentFrame() {
 	return 0;
 }
 
+void PlayLayer::updateDiscordPresence() {
+	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+	if (playLayer == nullptr) return;
+
+	if (setting().onDiscordRichPresence) {
+		if (roundf(m_lastRun) >= m_bestRunPercentage) {
+			m_bestRunPercentage = roundf(m_lastRun);
+		}
+
+		auto settings = DiscordManager::get().settingsForLevel(playLayer->m_level);
+		if (!playLayer->m_practiceMode && !playLayer->m_testMode) {
+			settings.state = "Best Run: " + std::string(CCString::createWithFormat("%.0f%%", m_bestRunPercentage)->getCString());
+		}
+		else if (playLayer->m_practiceMode || playLayer->m_testMode) {
+			settings.state = "Practicing a level";
+		}
+		DiscordManager::get().updatePresence(settings);
+	}
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpointStorage.clear();
@@ -877,6 +906,7 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_deathsFull = 0;
 	m_totalDelta = 0;
 	m_prevX = 0;
+	m_noclipAccuracy = 100.f;
 
 	m_currentFrame = 0;
 	m_frameOffset = 0;
@@ -885,6 +915,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	m_botPush = false;
 	m_botRelease = false;
+
+	Hitboxes::clearHitboxTrail();
 
 	if (!PlayLayer::init(self, level)) return false;
 
@@ -1018,6 +1050,10 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_botEventsOddAlert->setScale(.25f);
 	m_botEventsOddAlert->setVisible(false);
 	self->addChild(m_botEventsOddAlert, 35);
+
+	if (setting().onDiscordRichPresence) {
+		PlayLayer::updateDiscordPresence();
+	}
 
 	return true;
 }
@@ -1164,6 +1200,11 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		}
 		if (m_totalDelta >= .1f && playerXPos != m_prevX && !m_prevDied) {
 			m_deathsFull += 1;
+			std::cout << "Dead" << std::endl;
+			//m_noclipPercentage.push_back({ playerPercentPos, 0.f }); // this shit is so unstable
+		}
+		else {
+			//m_noclipPercentage.back().second = playerPercentPos;
 		}
 		m_prevDied = true;
 	}
@@ -1172,6 +1213,12 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	m_prevX = playerXPos;
+
+	if (!self->m_endTriggered) {
+		if (m_noclipFrames != 0) {
+			m_noclipAccuracy = (float(m_noclipFrames - m_deaths) / float(m_noclipFrames)) * 100.f;
+		}
+	}
 
 	updateCheatIndicator();
 	updateMessageLabel();
@@ -1222,7 +1269,11 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 		PlayLayer::setupReplay(self, self->m_level->m_recordString);
 	}
 
+	m_noclipAccuracy = 100.f;
+
 	PlayLayer::resetLevel(self);
+
+	Hitboxes::clearHitboxTrail();
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
 
@@ -1363,6 +1414,14 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	if (m_botEventsOddAlert && setting().onRecordMacro) {
 		m_botEventsOddAlert->setVisible(PolzBot::m_replayEventsVec.size() % 2 != 0);
 	}
+
+	if (PauseLayer::get()) {
+		CCEGLView::sharedOpenGLView()->showCursor(true);
+	}
+
+	if (setting().onDiscordRichPresence) {
+		PlayLayer::updateDiscordPresence();
+	}
 }
 
 void __fastcall PlayLayer::addToSectionH(gd::PlayLayer* self, void*, gd::GameObject* object) {
@@ -1436,6 +1495,10 @@ void __fastcall PlayLayer::togglePracticeModeH(gd::PlayLayer* self, void*, bool 
 
 	if (setting().onHidePracticeButtons) {
 		self->m_uiLayer->m_checkpointMenu->setVisible(!setting().onHidePracticeButtons);
+	}
+
+	if (setting().onDiscordRichPresence) {
+		PlayLayer::updateDiscordPresence();
 	}
 }
 
@@ -1770,8 +1833,29 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 //	
 //}
 
+void __fastcall PlayLayer::updateColorH(gd::PlayLayer* self, void*, cocos2d::ccColor3B const& color, int channel) {
+	float duration = 0.f;
+	__asm {
+		movss duration, xmm2;
+	}
+
+	PlayLayer::updateColor(self, color, channel);
+}
+
 void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	PlayLayer::destructor(self);
+	m_coinsToPickup.clear();
+	m_deathObject = nullptr;
+	m_startPositions.clear();
+	m_dualPortals.clear();
+	m_gamemodePortals.clear();
+	m_miniPortals.clear();
+	m_speedChanges.clear();
+	m_mirrorPortals.clear();
+	m_startPositionsBestRun.clear();
+	m_checkpointStorage.clear();
+	m_portalRef = nullptr;
+	m_dualPortalRef = nullptr;
 	m_labelsNode = nullptr;
 	m_cheatIndicatorLabel = nullptr;
 	m_messageLabel = nullptr;
@@ -1785,6 +1869,11 @@ void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	m_noclipDeathsLabel = nullptr;
 	m_metaLabel = nullptr;
 	m_botEventsOddAlert = nullptr;
+
+	if (setting().onDiscordRichPresence) {
+		PresenceSettings settings;
+		DiscordManager::get().updatePresence(settings);
+	}
 }
 
 void PlayLayer::mem_init() {
@@ -1808,6 +1897,7 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0a00), PlayLayer::pushButtonH, reinterpret_cast<void**>(&PlayLayer::pushButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0af0), PlayLayer::releaseButtonH, reinterpret_cast<void**>(&PlayLayer::releaseButton));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeca90), PlayLayer::updateColorH, reinterpret_cast<void**>(&PlayLayer::updateColor));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xea180), PlayLayer::checkCollisionsH, reinterpret_cast<void**>(&PlayLayer::checkCollisions));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee5e0), PlayLayer::drawH, reinterpret_cast<void**>(&PlayLayer::draw));
 

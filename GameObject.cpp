@@ -42,6 +42,7 @@ bool __fastcall GameObject::shouldBlendColorH(gd::GameObject* self) {
 			return LevelEditorLayer::isColorBlending(self->getColorMode());
 			break;
 		default: break;
+		case static_cast<gd::GJCustomColorMode>(9): return false;
 		}
 		return false;
 	}
@@ -75,6 +76,11 @@ void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
 //	std::cout << std::boolalpha << p0->m_hasBeenActivatedP1 << std::endl;
 //}
 
+CCRect* __fastcall GameObject::getObjectRectH(gd::GameObject* self, void*, CCRect* rect, float x, float y) {
+
+	return GameObject::getObjectRect(self, rect, x, y);
+}
+
 void GameObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6ee50), GameObject::customSetupH, reinterpret_cast<void**>(&GameObject::customSetup));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x756b0), GameObject::getEditorColorH, reinterpret_cast<void**>(&GameObject::getEditorColor));
@@ -82,6 +88,7 @@ void GameObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x736e0), GameObject::playShineEffectH, reinterpret_cast<void**>(&GameObject::playShineEffect));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x6e230), GameObject::triggerObjectH, reinterpret_cast<void**>(&GameObject::triggerObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x75980), GameObject::activatedByPlayerH, reinterpret_cast<void**>(&GameObject::activatedByPlayer));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x722e0), GameObject::getObjectRectH, reinterpret_cast<void**>(&GameObject::getObjectRect));
 }
 
 void RingObject::mem_init() {

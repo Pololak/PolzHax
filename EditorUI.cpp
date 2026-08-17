@@ -12,6 +12,7 @@
 #include "RotateSaws.hpp"
 #include "NewCustomizeObjectLayer.hpp"
 #include "CircleToolPopup.hpp"
+#include "DiscordManager.hpp"
 
 gd::EditorUI* m_editorUI;
 
@@ -253,32 +254,12 @@ void EditorUI::Callback::onGridSize(CCObject* sender) {
 	}
 }
 
-void EditorUI::setupStartPos(gd::EditorUI* self, gd::StartPosObject* startPos) {
-	if (!startPos) return;
-
-	gd::LevelSettingsObject* startPosSettings = startPos->m_settings;
-	gd::LevelSettingsObject* levelSettings = self->m_editorLayer->m_levelSettings;
-
-	startPosSettings->m_startDual = levelSettings->m_startDual;
-	startPosSettings->m_startMode = levelSettings->m_startMode;
-	startPosSettings->m_startMini = levelSettings->m_startMini;
-	startPosSettings->m_startSpeed = levelSettings->m_startSpeed;
-
-	gd::GameObject* obj = getClosestObject(LevelEditorLayer::m_gamemodePortals, startPos);
-	if (obj) {
-		switch (obj->m_objectID) {
-		case 12:
-			startPosSettings->m_startMode = 0; break;
-		case 13:
-			startPosSettings->m_startMode = 1; break;
-		case 74:
-			startPosSettings->m_startMode = 2; break;
-		case 111:
-			startPosSettings->m_startMode = 3; break;
-		case 660:
-			startPosSettings->m_startMode = 4; break;
-		default: break;
-		}
+void EditorUI::Callback::onCircleTool(CCObject*) {
+	if (this->getSelectedObjects()->count()) {
+		CircleToolPopup::create()->show();
+	}
+	else {
+		gd::FLAlertLayer::create("Circle Tool", "You must first select the objects.", "OK")->show();
 	}
 }
 
@@ -639,6 +620,10 @@ void __fastcall EditorUI::updateButtonsH(gd::EditorUI* self, void*) {
 	}
 
 	updateObjectInfoLabel(self);
+
+	if (setting().onDiscordRichPresence) {
+		DiscordManager::get().updatePresence(DiscordManager::get().settingsForEditor(self->m_editorLayer));
+	}
 }
 
 void __fastcall EditorUI::clickOnPositionH(gd::EditorUI* self, void*, cocos2d::CCPoint pos) {
@@ -813,11 +798,8 @@ bool touchIntersectsInput(gd::CCTextInputNode* input, CCTouch* touch) {
 		return true;
 }
 
-bool m_isHoldingInEditor;
-
 bool __fastcall EditorUI::ccTouchBeganH(gd::EditorUI* _self, void*, CCTouch* touch, CCEvent* event) {
 	auto self = reinterpret_cast<gd::EditorUI*>(reinterpret_cast<uintptr_t>(_self) - 0xe8);
-	m_isHoldingInEditor = true;
 
 	auto editorLayerInput = static_cast<EditorLayerInput*>(self->getChildByTag(2703));
 	if (editorLayerInput) {
@@ -827,13 +809,10 @@ bool __fastcall EditorUI::ccTouchBeganH(gd::EditorUI* _self, void*, CCTouch* tou
 	return EditorUI::ccTouchBegan(_self, touch, event);
 }
 
-void __fastcall EditorUI::ccTouchEndedH(gd::EditorUI* self, void*, CCTouch* touch, CCEvent* event) {
-	m_isHoldingInEditor = false;
-	return EditorUI::ccTouchEnded(self, touch, event);
-}
-
 void __fastcall EditorUI::onPlaytestH(gd::EditorUI* self, void*, CCObject* obj) {
-	if (!m_isHoldingInEditor) EditorUI::onPlaytest(self, obj);
+	EditorUI::onPlaytest(self, obj);
+
+	self->m_touchID = -1;
 }
 
 void __fastcall EditorUI::scrollWheelH(gd::EditorUI* _self, void*, float dy, float dx) { // From BEv6
@@ -974,8 +953,8 @@ void __fastcall EditorUI::onDuplicateH(gd::EditorUI* self, void*, CCObject* send
 }
 
 void __fastcall EditorUI::updateGridNodeSizeH(gd::EditorUI* self) {
-	auto size = setting().m_customEditorGridSize;
-	if (size < 1 || roundf(size) == 30) {
+	float gridSize = setting().m_customEditorGridSize;
+	if (gridSize < 1.f || roundf(gridSize) == 30.f) {
 		return EditorUI::updateGridNodeSize(self);
 	}
 
@@ -1021,6 +1000,12 @@ void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* sende
 	EditorUI::editObject(self, sender);
 }
 
+void __fastcall EditorUI::onToggleGuideH(gd::EditorUI* self, void*, CCObject* sender) {
+	EditorUI::onToggleGuide(self, sender);
+
+	self->tryUpdateTimeMarkers();
+}
+
 //void __fastcall EditorUI::setupCreateMenuH(gd::EditorUI* self) {
 //	EditorUI::setupCreateMenu(self);
 //
@@ -1056,15 +1041,6 @@ void __fastcall EditorUI::editObjectH(gd::EditorUI* self, void*, CCObject* sende
 //	self->updateCreateMenu(false);
 //}
 
-void EditorUI::Callback::onCircleTool(CCObject*) {
-	if (this->getSelectedObjects()->count()) {
-		CircleToolPopup::create()->show();
-	}
-	else {
-		gd::FLAlertLayer::create("Circle Tool", "You must first select the objects.", "OK")->show();
-	}
-}
-
 void __fastcall EditorUI::destructorH(gd::EditorUI* self) {
 	saveClipboard(self);
 	EditorUI::destructor(self);
@@ -1093,7 +1069,7 @@ void EditorUI::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4af50), EditorUI::onGroupUpH, reinterpret_cast<void**>(&EditorUI::onGroupUp));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4d5e0), EditorUI::ccTouchBeganH, reinterpret_cast<void**>(&EditorUI::ccTouchBegan));
-	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4de40), EditorUI::ccTouchEndedH, reinterpret_cast<void**>(&EditorUI::ccTouchEnded));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4de40), EditorUI::ccTouchEndedH, reinterpret_cast<void**>(&EditorUI::ccTouchEnded));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x489c0), EditorUI::onPlaytestH, reinterpret_cast<void**>(&EditorUI::onPlaytest));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee90), EditorUI::scrollWheelH, reinterpret_cast<void**>(&EditorUI::scrollWheel));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x47400), EditorUI::onCreateButtonH, reinterpret_cast<void**>(&EditorUI::onCreateButton));
@@ -1103,6 +1079,7 @@ void EditorUI::mem_init() {
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x49680), EditorUI::editButtonUsableH, reinterpret_cast<void**>(&EditorUI::editButtonUsable));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ae20), EditorUI::editObjectH, reinterpret_cast<void**>(&EditorUI::editObject));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x43590), EditorUI::setupCreateMenuH, reinterpret_cast<void**>(&EditorUI::setupCreateMenu));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x41d10), EditorUI::onToggleGuideH, reinterpret_cast<void**>(&EditorUI::onToggleGuide));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4e550), EditorUI::keyDownH, reinterpret_cast<void**>(&EditorUI::keyDown));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x4ee40), EditorUI::keyUpH, reinterpret_cast<void**>(&EditorUI::keyUp));

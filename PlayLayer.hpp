@@ -70,6 +70,9 @@ namespace PlayLayer {
 	inline void(__thiscall* checkCollisions)(gd::PlayLayer*, gd::PlayerObject*);
 	void __fastcall checkCollisionsH(gd::PlayLayer*, void*, gd::PlayerObject*);
 
+	inline void(__thiscall* updateColor)(gd::PlayLayer*, cocos2d::ccColor3B const&, int);
+	void __fastcall updateColorH(gd::PlayLayer*, void*, cocos2d::ccColor3B const&, int);
+
 	inline void(__thiscall* draw)(gd::PlayLayer*);
 	void __fastcall drawH(gd::PlayLayer*);
 
@@ -84,6 +87,9 @@ namespace PlayLayer {
 	int getCurrentStartPos();
 	std::vector<gd::StartPosObject*> getStartPositions();
 	unsigned int getCurrentFrame();
+	std::vector<std::pair<float, float>> getNoclipPercentage();
+	float getNoclipAccuracy();
+	int getDeathsFull();
 
 	void updateShowHitboxes();
 	void clearHitboxes();
@@ -94,6 +100,7 @@ namespace PlayLayer {
 	void updatePlayerColors();
 	void updateStatusLabels();
 	void updateStartPosSwitcherLabel();
+	void updateDiscordPresence();
 
 	void mem_init();
 }
