@@ -200,7 +200,7 @@ public:
     GLFWmonitor* m_pPrimaryMonitor;
 public:
     // @note RobTop Addition
-    CC_SYNTHESIZE(CCSize, m_obWindowedSize, WindowedSize);
+    CCSize m_obWindowedSize;
 
     // @note RobTop Addition
     float m_fMouseX;

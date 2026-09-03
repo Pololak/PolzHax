@@ -5,6 +5,7 @@
 
 // Hooks
 #include "BoomScrollLayer.hpp"
+#include "CCEGLViewHook.hpp"
 #include "CCSchedulerHook.hpp"
 #include "ColorSelectPopup.hpp"
 #include "CustomizeObjectLayer.hpp"
@@ -284,20 +285,24 @@ void __fastcall AppDelegate_applicationDidEnterBackgroundH(gd::AppDelegate* self
 inline void(__thiscall* AppDelegate_applicationWillEnterForeground)(gd::AppDelegate*);
 void __fastcall AppDelegate_applicationWillEnterForegroundH(gd::AppDelegate* self) {
 	AppDelegate_applicationWillEnterForeground(self);
+	ImGui::GetIO().ClearInputKeys();
+
 	if (setting().onAutoSave) {
 		setting().save();
 	}
 
-	texturePacks.clear();
-	texturePacks.push_back("Base");
-	auto texturePacksPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/texturepacks";
-	for (const auto& directory : std::filesystem::directory_iterator(texturePacksPath)) {
-		if (directory.is_directory()) {
-			texturePacks.push_back(directory.path().filename().string());
+	if (gd::GameManager::sharedState()->m_loaded) {
+		texturePacks.clear();
+		texturePacks.push_back("Base");
+		auto texturePacksPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/texturepacks";
+		for (const auto& directory : std::filesystem::directory_iterator(texturePacksPath)) {
+			if (directory.is_directory()) {
+				texturePacks.push_back(directory.path().filename().string());
+			}
 		}
-	}
 
-	PolzBot::updateReplayList();
+		PolzBot::updateReplayList();
+	}
 }
 
 bool debugCheck() {
@@ -348,6 +353,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x613f0), GJGameLevel_createH, reinterpret_cast<void**>(&GJGameLevel_create));
 
 	//BoomScrollLayer::mem_init();
+	CCEGLViewHook::mem_init();
 	CCSchedulerHook::mem_init();
 	ColorSelectPopup::mem_init();
 	CustomizeObjectLayer::mem_init();
@@ -383,7 +389,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	SetGroupIDLayer::mem_init();
 	//ShareLevelLayer::mem_init();
 	SimplePlayer::mem_init();
-	VideoOptionsLayer::mem_init();
+	//VideoOptionsLayer::mem_init();
 	UILayer::mem_init();
 
 	setupImGuiMenu();

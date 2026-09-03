@@ -2,6 +2,7 @@
 #include "LevelEditorLayer.hpp"
 #include "Setting.hpp"
 #include "PracticeFix.hpp"
+#include "utils.hpp"
 
 void __fastcall GameObject::customSetupH(gd::GameObject* self) {
 	GameObject::customSetup(self);
@@ -57,13 +58,41 @@ void __fastcall GameObject::playShineEffectH(gd::GameObject* self) {
 }
 
 void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
-	if (setting().onShowLayout) {
-		switch (self->m_objectID) {
-		case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
-			return;
-		}
+	if (setting().onShowLayout && isColorTrigger(self)) {
+		return;
 	}
+
+	// this is awful
+
+	//auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+	//ccColor3B origBGColor = ccWHITE;
+	//ccColor3B origGColor = ccWHITE;
+	//ccColor3B origLineColor = ccWHITE;
+	//ccColor3B origObjColor = ccWHITE;
+	//ccColor3B orig3DLColor = ccWHITE;
+	//ccColor3B orig01Color = ccWHITE;
+	//ccColor3B orig02Color = ccWHITE;
+	//ccColor3B orig03Color = ccWHITE;
+	//ccColor3B orig04Color = ccWHITE;
+
+	//if (playLayer && playLayer->m_testMode && isColorTrigger(self)) {
+	//	origBGColor = playLayer->m_backgroundSprite->getColor();
+	//	origGColor = playLayer->m_gColorRef->getColor();
+	//	origLineColor = playLayer->m_lineColorRef->getColor();
+	//	origObjColor = playLayer->m_objColorRef->getColor();
+	//	orig3DLColor = playLayer->m_3DLineColorRef->getColor();
+	//	orig01Color = playLayer->m_custom01ColorRef->getColor();
+	//	orig01Color = playLayer->m_custom02ColorRef->getColor();
+	//	orig01Color = playLayer->m_custom03ColorRef->getColor();
+	//	orig01Color = playLayer->m_custom04ColorRef->getColor();
+	//}
+
 	GameObject::triggerObject(self);
+
+	//if (playLayer && playLayer->m_testMode && isColorTrigger(self)) {
+	//	
+	//}
 }
 
 //void __fastcall GameObject::activatedByPlayerH(gd::GameObject* self, void*, gd::GameObject* p0) {

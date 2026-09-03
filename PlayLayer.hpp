@@ -73,6 +73,9 @@ namespace PlayLayer {
 	inline void(__thiscall* updateColor)(gd::PlayLayer*, cocos2d::ccColor3B const&, int);
 	void __fastcall updateColorH(gd::PlayLayer*, void*, cocos2d::ccColor3B const&, int);
 
+	inline void(__thiscall* updateCamera)(gd::PlayLayer*);
+	void __fastcall updateCameraH(gd::PlayLayer*);
+
 	inline void(__thiscall* draw)(gd::PlayLayer*);
 	void __fastcall drawH(gd::PlayLayer*);
 
@@ -101,6 +104,7 @@ namespace PlayLayer {
 	void updateStatusLabels();
 	void updateStartPosSwitcherLabel();
 	void updateDiscordPresence();
+	void extrapolatePlayer(gd::PlayerObject*, float);
 
 	void mem_init();
 }

@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BoomScrollLayer.hpp" />
+    <ClInclude Include="CCEGLViewHook.hpp" />
     <ClInclude Include="CCSchedulerHook.hpp" />
     <ClInclude Include="CircleToolPopup.hpp" />
     <ClInclude Include="CocosExplorer.hpp" />
@@ -735,6 +736,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BoomScrollLayer.cpp" />
+    <ClCompile Include="CCEGLViewHook.cpp" />
     <ClCompile Include="CCSchedulerHook.cpp" />
     <ClCompile Include="CircleToolPopup.cpp" />
     <ClCompile Include="CocosExplorer.cpp" />

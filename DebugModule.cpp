@@ -33,12 +33,13 @@ void renderDebugModule() {
 		ImGui::Text("SHORT_ITEM_WIDTH: %f", SHORT_ITEM_WIDTH);
 		ImGui::Text("LONG_ITEM_WIDTH: %f", LONG_ITEM_WIDTH);
 
+		auto gm = gd::GameManager::sharedState();
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("GameManager: 0x%p", gd::GameManager::sharedState());
+		ImGui::Text("GameManager: 0x%p", gm);
 		ImGui::SameLine();
 		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - 50.f);
 		if (ImGui::Button("Copy##gamemanager", ImVec2(50.f, 0.f))) {
-			clipboard::write(CCString::createWithFormat("%p", gd::GameManager::sharedState())->getCString());
+			clipboard::write(CCString::createWithFormat("%p", gm)->getCString());
 		}
 
 		auto glm = gd::GameLevelManager::sharedState();
@@ -78,6 +79,19 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", CCDirector::sharedDirector())->getCString());
 		}
 
+		auto egl = CCEGLView::sharedOpenGLView();
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("CCEGLView: 0x%p", egl);
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - 50.f);
+		if (ImGui::Button("Copy##cceglview", ImVec2(50.f, 0.f))) {
+			clipboard::write(CCString::createWithFormat("%p", egl)->getCString());
+		}
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Main Window: 0x%p, W: %i, H: %i", CCEGLView::sharedOpenGLView()->m_pMainWindow, from<int>(egl->m_pMainWindow, 0x1b4), from<int>(egl->m_pMainWindow, 0x1b8));
+		ImGui::DragFloat("Width", &egl->m_obWindowedSize.width);
+		ImGui::DragFloat("Height", &egl->m_obWindowedSize.height);
+		
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("ObjectToolbox: 0x%p", gd::ObjectToolbox::sharedState());
 		ImGui::SameLine();
@@ -104,6 +118,57 @@ void renderDebugModule() {
 		ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - 50.f);
 		if (ImGui::Button("Copy##gjAccountManager", ImVec2(50.f, 0.f))) {
 			clipboard::write(CCString::createWithFormat("%p", gjam)->getCString());
+		}
+
+		if (ImGui::Checkbox("Borderless Fullscreen", &setting().onBorderlessFullscreen)) {
+			if (setting().onBorderlessFullscreen) {
+				if (egl->m_bIsFullscreen) {
+					gm->setGameVariable("0025", false);
+					gm->reloadAll(true, false, true);
+				}
+
+				HWND windowHwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(egl->m_pMainWindow) + 0x244));
+				LONG windowStyle = GetWindowLong(windowHwnd, GWL_STYLE);
+				SetWindowLong(windowHwnd, GWL_STYLE, windowStyle & ~(WS_CAPTION | WS_SIZEBOX | WS_SYSMENU));
+
+				toggleFreeWindowResize(true);
+
+				HMONITOR monitor = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
+				MONITORINFO monitorInfo;
+				monitorInfo.cbSize = sizeof(MONITORINFO);
+				if (!GetMonitorInfo(monitor, &monitorInfo)) {
+					return;
+				}
+
+				RECT monitorRect = monitorInfo.rcMonitor;
+
+				auto width = monitorRect.right - monitorRect.left;
+				auto height = monitorRect.bottom - monitorRect.top;
+
+				SetWindowPos(windowHwnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+				egl->resizeWindow(width, height);
+			}
+			else {
+				HWND windowHwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(egl->m_pMainWindow) + 0x244));
+				SetWindowLong(windowHwnd, GWL_STYLE, 0x6cf0000);
+
+				toggleFreeWindowResize(false);
+
+				HMONITOR monitor = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
+				MONITORINFO monitorInfo;
+				monitorInfo.cbSize = sizeof(MONITORINFO);
+				if (!GetMonitorInfo(monitor, &monitorInfo)) {
+					return;
+				}
+
+				RECT monitorRect = monitorInfo.rcMonitor;
+
+				auto width = egl->m_obWindowedSize.width;
+				auto height = egl->m_obWindowedSize.height;
+
+				SetWindowPos(windowHwnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+				egl->resizeWindow(width, height);
+			}
 		}
 
 		if (ImGui::CollapsingHeader("Account info (password)")) {
@@ -174,6 +239,11 @@ void renderDebugModule() {
 				pl->releaseButton(1, false);
 			}
 
+			ImGui::Checkbox("m_isCameraShaking", &pl->m_isCameraShaking);
+			ImGui::DragFloat("m_currentShakeStrength", &pl->m_currentShakeStrength);
+			ImGui::Checkbox("m_hintShown", &pl->m_hintShown);
+			ImGui::DragFloat("m_cameraFlip", &pl->m_cameraFlip);
+
 			static bool cl = false;
 			if (ImGui::Checkbox("Disable No Collision on Playback", &cl)) {
 				if (cl) {
@@ -200,6 +270,10 @@ void renderDebugModule() {
 				ImGui::Text("TimeStamp: %.4f", pl->m_activeBGColorAction->m_timeStamp);
 				ImGui::Text("Blend: %s", pl->m_activeBGColorAction->m_blend ? "true" : "false");
 			}
+			
+			auto bgRef = pl->m_backgroundSprite->getColor();
+			float bgColor[4] = { bgRef.r / 255.f, bgRef.g / 255.f, bgRef.b / 255.f, 1.f };
+			ImGui::ColorEdit4("BG", bgColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions | ImGuiColorEditFlags_NoPicker);
 		}
 
 		auto editorLayer = LevelEditorLayer::get();

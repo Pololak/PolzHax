@@ -1821,6 +1821,9 @@
     <ClInclude Include="DiscordManager.hpp">
       <Filter>Файлы заголовков\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="CCEGLViewHook.hpp">
+      <Filter>Файлы заголовков\Hooks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2086,6 +2089,9 @@
     </ClCompile>
     <ClCompile Include="DiscordManager.cpp">
       <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCEGLViewHook.cpp">
+      <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

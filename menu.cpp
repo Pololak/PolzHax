@@ -798,12 +798,10 @@ void imgui_render() {
 		}
 
 		if (setting().onNoEditorTrail) {
-			sequence_patch(gd::base + 0x94305, { 0x00 });
-			sequence_patch(gd::base + 0x9442c, { 0x00 });		
+			sequence_patch(gd::base + 0x942f0, { 0xe9, 0x77, 0x02, 0x00, 0x00, 0x90 });
 		}
 		else {
-			sequence_patch(gd::base + 0x94305, { 0xff });
-			sequence_patch(gd::base + 0x9442c, { 0xff });
+			sequence_patch(gd::base + 0x942f0, { 0x0f, 0x84, 0x76, 0x02, 0x00, 0x00 });
 		}
 
 		if (setting().onObjectBypass) {
@@ -1035,11 +1033,12 @@ void imgui_render() {
 		if (setting().onFreeWindowResize) {
 			sequence_patch(libcocosbase + 0x10f48b, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 			sequence_patch(libcocosbase + 0x10ee81, { 0xe9, 0x2f, 0xff, 0xff, 0xff, 0x90 });
-			sequence_patch(libcocosbase + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+			patch(libcocosbase + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, true);
 		}
 		else {
 			sequence_patch(libcocosbase + 0x10f48b, { 0xe8, 0xb0, 0xf3, 0xff, 0xff });
 			sequence_patch(libcocosbase + 0x10ee81, { 0x0f, 0x85, 0x2e, 0xff, 0xff, 0xff });
+			unpatch(libcocosbase + 0x10e143, true);
 		}
 
 		if (setting().onIncreaseMaxLevels) {
@@ -1176,7 +1175,7 @@ void imgui_render() {
 	if (setting().show) {
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (V) 170826");
+			ImGui::Text("1.920 - v1.3.3 (V) 030926");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -2358,12 +2357,10 @@ void imgui_render() {
 
 			if (ImGui::CheckboxF("No Editor Trail", &setting().onNoEditorTrail)) {
 				if (setting().onNoEditorTrail) {
-					sequence_patch(gd::base + 0x94305, { 0x00 });
-					sequence_patch(gd::base + 0x9442c, { 0x00 });
+					sequence_patch(gd::base + 0x942f0, { 0xe9, 0x77, 0x02, 0x00, 0x00, 0x90 });
 				}
 				else {
-					sequence_patch(gd::base + 0x94305, { 0xff });
-					sequence_patch(gd::base + 0x9442c, { 0xff });
+					sequence_patch(gd::base + 0x942f0, { 0x0f, 0x84, 0x76, 0x02, 0x00, 0x00 });
 				}
 			}
 			ImGui::Tooltip("Removes the editor trail.");
@@ -3241,11 +3238,12 @@ void imgui_render() {
 				if (setting().onFreeWindowResize) {
 					sequence_patch(libcocosbase + 0x10f48b, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 					sequence_patch(libcocosbase + 0x10ee81, { 0xe9, 0x2f, 0xff, 0xff, 0xff, 0x90 });
-					sequence_patch(libcocosbase + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+					patch(libcocosbase + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, true);
 				}
 				else {
 					sequence_patch(libcocosbase + 0x10f48b, { 0xe8, 0xb0, 0xf3, 0xff, 0xff });
 					sequence_patch(libcocosbase + 0x10ee81, { 0x0f, 0x85, 0x2e, 0xff, 0xff, 0xff });
+					unpatch(0x10e143, true);
 				}
 			}
 			ImGui::Tooltip("Removes limits in place for window resizing.");

@@ -63,6 +63,20 @@ namespace gd {
 			auto b = color1.b * ratio + color2.b * (1.f - ratio);
 			return { std::clamp<uint8_t>(r, 0, 255), std::clamp<uint8_t>(g, 0, 255), std::clamp<uint8_t>(b, 0, 255) };
 		}
+
+		static cocos2d::ccColor3B multipliedColorValue(cocos2d::ccColor3B minColor, cocos2d::ccColor3B maxColor, float factor) {
+			if (factor < 1.f) {
+				if (factor > 0.f) {
+					cocos2d::ccColor3B ret;
+					ret.r = (maxColor.r - minColor.r) * factor + minColor.r;
+					ret.g = (maxColor.g - minColor.g) * factor + minColor.g;
+					ret.b = (maxColor.b - minColor.b) * factor + minColor.b;
+					return ret;
+				}
+				else return minColor;
+			}
+			else return maxColor;
+		}
 	};
 }
 

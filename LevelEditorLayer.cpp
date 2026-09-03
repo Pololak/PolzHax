@@ -155,12 +155,6 @@ enum class ColorTriggers {
 	Col4 = 743,
 };
 
-static std::unordered_set<int> colorTriggerIds = { 29, 30, 104, 105, 221, 717, 718, 743, 744 };
-
-bool isColorTrigger(gd::GameObject* object) {
-	return colorTriggerIds.find(object->m_objectID) != colorTriggerIds.end();
-}
-
 std::unordered_map<ColorTriggers, std::vector<gd::GameObject*>> m_colorTriggers;
 CCSpriteBatchNode* m_blendingBatchNode;
 std::unordered_map<gd::GJCustomColorMode, bool> m_currentColor;
@@ -992,11 +986,19 @@ void __fastcall LevelEditorLayer::pushButtonH(gd::LevelEditorLayer* self, void*,
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
 	if (clicksDrawNode && setting().onShowClicks) {
-		if (p1) {
-			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
+		if (self->m_levelSettings->m_twoPlayerMode && self->m_dualMode) {
+			if (p1) {
+				clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(1.f, .5f, 1.f, 1.f));
+			}
+			else {
+				clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
+			}
 		}
 		else {
-			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(1.f, .5f, 1.f, 1.f));
+			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(1.f, .5f, 0.f, 1.f));
+			if (self->m_dualMode) {
+				clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(1.f, .5f, 1.f, 1.f));
+			}
 		}
 	}
 }
@@ -1005,11 +1007,17 @@ void __fastcall LevelEditorLayer::releaseButtonH(gd::LevelEditorLayer* self, voi
 	LevelEditorLayer::releaseButton(self, p0, p1);
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
-	if (clicksDrawNode && setting().onShowClicks) {
+	if (self->m_levelSettings->m_twoPlayerMode && self->m_dualMode) {
 		if (p1) {
-			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
 		}
 		else {
+			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+		}
+	}
+	else {
+		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+		if (self->m_dualMode) {
 			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
 		}
 	}

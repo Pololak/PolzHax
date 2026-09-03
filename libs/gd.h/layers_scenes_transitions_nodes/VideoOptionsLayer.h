@@ -17,6 +17,10 @@ namespace gd {
 		cocos2d::CCArray* m_availableResolutions; // 0x1d4
 		bool m_fullscreen; // 0x1d8
 		int m_currentResolution; // 0x1dc
+
+		void createToggleButton(cocos2d::SEL_MenuHandler callback, bool toggle, cocos2d::CCMenu* menu, float toggleScale, float labelMaxWidth, bool center, std::string caption, cocos2d::CCPoint position) {
+			return reinterpret_cast<void(__thiscall*)(VideoOptionsLayer*, cocos2d::SEL_MenuHandler, bool, cocos2d::CCMenu*, float, float, bool, std::string, cocos2d::CCPoint)>(base + 0xd4810)(this, callback, toggle, menu, toggleScale, labelMaxWidth, center, caption, position);
+		}
 	};
 }
 

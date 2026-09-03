@@ -9,7 +9,6 @@ static CCNode* selected_node = nullptr;
 static bool reached_selected_node;
 static CCNode* hovered_node = nullptr;
 
-bool operator!=(const cocos2d::CCSize& a, const cocos2d::CCSize& b) { return a.width != b.width || a.height != b.height; }
 ImVec2 operator*(const ImVec2& vec, const float m) { return { vec.x * m, vec.y * m }; }
 ImVec2 operator/(const ImVec2& vec, const float m) { return { vec.x / m, vec.y / m }; }
 ImVec2 operator+(const ImVec2& a, const ImVec2& b) { return { a.x + b.x, a.y + b.y }; }

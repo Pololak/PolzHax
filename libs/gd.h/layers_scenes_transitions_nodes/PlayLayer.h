@@ -59,7 +59,10 @@ namespace gd {
 		float m_levelLength; // 0x1d0
 		float m_realLevelLength; // 0x1d4
 		cocos2d::CCLabelBMFont* m_attemptsLabel; // 0x1d8
-		PAD(16)
+		bool m_isCameraShaking; // 0x1dc
+		float m_currentShakeStrength; // 0x1e0
+		bool m_hintShown; // 0x1e4
+		float m_backgroundScrollOffset; // 0x1e8
 		float m_cameraFlip; // 0x1ec
 		PAD(4)
 		cocos2d::CCDictionary* m_particlesDictionary; // 0x1f4
@@ -334,6 +337,12 @@ namespace gd {
 
 		void exitRollMode(PlayerObject* player) {
 			player->toggleRollMode(false);
+		}
+
+		void updateCamera(float dt) {
+			__asm movss xmm1, dt
+
+			reinterpret_cast<void(__fastcall*)(PlayLayer*)>(base + 0xed0f0)(this);
 		}
 	};
 }

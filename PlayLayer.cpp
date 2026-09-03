@@ -84,6 +84,8 @@ CCLabelBMFont* m_botEventsOddAlert = nullptr;
 bool m_botPush;
 bool m_botRelease;
 float m_postNoclipDeathValueIdk;
+bool m_isExtrapolatingCamera;
+CCPoint m_savedCameraPos;
 
 float PlayLayer::getNoclipAccuracy() {
 	return m_noclipAccuracy;
@@ -861,6 +863,19 @@ void PlayLayer::updateDiscordPresence() {
 	}
 }
 
+void PlayLayer::extrapolatePlayer(gd::PlayerObject* player, float t) {
+	if (!player) return;
+
+	float deltaX = player->m_realPlayerPos.x - player->m_lastPos.x;
+	float deltaY = player->m_realPlayerPos.y - player->m_lastPos.y;
+
+	player->setPosition({ player->m_realPlayerPos.x + (deltaX * t), player->m_realPlayerPos.y + (deltaY * t) });
+
+	//float rotateSpeed = (player->m_rollMode && player->m_isRotating) ? 1.0f : player->m_speed;
+	//float endRot = (player->m_rotationSpeed * rotateSpeed) / 60.f;
+	//float baseRot = player->m_isSideways ? -90.f : 0.f;
+}
+
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
 	m_coinsToPickup.clear();
 	m_checkpointStorage.clear();
@@ -915,6 +930,9 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	m_botPush = false;
 	m_botRelease = false;
+
+	m_isExtrapolatingCamera = false;
+	m_savedCameraPos = CCPointZero;
 
 	Hitboxes::clearHitboxTrail();
 
@@ -1121,6 +1139,12 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	PlayLayer::update(self, dt);
+
+	//m_savedCameraPos = self->m_cameraPos;
+
+	//m_isExtrapolatingCamera = true;
+	//self->updateCamera(FLT_MIN);
+	//m_isExtrapolatingCamera = false;
 
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";
@@ -1818,6 +1842,23 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 	PlayLayer::releaseButton(self, p0, p1);
 }
 
+void __fastcall PlayLayer::updateCameraH(gd::PlayLayer* self) {
+	float dt = 0.f;
+	__asm movss dt, xmm1;
+
+	if (!m_isExtrapolatingCamera) {
+		return PlayLayer::updateCamera(self);
+	}
+
+	PlayLayer::updateCamera(self);
+
+	auto newCameraX = m_savedCameraPos.x - self->m_cameraPos.x;
+	auto newCameraY = m_savedCameraPos.y - self->m_cameraPos.y;
+
+	self->m_cameraPos.x = self->m_cameraPos.x + newCameraX / 240.f;
+	self->m_cameraPos.y = self->m_cameraPos.y + newCameraY / 240.f;
+}
+
 //void __fastcall PlayLayer::checkCollisionsH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
 //	float dt = 0.f;
 //	__asm movss dt, xmm2
@@ -1834,11 +1875,6 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 //}
 
 void __fastcall PlayLayer::updateColorH(gd::PlayLayer* self, void*, cocos2d::ccColor3B const& color, int channel) {
-	float duration = 0.f;
-	__asm {
-		movss duration, xmm2;
-	}
-
 	PlayLayer::updateColor(self, color, channel);
 }
 
@@ -1897,6 +1933,7 @@ void PlayLayer::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xef0d0), PlayLayer::spawnPlayer2H, reinterpret_cast<void**>(&PlayLayer::spawnPlayer2));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0a00), PlayLayer::pushButtonH, reinterpret_cast<void**>(&PlayLayer::pushButton));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xf0af0), PlayLayer::releaseButtonH, reinterpret_cast<void**>(&PlayLayer::releaseButton));
+	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xed0f0), PlayLayer::updateCameraH, reinterpret_cast<void**>(&PlayLayer::updateCamera));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xeca90), PlayLayer::updateColorH, reinterpret_cast<void**>(&PlayLayer::updateColor));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xea180), PlayLayer::checkCollisionsH, reinterpret_cast<void**>(&PlayLayer::checkCollisions));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xee5e0), PlayLayer::drawH, reinterpret_cast<void**>(&PlayLayer::draw));

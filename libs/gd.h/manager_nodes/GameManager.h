@@ -125,6 +125,10 @@ namespace gd {
 		void fadeInMusic() {
 			reinterpret_cast<void(__thiscall*)(GameManager*)>(base + 0x66890)(this);
 		}
+
+		cocos2d::CCSize resolutionForKey(int key) {
+			return *reinterpret_cast<cocos2d::CCSize * (__thiscall*)(GameManager*, cocos2d::CCSize*, int)>(base + 0x6cca0)(this, new cocos2d::CCSize(), key);
+		}
 	};
 }
 

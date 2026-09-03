@@ -4,6 +4,7 @@
 #include "patching.hpp"
 #include <ShlObj.h>
 #include "hsv.hpp"
+#include "Setting.hpp"
 
 #define CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__, __index__)                                                                    \
     if (__array__ && __array__->count())                                                                                                   \
@@ -13,6 +14,8 @@
 #define CCARRAY_FOREACH_B_TYPE(__array__, __obj__, __type__) CCARRAY_FOREACH_B_BASE(__array__, __obj__, __type__*, ix)
 
 #define VARIABLE_NAME(var) (#var + 10)
+
+inline bool operator!=(const cocos2d::CCSize & a, const cocos2d::CCSize & b) { return a.width != b.width || a.height != b.height; }
 
 inline auto getExePath() {
 	char buffer[MAX_PATH];
@@ -687,6 +690,13 @@ inline float getFps(bool only_read) {
 	return cachedFps;
 }
 
+inline bool isColorTrigger(gd::GameObject* object) {
+	switch (object->m_objectID) {
+	case 29: case 30: case 104: case 105: case 744: case 221: case 717: case 718: case 743:
+		return true;
+	}
+	return false;
+}
 
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
@@ -698,4 +708,26 @@ inline void safeModeOFF() {
 	sequence_patch(gd::base + 0xf0624, { 0x75, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0x0f, 0x85, 0x76, 0x01, 0x00, 0x00 });
 	sequence_patch(gd::base + 0xe5419, { 0x0f, 0x85, 0x13, 0x01, 0x00, 0x00 });
+}
+
+inline void toggleFreeWindowResize(bool toggle) {
+	auto cocos = reinterpret_cast<uintptr_t>(GetModuleHandleA("libcocos2d.dll"));
+	if (toggle) {
+		patch(cocos + 0x10f48b, { 0x90, 0x90, 0x90, 0x90, 0x90 }, true);
+		patch(cocos + 0x10f498, { 0xb9, 0xff, 0xff, 0xff, 0x7f, 0x90, 0x90 }, true);
+		patch(cocos + 0x10ee81, { 0xe9, 0x2f, 0xff, 0xff, 0xff, 0x90 }, true);
+		patch(cocos + 0x10e143, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, true);
+		//patch(cocos + 0x10f4be, { 0x48 }, true);
+		//patch(cocos + 0x10f4c5, { 0x48 }, true);
+		patch(cocos + 0x10e136, { 0xeb, 0x11, 0x90 }, true);
+	}
+	else {
+		unpatch(cocos + 0x10f48b, true);
+		unpatch(cocos + 0x10f498, true);
+		unpatch(cocos + 0x10ee81, true);
+		unpatch(cocos + 0x10e143, true);
+		//unpatch(cocos + 0x10f4be, true);
+		//unpatch(cocos + 0x10f4c5, true);
+		unpatch(cocos + 0x10e136, true);
+	}
 }

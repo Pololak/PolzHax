@@ -243,6 +243,7 @@ struct SettingStruct {
 	bool m_clearHitboxes;
 	bool m_fixSlabOffset;
 	bool m_smallSawHitbox;
+	bool onBorderlessFullscreen;
 
 	// GDPS Switcher
 	std::string originalServerURL;
@@ -488,6 +489,7 @@ DEF_SCHEMA(
 	m_openMenuKey,
 	m_liveColorEnabled,
 	m_fixSlabOffset,
+	onBorderlessFullscreen,
 
 	onEnableSwitcher, m_serverIndex, m_customServerURL,
 

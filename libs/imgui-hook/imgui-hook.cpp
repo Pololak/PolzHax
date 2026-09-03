@@ -27,6 +27,10 @@ void ImGuiHook::setToggleCallback(std::function<void()> func) {
 
 bool g_inited = false;
 
+void ImGuiHook::setInited(bool inited) {
+    g_inited = inited;
+}
+
 HWND windowToHWND(GLFWwindow* window) {
     return WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(window) + 0x244));
 }
@@ -141,30 +145,6 @@ void ImGuiHook::poll(CCEGLView* self) {
     CCEGLView_pollEvents_H(self);
 }
 
-void (__thiscall* CCEGLView_toggleFullScreen)(cocos2d::CCEGLView*, bool);
-void __fastcall CCEGLView_toggleFullScreen_H(cocos2d::CCEGLView* self, void*, bool toggle) {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
-
-    CCEGLView_toggleFullScreen(self, toggle);
-
-    g_inited = false;
-    // ImGui::CreateContext();
-    // ImGui::GetIO();
-    // auto hwnd = windowToHWND(self->getWindow());
-    // ImGui_ImplWin32_Init(hwnd);
-    // ImGui_ImplOpenGL3_Init();
-
-    PolzHax::updateFPSBypass();
-}
-
-void (__thiscall* AppDelegate_applicationWillEnterForeground)(void*);
-void __fastcall AppDelegate_applicationWillEnterForeground_H(void* self) {
-    AppDelegate_applicationWillEnterForeground(self);
-    ImGui::GetIO().ClearInputKeys();
-}
-
 void ImGuiHook::setupHooks(std::function<void(void*, void*, void**)> hookFunc) {
     auto cocosBase = GetModuleHandleA("libcocos2d.dll");
     hookFunc(
@@ -176,15 +156,5 @@ void ImGuiHook::setupHooks(std::function<void(void*, void*, void**)> hookFunc) {
         reinterpret_cast<void*>(GetProcAddress(cocosBase, "?pollEvents@CCEGLView@cocos2d@@QAEXXZ")),
         reinterpret_cast<void*>(&CCEGLView_pollEvents_H),
         reinterpret_cast<void**>(&CCEGLView_pollEvents)
-    );
-    hookFunc(
-        reinterpret_cast<void*>(GetProcAddress(cocosBase, "?toggleFullScreen@CCEGLView@cocos2d@@QAEX_N@Z")),
-        reinterpret_cast<void*>(&CCEGLView_toggleFullScreen_H),
-        reinterpret_cast<void**>(&CCEGLView_toggleFullScreen)
-    );
-    hookFunc(
-        reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandleA(0)) + 0x28f00),
-        reinterpret_cast<void*>(&AppDelegate_applicationWillEnterForeground_H),
-        reinterpret_cast<void**>(&AppDelegate_applicationWillEnterForeground)
     );
 }
