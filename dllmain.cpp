@@ -274,6 +274,24 @@ gd::GJGameLevel* __fastcall GJGameLevel_createH(CCDictionary* dict) {
 	return level;
 }
 
+inline void(__thiscall* AppDelegate_trySaveGame)(gd::AppDelegate*);
+void __fastcall AppDelegate_trySaveGameH(gd::AppDelegate* self) {
+	auto saveFolder = CCFileUtils::sharedFileUtils()->getWritablePath();
+
+	if (setting().onBackupFix) {
+		if (std::filesystem::exists(saveFolder + "CCGameManager.dat.bak")) {
+			std::filesystem::remove(saveFolder + "CCGameManager.dat.bak");
+			std::cout << "Removed CCGameManager.dat.bak..." << std::endl;
+		}
+		if (std::filesystem::exists(saveFolder + "CCLocalLevels.dat.bak")) {
+			std::filesystem::remove(saveFolder + "CCLocalLevels.dat.bak");
+			std::cout << "Removed CCLocalLevels.dat.bak..." << std::endl;
+		}
+	}
+
+	AppDelegate_trySaveGame(self);
+}
+
 inline void(__thiscall* AppDelegate_applicationDidEnterBackground)(gd::AppDelegate*);
 void __fastcall AppDelegate_applicationDidEnterBackgroundH(gd::AppDelegate* self) {
 	AppDelegate_applicationDidEnterBackground(self);
@@ -316,6 +334,7 @@ DWORD WINAPI my_thread(void* hModule) {
 	if (debugCheck()) {
 		AllocConsole();
 		freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+		#define SHOW_CONSOLE
 	}
 
 	if (MH_Initialize() != MH_OK) {
@@ -339,6 +358,7 @@ DWORD WINAPI my_thread(void* hModule) {
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x28d10), AppDelegate_applicationDidEnterBackgroundH, reinterpret_cast<void**>(&AppDelegate_applicationDidEnterBackground));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x28f00), AppDelegate_applicationWillEnterForegroundH, reinterpret_cast<void**>(&AppDelegate_applicationWillEnterForeground));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0x293f0), AppDelegate_trySaveGameH, reinterpret_cast<void**>(&AppDelegate_trySaveGame));
 
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xb4b0), CCCircleWave_drawH, reinterpret_cast<void**>(&CCCircleWave_draw));
 	MH_CreateHook(reinterpret_cast<void*>(cocos + 0xb7b60), CCParticleSystemQuad_initWithTotalParticlesH, reinterpret_cast<void**>(&CCParticleSystemQuad_initWithTotalParticles));

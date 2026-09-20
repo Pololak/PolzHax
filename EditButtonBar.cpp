@@ -4,6 +4,24 @@
 #include "Setting.hpp"
 #include "utils.hpp"
 
+bool EditButtonBar_init(gd::EditButtonBar* self, CCArray* objects, int page, bool isObjects, CCPoint position) {
+	int uVar10 = 0;
+	auto director = CCDirector::sharedDirector();
+	auto winSize = director->getWinSize();
+
+	self->m_pagesArray = CCArray::create(); // 0xec
+	self->m_pagesArray->retain();
+
+	auto pCVar2 = CCArray::create();
+	auto pCVar3 = CCArray::create();
+	pCVar2->addObject(pCVar3);
+
+	for (int i = 0; i < objects->count(); i++) {
+		auto piVar6 = objects->objectAtIndex(i);
+		auto pCVar5 = pCVar2->objectAtIndex(uVar10);
+	}
+}
+
 bool __fastcall EditButtonBar::initH(gd::EditButtonBar* self, void*, CCArray* objs, int page, bool isObjects, CCPoint pos) {
 	auto editorUI = EditorUI::get();
 	

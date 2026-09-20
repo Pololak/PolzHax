@@ -698,6 +698,26 @@ inline bool isColorTrigger(gd::GameObject* object) {
 	return false;
 }
 
+inline std::string narrow(const wchar_t* str) {
+	int size = WideCharToMultiByte(CP_UTF8, 0, str, -1, nullptr, 0, nullptr, nullptr);
+	if (size <= 0) { /* fuck */ }
+	auto buffer = new char[size];
+	WideCharToMultiByte(CP_UTF8, 0, str, -1, buffer, size, nullptr, nullptr);
+	std::string result(buffer, size_t(size) - 1);
+	delete[] buffer;
+	return result;
+}
+
+inline std::wstring widen(const char* str) {
+	int size = MultiByteToWideChar(CP_UTF8, 0, str, -1, nullptr, 0);
+	if (size <= 0) { /* fuck */ }
+	auto buffer = new wchar_t[size];
+	MultiByteToWideChar(CP_UTF8, 0, str, -1, buffer, size);
+	std::wstring result(buffer, size_t(size) - 1);
+	delete[] buffer;
+	return result;
+}
+
 inline void safeModeON() {
 	sequence_patch(gd::base + 0xf0624, { 0xeb, 0x6c });
 	sequence_patch(gd::base + 0xe53b6, { 0xe9, 0x77, 0x01, 0x00, 0x00, 0x90 });

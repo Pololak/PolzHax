@@ -73,6 +73,10 @@ namespace gd {
         int m_capacity002; // 0x27c
         int m_capacity003; // 0x280
         int m_capacity004; // 0x284
+
+        std::string getAudioFileName() {
+            return *reinterpret_cast<std::string*(__thiscall*)(GJGameLevel*, std::string*)>(base + 0x62710)(this, new std::string());
+        }
 	};
 }
 

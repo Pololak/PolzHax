@@ -2,15 +2,17 @@
 #include "PauseLayer.hpp"
 #include "Setting.hpp"
 #include <chrono>
+#include "Recorder.hpp"
 
 float g_left_over = 0.f; // tps bypass by Mat ig (taken from ReplayBot https://github.com/matcool/ReplayBot/blob/9bb45e2ca6fa62aad939d9bcc18595085d90d7b6/src/hooks.cpp#L10)
 
 void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, float dt) {
+	auto& recorder = Recorder::get();
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 
-	if (playLayer && (setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass) && !PauseLayer::get()) {
+	if (playLayer && (recorder.m_recording || setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass) && !PauseLayer::get()) {
 		const auto fps = setting().tpsValue;
-		auto speedhack = self->getTimeScale();
+		auto speedhack = (setting().onSpeedhack && setting().onClassicMode) ? setting().speedhackValue : self->getTimeScale();
 
 		const float target_dt = 1.f / fps / speedhack;
 

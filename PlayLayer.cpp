@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "PolzBot.hpp"
 #include "DiscordManager.hpp"
+#include "Recorder.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -1073,6 +1074,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 		PlayLayer::updateDiscordPresence();
 	}
 
+	Recorder::get().update_song_offset(self);
+
 	return true;
 }
 
@@ -1136,6 +1139,11 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 				}
 			}
 		}
+	}
+
+	auto& recorder = Recorder::get();
+	if (recorder.m_recording) {
+		recorder.handle_recording(self, dt);
 	}
 
 	PlayLayer::update(self, dt);
@@ -1296,6 +1304,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	m_noclipAccuracy = 100.f;
 
 	PlayLayer::resetLevel(self);
+
+	Recorder::get().update_song_offset(self);
 
 	Hitboxes::clearHitboxTrail();
 

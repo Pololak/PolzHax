@@ -1007,18 +1007,20 @@ void __fastcall LevelEditorLayer::releaseButtonH(gd::LevelEditorLayer* self, voi
 	LevelEditorLayer::releaseButton(self, p0, p1);
 
 	auto clicksDrawNode = static_cast<CCDrawNode*>(self->m_gameLayer->getChildByTag(126));
-	if (self->m_levelSettings->m_twoPlayerMode && self->m_dualMode) {
-		if (p1) {
-			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
+	if (clicksDrawNode && setting().onShowClicks) {
+		if (self->m_levelSettings->m_twoPlayerMode && self->m_dualMode) {
+			if (p1) {
+				clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
+			}
+			else {
+				clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
+			}
 		}
 		else {
 			clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
-		}
-	}
-	else {
-		clicksDrawNode->drawDot(self->m_player->getPosition(), 3.f, ccc4f(0.f, 1.f, 1.f, 1.f));
-		if (self->m_dualMode) {
-			clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
+			if (self->m_dualMode) {
+				clicksDrawNode->drawDot(self->m_player2->getPosition(), 3.f, ccc4f(.5f, 1.f, .5f, 1.f));
+			}
 		}
 	}
 }

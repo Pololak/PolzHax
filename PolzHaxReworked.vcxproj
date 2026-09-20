@@ -721,6 +721,7 @@
     <ClInclude Include="portable-file-dialogs.h" />
     <ClInclude Include="PracticeFix.hpp" />
     <ClInclude Include="PulseBuilderPopup.hpp" />
+    <ClInclude Include="Recorder.hpp" />
     <ClInclude Include="RemapTriggerWidget.hpp" />
     <ClInclude Include="RGBColorInputWidget.hpp" />
     <ClInclude Include="RotateSaws.hpp" />
@@ -729,6 +730,7 @@
     <ClInclude Include="ShareLevelLayer.hpp" />
     <ClInclude Include="SimplePlayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
+    <ClInclude Include="subprocess.hpp" />
     <ClInclude Include="SURVEY_PROGRAM.hpp" />
     <ClInclude Include="TextureManager.hpp" />
     <ClInclude Include="utils.hpp" />
@@ -817,6 +819,7 @@
     <ClCompile Include="PlayLayer.cpp" />
     <ClCompile Include="PolzBot.cpp" />
     <ClCompile Include="PulseBuilderPopup.cpp" />
+    <ClCompile Include="Recorder.cpp" />
     <ClCompile Include="RemapTriggerWidget.cpp" />
     <ClCompile Include="RGBColorInputWidget.cpp" />
     <ClCompile Include="RotateSaws.cpp" />

@@ -1,0 +1,192 @@
+#include "recorder.hpp"
+#include <sstream>
+#include <CCGL.h>
+#include <filesystem>
+#include <fstream>
+#include "utils.hpp"
+#include "Setting.hpp"
+
+Recorder::Recorder() : m_width(1920), m_height(1080), m_fps(60) {}
+
+void Recorder::start(const std::string& path) {
+#ifndef SHOW_CONSOLE
+    static bool has_console = false;
+    if (!has_console) {
+        has_console = true;
+        AllocConsole();
+        static std::ofstream conout("CONOUT$", std::ios::out);
+        std::cout.rdbuf(conout.rdbuf());
+    }
+#endif
+    m_recording = true;
+    m_frame_has_data = false;
+    m_current_frame.resize(m_width * m_height * 3, 0);
+    m_finished_level = false;
+    m_last_frame_t = m_extra_t = 0;
+    m_after_end_extra_time = 0.f;
+    m_renderer.m_width = m_width;
+    m_renderer.m_height = m_height;
+    m_renderer.begin();
+    auto gm = gd::GameManager::sharedState();
+    auto playLayer = gm->getPlayLayer();
+    auto songFile = playLayer->m_level->getAudioFileName();
+    auto fadeIn = playLayer->m_levelSettings->m_fadeIn;
+    auto fadeOut = playLayer->m_levelSettings->m_fadeOut;
+    auto bgVolume = gm->m_bgVolume;
+    auto sfxVolume = gm->m_sfxVolume;
+    if (playLayer->m_level->m_songID == 0)
+        songFile = CCFileUtils::sharedFileUtils()->fullPathForFilename(songFile.c_str(), false);
+    auto isTestmode = playLayer->m_testMode;
+    auto songOffset = m_song_start_offset;
+    std::thread([&, path, songFile, fadeIn, fadeOut, bgVolume, sfxVolume, isTestmode, songOffset]() {
+        std::stringstream stream;
+        stream << '"' << m_ffmpeg_path << '"' << " -y -f rawvideo -pix_fmt rgb24 -s " << m_width << "x" << m_height << " -r " << m_fps
+            << " -i - ";
+        if (!m_codec.empty())
+            stream << "-c:v " << m_codec << " ";
+        if (!m_bitrate.empty())
+            stream << "-b:v " << m_bitrate << " ";
+        if (!m_extra_args.empty())
+            stream << m_extra_args << " ";
+        else
+            stream << "-pix_fmt yuv420p ";
+        stream << "-vf \"vflip\" -an \"" << path << "\" "; // i hope just putting it in "" escapes it
+        std::cout << "executing: " << stream.str() << std::endl;
+        auto process = subprocess::Popen(stream.str());
+        while (m_recording || m_frame_has_data) {
+            m_lock.lock();
+            if (m_frame_has_data) {
+                const auto frame = m_current_frame; // copy it
+                m_frame_has_data = false;
+                m_lock.unlock();
+                process.m_stdin.write(frame.data(), frame.size());
+            }
+            else m_lock.unlock();
+        }
+        if (process.close()) {
+            std::cout << "ffmpeg errored :(" << std::endl;
+            return;
+        }
+        std::cout << "video should be done now" << std::endl;
+        if (!m_include_audio || !std::filesystem::exists(songFile)) return;
+        wchar_t buffer[MAX_PATH];
+        if (!GetTempFileNameW(widen(std::filesystem::temp_directory_path().string().c_str()).c_str(), L"rec", 0, buffer)) {
+            std::cout << "error getting temp file" << std::endl;
+            return;
+        }
+        auto temp_path = narrow(buffer) + "." + std::filesystem::path(path).filename().string();
+        std::filesystem::rename(buffer, temp_path);
+        auto total_time = m_last_frame_t; // 1 frame too short?
+        {
+            std::stringstream stream;
+            stream << '"' << m_ffmpeg_path << '"' << " -y -ss " << songOffset << " -i \"" << songFile
+                << "\" -i \"" << path << "\" -t " << total_time << " -c:v copy ";
+            if (!m_extra_audio_args.empty())
+                stream << m_extra_audio_args << " ";
+            stream << "-filter:a \"volume=1[0:a]";
+            if (fadeIn && !isTestmode)
+                stream << ";[0:a]afade=t=in:d=2[0:a]";
+            if (fadeOut && m_finished_level)
+                stream << ";[0:a]afade=t=out:d=2:st=" << (total_time - m_after_end_duration - 3.5f) << "[0:a]";
+            std::cout << "in " << fadeIn << " out " << fadeOut << std::endl;
+            stream << "\" \"" << temp_path << "\"";
+            std::cout << "executing: " << stream.str() << std::endl;
+            auto process = subprocess::Popen(stream.str());
+            if (process.close()) {
+                std::cout << "oh god adding the song went wrong cmon" << std::endl;
+                return;
+            }
+        }
+        std::filesystem::remove(widen(path.c_str()));
+        std::filesystem::rename(temp_path, widen(path.c_str()));
+        std::cout << "video + audio should be done now!" << std::endl;
+        }).detach();
+}
+
+void Recorder::stop() {
+    m_renderer.end();
+    m_recording = false;
+    setting().onCaptureRender = false;
+}
+
+void MyRenderTexture::begin() {
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &m_old_fbo);
+
+    m_texture = new CCTexture2D;
+    {
+        auto data = malloc(m_width * m_height * 3);
+        memset(data, 0, m_width * m_height * 3);
+        m_texture->initWithData(data, kCCTexture2DPixelFormat_RGB888, m_width, m_height, CCSize(static_cast<float>(m_width), static_cast<float>(m_height)));
+        free(data);
+    }
+
+    glGetIntegerv(GL_RENDERBUFFER_BINDING_EXT, &m_old_rbo);
+
+    glGenFramebuffersEXT(1, &m_fbo);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture->getName(), 0);
+
+    m_texture->setAliasTexParameters();
+
+    m_texture->autorelease();
+
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, m_old_rbo);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);
+}
+
+void MyRenderTexture::capture(std::mutex& lock, std::vector<u8>& data, volatile bool& lul) {
+    glViewport(0, 0, m_width, m_height);
+
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &m_old_fbo);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
+
+    auto director = CCDirector::sharedDirector();
+    auto scene = director->getRunningScene();
+    scene->visit();
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    lock.lock();
+    lul = true;
+    glReadPixels(0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, data.data());
+    lock.unlock();
+
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_old_fbo);
+    director->setViewport();
+}
+
+void MyRenderTexture::end() {
+    m_texture->release();
+}
+
+void Recorder::capture_frame() {
+    while (m_frame_has_data) {}
+    m_renderer.capture(m_lock, m_current_frame, m_frame_has_data);
+}
+
+void Recorder::handle_recording(gd::PlayLayer* playLayer, float dt) {
+    if (!playLayer->m_showingEndLayer || m_after_end_extra_time < m_after_end_duration) {
+        if (playLayer->m_showingEndLayer) {
+            m_after_end_extra_time += dt;
+            m_finished_level = true;
+        }
+        auto frame_dt = 1. / static_cast<double>(m_fps);
+        auto time = playLayer->m_levelTime + m_extra_t - m_last_frame_t;
+        if (time >= frame_dt) {
+            gd::FMODAudioEngine::sharedEngine()->setBackgroundMusicTime(
+                playLayer->m_levelTime + m_song_start_offset);
+            m_extra_t = time - frame_dt;
+            m_last_frame_t = playLayer->m_levelTime;
+            capture_frame();
+        }
+    }
+    else {
+        stop();
+    }
+}
+
+void Recorder::update_song_offset(gd::PlayLayer* playLayer) {
+    // from what i've checked rob doesnt store the timeforxpos result anywhere, so i have to calculate it again
+    m_song_start_offset = playLayer->m_levelSettings->m_songOffset + playLayer->timeForXPos(
+        playLayer->m_player->m_realPlayerPos.x, playLayer->m_testMode);
+}

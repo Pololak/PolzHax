@@ -36,6 +36,11 @@ namespace gd {
 		void playBackgroundMusic(bool p0, FMOD::Channel* channel, std::string path) {
 			reinterpret_cast<void(__thiscall*)(FMODAudioEngine*, bool, FMOD::Channel*, std::string)>(base + 0x16850)(this, p0, channel, path);
 		}
+
+		void setBackgroundMusicTime(float time) {
+			__asm movss xmm1, time
+			reinterpret_cast<void(__thiscall*)(FMODAudioEngine*)>(base + 0x16a80)(this);
+		}
 	};
 }
 

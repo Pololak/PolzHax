@@ -120,56 +120,56 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", gjam)->getCString());
 		}
 
-		if (ImGui::Checkbox("Borderless Fullscreen", &setting().onBorderlessFullscreen)) {
-			if (setting().onBorderlessFullscreen) {
-				if (egl->m_bIsFullscreen) {
-					gm->setGameVariable("0025", false);
-					gm->reloadAll(true, false, true);
-				}
+		//if (ImGui::Checkbox("Borderless Fullscreen", &setting().onBorderlessFullscreen)) {
+		//	if (setting().onBorderlessFullscreen) {
+		//		if (egl->m_bIsFullscreen) {
+		//			gm->setGameVariable("0025", false);
+		//			gm->reloadAll(true, false, true);
+		//		}
 
-				HWND windowHwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(egl->m_pMainWindow) + 0x244));
-				LONG windowStyle = GetWindowLong(windowHwnd, GWL_STYLE);
-				SetWindowLong(windowHwnd, GWL_STYLE, windowStyle & ~(WS_CAPTION | WS_SIZEBOX | WS_SYSMENU));
+		//		HWND windowHwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(egl->m_pMainWindow) + 0x244));
+		//		LONG windowStyle = GetWindowLong(windowHwnd, GWL_STYLE);
+		//		SetWindowLong(windowHwnd, GWL_STYLE, windowStyle & ~(WS_CAPTION | WS_SIZEBOX | WS_SYSMENU));
 
-				toggleFreeWindowResize(true);
+		//		toggleFreeWindowResize(true);
 
-				HMONITOR monitor = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
-				MONITORINFO monitorInfo;
-				monitorInfo.cbSize = sizeof(MONITORINFO);
-				if (!GetMonitorInfo(monitor, &monitorInfo)) {
-					return;
-				}
+		//		HMONITOR monitor = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
+		//		MONITORINFO monitorInfo;
+		//		monitorInfo.cbSize = sizeof(MONITORINFO);
+		//		if (!GetMonitorInfo(monitor, &monitorInfo)) {
+		//			return;
+		//		}
 
-				RECT monitorRect = monitorInfo.rcMonitor;
+		//		RECT monitorRect = monitorInfo.rcMonitor;
 
-				auto width = monitorRect.right - monitorRect.left;
-				auto height = monitorRect.bottom - monitorRect.top;
+		//		auto width = monitorRect.right - monitorRect.left;
+		//		auto height = monitorRect.bottom - monitorRect.top;
 
-				SetWindowPos(windowHwnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-				egl->resizeWindow(width, height);
-			}
-			else {
-				HWND windowHwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(egl->m_pMainWindow) + 0x244));
-				SetWindowLong(windowHwnd, GWL_STYLE, 0x6cf0000);
+		//		SetWindowPos(windowHwnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+		//		egl->resizeWindow(width, height);
+		//	}
+		//	else {
+		//		HWND windowHwnd = WindowFromDC(*reinterpret_cast<HDC*>(reinterpret_cast<uintptr_t>(egl->m_pMainWindow) + 0x244));
+		//		SetWindowLong(windowHwnd, GWL_STYLE, 0x6cf0000);
 
-				toggleFreeWindowResize(false);
+		//		toggleFreeWindowResize(false);
 
-				HMONITOR monitor = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
-				MONITORINFO monitorInfo;
-				monitorInfo.cbSize = sizeof(MONITORINFO);
-				if (!GetMonitorInfo(monitor, &monitorInfo)) {
-					return;
-				}
+		//		HMONITOR monitor = MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
+		//		MONITORINFO monitorInfo;
+		//		monitorInfo.cbSize = sizeof(MONITORINFO);
+		//		if (!GetMonitorInfo(monitor, &monitorInfo)) {
+		//			return;
+		//		}
 
-				RECT monitorRect = monitorInfo.rcMonitor;
+		//		RECT monitorRect = monitorInfo.rcMonitor;
 
-				auto width = egl->m_obWindowedSize.width;
-				auto height = egl->m_obWindowedSize.height;
+		//		auto width = egl->m_obWindowedSize.width;
+		//		auto height = egl->m_obWindowedSize.height;
 
-				SetWindowPos(windowHwnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-				egl->resizeWindow(width, height);
-			}
-		}
+		//		SetWindowPos(windowHwnd, HWND_TOP, monitorRect.left, monitorRect.top, width, height, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+		//		egl->resizeWindow(width, height);
+		//	}
+		//}
 
 		if (ImGui::CollapsingHeader("Account info (password)")) {
 			ImGui::Text("Username: %s", gjam->m_username.c_str());
@@ -186,6 +186,8 @@ void renderDebugModule() {
 		ImGui::Checkbox("Fix Slabs Y Offset", &setting().m_fixSlabOffset);
 
 		ImGui::Checkbox("Small Saw Hitbox", &setting().m_smallSawHitbox);
+
+		ImGui::Checkbox("Backup Fix", &setting().onBackupFix);
 		
 		if (ImGui::Button("Reload Sounds")) {
 			gd::GameSoundManager::sharedState()->preload();
@@ -208,6 +210,11 @@ void renderDebugModule() {
 			ImGui::Text("Name: %s", songObject->m_songName.c_str());
 			ImGui::Text("Artist: %s", songObject->m_artistName.c_str());
 			ImGui::Text("File Size: %.02fMB", songObject->m_fileSize);
+		}
+
+		static bool testbool69 = false;
+		if (ImGui::Button(testbool69 ? "On" : "Off")) {
+			testbool69 = !testbool69;
 		}
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
@@ -274,6 +281,10 @@ void renderDebugModule() {
 			auto bgRef = pl->m_backgroundSprite->getColor();
 			float bgColor[4] = { bgRef.r / 255.f, bgRef.g / 255.f, bgRef.b / 255.f, 1.f };
 			ImGui::ColorEdit4("BG", bgColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoOptions | ImGuiColorEditFlags_NoPicker);
+
+			if (ImGui::Button("SetBackgroundMusicTime")) {
+				fme->setBackgroundMusicTime(40.f);
+			}
 		}
 
 		auto editorLayer = LevelEditorLayer::get();

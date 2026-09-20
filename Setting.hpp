@@ -212,6 +212,19 @@ struct SettingStruct {
 	bool onSameDualColor;
 	bool onIconRandomizer; bool onRandomizeCube = true, onRandomizeShip = true, onRandomizeBall = true, onRandomizeUFO = true, onRandomizeDart = true, onRandomizeColor1 = true, onRandomizeColor2 = true, onRandomizeTrail = true;
 
+	// Recorder
+	bool onCaptureRender;
+	int m_captureWidth = 1920;
+	int m_captureHeight = 1080;
+	int m_captureFPS = 60;
+	bool onCaptureRenderUntilEnd = true;
+	int m_afterEndDur = 3;
+	bool onCaptureIncludeAudio = true;
+	std::string m_captureBitrate = "30M";
+	std::string m_captureCodec = "";
+	std::string m_captureExtraArgs = "";
+	std::string m_captureExtraAudioArgs = "";
+
 	// Editor settings
 	bool onSelectFilter;
 	bool onShowObjectInfo;
@@ -244,6 +257,7 @@ struct SettingStruct {
 	bool m_fixSlabOffset;
 	bool m_smallSawHitbox;
 	bool onBorderlessFullscreen;
+	bool onBackupFix;
 
 	// GDPS Switcher
 	std::string originalServerURL;
@@ -463,6 +477,18 @@ DEF_SCHEMA(
 	onSameDualColor,
 	onIconRandomizer, onRandomizeCube, onRandomizeShip, onRandomizeBall, onRandomizeUFO, onRandomizeDart, onRandomizeColor1, onRandomizeColor2, onRandomizeTrail,
 
+	// Recorder
+	m_captureWidth,
+	m_captureHeight,
+	m_captureFPS,
+	onCaptureRenderUntilEnd,
+	m_afterEndDur,
+	onCaptureIncludeAudio,
+	m_captureBitrate,
+	m_captureCodec,
+	m_captureExtraArgs,
+	m_captureExtraAudioArgs,
+
 	// Editor settings
 	onSelectFilter,
 	onShowObjectInfo,
@@ -490,6 +516,7 @@ DEF_SCHEMA(
 	m_liveColorEnabled,
 	m_fixSlabOffset,
 	onBorderlessFullscreen,
+	onBackupFix,
 
 	onEnableSwitcher, m_serverIndex, m_customServerURL,
 

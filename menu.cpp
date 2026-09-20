@@ -25,9 +25,11 @@
 #include "PitchShifter.hpp"
 #include "PolzBot.hpp"
 #include "DiscordManager.hpp"
+#include "Recorder.hpp"
 
 #include "portable-file-dialogs.h"
 #include <fstream>
+#include <nfd.h>
 
 ImVec4 color1;
 ImVec4 color2;
@@ -326,6 +328,7 @@ void sortTabs() {
 		ImGui::SetWindowPos(ImVec2(universal_xPos, addingSpeedhackY));
 	}
 	float addingIconsY = -1.f;
+	float addingCaptureY = -1.f;
 	{
 		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Status", nullptr);
@@ -336,7 +339,14 @@ void sortTabs() {
 		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		ImGui::Begin("Icons", nullptr);
 		ImGui::SetWindowPos(ImVec2(status_xPos, addingIconsY));
+		addingCaptureY = addingIconsY + ImGui::GetWindowHeight() + 5.f * setting().UISize;
 	}
+	{
+		ImGui::SetWindowSize(ImVec2(200.f * setting().UISize, 0.f));
+		ImGui::Begin("Capture", nullptr);
+		ImGui::SetWindowPos(ImVec2(status_xPos, addingCaptureY));
+	}
+
 }
 
 void updateUISize() {
@@ -3963,6 +3973,117 @@ void imgui_render() {
 			//}
 		}
 
+		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
+		if (ImGui::Begin("Capture", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
+			auto& recorder = Recorder::get();
+
+			if (playLayer == nullptr) {
+				ImGui::BeginDisabled();
+			}
+			if (ImGui::CheckboxF("Record", &setting().onCaptureRender)) {
+				recorder.m_until_end = setting().onCaptureRenderUntilEnd;
+				recorder.m_after_end_duration = setting().m_afterEndDur;
+				recorder.m_include_audio = setting().onCaptureIncludeAudio;
+				recorder.m_width = setting().m_captureWidth;
+				recorder.m_height = setting().m_captureHeight;
+				recorder.m_bitrate = setting().m_captureBitrate;
+				recorder.m_fps = setting().m_captureFPS;
+				recorder.m_codec = setting().m_captureCodec;
+				recorder.m_extra_args = setting().m_captureExtraArgs;
+				recorder.m_extra_audio_args = setting().m_captureExtraAudioArgs;
+
+				if (setting().onCaptureRender) {
+					nfdchar_t* path = nullptr;
+					if (NFD_SaveDialog("mp4;mkv;webm", nullptr, &path) == NFD_OKAY) {
+						if (!setting().onPlayMacro) {
+							setting().onPlayMacro = true;
+						}
+						recorder.start(path);
+						free(path);
+					}
+					else {
+						setting().onCaptureRender = false;
+					}
+				}
+				else {
+					recorder.stop();
+				}
+			}
+			if (playLayer == nullptr) {
+				ImGui::EndDisabled();
+			}
+
+			if (ImGui::CheckboxF("Render Until The End", &setting().onCaptureRenderUntilEnd)) {
+				recorder.m_until_end = setting().onCaptureRenderUntilEnd;
+			}
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##untilEndSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::DragInt("Seconds", &setting().m_afterEndDur, 1.f, 0, 10)) {
+					if (setting().m_afterEndDur < 0) setting().m_afterEndDur = 0;
+
+					recorder.m_after_end_duration = setting().m_afterEndDur;
+				}
+
+				ImGui::TreePop();
+			}
+
+			if (ImGui::CheckboxF("Include Audio", &setting().onCaptureIncludeAudio)) {
+				recorder.m_include_audio = setting().onCaptureIncludeAudio;
+			}
+
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+			if (ImGui::DragInt("##captureWidth", &setting().m_captureWidth, 1.f, 1, 3840, "W: %d")) {
+				if (setting().m_captureWidth < 1) setting().m_captureWidth = 1;
+
+				recorder.m_width = setting().m_captureWidth;
+			}
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+			if (ImGui::DragInt("##captureHeight", &setting().m_captureHeight, 1.f, 1, 2160, "H: %d")) {
+				if (setting().m_captureHeight < 1) setting().m_captureHeight = 1;
+
+				recorder.m_height = setting().m_captureHeight;
+			}
+
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+			if (ImGui::InputText("##captureBitrate", &setting().m_captureBitrate)) {
+				recorder.m_bitrate = setting().m_captureBitrate;
+			}
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+			if (ImGui::DragInt("##captureFPS", &setting().m_captureFPS, 1.f, 1, 120, "%d FPS")) {
+				if (setting().m_captureFPS < 1) setting().m_captureFPS = 1;
+
+				recorder.m_fps = setting().m_captureFPS;
+			}
+
+			ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+			if (ImGui::InputText("Codec", &setting().m_captureCodec)) {
+				recorder.m_codec = setting().m_captureCodec;
+			}
+
+			ImGui::SetNextItemWidth(LONG_ITEM_WIDTH());
+			if (ImGui::TreeNodeEx("Advanced Options", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::InputText("Extra Args", &setting().m_captureExtraArgs)) {
+					recorder.m_extra_args = setting().m_captureExtraArgs;
+				}
+
+				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				if (ImGui::InputText("Audio Args", &setting().m_captureExtraAudioArgs)) {
+					recorder.m_extra_audio_args = setting().m_captureExtraAudioArgs;
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
 		if (setting().onCocosExplorer) {
 			renderCocosExplorer(setting().onCocosExplorer);
 		}
@@ -4027,6 +4148,14 @@ void setupImGuiMenu() {
 	if (!std::filesystem::is_directory("PolzHax/texturepacks") || !std::filesystem::exists("PolzHax/texturepacks"))
 	{
 		std::filesystem::create_directory("PolzHax/texturepacks");
+	}
+	if (!std::filesystem::is_directory(CCFileUtils::sharedFileUtils()->getWritablePath() + "PolzHax") || !std::filesystem::exists(CCFileUtils::sharedFileUtils()->getWritablePath() + "PolzHax"))
+	{
+		std::filesystem::create_directory(CCFileUtils::sharedFileUtils()->getWritablePath() + "PolzHax");
+	}
+	if (!std::filesystem::is_directory(CCFileUtils::sharedFileUtils()->getWritablePath() + "PolzHax/backups") || !std::filesystem::exists(CCFileUtils::sharedFileUtils()->getWritablePath() + "PolzHax/backups"))
+	{
+		std::filesystem::create_directory(CCFileUtils::sharedFileUtils()->getWritablePath() + "PolzHax/backups");
 	}
 
 	auto extensionsPath = CCFileUtils::sharedFileUtils()->getWritablePath2() + "PolzHax/extensions";

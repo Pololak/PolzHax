@@ -344,6 +344,14 @@ namespace gd {
 
 			reinterpret_cast<void(__fastcall*)(PlayLayer*)>(base + 0xed0f0)(this);
 		}
+
+		float timeForXPos(float position, bool useActivatedSpeedObjects) {
+			float value;
+			__asm movss xmm1, position
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, bool)>(base + 0xee590)(this, useActivatedSpeedObjects);
+			__asm movss value, xmm0
+			return value;
+		}
 	};
 }
 

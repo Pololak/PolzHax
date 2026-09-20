@@ -1824,6 +1824,12 @@
     <ClInclude Include="CCEGLViewHook.hpp">
       <Filter>Файлы заголовков\Hooks</Filter>
     </ClInclude>
+    <ClInclude Include="subprocess.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Recorder.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2092,6 +2098,9 @@
     </ClCompile>
     <ClCompile Include="CCEGLViewHook.cpp">
       <Filter>Исходные файлы\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Recorder.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
