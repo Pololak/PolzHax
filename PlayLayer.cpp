@@ -1380,7 +1380,9 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 
 	if (setting().onPlayMacro) {
 		self->releaseButton(0, false);
+		self->m_player->releaseButton(0);
 		self->releaseButton(0, true);
+		self->m_player2->releaseButton(0);
 		PolzBot::m_eventIndex = 0;
 	}
 

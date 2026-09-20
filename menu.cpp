@@ -1307,8 +1307,10 @@ void imgui_render() {
 			if (ImGui::CheckboxF("Record", &setting().onRecordMacro)) {
 				setting().onPlayMacro = false;
 				setting().onPracticeFix = true;
-				setting().onClassicMode = true;
+				setting().onClassicMode = false;
 				setting().tpsValue = setting().fpsValue;
+
+				updateSpeedhack();
 
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();
@@ -1321,8 +1323,10 @@ void imgui_render() {
 
 				setting().onRecordMacro = false;
 				setting().onPracticeFix = true;
-				setting().onClassicMode = true;
+				setting().onClassicMode = false;
 				setting().tpsValue = setting().fpsValue;
+
+				updateSpeedhack();
 
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();

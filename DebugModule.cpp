@@ -120,6 +120,8 @@ void renderDebugModule() {
 			clipboard::write(CCString::createWithFormat("%p", gjam)->getCString());
 		}
 
+		ImGui::Text("Time Scale: %.2f", director->getScheduler()->getTimeScale());
+
 		//if (ImGui::Checkbox("Borderless Fullscreen", &setting().onBorderlessFullscreen)) {
 		//	if (setting().onBorderlessFullscreen) {
 		//		if (egl->m_bIsFullscreen) {

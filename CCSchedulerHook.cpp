@@ -12,7 +12,7 @@ void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, floa
 
 	if (playLayer && (recorder.m_recording || setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass) && !PauseLayer::get()) {
 		const auto fps = setting().tpsValue;
-		auto speedhack = (setting().onSpeedhack && setting().onClassicMode) ? setting().speedhackValue : self->getTimeScale();
+		auto speedhack = self->getTimeScale();
 
 		const float target_dt = 1.f / fps / speedhack;
 
