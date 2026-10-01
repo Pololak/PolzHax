@@ -221,6 +221,8 @@ void renderDebugModule() {
 
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
+			ImGui::Text("yVelocity: %.f", pl->m_player->m_yVelocity);
+
 			if (ImGui::CollapsingHeader("Replay Events")) {
 				auto& events = PolzBot::m_replayEventsVec;
 				for (int i = 0; i < events.size(); i++) {
@@ -302,6 +304,8 @@ void renderDebugModule() {
 			float screenBorderRight = editorLayer->m_gameLayer->convertToNodeSpace({ director->getScreenRight(), 0.f }).x;
 			ImGui::Text("Screen Borders: %f/%f", screenBorderLeft, screenBorderRight);
 		}
+
+		ImGui::Text("0x%p", &gd::PlayerObject::m_slopeYVel);
 	}
 	ImGui::End();
 }

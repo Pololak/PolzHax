@@ -152,6 +152,20 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
 					PlayLayer::nextStartPos();
 				}
 			}
+
+			if (setting().onFrameStepper) {
+				if (key == setting().m_forwardStepperKey) {
+					setting().frameStepperToggle = false;
+					CCSchedulerHook::update(CCDirector::sharedDirector()->getScheduler(), 1.f / setting().fpsValue);
+					setting().frameStepperToggle = true;
+				}
+				if (key == setting().m_toggleStepperKey) {
+					setting().frameStepperToggle = !setting().frameStepperToggle;
+				}
+				if (key == setting().m_backStepperKey) {
+
+				}
+			}
 		}
 	}
 

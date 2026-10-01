@@ -10,20 +10,17 @@ void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, floa
 	auto& recorder = Recorder::get();
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
 
-	if (playLayer && (recorder.m_recording || setting().onRecordMacro || setting().onPlayMacro || setting().onTPSBypass) && !PauseLayer::get()) {
+	if (playLayer && (recorder.m_recording || setting().onPlayMacro || setting().onRecordMacro || setting().onTPSBypass) && !PauseLayer::get()) {
 		const auto fps = setting().tpsValue;
-		auto speedhack = self->getTimeScale();
-
-		const float target_dt = 1.f / fps / speedhack;
+		const float target_dt = 1.f / fps;
 
 		if (!setting().onRealTime) {
 			return CCSchedulerHook::update(self, target_dt);
 		}
 
 		unsigned times = static_cast<int>((dt + g_left_over) / target_dt);
-		if (dt <= 0.f) {
+		if (dt == 0.f)
 			return CCSchedulerHook::update(self, target_dt);
-		}
 		auto start = std::chrono::high_resolution_clock::now();
 		for (unsigned i = 0; i < times; ++i) {
 			CCSchedulerHook::update(self, target_dt);

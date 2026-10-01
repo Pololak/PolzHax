@@ -13,19 +13,22 @@ namespace gd {
 
 	class PlayerObject : public GameObject {
 	public:
-		double m_slopeTime; // 0x328
-		PAD(8)
+		double m_slopeStartTime; // 0x328
+		bool m_placedStreakPoint; // 0x330
+		GameObject* m_collidedObject; // 0x334
 		cocos2d::CCDictionary* m_collisionLogTop; // 0x338
 		cocos2d::CCDictionary* m_collisionLogBottom; // 0x33c
 		int m_lastCollisionIdBottom; // 0x340
 		int m_lastCollisionIdTop; // 0x344
 		bool m_isRotating; // 0x348
-		PAD(3)
+		bool m_checkCollisions; // 0x349 used in checkCollisions and preSlopeCollision idk
 		GameObject* m_nextSlope; // 0x34c
 		GameObject* m_collidingSlope; // 0x350
-		PAD(12)
+		float m_slopeAngle; // 0x354
+		int m_collidingWithSlopeId; // 0x358
+		bool m_slopeFlipGravityRelated; // 0x35c
 		cocos2d::CCArray* m_particleSystems; // 0x360
-		PAD(4)
+		int m_iUnused1; // 0x364
 		GhostType m_ghostEffect; // 0x368
 		GhostTrailEffect* m_ghostTrailEffect; // 0x36c
 		cocos2d::CCSprite* m_playerFrame; // 0x370
@@ -41,43 +44,54 @@ namespace gd {
 		double m_speed; // 0x398
 		double m_yStart; // 0x3a0
 		double m_gravity; // 0x3a8
-		PAD(10)
+		float m_trailingParticleLife; // 0x3b0
+		float m_gameModeChangedTime; // 0x3b4
+		bool m_bUnknown4; // 0x3b8
+		bool m_bUnknown5; // 0x3b9
 		bool m_placedJumpCheckpoint; // 0x3ba
 		bool m_hasPlayLayer; // 0x3bb
-		PAD(1)
+		bool m_bUnknown6; // 0x3bc
 		bool m_particlesActive; // 0x3bd
 		bool m_flyFallParticlesActive; // 0x3be
 		bool m_inBallFall; // 0x3bf
-		PAD(12)
-		double m_lastJumpTime; // 0x3d0
-		PAD(32)
+		bool m_bUnknown8; // 0x3c0
+		double m_lastCheckpointTime; // 0x3cc
+		double m_lastJumpTime; // 0x3d4
+		double m_lastFlipTime; // 0x3dc
+		bool m_bUnknown9; // 0x3e4
+		bool m_bUnknown10; // 0x3e5
+		double m_accelerationOrSpeed; // 0x3e8
+		double m_snapDistance; // 0x3f0
 		GameObject* m_snapToObject; // 0x3f8
 		CheckpointObject* m_pendingCheckpoint; // 0x3fc
-		PAD(4)
+		int m_onFlyCheckpointTries; // 0x400
 		cocos2d::CCPoint m_lastUpdatePos; // 0x404
 		cocos2d::CCParticleSystemQuad* m_playerGroundParticles; // 0x40c
 		cocos2d::CCParticleSystemQuad* m_trailingParticles; // 0x410
 		cocos2d::CCParticleSystemQuad* m_shipClickParticles; // 0x414
 		cocos2d::CCParticleSystemQuad* m_vehicleGroundParticles; // 0x418
 		cocos2d::CCParticleSystemQuad* m_ufoClickParticles; // 0x41c
-		PAD(4)
+		bool m_useLandParticles; // 0x420
 		cocos2d::CCParticleSystemQuad* m_landParticles; // 0x424
 		cocos2d::CCParticleSystemQuad* m_landParticles2; // 0x428
-		PAD(8)
+		float m_landParticlesAngle; // 0x42c
+		float m_landParticleRelatedY; // 0x430
 		int m_streakType; // 0x434
-		PAD(12)
+		float m_slopeRotation; // 0x438
+		float m_currentSlopeYVelocity; // 0x43c
+		float m_lastPlayerYPosOnSlope; // 0x440 it changes when you're colliding with slope
 		bool m_inBoost; // 0x444
-		PAD(11)
+		bool m_isCurrentSlopeTop; // 0x445
+		float m_updateCollideBottom; // 0x448
+		float m_updateCollideTop; // 0x44c
 		bool m_hardStreakActive; // 0x450
-		PAD(1)
+		bool m_canPlaceCheckpoint; // 0x451
 		bool m_tookDamage; // 0x452
 		bool m_upKeyDown; // 0x453
 		bool m_upKeyPressed; // 0x454
-		PAD(3)
 		double m_yVelocity; // 0x458
 		bool m_onSlope; // 0x460
 		bool m_wasOnSlope; // 0x461
-		PAD(2)
 		float m_slopeYVel; // 0x464
 		bool m_flyMode; // 0x468
 		bool m_birdMode; // 0x469
@@ -86,7 +100,6 @@ namespace gd {
 		bool m_gravityFlipped; // 0x46c
 		bool m_isDead; // 0x46d
 		bool m_canJump; // 0x46e
-		PAD(1)
 		float m_playerScale; // 0x470
 		float m_timeMod; // 0x474
 		cocos2d::CCPoint m_lastPos; // 0x478
@@ -106,10 +119,8 @@ namespace gd {
 		cocos2d::CCPoint m_realPlayerPos; // 0x4a8
 		bool m_isSecondPlayer; // 0x4b0
 		bool m_dualMode; // 0x4b1
-		PAD(2)
 		double m_clkTimer; // 0x4b8
 		bool m_disableEffects; // 0x4c0
-		PAD(3)
 		GameplayDelegate* m_gameDelegate; // 0x4c4
 		float m_audioScale; // 0x4c8
 		float m_groundHeight; // 0x4cc

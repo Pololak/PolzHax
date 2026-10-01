@@ -126,7 +126,7 @@ struct SettingStruct {
 	bool onEverythingHurts;
 	bool onEverythingPulses;
 	bool onForceBlockType;
-	bool onFrameStepper; int m_toggleStepper, m_backStepper, m_forwardStepper;
+	bool onFrameStepper, frameStepperToggle = true; int m_toggleStepperKey, m_backStepperKey, m_forwardStepperKey;
 	bool onFreezePlayer;
 	bool onHighFPSRotationFix;
 	bool onHitboxMultiplier; float solidHitboxesMult = .5f, hazardHitboxesMult = .5f, sawHitboxesMult = .5f, specialHitboxesMult = .5f;
@@ -392,7 +392,7 @@ DEF_SCHEMA(
 	onEverythingHurts,
 	onEverythingPulses,
 	onForceBlockType,
-	onFrameStepper, m_toggleStepper, m_backStepper, m_forwardStepper,
+	onFrameStepper, frameStepperToggle, m_toggleStepperKey, m_backStepperKey, m_forwardStepperKey,
 	onFreezePlayer,
 	onHighFPSRotationFix,
 	onHitboxMultiplier, solidHitboxesMult, hazardHitboxesMult, sawHitboxesMult, specialHitboxesMult,

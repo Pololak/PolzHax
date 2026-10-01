@@ -1080,6 +1080,8 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 }
 
 void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
+	if (setting().onFrameStepper && setting().frameStepperToggle) return;
+
 	if (self->m_practiceMode || self->m_testMode) {
 		if (m_smoothFrames > 0) {
 			auto ideal_dt = CCDirector::sharedDirector()->getAnimationInterval();
@@ -1303,6 +1305,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 
 	m_noclipAccuracy = 100.f;
 
+	setting().frameStepperToggle = true;
+
 	PlayLayer::resetLevel(self);
 
 	Recorder::get().update_song_offset(self);
@@ -1325,15 +1329,8 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 			if (it != m_checkpointStorage.end()) {
 				auto& currentCheckpointStorage = it->second;
 
-				self->m_cameraPortal = currentCheckpointStorage.m_cameraPortal;
-				self->m_dualModeCamera = currentCheckpointStorage.m_dualPortal;
-
-				self->m_player->m_realPlayerPos = currentCheckpointStorage.m_player1RealPos;
-				self->m_player2->m_realPlayerPos = currentCheckpointStorage.m_player2RealPos;
-				self->m_player->m_yVelocity = currentCheckpointStorage.m_yVelocity;
-				self->m_player2->m_yVelocity = currentCheckpointStorage.m_yVelocityP2;
-				self->m_player->setRotation(currentCheckpointStorage.m_rotation);
-				self->m_player2->setRotation(currentCheckpointStorage.m_rotationP2);
+				currentCheckpointStorage.m_playerCheckpointData.apply(self->m_player);
+				currentCheckpointStorage.m_player2CheckpointData.apply(self->m_player2);
 
 				if (setting().onStoreObjects) {
 					for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
@@ -1715,16 +1712,9 @@ void __fastcall PlayLayer::loadLastCheckpointH(gd::PlayLayer* self) {
 gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* self) {
 	auto ret = PlayLayer::createCheckpoint(self);
 
-	m_checkpointStorage[ret] = {
-		self->m_cameraPortal,
-		self->m_dualModeCamera,
-		self->m_player->m_realPlayerPos,
-		self->m_player2->m_realPlayerPos,
-		self->m_player->m_yVelocity,
-		self->m_player2->m_yVelocity,
-		self->m_player->getRotation(),
-		self->m_player2->getRotation()
-	};
+	auto& checkpointStorage = m_checkpointStorage[ret];
+	checkpointStorage.m_playerCheckpointData.store(self->m_player);
+	checkpointStorage.m_player2CheckpointData.store(self->m_player2);
 
 	for (auto section : CCArrayExt<CCArray*>(self->m_levelSections)) {
 		if (section) {
@@ -1747,7 +1737,7 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 					case gd::GameObjectType::UfoPortal:
 					case gd::GameObjectType::WavePortal:
 						if (object->m_hasBeenActivatedP1 || object->m_hasBeenActivatedP2) {
-							m_checkpointStorage[ret].m_activatedObjects[object] = { object->m_hasBeenActivatedP1, object->m_hasBeenActivatedP2 };
+							checkpointStorage.m_activatedObjects[object] = { object->m_hasBeenActivatedP1, object->m_hasBeenActivatedP2 };
 						}
 					}
 				}
@@ -1755,10 +1745,10 @@ gd::CheckpointObject* __fastcall PlayLayer::createCheckpointH(gd::PlayLayer* sel
 		}
 	}
 
-	m_checkpointStorage[ret].m_currentFrame = m_currentFrame;
-	m_checkpointStorage[ret].m_frameOffset = PlayLayer::getCurrentFrame();
+	checkpointStorage.m_currentFrame = m_currentFrame;
+	checkpointStorage.m_frameOffset = PlayLayer::getCurrentFrame();
 
-	m_checkpointStorage[ret].m_replayEventsVec = PolzBot::m_replayEventsVec;
+	checkpointStorage.m_replayEventsVec = PolzBot::m_replayEventsVec;
 
 	return ret;
 }

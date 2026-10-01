@@ -146,20 +146,11 @@ void updatePriority() {
 void PolzHax::updateFPSBypass() {
 	auto currentFps = setting().fpsValue;
 
-	if (currentFps == 0.f) {
+	if (currentFps <= 1.f) {
 		currentFps = 60.f;
 	}
 
-	if (setting().onFPSBypass) {
-		CCApplication::sharedApplication()->toggleVerticalSync(false);
-		CCDirector::sharedDirector()->setAnimationInterval(1.0 / static_cast<double>(currentFps));
-	}
-	else {
-		CCDirector::sharedDirector()->setAnimationInterval(1.0 / 60.0);
-		if (gd::GameManager::sharedState()->getGameVariable("0030")) {
-			CCApplication::sharedApplication()->toggleVerticalSync(true);
-		}
-	}
+	CCDirector::sharedDirector()->setAnimationInterval(1.0 / (setting().onFPSBypass ? static_cast<double>(currentFps) : 60.0));
 }
 
 void updateSpeedhack() {
@@ -1306,8 +1297,8 @@ void imgui_render() {
 
 			if (ImGui::CheckboxF("Record", &setting().onRecordMacro)) {
 				setting().onPlayMacro = false;
+
 				setting().onPracticeFix = true;
-				setting().onClassicMode = false;
 				setting().tpsValue = setting().fpsValue;
 
 				updateSpeedhack();
@@ -1322,8 +1313,8 @@ void imgui_render() {
 				PolzBot::m_eventIndex = 0;
 
 				setting().onRecordMacro = false;
+
 				setting().onPracticeFix = true;
-				setting().onClassicMode = false;
 				setting().tpsValue = setting().fpsValue;
 
 				updateSpeedhack();
@@ -2645,6 +2636,30 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Treats all objects as if they were blocks.");
 
+			ImGui::CheckboxF("Frame Stepper", &setting().onFrameStepper);
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##frameStepperSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				if (setting().onDeveloperMode) {
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					ImGui::AlignTextToFramePadding();
+					ImGui::Text("Toggled: %s", setting().frameStepperToggle ? "true" : "false");
+				}
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::HotKey("Forward", setting().m_forwardStepperKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::HotKey("Toggle", setting().m_toggleStepperKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
+
+				if (setting().onDeveloperMode) {
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					ImGui::HotKey("Back", setting().m_backStepperKey, 0.f, ImVec2(80.f * setting().UISize, 0.f));
+				}
+				
+
+				ImGui::TreePop();
+			}
+
 			if (ImGui::CheckboxF("Freeze Player", &setting().onFreezePlayer)) {
 				if (setting().onFreezePlayer) {
 					sequence_patch(gd::base + 0xe9dd3, { 0xe9, 0x3f, 0x01, 0x00, 0x00, 0x90 });
@@ -2665,39 +2680,41 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Fixed vehicles rotation on high fps (affects hitboxes).");
 
-			ImGui::CheckboxF("Hitbox Multiplier", &setting().onHitboxMultiplier);
-			ImGui::Tooltip("Changes the size of hitboxes.");
-			ImGui::SameLine(170.f * setting().UISize);
-			if (ImGui::TreeNodeEx("##hitboxMultiplierSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
-				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				if (ImGui::DragFloat("Solids", &setting().solidHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
-					if (setting().solidHitboxesMult < .1f) setting().solidHitboxesMult = .1f;
-					if (setting().solidHitboxesMult > 5.f) setting().solidHitboxesMult = 5.f;
-				}
+			if (setting().onDeveloperMode) {
+				ImGui::CheckboxF("Hitbox Multiplier", &setting().onHitboxMultiplier);
+				ImGui::Tooltip("Changes the size of hitboxes.");
+				ImGui::SameLine(170.f * setting().UISize);
+				if (ImGui::TreeNodeEx("##hitboxMultiplierSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+					ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					if (ImGui::DragFloat("Solids", &setting().solidHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+						if (setting().solidHitboxesMult < .1f) setting().solidHitboxesMult = .1f;
+						if (setting().solidHitboxesMult > 5.f) setting().solidHitboxesMult = 5.f;
+					}
 
-				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
-				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				if (ImGui::DragFloat("Hazards", &setting().hazardHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
-					if (setting().hazardHitboxesMult < .1f) setting().hazardHitboxesMult = .1f;
-					if (setting().hazardHitboxesMult > 5.f) setting().hazardHitboxesMult = 5.f;
-				}
+					ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					if (ImGui::DragFloat("Hazards", &setting().hazardHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+						if (setting().hazardHitboxesMult < .1f) setting().hazardHitboxesMult = .1f;
+						if (setting().hazardHitboxesMult > 5.f) setting().hazardHitboxesMult = 5.f;
+					}
 
-				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
-				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				if (ImGui::DragFloat("Saws", &setting().sawHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
-					if (setting().sawHitboxesMult < .1f) setting().sawHitboxesMult = .1f;
-					if (setting().sawHitboxesMult > 5.f) setting().sawHitboxesMult = 5.f;
-				}
+					ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					if (ImGui::DragFloat("Saws", &setting().sawHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+						if (setting().sawHitboxesMult < .1f) setting().sawHitboxesMult = .1f;
+						if (setting().sawHitboxesMult > 5.f) setting().sawHitboxesMult = 5.f;
+					}
 
-				ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
-				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
-				if (ImGui::DragFloat("Specials", &setting().specialHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
-					if (setting().specialHitboxesMult < .1f) setting().specialHitboxesMult = .1f;
-					if (setting().specialHitboxesMult > 5.f) setting().specialHitboxesMult = 5.f;
-				}
+					ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
+					ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+					if (ImGui::DragFloat("Specials", &setting().specialHitboxesMult, .05f, .1f, 5.f, "%.2fx")) {
+						if (setting().specialHitboxesMult < .1f) setting().specialHitboxesMult = .1f;
+						if (setting().specialHitboxesMult > 5.f) setting().specialHitboxesMult = 5.f;
+					}
 
-				ImGui::TreePop();
+					ImGui::TreePop();
+				}
 			}
 
 			if (ImGui::CheckboxF("Hitboxes", &setting().onHitboxes)) {
