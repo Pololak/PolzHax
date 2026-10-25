@@ -157,6 +157,7 @@ void MyRenderTexture::capture(std::mutex& lock, std::vector<u8>& data, volatile 
 
 void MyRenderTexture::end() {
     m_texture->release();
+    m_texture = nullptr;
 }
 
 void Recorder::capture_frame() {

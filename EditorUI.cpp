@@ -524,7 +524,7 @@ void __fastcall EditorUI::selectObjectsH(gd::EditorUI* self, void*, CCArray* obj
 		}
 		else if (setting().colorFilter) {
 			for (auto object : CCArrayExt<gd::GameObject*>(objects)) {
-				if (setting().colorFilter && static_cast<int>(object->getColorMode()) != setting().colorFilter) {
+				if (setting().colorFilter && static_cast<int>(object->getColorMode()) == setting().colorFilter) {
 					filteredObjects->addObject(object);
 				}
 			}

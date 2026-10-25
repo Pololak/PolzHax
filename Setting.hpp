@@ -113,6 +113,7 @@ struct SettingStruct {
 	bool onZoomBypass;
 
 	// Level
+	bool onTwoPlayerGravityBugFix;
 	bool onZeroPracticeComplete;
 	bool onAutoDeafen; bool onPauseUndeafen; bool onPracticeDeafen; bool onTestmodeDeafen; float deafenPercent = 50; float undeafenPercent = 100; int m_autoDeafenKey;
 	bool onAutoKill; float killPercentage = 50;
@@ -137,7 +138,8 @@ struct SettingStruct {
 	bool onInvisibleDualFix;
 	bool onJumpHack;
 	bool onKrazyManMode;
-	bool onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5; bool onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck;
+	bool onNoclip, onNoclipTint; int noclipTintR = 255, noclipTintG = 0, noclipTintB = 0; bool onNoclipUnstuck, onNoclipP1 = true, onNoclipP2 = true;
+	bool onNoclipLimits, onNoclipAccuracyLimit, onNoclipDeathsLimit; float noclipAccuracyLimit = 95.f; int noclipDeathsLimit = 5;
 	bool onNoHitbox;
 	bool onPauseDuringCompletion;
 	bool onPracticeFix, onStoreAccuracy, onStoreObjects;
@@ -146,6 +148,7 @@ struct SettingStruct {
 	bool onRespawnTime; float respawnValue = 1000.f;
 	bool onShipcopter;
 	bool onShowLayout; int layoutBGR = 40, layoutBGG = 125, layoutBGB = 255; int layoutGR = 0, layoutGG = 102, layoutGB = 255;
+	bool onShowTrajectory;
 	bool onSmartStartPos;
 	bool onStartPosSwitcher; int m_previousStartPosKey = 0x25, m_nextStartPosKey = 0x27;
 	bool onVoidClickFix;
@@ -379,6 +382,7 @@ DEF_SCHEMA(
 	onZoomBypass,
 
 	// Level
+	onTwoPlayerGravityBugFix,
 	onZeroPracticeComplete,
 	onAutoDeafen, onPauseUndeafen, onPracticeDeafen, onTestmodeDeafen, deafenPercent, undeafenPercent, m_autoDeafenKey,
 	onAutoKill, killPercentage,
@@ -402,7 +406,8 @@ DEF_SCHEMA(
 	onInstantComplete,
 	onInvisibleDualFix,
 	onJumpHack,
-	onNoclip, onNoclipAccuracyLimit, onNoclipDeathsLimit, noclipAccuracyLimit, noclipDeathsLimit, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck,
+	onNoclip, onNoclipTint, noclipTintR, noclipTintG, noclipTintB, onNoclipUnstuck, onNoclipP1, onNoclipP2,
+	onNoclipLimits, onNoclipAccuracyLimit, onNoclipDeathsLimit, noclipAccuracyLimit, noclipDeathsLimit,
 	onNoHitbox,
 	onPauseDuringCompletion,
 	onPracticeFix, onStoreAccuracy, onStoreObjects,
@@ -411,6 +416,7 @@ DEF_SCHEMA(
 	onRespawnTime, respawnValue,
 	onShipcopter,
 	onShowLayout, layoutBGR, layoutBGG, layoutBGB, layoutGR, layoutGG, layoutGB,
+	onShowTrajectory,
 	onSmartStartPos,
 	onStartPosSwitcher, m_previousStartPosKey, m_nextStartPosKey,
 	onVoidClickFix,

@@ -352,6 +352,15 @@ namespace gd {
 			__asm movss value, xmm0
 			return value;
 		}
+
+		void checkCollisions(PlayerObject* player, float dt) {
+			__asm movss xmm2, dt;
+			reinterpret_cast<void(__thiscall*)(PlayLayer*, PlayerObject*)>(base + 0xea180)(this, player);
+		}
+
+		bool isFlipping() {
+			return m_flipValue != 0.f && m_flipValue != 1.f;
+		}
 	};
 }
 

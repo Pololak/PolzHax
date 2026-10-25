@@ -8,5 +8,8 @@ namespace HardStreak {
 	inline void(__thiscall* resumeStreak)(gd::HardStreak*);
 	void __fastcall resumeStreakH(gd::HardStreak*);
 
+	inline void(__thiscall* addPoint)(gd::HardStreak*, CCPoint);
+	void __fastcall addPointH(gd::HardStreak*, void*, CCPoint);
+
 	void mem_init();
 }

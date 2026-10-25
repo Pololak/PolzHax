@@ -65,6 +65,9 @@ namespace PlayerObject {
 	inline void(__thiscall* resetObject)(gd::PlayerObject*);
 	void __fastcall resetObjectH(gd::PlayerObject*);
 
+	inline void(__thiscall* update)(gd::PlayerObject*, float);
+	void __fastcall updateH(gd::PlayerObject*, void*, float);
+
 	inline void(__thiscall* destructor)(gd::PlayerObject*);
 	void __fastcall destructorH(gd::PlayerObject*);
 

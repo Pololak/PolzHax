@@ -12,6 +12,7 @@
 #include <support/zip_support/ZipUtils.h>
 #include "json.hpp"
 #include <fstream>
+#include "Recorder.hpp"
 
 #include "utils.hpp"
 
@@ -219,8 +220,19 @@ void renderDebugModule() {
 			testbool69 = !testbool69;
 		}
 
+		auto& recorder = Recorder::get();
+		ImGui::Text("m_recording: %s", recorder.m_recording ? "true" : "false");
+		ImGui::Text("m_texture: %p", recorder.m_renderer.m_texture);
+
 		auto pl = gd::GameManager::sharedState()->getPlayLayer();
 		if (pl) {
+			ImGui::Text("m_lastPos: %.2f/%.2f", pl->m_player->m_lastPos.x, pl->m_player->m_lastPos.y);
+			ImGui::Text("m_realPlayerPos: %.2f/%.2f", pl->m_player->m_realPlayerPos.x, pl->m_player->m_realPlayerPos.y);
+
+			if (ImGui::Button("spawnFromPlayer")) {
+				pl->m_player->spawnFromPlayer(pl->m_player2);
+			}
+
 			ImGui::Text("yVelocity: %.f", pl->m_player->m_yVelocity);
 
 			if (ImGui::CollapsingHeader("Replay Events")) {
@@ -288,6 +300,13 @@ void renderDebugModule() {
 
 			if (ImGui::Button("SetBackgroundMusicTime")) {
 				fme->setBackgroundMusicTime(40.f);
+			}
+
+			if (ImGui::CollapsingHeader("CollisionTopLog")) {
+				ImGui::Text("%i", pl->m_player->m_collisionLogTop->count());
+				for (auto key : CCArrayExt<CCObject*>(pl->m_player->m_collisionLogTop->allKeys())) {
+					ImGui::Text("%p", key);
+				}
 			}
 		}
 

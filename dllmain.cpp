@@ -57,6 +57,60 @@
 
 #include <imgui-hook.hpp>
 
+class PlayerObjectExt : public gd::PlayerObject {
+	void flipGravityDecomp(bool flip, bool showEffect) {
+		if (this->m_gravityFlipped != flip) {
+			// local_14[0] = this;
+			this->placeStreakPoint();
+			this->m_gravityFlipped = flip;
+			this->m_lastFlipTime = this->m_clkTimer;
+			this->m_updateCollideTop = 0;
+			this->m_updateCollideBottom = 0;
+			if (this->m_wasOnSlope || this->m_onSlope) {
+				this->m_slopeFlipGravityRelated = this->m_slopeFlipGravityRelated == 0; // what
+			}
+			// this->resetCollisionLog();
+			// but actually
+			this->m_collisionLogTop->removeAllObjects();
+			this->m_collisionLogBottom->removeAllObjects();
+			this->m_lastCollisionIdBottom = 0;
+			this->m_lastCollisionIdTop = 0;
+			if (!this->m_bUnknown4) {
+				this->m_yVelocity *= .5f; // why?
+			}
+			// there's some animation related code so idc
+			//iVar6 = **(int**)((int)param_1_00 + 0x40c);
+			//fVar7 = (float10)(**(code**)(iVar6 + 0x1e8))();
+			//(**(code**)(iVar6 + 0x1ec))((float)(fVar7 + (float10)180.0));
+			//iVar6 = **(int**)((int)param_1_00 + 0x40c);
+			//pfVar2 = (float*)(**(code**)(**(int**)((int)param_1_00 + 0x40c) + 0x1f8))();
+			//iVar3 = (**(code**)(iVar6 + 0x1f8))();
+			//uVar4 = cocos2d::CCPoint::CCPoint((CCPoint*)local_14, *pfVar2, *(float*)(iVar3 + 4) * -1.0);
+			//(**(code**)(iVar6 + 0x1fc))(uVar4);
+			//iVar6 = **(int**)(iStack_18 + 0x41c);
+			//fVar7 = (float10)(**(code**)(iVar6 + 0x1e8))();
+			//(**(code**)(iVar6 + 0x1ec))((float)(fVar7 + (float10)180.0));
+			//iVar6 = **(int**)(iStack_18 + 0x41c);
+			//pfVar2 = (float*)(**(code**)(**(int**)(iStack_18 + 0x41c) + 0x1f8))();
+			//iVar3 = (**(code**)(iVar6 + 0x1f8))();
+			//uVar4 = cocos2d::CCPoint::CCPoint(aCStack_1c, *pfVar2, *(float*)(iVar3 + 4) * -1.0);
+			//(**(code**)(iVar6 + 0x1fc))(uVar4);
+			//if ((*(char*)(unaff_EBX + 0xee) == '\0') && (param_3 == '\0')) {
+			//	uVar8 = (undefined2)((uint)unaff_EDI >> 0x10);
+			//	if (param_2 == '\0') {
+			//		unaff_EDI = (undefined4*)CONCAT22(uVar8, 0x9600);
+			//	}
+			//	else {
+			//		unaff_EDI = (undefined4*)CONCAT22(uVar8, 0xc8ff);
+			//	}
+			//	spawnPortalCircle((int)unaff_EBX);
+			//}
+			// this->updatePlayerScale(); wow
+			// activate streak and runBallRotation2 ok
+		}
+	}
+};
+
 void(__thiscall* fpMainLoop)(cocos2d::CCDirector*);
 void __fastcall hkMainLoop(cocos2d::CCDirector* self) {
 	ImGuiHook::poll(self->getOpenGLView());
@@ -155,9 +209,8 @@ bool __fastcall CCKeyboardDispatcher_dispatchKeyboardMSGH(CCKeyboardDispatcher* 
 
 			if (setting().onFrameStepper) {
 				if (key == setting().m_forwardStepperKey) {
-					setting().frameStepperToggle = false;
-					CCSchedulerHook::update(CCDirector::sharedDirector()->getScheduler(), 1.f / setting().fpsValue);
-					setting().frameStepperToggle = true;
+					//PlayLayer::setStepFrame(true);
+					CCSchedulerHook::setNextFrame(true);
 				}
 				if (key == setting().m_toggleStepperKey) {
 					setting().frameStepperToggle = !setting().frameStepperToggle;

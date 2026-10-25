@@ -1,14 +1,26 @@
 #include "CCSchedulerHook.hpp"
 #include "PauseLayer.hpp"
+#include "LevelEditorLayer.hpp"
+#include "PlayLayer.hpp"
 #include "Setting.hpp"
 #include <chrono>
 #include "Recorder.hpp"
 
 float g_left_over = 0.f; // tps bypass by Mat ig (taken from ReplayBot https://github.com/matcool/ReplayBot/blob/9bb45e2ca6fa62aad939d9bcc18595085d90d7b6/src/hooks.cpp#L10)
+bool m_nextFrame = false;
+
+void CCSchedulerHook::setNextFrame(bool val) {
+	m_nextFrame = val;
+}
 
 void __fastcall CCSchedulerHook::updateH(cocos2d::CCScheduler* self, void*, float dt) {
 	auto& recorder = Recorder::get();
 	auto playLayer = gd::GameManager::sharedState()->getPlayLayer();
+
+	if (playLayer && playLayer->m_player->getPositionX() > 0.f && !PauseLayer::get()) {
+		if (setting().onFrameStepper && setting().frameStepperToggle && !m_nextFrame) return;
+		m_nextFrame = false;
+	}
 
 	if (playLayer && (recorder.m_recording || setting().onPlayMacro || setting().onRecordMacro || setting().onTPSBypass) && !PauseLayer::get()) {
 		const auto fps = setting().tpsValue;

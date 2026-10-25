@@ -728,6 +728,7 @@
     <ClInclude Include="schema.hpp" />
     <ClInclude Include="SetGroupIDLayer.hpp" />
     <ClInclude Include="ShareLevelLayer.hpp" />
+    <ClInclude Include="ShowTrajectory.hpp" />
     <ClInclude Include="SimplePlayer.hpp" />
     <ClInclude Include="SpeedHack.h" />
     <ClInclude Include="subprocess.hpp" />
@@ -826,6 +827,7 @@
     <ClCompile Include="SetGroupIDLayer.cpp" />
     <ClCompile Include="Setting.cpp" />
     <ClCompile Include="ShareLevelLayer.cpp" />
+    <ClCompile Include="ShowTrajectory.cpp" />
     <ClCompile Include="SimplePlayer.cpp" />
     <ClCompile Include="SpeedHack.cpp" />
     <ClCompile Include="SURVEY_PROGRAM.cpp" />

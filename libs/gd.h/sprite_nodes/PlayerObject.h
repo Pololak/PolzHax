@@ -209,6 +209,19 @@ namespace gd {
 		void runRotateAction(bool ground) {
 			reinterpret_cast<void(__fastcall*)(PlayerObject*, bool)>(base + 0xdab30)(this, ground);
 		}
+
+		virtual void update(float dt) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, float)>(base + 0xd9b50)(this, dt);
+		}
+
+		void updateRotation(float dt) {
+			__asm movss xmm1, dt
+			reinterpret_cast<void(__thiscall*)(PlayerObject*)>(base + 0xdc220)(this);
+		}
+
+		void spawnFromPlayer(PlayerObject* player) {
+			reinterpret_cast<void(__thiscall*)(PlayerObject*, PlayerObject*)>(base + 0xe11c0)(this, player);
+		}
 	};
 }
 

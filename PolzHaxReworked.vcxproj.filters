@@ -1830,6 +1830,9 @@
     <ClInclude Include="Recorder.hpp">
       <Filter>Файлы заголовков\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="ShowTrajectory.hpp">
+      <Filter>Файлы заголовков\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -2100,6 +2103,9 @@
       <Filter>Исходные файлы\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="Recorder.cpp">
+      <Filter>Исходные файлы\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowTrajectory.cpp">
       <Filter>Исходные файлы\Utils</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,6 +3,7 @@
 
 namespace PlayLayer {
 	inline int m_currentFrame;
+	inline bool m_updating;
 
 	inline bool(__thiscall* init)(gd::PlayLayer*, gd::GJGameLevel*);
 	bool __fastcall initH(gd::PlayLayer*, void*, gd::GJGameLevel*);
@@ -93,6 +94,9 @@ namespace PlayLayer {
 	std::vector<std::pair<float, float>> getNoclipPercentage();
 	float getNoclipAccuracy();
 	int getDeathsFull();
+	void setStepFrame(bool);
+	bool physicsChangesEnabled();
+	bool getWasPhysicsChangesEnabled();
 
 	void updateShowHitboxes();
 	void clearHitboxes();

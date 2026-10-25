@@ -3,6 +3,7 @@
 #include "Setting.hpp"
 #include "PracticeFix.hpp"
 #include "utils.hpp"
+#include "ShowTrajectory.hpp"
 
 void __fastcall GameObject::customSetupH(gd::GameObject* self) {
 	GameObject::customSetup(self);
@@ -54,10 +55,14 @@ void __fastcall RingObject::spawnCircleH(gd::RingObject* self) {
 }
 
 void __fastcall GameObject::playShineEffectH(gd::GameObject* self) {
+	if (ShowTrajectory::get().m_isSimulation) return;
+
 	if (!setting().onNoPortalShine) GameObject::playShineEffect(self);
 }
 
 void __fastcall GameObject::triggerObjectH(gd::GameObject* self) {
+	if (ShowTrajectory::get().m_isSimulation) return;
+
 	if (setting().onShowLayout && isColorTrigger(self)) {
 		return;
 	}

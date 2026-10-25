@@ -72,6 +72,21 @@ void updateCheatIndicator2(gd::EndLevelLayer* self) {
 			cheatIndicator->setColor(ccRED);
 		}
 	}
+
+	bool physicsChangesEnabled = PlayLayer::physicsChangesEnabled();
+	bool wasPhysicsChangesEnabled = PlayLayer::getWasPhysicsChangesEnabled();
+
+	auto physicsIndicator = static_cast<CCLabelBMFont*>(self->m_mainLayer->getChildByTag(508));
+	if (physicsIndicator) {
+		physicsIndicator->setVisible(physicsChangesEnabled || wasPhysicsChangesEnabled);
+	}
+
+	auto physicsLabel = static_cast<CCLabelBMFont*>(self->m_mainLayer->getChildByTag(509));
+	if (physicsLabel) {
+		if (physicsChangesEnabled || wasPhysicsChangesEnabled) {
+			physicsLabel->setString("(2P Fix)");
+		}
+	}
 }
 
 void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
@@ -84,7 +99,7 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	auto practiceButton = gd::CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_practiceBtn_001.png"), self, menu_selector(EndLevelLayer::Callback::onLastCheckpoint));
 	practiceButton->setPositionY(-125.f);
 
-	if (setting().onReplayLastCheckpoint && self->m_actionsMenu && gd::GameManager::sharedState()->getPlayLayer()->m_practiceMode) {
+	if (setting().onReplayLastCheckpoint && self->m_actionsMenu && playLayer->m_practiceMode) {
 		if (self->m_actionsMenu->getChildrenCount() == 2) {
 			static_cast<gd::CCMenuItemSpriteExtra*>(self->m_actionsMenu->getChildren()->objectAtIndex(0))->setPositionX(-100.f);
 			static_cast<gd::CCMenuItemSpriteExtra*>(self->m_actionsMenu->getChildren()->objectAtIndex(1))->setPositionX(100.f);
@@ -138,16 +153,30 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 	auto cheatIndicator = CCLabelBMFont::create(".", "bigFont.fnt");
 	cheatIndicator->setPosition(winSize.width / 2.f - 168.f, winSize.height / 2.f + 110.f);
 	self->m_mainLayer->addChild(cheatIndicator, 15, 507);
+	
+	// Physics indicator
+	auto physicsIndicator = CCLabelBMFont::create(".", "bigFont.fnt");
+	physicsIndicator->setPosition(winSize.width / 2.f - 168.f, winSize.height / 2.f + 100.f);
+	physicsIndicator->setColor(ccBLUE);
+	self->m_mainLayer->addChild(physicsIndicator, 15, 508);
 
 	updateCheatIndicator2(self);
 
-	auto versionLabel = CCLabelBMFont::create("v1.3.3 (V) 030926", "chatFont.fnt");
+	auto versionLabel = CCLabelBMFont::create("v1.3.3 (Vanilla)", "chatFont.fnt");
 	versionLabel->setScale(.6f);
 	versionLabel->setAnchorPoint({ 0.f, 1.f });
 	versionLabel->setColor(ccc3(100, 100, 100));
 	versionLabel->setOpacity(100);
 	versionLabel->setPosition(winSize.width / 2.f - 162.f, winSize.height / 2.f + 105.25f);
 	self->m_mainLayer->addChild(versionLabel, 15);
+
+	auto physicsLabel = CCLabelBMFont::create("", "chatFont.fnt");
+	physicsLabel->setScale(.6f);
+	physicsLabel->setAnchorPoint({ 0.f, 1.f });
+	physicsLabel->setColor(ccc3(100, 100, 100));
+	physicsLabel->setOpacity(100);
+	physicsLabel->setPosition(winSize.width / 2.f - 162.f, winSize.height / 2.f + 100.25f);
+	self->m_mainLayer->addChild(physicsLabel, 15, 509);
 
 	auto attemptsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(0);
 	auto jumpsLabel = self->m_mainLayer->getChildByType<CCLabelBMFont*>(1);
@@ -168,7 +197,7 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 		timeLabel->setPosition(winSize.width / 2.f - 80.f, winSize.height / 2.f + 11.f);
 
 		startPosLabel->setPosition(winSize.width / 2.f + 80.f, winSize.height / 2.f + 11.f);
-		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
+		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / playLayer->m_levelLength * 100.f));
 		startPosLabel->setString(CCString::createWithFormat("StartPos: %i%%", startPosLevelPos)->getCString());
 		self->m_mainLayer->addChild(startPosLabel, 3);
 
@@ -191,7 +220,7 @@ void __fastcall EndLevelLayer::customSetupH(gd::EndLevelLayer* self) {
 		timeLabel->setPositionY(timeLabel->getPositionY() + 10.f);
 
 		startPosLabel->setPosition(winSize.width / 2.f, winSize.height / 2.f - 29.f);
-		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / gd::GameManager::sharedState()->getPlayLayer()->m_levelLength * 100.f));
+		int startPosLevelPos = static_cast<int>(roundf(PlayLayer::getStartPositions()[PlayLayer::getCurrentStartPos()]->getPositionX() / playLayer->m_levelLength * 100.f));
 		startPosLabel->setString(CCString::createWithFormat("StartPos: %i%%", startPosLevelPos)->getCString());
 		self->m_mainLayer->addChild(startPosLabel, 3);
 	}

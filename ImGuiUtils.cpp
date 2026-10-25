@@ -3,6 +3,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "ImGuiUtils.hpp"
 #include <imgui/imgui_internal.h>
+#include "Setting.hpp"
 
 namespace StringH {
 	std::string vkToString(int vk) {
@@ -206,7 +207,12 @@ bool ImGui::CheckboxF(const char* label, bool* v) {
 	bool isDisabled = false;
 	if (!PolzHax::getTextFilter().PassFilter(label)) isDisabled = true;
 	ImGui::BeginDisabled(isDisabled);
+	
+	auto activatedColor = ImVec4(setting().overlayColor01 + 0.3f, setting().overlayColor02 + 0.3f, setting().overlayColor03 + 0.3f, setting().overlayColor04 + 0.3f);
+	ImGui::PushStyleColor(ImGuiCol_Text, *v ? activatedColor : ImVec4(1.f, 1.f, 1.f, 1.f));
 	auto checkbox = ImGui::Checkbox(label, v);
+	ImGui::PopStyleColor();
+
 	ImGui::EndDisabled();
 
 	return checkbox;

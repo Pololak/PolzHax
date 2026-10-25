@@ -13,6 +13,7 @@
 #include "PolzBot.hpp"
 #include "DiscordManager.hpp"
 #include "Recorder.hpp"
+#include "ShowTrajectory.hpp"
 
 std::vector<gd::GameObject*> m_coinsToPickup;
 
@@ -102,6 +103,12 @@ bool PlayLayer::getCheatingBeforeRestart() {
 	return m_cheatingBeforeRestart;
 }
 
+bool m_wasPhysicsChangesEnabled;
+
+bool PlayLayer::getWasPhysicsChangesEnabled() {
+	return m_wasPhysicsChangesEnabled;
+}
+
 bool PlayLayer::isCheating() {
 	return
 		setting().onInstantMirror ||
@@ -126,6 +133,10 @@ bool PlayLayer::isCheating() {
 		setting().onForceBlockType ||
 		setting().onNoHitbox ||
 		setting().m_smallSawHitbox;
+}
+
+bool PlayLayer::physicsChangesEnabled() {
+	return setting().onTwoPlayerGravityBugFix;
 }
 
 void pickStartPos(gd::PlayLayer* playLayer, int32_t index) { // Eclipse menu
@@ -865,19 +876,25 @@ void PlayLayer::updateDiscordPresence() {
 }
 
 void PlayLayer::extrapolatePlayer(gd::PlayerObject* player, float t) {
-	if (!player) return;
+	//if (!player) return;
 
-	float deltaX = player->m_realPlayerPos.x - player->m_lastPos.x;
-	float deltaY = player->m_realPlayerPos.y - player->m_lastPos.y;
+	//float deltaX = player->m_realPlayerPos.x - player->m_lastPos.x;
+	//float deltaY = player->m_realPlayerPos.y - player->m_lastPos.y;
 
-	player->setPosition({ player->m_realPlayerPos.x + (deltaX * t), player->m_realPlayerPos.y + (deltaY * t) });
+	//player->setPosition({
+	//	player->m_realPlayerPos.x + (deltaX * t),
+	//	player->m_realPlayerPos.y + (deltaY * t)
+	//	});
 
-	//float rotateSpeed = (player->m_rollMode && player->m_isRotating) ? 1.0f : player->m_speed;
-	//float endRot = (player->m_rotationSpeed * rotateSpeed) / 60.f;
-	//float baseRot = player->m_isSideways ? -90.f : 0.f;
+	//float rotateSpeed = (player->m_rollMode && player->m_isRotating) ? 1.f : player->m_speed;
+	//float endRot = (player->m_accelerationOrSpeed * rotateSpeed) / 240.f;
+
+	//player->m_playerFrame->setRotation(endRot * t);
 }
 
 bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* level) {
+	m_updating = false;
+
 	m_coinsToPickup.clear();
 	m_checkpointStorage.clear();
 	//m_activatedObjects.clear();
@@ -897,6 +914,7 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_dualPortalRef = nullptr;
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
+	m_wasPhysicsChangesEnabled = PlayLayer::physicsChangesEnabled();
 
 	m_deathObject = nullptr;
 
@@ -936,6 +954,10 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 	m_savedCameraPos = CCPointZero;
 
 	Hitboxes::clearHitboxTrail();
+
+	auto& trajectory = ShowTrajectory::get();
+	trajectory.m_player = nullptr;
+	trajectory.m_player2 = nullptr;
 
 	if (!PlayLayer::init(self, level)) return false;
 
@@ -1076,11 +1098,13 @@ bool __fastcall PlayLayer::initH(gd::PlayLayer* self, void*, gd::GJGameLevel* le
 
 	Recorder::get().update_song_offset(self);
 
+	//trajectory.createPlayers();
+
 	return true;
 }
 
 void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
-	if (setting().onFrameStepper && setting().frameStepperToggle) return;
+	m_updating = true;
 
 	if (self->m_practiceMode || self->m_testMode) {
 		if (m_smoothFrames > 0) {
@@ -1110,35 +1134,33 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 		auto& events = PolzBot::m_replayEventsVec;
 		if (events.size()) {
 			PolzBot::Event event;
-			if (setting().m_macroMode == 0) {
-				while (PolzBot::m_eventIndex < events.size() && PlayLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame) {
-					if (event.down) {
-						m_botPush = true;
-						m_botRelease = false;
+			while (PolzBot::m_eventIndex < events.size() && (setting().m_macroMode == 0) ? PlayLayer::getCurrentFrame() >= (event = events[PolzBot::m_eventIndex]).frame : self->m_player->m_realPlayerPos.x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
+				if (event.down) {
+					m_botPush = true;
+					m_botRelease = false;
+					if (!setting().onClickFixes) {
 						self->pushButton(0, !event.p2);
 					}
 					else {
-						m_botPush = false;
-						m_botRelease = true;
-						self->releaseButton(0, !event.p2);
+						std::cout << "au" << std::endl;
+						(!event.p2 ? self->m_player : self->m_player2)->setRotation(event.rotation);
+						(!event.p2 ? self->m_player : self->m_player2)->setPosition({ event.xPosition, event.yPosition });
+						(!event.p2 ? self->m_player : self->m_player2)->m_yVelocity = event.yVelocity;
 					}
-					++PolzBot::m_eventIndex;
 				}
-			}
-			else {
-				while (PolzBot::m_eventIndex < events.size() && self->m_player->m_realPlayerPos.x >= (event = events[PolzBot::m_eventIndex]).xPosition) {
-					if (event.down) {
-						m_botPush = true;
-						m_botRelease = false;
-						self->pushButton(0, !event.p2);
+				else {
+					m_botPush = false;
+					m_botRelease = true;
+					if (!setting().onClickFixes) {
+						self->releaseButton(0, !event.p2);
 					}
 					else {
-						m_botPush = false;
-						m_botRelease = true;
-						self->releaseButton(0, !event.p2);
+						(!event.p2 ? self->m_player : self->m_player2)->setRotation(event.rotation);
+						(!event.p2 ? self->m_player : self->m_player2)->setPosition({ event.xPosition, event.yPosition });
+						(!event.p2 ? self->m_player : self->m_player2)->m_yVelocity = event.yVelocity;
 					}
-					++PolzBot::m_eventIndex;
 				}
+				++PolzBot::m_eventIndex;
 			}
 		}
 	}
@@ -1149,12 +1171,6 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 	}
 
 	PlayLayer::update(self, dt);
-
-	//m_savedCameraPos = self->m_cameraPos;
-
-	//m_isExtrapolatingCamera = true;
-	//self->updateCamera(FLT_MIN);
-	//m_isExtrapolatingCamera = false;
 
 	float playerPercentPos = self->m_player->getPositionX() / self->m_levelLength * 100.f;
 	std::string percentageString = "%." + std::to_string((setting().onAccuratePercentage ? setting().decimalPlaces : 0)) + "f%%";
@@ -1171,6 +1187,10 @@ void __fastcall PlayLayer::updateH(gd::PlayLayer* self, void*, float dt) {
 
 	if (PlayLayer::isCheating()) {
 		m_cheatingBeforeRestart = PlayLayer::isCheating();
+	}
+
+	if (PlayLayer::physicsChangesEnabled()) {
+		m_wasPhysicsChangesEnabled = PlayLayer::physicsChangesEnabled();
 	}
 
 	if ((setting().onAutoSafeMode && (PlayLayer::isCheating() || m_cheatingBeforeRestart)) || setting().onSafeMode) {
@@ -1314,6 +1334,7 @@ void __fastcall PlayLayer::resetLevelH(gd::PlayLayer* self) {
 	Hitboxes::clearHitboxTrail();
 
 	m_cheatingBeforeRestart = PlayLayer::isCheating();
+	m_wasPhysicsChangesEnabled = PlayLayer::physicsChangesEnabled();
 
 	//if (setting().onSmartStartPos) {
 	//	for (gd::StartPosObject* obj : m_startPositions) {
@@ -1578,16 +1599,6 @@ void __fastcall PlayLayer::processItemsH(gd::PlayLayer* self) {
 }
 
 void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
-	PlayLayer::destroyPlayer(self, player);
-	m_wouldDie = true;
-
-	if (setting().onNoclipTint && setting().onNoclip) {
-		auto noclipTint = static_cast<CCLayerColor*>(self->getChildByTag(875));
-		if (noclipTint) {
-			noclipTint->runAction(CCSequence::create(CCFadeTo::create(0.f, 65), CCFadeTo::create(.1f, 0), nullptr));
-		}
-	}
-
 	if (m_deafenPressed) {
 		m_deafenPressed = false;
 		keybd_event(VK_MENU, 0x38, 0, 0);
@@ -1632,6 +1643,30 @@ void __fastcall PlayLayer::destroyPlayerH(gd::PlayLayer* self, void*, gd::Player
 	}
 
 	updateBestRunLabel();
+
+	if (setting().onNoclip && setting().onNoclipLimits) {
+		if ((setting().onNoclipAccuracyLimit && m_noclipAccuracy <= setting().noclipAccuracyLimit) || (setting().onNoclipDeathsLimit && m_deathsFull >= setting().noclipDeathsLimit)) {
+			return PlayLayer::destroyPlayer(self, player);
+		}
+	}
+
+	if (!setting().onNoclip) return PlayLayer::destroyPlayer(self, player);
+
+	bool player1 = setting().onNoclipP1 && player == self->m_player;
+	bool player2 = setting().onNoclipP2 && player == self->m_player2;
+	if (player1 || player2) {
+		m_wouldDie = true;
+	}
+	else {
+		PlayLayer::destroyPlayer(self, player);
+	}
+
+	if (setting().onNoclipTint) {
+		auto noclipTint = static_cast<CCLayerColor*>(self->getChildByTag(875));
+		if (noclipTint) {
+			noclipTint->runAction(CCSequence::create(CCFadeTo::create(0.f, 65), CCFadeTo::create(.1f, 0), nullptr));
+		}
+	}
 }
 
 void __fastcall PlayLayer::levelCompleteH(gd::PlayLayer* self) {
@@ -1801,14 +1836,25 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 		m_hasClicked = true;
 	}
 
+	bool isTwoPlayer = self->m_levelSettings->m_twoPlayerMode && !p1;
+	PolzBot::Event event;
+
 	if (setting().onRecordMacro) {
-		bool isTwoPlayer = self->m_levelSettings->m_twoPlayerMode && !p1;
-
-		PolzBot::Event event;
-
 		event.down = true;
 		event.p2 = isTwoPlayer;
 		event.frame = PlayLayer::getCurrentFrame();
+	}
+
+	//auto& trajectory = ShowTrajectory::get();
+	//if (p0 == 1) {
+	//	trajectory.m_p1Down = p1;
+	//	trajectory.m_p2Down = p1;
+	//}
+	
+	if (setting().onPlayMacro && !m_botPush) return;
+	PlayLayer::pushButton(self, p0, p1);
+
+	if (setting().onRecordMacro) {
 		event.rotation = !isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
 		event.xPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
 		event.yPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
@@ -1816,22 +1862,30 @@ void __fastcall PlayLayer::pushButtonH(gd::PlayLayer* self, void*, int p0, bool 
 
 		PolzBot::m_replayEventsVec.push_back(event);
 	}
-	
-	if (setting().onPlayMacro && !m_botPush) return;
-	PlayLayer::pushButton(self, p0, p1);
 }
 
 void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bool p1) {
 	m_isHolding = false;
 
+	bool isTwoPlayer = self->m_levelSettings->m_twoPlayerMode && !p1;
+	PolzBot::Event event;
+
 	if (setting().onRecordMacro) {
-		bool isTwoPlayer = self->m_levelSettings->m_twoPlayerMode && !p1;
-
-		PolzBot::Event event;
-
 		event.down = false;
 		event.p2 = isTwoPlayer;
 		event.frame = PlayLayer::getCurrentFrame();
+	}
+
+	auto& trajectory = ShowTrajectory::get();
+	if (p0 == 1) {
+		trajectory.m_p1Down = p1;
+		trajectory.m_p2Down = p1;
+	}
+
+	if (setting().onPlayMacro && !m_botRelease) return;
+	PlayLayer::releaseButton(self, p0, p1);
+
+	if (setting().onRecordMacro) {
 		event.rotation = !isTwoPlayer ? self->m_player->getRotation() : self->m_player2->getRotation();
 		event.xPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.x : self->m_player2->m_realPlayerPos.x;
 		event.yPosition = !isTwoPlayer ? self->m_player->m_realPlayerPos.y : self->m_player2->m_realPlayerPos.y;
@@ -1839,26 +1893,26 @@ void __fastcall PlayLayer::releaseButtonH(gd::PlayLayer* self, void*, int p0, bo
 
 		PolzBot::m_replayEventsVec.push_back(event);
 	}
-
-	if (setting().onPlayMacro && !m_botRelease) return;
-	PlayLayer::releaseButton(self, p0, p1);
 }
 
 void __fastcall PlayLayer::updateCameraH(gd::PlayLayer* self) {
-	float dt = 0.f;
-	__asm movss dt, xmm1;
-
-	if (!m_isExtrapolatingCamera) {
+	if (!setting().onShowTrajectory) {
 		return PlayLayer::updateCamera(self);
 	}
 
+	auto& trajectory = ShowTrajectory::get();
+	
+	trajectory.m_isSimulation = true;
+
+	trajectory.simulationForPlayer(trajectory.m_player, trajectory.m_player2, self->m_player);
+
+	if (self->m_dualMode) {
+		trajectory.simulationForPlayer(trajectory.m_player, trajectory.m_player2, self->m_player2);
+	}
+
+	trajectory.m_isSimulation = false;
+
 	PlayLayer::updateCamera(self);
-
-	auto newCameraX = m_savedCameraPos.x - self->m_cameraPos.x;
-	auto newCameraY = m_savedCameraPos.y - self->m_cameraPos.y;
-
-	self->m_cameraPos.x = self->m_cameraPos.x + newCameraX / 240.f;
-	self->m_cameraPos.y = self->m_cameraPos.y + newCameraY / 240.f;
 }
 
 //void __fastcall PlayLayer::checkCollisionsH(gd::PlayLayer* self, void*, gd::PlayerObject* player) {
@@ -1882,6 +1936,7 @@ void __fastcall PlayLayer::updateColorH(gd::PlayLayer* self, void*, cocos2d::ccC
 
 void __fastcall PlayLayer::destructorH(gd::PlayLayer* self) {
 	PlayLayer::destructor(self);
+	m_updating = false;
 	m_coinsToPickup.clear();
 	m_deathObject = nullptr;
 	m_startPositions.clear();

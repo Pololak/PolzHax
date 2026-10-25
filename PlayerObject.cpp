@@ -3,6 +3,7 @@
 #include "Setting.hpp"
 #include "Icons.hpp"
 #include "LevelEditorLayer.hpp"
+#include "ShowTrajectory.hpp"
 
 void PlayerObject::updateSwing(gd::PlayerObject* self, const float delta) { // https://github.com/adafcaefc/SwingCopter/blob/master/SwingCopter/main.cpp
 	const auto direction = self->m_gravityFlipped ? -1.f : 1.f;
@@ -269,6 +270,20 @@ void __fastcall PlayerObject::resetObjectH(gd::PlayerObject* self) {
 	}
 }
 
+void __fastcall PlayerObject::ringJumpH(gd::PlayerObject* self) {
+	if (ShowTrajectory::get().m_isSimulation) return;
+
+	PlayerObject::ringJump(self);
+}
+
+void __fastcall PlayerObject::updateH(gd::PlayerObject* self, void*, float dt) {
+	PlayerObject::update(self, dt);
+	auto& trajectory = ShowTrajectory().get();
+	if (!trajectory.m_isSimulation) {
+		trajectory.m_frameDt = dt;
+	}
+}
+
 void __fastcall PlayerObject::destructorH(gd::PlayerObject* self) {
 	PlayerObject::destructor(self);
 }
@@ -293,7 +308,7 @@ void PlayerObject::mem_init() {
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe19c0), PlayerObject::loadFromCheckpointH, reinterpret_cast<void**>(&PlayerObject::loadFromCheckpoint));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xda1a0), PlayerObject::updateJumpH, reinterpret_cast<void**>(&PlayerObject::updateJump));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xe0d10), PlayerObject::activateStreakH, reinterpret_cast<void**>(&PlayerObject::activateStreak));
-	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xde1c0), PlayerObject::ringJumpH, reinterpret_cast<void**>(&PlayerObject::ringJump));
+	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xde1c0), PlayerObject::ringJumpH, reinterpret_cast<void**>(&PlayerObject::ringJump));
 	//MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xdc510), PlayerObject::collidedWithObjectH, reinterpret_cast<void**>(&PlayerObject::collidedWithObject));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xddda0), PlayerObject::playerDestroyedH, reinterpret_cast<void**>(&PlayerObject::playerDestroyed));
 	MH_CreateHook(reinterpret_cast<void*>(gd::base + 0xd9f80), PlayerObject::resetObjectH, reinterpret_cast<void**>(&PlayerObject::resetObject));

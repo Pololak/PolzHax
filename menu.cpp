@@ -154,7 +154,7 @@ void PolzHax::updateFPSBypass() {
 }
 
 void updateSpeedhack() {
-	if (setting().speedhackValue == 0.f) return;
+	if (setting().speedhackValue <= 0.f) return;
 
 	const auto value = setting().onSpeedhack ? setting().speedhackValue : 1.f;
 
@@ -209,9 +209,9 @@ void colorSet() {
 	colors[ImGuiCol_Button] = color3;
 	colors[ImGuiCol_ButtonHovered] = color1;
 	colors[ImGuiCol_ButtonActive] = color1;
-	colors[ImGuiCol_CheckMark] = ImVec4(1, 1, 1, 1);
+	colors[ImGuiCol_CheckMark] = ImVec4(1.f, 1.f, 1.f, 1.f);
 	colors[ImGuiCol_FrameBg] = color1;
-	colors[ImGuiCol_FrameBgHovered] = color3;
+	colors[ImGuiCol_FrameBgHovered] = color5;
 	colors[ImGuiCol_FrameBgActive] = color3;
 	colors[ImGuiCol_Tab] = ImVec4(color5.x, color5.y, color5.z, color5.w - 0.2f);
 	colors[ImGuiCol_TabHovered] = color3;
@@ -865,6 +865,13 @@ void imgui_render() {
 
 		// Level
 
+		if (setting().onTwoPlayerGravityBugFix) {
+			sequence_patch(gd::base + 0xef9eb, { 0xe9, 0xb4, 0x00, 0x00, 0x00, 0x90 });
+		}
+		else {
+			sequence_patch(gd::base + 0xef9eb, { 0x0f, 0x84, 0xb3, 0x00, 0x00, 0x00 });
+		}
+
 		if (setting().onConfirmExit) {
 			sequence_patch(gd::base + 0xd7f80, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 			sequence_patch(gd::base + 0xd7f8d, { 0x90, 0x90 });
@@ -942,12 +949,12 @@ void imgui_render() {
 			sequence_patch(gd::base + 0x72a8e, { 0x0f, 0x45, 0xd8 });
 		}
 
-		if (setting().onNoclip) {
-			sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
-		}
-		else {
-			sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
-		}
+		//if (setting().onNoclip) {
+		//	sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
+		//}
+		//else {
+		//	sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
+		//}
 
 		if (setting().onNoclipUnstuck) {
 			sequence_patch(gd::base + 0xdae16, { 0xe9, 0x00, 0x02, 0x00, 0x00, 0x90 });
@@ -1176,7 +1183,7 @@ void imgui_render() {
 	if (setting().show) {
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("PolzHax", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			ImGui::Text("1.920 - v1.3.3 (V) 030926");
+			ImGui::Text("1.920 - v1.3.3 (Vanilla)");
 
 			ImGui::CheckboxF("Auto Save", &setting().onAutoSave);
 			ImGui::SameLine(0.f, 0.f);
@@ -1357,32 +1364,28 @@ void imgui_render() {
 				ShellExecute(0, NULL, std::string(CCFileUtils::sharedFileUtils()->getWritablePath2() + "/PolzHax/replays").c_str(), NULL, NULL, SW_SHOW);
 			}
 
-			ImGui::BeginDisabled();
-			ImGui::Checkbox("Click Fixes", &setting().onClickFixes);
+			ImGui::BeginDisabled(!setting().onDeveloperMode);
+			ImGui::CheckboxF("Click Fix", &setting().onClickFixes);
 			ImGui::Tooltip("Experimental. Applies recorded position, rotation and velocity to player (More accuracy).");
 			ImGui::EndDisabled();
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			ImGui::Checkbox("Real Time", &setting().onRealTime);
+			ImGui::CheckboxF("Real Time", &setting().onRealTime);
 
-			if (setting().onRecordMacro || setting().onPlayMacro) {
-				ImGui::BeginDisabled();
-			}
+			ImGui::BeginDisabled(setting().onRecordMacro || setting().onPlayMacro);
 			bool frame = setting().m_macroMode == 0;
 			bool xPos = setting().m_macroMode == 1;
-			if (ImGui::Checkbox("Frame", &frame)) {
+			if (ImGui::CheckboxF("Frame", &frame)) {
 				xPos = false;
 				setting().m_macroMode = 0;
 			}
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f + (ImGui::GetStyle().WindowPadding.x / 4.f));
-			if (ImGui::Checkbox("X Pos", &xPos)) {
+			if (ImGui::CheckboxF("X Pos", &xPos)) {
 				frame = false;
 				setting().m_macroMode = 1;
 			}
-			if (setting().onRecordMacro || setting().onPlayMacro) {
-				ImGui::EndDisabled();
-			}
+			ImGui::EndDisabled();
 
 			ImGui::Text("Events size: %i", PolzBot::m_replayEventsVec.size());
 		}
@@ -2477,9 +2480,7 @@ void imgui_render() {
 					}
 				}
 
-				if ((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1)) {
-					ImGui::BeginDisabled();
-				}
+				ImGui::BeginDisabled((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1));
 				ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
 				ImGui::InputFloat("##variableValue", &variableValue);
 				ImGui::SameLine(0.f, 0.f);
@@ -2496,9 +2497,7 @@ void imgui_render() {
 				if (ImGui::Button("Save", ImVec2(SHORT_ITEM_WIDTH(), 0.f))) {
 
 				}
-				if ((selectedCategory == 0 && selectedPlayerVariable == -1) || (selectedCategory == 1 && selectedCreatorVariable == -1)) {
-					ImGui::EndDisabled();
-				}
+				ImGui::EndDisabled();
 
 				ImGui::SetCursorPosX(LONG_CENTER_X());
 				if (ImGui::Button("Reset All", ImVec2(LONG_ITEM_WIDTH(), 0.f))) {
@@ -2511,6 +2510,16 @@ void imgui_render() {
 		if (ImGui::Begin("Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			//ImGui::CheckboxF("0% Practice Complete", &setting().onZeroPracticeComplete);
 			//ImGui::Tooltip("Completes a level if you beat it in 1 practice attempt.");
+
+			if (ImGui::CheckboxF("2P Gravity Bug Fix", &setting().onTwoPlayerGravityBugFix)) {
+				if (setting().onTwoPlayerGravityBugFix) {
+					sequence_patch(gd::base + 0xef9eb, { 0xe9, 0xb4, 0x00, 0x00, 0x00, 0x90 });
+				}
+				else {
+					sequence_patch(gd::base + 0xef9eb, { 0x0f, 0x84, 0xb3, 0x00, 0x00, 0x00 });
+				}
+			}
+			ImGui::Tooltip("Fixes very awful bug when solo player randomly flips gravity if 2-Player Mode is enabled.");
 
 			ImGui::CheckboxF("Auto Deafen", &setting().onAutoDeafen);
 			ImGui::Tooltip("Deafens user in Discord after a certain %%.");
@@ -2957,13 +2966,6 @@ void imgui_render() {
 			ImGui::Tooltip("Well... It makes level invisible.");
 
 			if (ImGui::CheckboxF("Noclip", &setting().onNoclip)) {
-				if (setting().onNoclip) {
-					sequence_patch(gd::base + 0xf04e9, { 0xe9, 0xf0, 0x02, 0x00, 0x00, 0x90 });
-				}
-				else {
-					sequence_patch(gd::base + 0xf04e9, { 0x0f, 0x85, 0xef, 0x02, 0x00, 0x00 });
-				}
-
 				if (playLayer) {
 					PlayLayer::updateStatusLabels();
 				}
@@ -2971,19 +2973,6 @@ void imgui_render() {
 			ImGui::Tooltip("Makes the player invincible.");
 			ImGui::SameLine(170.f * setting().UISize);
 			if (ImGui::TreeNodeEx("##noclipSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
-				//ImGui::CheckboxF("Death Limit", &setting().onNoclipDeathsLimit);
-				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
-				//if (ImGui::DragInt("Limit##deathLimit", &setting().noclipDeathsLimit)) {
-				//	if (setting().noclipDeathsLimit < 0) setting().noclipDeathsLimit = 0;
-				//}
-				//
-				//ImGui::CheckboxF("Accuracy Limit", &setting().onNoclipAccuracyLimit);
-				//ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
-				//if (ImGui::DragFloat("Limit##accuracyLimit", &setting().noclipAccuracyLimit, 1.f, 0.f, 100.f, "%.0f")) {
-				//	if (setting().noclipAccuracyLimit < 0.f) setting().noclipAccuracyLimit = 0.f;
-				//	if (setting().noclipAccuracyLimit > 100.f) setting().noclipAccuracyLimit = 100.f;
-				//}
-
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				ImGui::CheckboxF("Noclip Tint", &setting().onNoclipTint);
 
@@ -3009,6 +2998,12 @@ void imgui_render() {
 				}
 
 				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::CheckboxF("Player 1", &setting().onNoclipP1);
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::CheckboxF("Player 2", &setting().onNoclipP2);
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
 				if (ImGui::CheckboxF("Experimental (buggy)", &setting().onNoclipUnstuck)) {
 					if (setting().onNoclipUnstuck) {
 						sequence_patch(gd::base + 0xdae16, { 0xe9, 0x00, 0x02, 0x00, 0x00, 0x90 });
@@ -3020,6 +3015,30 @@ void imgui_render() {
 					}
 				}
 				ImGui::Tooltip("Prevents player from getting stuck.");
+
+				ImGui::TreePop();
+			}
+
+			ImGui::CheckboxF("Noclip Limits", &setting().onNoclipLimits);
+			ImGui::Tooltip("Kills the player after certain accuracy thresholds, requires Noclip.");
+			ImGui::SameLine(170.f * setting().UISize);
+			if (ImGui::TreeNodeEx("##noclipLimitsSettings", ImGuiTreeNodeFlags_SpanAvailWidth)) {
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+				if (ImGui::DragFloat("##accuracyLimit", &setting().noclipAccuracyLimit, 1.f, 0.f, 100.f, "%.0f%%")) {
+					if (setting().noclipAccuracyLimit < 0.f) setting().noclipAccuracyLimit = 0.f;
+					if (setting().noclipAccuracyLimit > 100.f) setting().noclipAccuracyLimit = 100.f;
+				}
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::CheckboxF("Accuracy Limit", &setting().onNoclipAccuracyLimit);
+
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::SetNextItemWidth(SHORT_ITEM_WIDTH());
+				if (ImGui::DragInt("##deathLimit", &setting().noclipDeathsLimit, 1.f, 0, 0, "%d Deaths")) {
+					if (setting().noclipDeathsLimit < 0) setting().noclipDeathsLimit = 0;
+				}
+				ImGui::SetCursorPosX(IN_TREENODE_OFFSET_X());
+				ImGui::CheckboxF("Death Limit", &setting().onNoclipDeathsLimit);
 
 				ImGui::TreePop();
 			}
@@ -3046,9 +3065,7 @@ void imgui_render() {
 			}
 			ImGui::Tooltip("Lets you pause during the level complete animation.");
 
-			if (setting().onPlayMacro || setting().onRecordMacro) {
-				ImGui::BeginDisabled();
-			}
+			ImGui::BeginDisabled(setting().onPlayMacro || setting().onRecordMacro);
 			ImGui::CheckboxF("Practice Bug Fix", &setting().onPracticeFix);
 			ImGui::Tooltip("Saves & restores player velocity and object blending in practice mode.");
 			ImGui::SameLine(170.f * setting().UISize);
@@ -3058,9 +3075,7 @@ void imgui_render() {
 
 				ImGui::TreePop();
 			}
-			if (setting().onPlayMacro || setting().onRecordMacro) {
-				ImGui::EndDisabled();
-			}
+			ImGui::EndDisabled();
 
 			if (ImGui::CheckboxF("Practice Music", &setting().onPracticeMusic)) {
 				if (setting().onPracticeMusic) {
@@ -3137,6 +3152,9 @@ void imgui_render() {
 				ImGui::TreePop();
 			}
 
+			ImGui::CheckboxF("Show Trajectory", &setting().onShowTrajectory);
+			ImGui::Tooltip(".");
+
 			ImGui::CheckboxF("Smart StartPos", &setting().onSmartStartPos);
 			ImGui::Tooltip("Automatically sets gamemode, speed, size & border for a startpos.");
 
@@ -3171,9 +3189,7 @@ void imgui_render() {
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
 		if (ImGui::Begin("Universal", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
-			if (setting().onPlayMacro || setting().onRecordMacro) {
-				ImGui::BeginDisabled();
-			}
+			ImGui::BeginDisabled(setting().onPlayMacro || setting().onRecordMacro);
 			ImGui::SetNextItemWidth(SHORT_INPUT_WIDTH());
 			if (ImGui::DragFloat("##fpsBypass", &setting().fpsValue, 1.f, 1.f, 360.f, "%.0f FPS")) {
 				if (setting().fpsValue < 1.f) setting().fpsValue = 1.f;
@@ -3193,9 +3209,7 @@ void imgui_render() {
 			}
 			ImGui::SameLine();
 			ImGui::CheckboxF("Unlock TPS", &setting().onTPSBypass);
-			if (setting().onPlayMacro || setting().onRecordMacro) {
-				ImGui::EndDisabled();
-			}
+			ImGui::EndDisabled();
 
 			if (ImGui::CheckboxF("Allow Low Volume", &setting().onAllowLowVolume)) {
 				if (setting().onAllowLowVolume) {
@@ -3499,15 +3513,11 @@ void imgui_render() {
 				updateSpeedhack();
 			}
 
-			if (setting().onRecordMacro || setting().onPlayMacro)
-				ImGui::BeginDisabled();
-
+			ImGui::BeginDisabled(setting().onPlayMacro || setting().onRecordMacro);
 			if (ImGui::CheckboxF("Classic Mode", &setting().onClassicMode)) {
 				updateSpeedhack();
 			}
-
-			if (setting().onRecordMacro || setting().onPlayMacro)
-				ImGui::EndDisabled();
+			ImGui::EndDisabled();
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(200.f * setting().UISize, 0.f));
@@ -3998,9 +4008,7 @@ void imgui_render() {
 		if (ImGui::Begin("Capture", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar)) {
 			auto& recorder = Recorder::get();
 
-			if (playLayer == nullptr) {
-				ImGui::BeginDisabled();
-			}
+			ImGui::BeginDisabled(playLayer == nullptr);
 			if (ImGui::CheckboxF("Record", &setting().onCaptureRender)) {
 				recorder.m_until_end = setting().onCaptureRenderUntilEnd;
 				recorder.m_after_end_duration = setting().m_afterEndDur;
@@ -4134,7 +4142,7 @@ void imgui_init() {
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	io.Fonts->Clear();
-	auto font = io.Fonts->AddFontFromFileTTF("Muli-SemiBold.ttf", 16.f);
+	auto font = io.Fonts->AddFontFromFileTTF("Inter-SemiBold.otf", 16.f);
 	io.Fonts->Build();
 	ImGui_ImplOpenGL3_CreateFontsTexture();
 	io.FontDefault = font;
